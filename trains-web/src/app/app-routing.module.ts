@@ -19,6 +19,11 @@ const ROUTES: Routes = [
     runGuardsAndResolvers: 'always'
   },
   {
+    path: 'home',
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
+    runGuardsAndResolvers: 'always'
+  },
+  {
     path: 'places',
     loadChildren: () => import('./features/places/places.module').then(m => m.PlacesModule),
     canActivate: [AdminAuthGuard],

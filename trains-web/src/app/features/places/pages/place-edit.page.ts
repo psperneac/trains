@@ -7,11 +7,12 @@ import { filter, take } from 'rxjs/operators';
 import { AppState } from '../../../store';
 import { cloneDeep, isNil } from 'lodash';
 import { PlaceFormComponent } from '../components/place-form.component';
-import { PLACE_MAP_DEFAULT_ZOOM } from '../../../utils/constants';
+import {PLACE_MAP_DEFAULT_ZOOM, PLACES_LIST} from '../../../utils/constants';
 import { Subject } from 'rxjs';
 import { UiService } from '../../../services/ui.service';
 import { PlaceActions } from '../store';
 import { PlaceDto } from "../../../models/place.model";
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'trains-place-edit-page',
@@ -37,7 +38,8 @@ export class PlaceEditPage implements OnInit, OnDestroy {
   form: PlaceFormComponent;
 
   constructor(
-    private store: Store<AppState>,
+    private readonly store: Store<AppState>,
+    private readonly router: Router,
     private readonly uiService: UiService
   ) {
   }
@@ -62,14 +64,12 @@ export class PlaceEditPage implements OnInit, OnDestroy {
   private moveMarker(place: PlaceDto) {
     const currentPosition = marker([place.lat, place.long], { draggable: true });
     const self = this;
-    currentPosition.on('dragend', function(e) {
-      console.log(currentPosition.getLatLng());
+    currentPosition.on('dragend', function(_e) {
       self.place.lat = currentPosition.getLatLng().lat;
       self.place.long = currentPosition.getLatLng().lng;
       if (self.form) {
         self.form.externalPlaceUpdate(self.place);
       }
-      console.log(self.map.getZoom());
     });
     this.markers = [currentPosition];
     this.map.setView(latLng(place.lat, place.long), this.map.getZoom());
@@ -77,7 +77,6 @@ export class PlaceEditPage implements OnInit, OnDestroy {
 
   onMap(map: L.Map) {
     this.map = map;
-    console.log('Map ready: %O', this.map);
   }
 
   placeChanged($event: PlaceDto) {
@@ -90,7 +89,7 @@ export class PlaceEditPage implements OnInit, OnDestroy {
   }
 
   onCancel() {
-
+    this.router.navigateByUrl(PLACES_LIST);
   }
 
   onSave() {

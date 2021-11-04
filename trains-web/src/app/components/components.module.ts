@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { AlertComponent } from './alert/alert.component';
 import { ComponentsRoutingModule } from './components-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HomePageComponent } from './home-page/home-page.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { CustomMapComponent } from './custom-map/custom-map.component';
 import { NgxLoadingControlModule } from '@runette/ngx-leaflet-loading';
@@ -22,8 +21,7 @@ import { NgxLeafletFullscreenModule } from '@runette/ngx-leaflet-fullscreen';
   ],
   declarations: [
     AlertComponent,
-    CustomMapComponent,
-    HomePageComponent
+    CustomMapComponent
   ],
   exports: [
     CustomMapComponent,

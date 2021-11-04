@@ -24,6 +24,7 @@ export class PlaceService {
   }
 
   create(place: PlaceDto): Observable<PlaceDto> {
+    console.log('service.create: %O', place);
     return this.httpClient.post<PlaceDto>(urljoin(environment.api, 'api/places'), place);
   }
 

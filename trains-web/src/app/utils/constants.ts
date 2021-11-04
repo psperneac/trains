@@ -7,3 +7,6 @@ export const DEFAULT_TIMEOUT = 30;
 export const DEFAULT_KEEPALIVE = 30;
 
 export const PAGE_SIZE = 10;
+
+export const PLACES_LIST = '/places';
+export const PLACES_CREATE = '/places/create';

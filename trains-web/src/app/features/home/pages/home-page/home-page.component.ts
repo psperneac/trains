@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { latLng, tileLayer } from 'leaflet';
-import { UiService } from '../../services/ui.service';
+import {latLng, Layer, tileLayer} from 'leaflet';
+import {UiService} from '../../../../services/ui.service';
 
 @Component({
   selector: 'trains-home-page',
@@ -15,6 +15,8 @@ export class HomePageComponent implements OnInit {
     zoom: 5,
     center: latLng(46.879966, -121.726909)
   };
+
+  markers: Layer[] = [];
 
   constructor(private readonly uiService: UiService) { }
 

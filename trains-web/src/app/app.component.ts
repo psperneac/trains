@@ -91,10 +91,10 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
   menuClicked(tag: string) {
     switch(tag) {
       case 'home':
-        this.router.navigate(['/pages/home']);
+        this.router.navigate(['/home']);
         break;
       case 'places':
-        this.router.navigate(['/places/home']);
+        this.router.navigate(['/places']);
         break;
     }
   }

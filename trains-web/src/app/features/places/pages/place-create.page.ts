@@ -1,16 +1,14 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {PlaceDto} from '../../../models/place.model';
 import {latLng, Layer, marker, tileLayer} from 'leaflet';
-import {PLACE_MAP_DEFAULT_ZOOM} from '../../../utils/constants';
+import {PLACE_MAP_DEFAULT_ZOOM, PLACES_LIST} from '../../../utils/constants';
 import {Subject} from 'rxjs';
 import {PlaceActions} from '../store';
-import {select, Store} from '@ngrx/store';
-import {PlaceSelectors} from '../store/place.selectors';
-import {filter, take} from 'rxjs/operators';
-import {cloneDeep, isNil} from 'lodash';
+import {Store} from '@ngrx/store';
 import {AppState} from '../../../store';
 import {UiService} from '../../../services/ui.service';
 import {PlaceFormComponent} from '../components/place-form.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'trains-place-create-page',
@@ -38,39 +36,37 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<AppState>,
+    private readonly router: Router,
     private readonly uiService: UiService
   ) {
   }
 
   ngOnInit(): void {
     this.place = {
-      name: 'created',
-      description: 'created'
+      name: '',
+      description: '',
+      lat: 45.753567,
+      long: 21.225689
     } as PlaceDto;
 
-    this.uiService.setPageTitle('page.place.editTitle');
-    this.store.pipe(select(PlaceSelectors.Selected), filter(place => !isNil(place)), take(1)).subscribe(place => {
-      this.place = cloneDeep(place);
+    if (this.map) {
+      console.log('Has map');
+      console.dir(this.place);
+      this.moveMarker(this.place);
+    }
 
-      if (this.map) {
-        console.log('Has map');
-        console.dir(place);
-        this.moveMarker(place);
-      }
-    });
+    this.uiService.setPageTitle('page.place.createTitle');
   }
 
   private moveMarker(place: PlaceDto) {
     const currentPosition = marker([place.lat, place.long], { draggable: true });
     const self = this;
-    currentPosition.on('dragend', function(e) {
-      console.log(currentPosition.getLatLng());
+    currentPosition.on('dragend', function(_e) {
       self.place.lat = currentPosition.getLatLng().lat;
       self.place.long = currentPosition.getLatLng().lng;
       if (self.form) {
         self.form.externalPlaceUpdate(self.place);
       }
-      console.log(self.map.getZoom());
     });
     this.markers = [currentPosition];
     this.map.setView(latLng(place.lat, place.long), this.map.getZoom());
@@ -82,7 +78,7 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
 
   onMap(map: L.Map) {
     this.map = map;
-    console.log('Map ready: %O', this.map);
+    this.moveMarker(this.place);
   }
 
   placeChanged($event: PlaceDto) {
@@ -95,10 +91,11 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
   }
 
   onCancel() {
-
+    this.router.navigateByUrl(PLACES_LIST);
   }
 
   onSave() {
     this.store.dispatch(PlaceActions.create({payload: this.place}));
+    this.router.navigateByUrl(PLACES_LIST);
   }
 }

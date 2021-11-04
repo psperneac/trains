@@ -45,7 +45,7 @@ export class AuthEffects {
       map(([_action, loggedIn, _user, returnUrl]) => {
         if(loggedIn) {
           console.log('LoggedIn - Navigating to Home');
-          this.router.navigate([returnUrl || '/pages/home']);
+          this.router.navigate([returnUrl || '/home']);
         }
         return {type: 'NO-OP'};
       })
@@ -55,7 +55,7 @@ export class AuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(logout),
-      switchMap(action => {
+      switchMap(_action => {
         return this.service.logout().pipe(
           map(result => logoutSuccess({result})),
           catchError(err => of(logoutFailure({error: err})))

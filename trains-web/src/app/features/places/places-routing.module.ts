@@ -6,9 +6,9 @@ import { LoadOnePlaceGuard } from './load-one-place.guard';
 import {PlaceCreatePage} from './pages/place-create.page';
 
 const routes: Routes = [
-  { path: 'home', component: PlacesPage, canActivate: [], canDeactivate: []},
-  { path: 'home/create', component: PlaceCreatePage, canActivate: [], canDeactivate: []},
-  { path: 'home/:id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: []},
+  { path: '', component: PlacesPage, canActivate: [], canDeactivate: []},
+  { path: 'create', component: PlaceCreatePage, canActivate: [], canDeactivate: []},
+  { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: []},
 ];
 
 @NgModule({

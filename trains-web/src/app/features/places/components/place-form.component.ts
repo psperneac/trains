@@ -44,17 +44,23 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
   toForm(place: PlaceDto): FormGroup {
     return this.formBuilder.group({
       id: new FormControl({ value: place.id, disabled: true }),
-      name: new FormControl(place.name),
-      description: new FormControl(place.description),
-      type: new FormControl(place.type),
+      name: new FormControl(place.name, [Validators.required]),
+      description: new FormControl(place.description, [Validators.required]),
+      type: new FormControl(place.type, [Validators.required]),
       lat: new FormControl(place.lat, [
+        Validators.required,
         Validators.pattern('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$'),
         Validators.max(90),
         Validators.min(-90)]),
       long: new FormControl(place.long, [
+        Validators.required,
         Validators.pattern('^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'),
         Validators.max(180),
         Validators.min(-180)])
     });
+  }
+
+  public valid(): boolean {
+    return this.placeForm.valid;
   }
 }
