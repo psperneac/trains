@@ -1,0 +1,64 @@
+<div class="box">
+  <mat-toolbar class="row header">
+    <button [disabled]="!(loggedIn$ | async)" mat-icon-button class="example-icon" aria-label="Menu" [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <span>{{'application.title' | translate}} - {{currentTitle | translate}}</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button class="example-icon" aria-label="System Menu"  [matMenuTriggerFor]="systemMenu">
+      <mat-icon>face</mat-icon>
+    </button>
+  </mat-toolbar>
+  <div class="row content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item  (click)="menuClicked('home')">
+    <mat-icon>home</mat-icon>
+    <span>{{'menu.home' | translate}}</span>
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="adminMenu">
+    <mat-icon>settings_system_daydream</mat-icon>
+    <span>{{'menu.admin' | translate}}</span>
+  </button>
+</mat-menu>
+
+<mat-menu #adminMenu="matMenu">
+  <button mat-menu-item (click)="menuClicked('users')">
+    <mat-icon>supervisor_account</mat-icon>
+    <span>{{'menu.users' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="menuClicked('map')">
+    <mat-icon>map</mat-icon>
+    <span>{{'menu.map' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="menuClicked('places')">
+    <mat-icon>edit_location</mat-icon>
+    <span>{{'menu.places' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="menuClicked('routes')">
+    <mat-icon>edit_road</mat-icon>
+    <span>{{'menu.routes' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="menuClicked('vehicles')">
+    <mat-icon>directions_transit</mat-icon>
+    <span>{{'menu.vehicles' | translate}}</span>
+  </button>
+</mat-menu>
+
+<mat-menu #systemMenu="matMenu">
+  <button mat-menu-item (click)="menuClicked('info')">
+    <mat-icon>info</mat-icon>
+    <span>{{'menu.about' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="menuClicked('help')">
+    <mat-icon>help_outline</mat-icon>
+    <span>{{'menu.help' | translate}}</span>
+  </button>
+  <button mat-menu-item (click)="logout()" [disabled]="!(loggedIn$ | async)">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>{{'menu.logout' | translate}}</span>
+  </button>
+</mat-menu>

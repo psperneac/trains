@@ -1,0 +1,55 @@
+{
+  "application": {
+    "title": "Trains Web"
+  },
+  "button": {
+    "cancel": "Cancel",
+    "login": "Login",
+    "register": "Register",
+    "save": "Save"
+  },
+  "menu": {
+    "about": "About",
+    "admin": "Admin",
+    "help": "Help",
+    "home": "Home",
+    "login": "Login",
+    "logout": "Logout",
+    "map": "Map",
+    "places": "Places",
+    "register": "Register",
+    "routes": "Routes",
+    "users": "Users",
+    "vehicles": "Vehicles"
+  },
+  "page": {
+    "home": {
+      "title": "Home"
+    },
+    "login": {
+      "title": "Login",
+      "email.label": "Email",
+      "password.label": "Password",
+      "title": "Login"
+    },
+    "register": {
+      "title": "Register",
+      "email.label": "Email",
+      "password.label": "Password",
+      "passwordConfirm.label": "Password Confirmation",
+      "title": "Register",
+      "username.label": "Username"
+    },
+    "place": {
+      "listTitle": "Places",
+      "editTitle": "Edit Place",
+      "createTitle": "Create Place",
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
+    }
+  }
+}

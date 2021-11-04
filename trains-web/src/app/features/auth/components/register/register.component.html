@@ -1,0 +1,43 @@
+<div class="register-component center-screen">
+  <form [formGroup]="form" (submit)="onSubmit()">
+    <mat-card>
+      <mat-card-title>
+        {{'page.register.title' | translate}}
+      </mat-card-title>
+      <mat-card-content>
+        <p>
+          <mat-form-field  appearance="outline" style="width: 350px;">
+            <mat-label>{{'page.register.username.label' | translate}}</mat-label>
+            <input matInput type="text" id="username" formControlName="username" placeholder="pat_the_great"/>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field  appearance="outline" style="width: 350px;">
+            <mat-label>{{'page.register.email.label' | translate}}</mat-label>
+            <input matInput type="text" id="email" formControlName="email" placeholder="pat@lotsoftrains.com"/>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field appearance="outline" style="width: 350px;">
+            <mat-label>{{'page.register.password.label' | translate}}</mat-label>
+            <input matInput type="password" id="password" formControlName="password" class="form-control" />
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field appearance="outline" style="width: 350px;">
+            <mat-label>{{'page.register.passwordConfirm.label' | translate}}</mat-label>
+            <input matInput type="passwordConfirm" id="passwordConfirm" formControlName="passwordConfirm" class="form-control" />
+          </mat-form-field>
+        </p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button type="submit" class="btn btn-primary">
+          {{'button.register' | translate}}
+        </button>
+        <button mat-raised-button routerLink="../login" class="btn btn-link">
+          {{'button.login' | translate}}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

@@ -1,0 +1,28 @@
+<form [formGroup]="placeForm">
+  <div class="input-row">
+    <mat-form-field class="input-place-name">
+      <mat-label>{{'page.place.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40">
+    </mat-form-field>
+    <mat-form-field class="input-place-type">
+      <mat-label>{{'page.place.type' | translate}}</mat-label>
+      <input matInput formControlName="type" width="20">
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-description">
+      <mat-label>{{'page.place.description' | translate}}</mat-label>
+      <input matInput formControlName="description" width="50">
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-lat">
+      <mat-label>{{'page.place.latitude' | translate}}</mat-label>
+      <input matInput formControlName="lat" width="20" type="number">
+    </mat-form-field>
+    <mat-form-field class="input-place-long">
+      <mat-label>{{'page.place.longitude' | translate}}</mat-label>
+      <input matInput formControlName="long" width="20" type="number">
+    </mat-form-field>
+  </div>
+</form>

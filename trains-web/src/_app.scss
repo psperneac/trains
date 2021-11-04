@@ -1,0 +1,73 @@
+$app-table-background-hover: lightgray;
+
+.mat-card-actions {
+  margin-bottom: 0.5rem;
+}
+
+html { height: 100%; }
+body { margin: 0; height: 100%; }
+
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 80vh;
+}
+
+.alert-error{
+  background-color: rgb(153, 50, 50);
+}
+
+.alert-warning{
+  background-color: rgb(255,213,0);
+  color: rgb(0,0,0);
+}
+
+.alert-info{
+  background-color: rgb(255,255,255);
+  color: rgb(0,0,0);
+}
+
+.app-page {
+  margin: 1rem;
+}
+
+.app-full-height-page {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.input-row {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.mat-form-field {
+  margin: 0.5rem;
+}
+
+
+.mat-table {
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  &.hover {
+    background-color: $app-table-background-hover;
+  }
+}
+
+.mat-row {
+  height: auto;
+}
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}
+
