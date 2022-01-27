@@ -27,7 +27,7 @@ nx run trains:serve
 # Postgres
 
 ```bash
-docker run --name p1 -p 5432:5432 -d postgres
+docker run --name p1 -p 5432:5432 -e POSTGRES_PASSWORD=Admin1! -e POSTGRES_HOST_AUTH_METHOD=password -d postgres
 docker ps
 docker stop p1
 docker ps -a
@@ -41,6 +41,16 @@ Next update db to latest version for the app.
 ```bash
 cd scripts/liquibase
 .\liquibase.bat update
+```
+
+# Mysql
+
+```bash
+docker run --name m1 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Admin1! -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+docker ps
+docker stop m1
+docker ps -a
+docker start m1
 ```
 
 # Mongo
