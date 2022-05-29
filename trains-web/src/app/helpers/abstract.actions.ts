@@ -5,7 +5,7 @@ import {PageDto} from "../models/page.model";
 
 export class AbstractActions<T> {
   public getAll: ActionCreator<string, (props: ({ request: PageRequestDto } & NotAllowedCheck<{ request: PageRequestDto }>)) => ({ request: PageRequestDto } & TypedAction<string>)>;
-   public getAllSuccess: ActionCreator<string, (props: ({ result: PageDto<T> } & NotAllowedCheck<{ result: PageDto<T> }>)) => ({ result: PageDto<T> } & TypedAction<string>)>;
+  public getAllSuccess: ActionCreator<string, (props: ({ result: PageDto<T> } & NotAllowedCheck<{ result: PageDto<T> }>)) => ({ result: PageDto<T> } & TypedAction<string>)>;
   public getAllFailure: ActionCreator<string, (props: ({ error: any } & NotAllowedCheck<{ error: any }>)) => ({ error: any } & TypedAction<string>)>;
 
   public getOne: ActionCreator<string, (props: ({ uuid: string } & NotAllowedCheck<{ uuid: string }>)) => ({ uuid: string } & TypedAction<string>)>;

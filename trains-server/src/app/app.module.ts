@@ -1,14 +1,14 @@
 import * as Joi from 'joi';
-import {Module} from '@nestjs/common';
-import {ConfigModule} from '@nestjs/config';
-import {APP_FILTER} from '@nestjs/core';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 
-import {AuthenticationModule} from '../authentication/authentication.module';
-import {DatabaseModule} from '../database/database.module';
-import {ExceptionsLoggerFilter} from '../utils/exceptions-logger.filter';
-import {AppController} from './app.controller';
-import {ApiModule} from './api/api.module';
-import {AppService} from './app.service';
+import { AuthenticationModule } from '../authentication/authentication.module';
+import { DatabaseModule } from '../database/database.module';
+import { ExceptionsLoggerFilter } from '../utils/exceptions-logger.filter';
+import { AppController } from './app.controller';
+import { ApiModule } from './api/api.module';
+import { AppService } from './app.service';
 
 @Module({
   imports: [

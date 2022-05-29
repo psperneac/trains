@@ -39,6 +39,7 @@ export class UsersService {
 
   async create(userData: CreateUserDto) {
     const newUser = await this.usersRepository.create(userData);
+    console.dir(newUser);
     await this.usersRepository.save(newUser);
     return newUser;
   }
