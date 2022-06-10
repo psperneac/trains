@@ -118,5 +118,8 @@
       }
     }
   },
-  "defaultProject": "trains-web"
+  "defaultProject": "trains-web",
+  "cli": {
+    "analytics": false
+  }
 }
