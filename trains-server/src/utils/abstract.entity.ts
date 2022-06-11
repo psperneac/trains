@@ -1,14 +1,16 @@
 import {
   CreateDateColumn,
   DeleteDateColumn,
-  PrimaryGeneratedColumn,
+  Generated,
+  PrimaryColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 
 export abstract class AbstractEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
+  @Generated('uuid')
   @Expose()
   public id: string;
 
