@@ -5,6 +5,8 @@ import * as uuid from 'uuid-v4';
 
 export class MockRepository<T extends AbstractEntity> {
   private data: T[];
+  private dataOffset = 0;
+  private dataLimit: number;
 
   constructor(private initialData: T[]) {
     this.reset();
@@ -12,6 +14,18 @@ export class MockRepository<T extends AbstractEntity> {
 
   reset() {
     this.data = cloneDeep([...this.initialData]);
+    this.dataLimit = this.data.length;
+  }
+
+  getMany() {
+    const ret = this.data.slice(
+      this.dataOffset,
+      Math.min(
+        this.dataOffset + (this.dataLimit || this.data.length),
+        this.data.length,
+      ),
+    );
+    return Promise.resolve(ret);
   }
 
   find() {
@@ -69,5 +83,23 @@ export class MockRepository<T extends AbstractEntity> {
     const entity = this.data.find((u) => u.id === id);
     this.data = this.data.filter((u) => u.id !== id);
     return Promise.resolve({ affected: !!entity });
+  }
+
+  count() {
+    return this.data.length;
+  }
+
+  createQueryBuilder() {
+    return this;
+  }
+
+  offset(skippedItems: number) {
+    this.dataOffset = skippedItems;
+    return this;
+  }
+
+  limit(limit: number) {
+    this.dataLimit = limit;
+    return this;
   }
 }

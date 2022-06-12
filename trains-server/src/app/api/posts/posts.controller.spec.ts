@@ -79,7 +79,7 @@ describe('Posts Controller', () => {
   });
 
   it('should return empty posts list', async () => {
-    spyOn(repository, 'find').and.returnValue([]);
+    jest.spyOn(repository, 'find').mockReturnValue([]);
 
     await request(app.getHttpServer())
       .get('/posts')
@@ -89,7 +89,7 @@ describe('Posts Controller', () => {
   });
 
   it('should return posts as a list', async () => {
-    spyOn(repository, 'find').and.returnValue(POSTS);
+    jest.spyOn(repository, 'find').mockReturnValue(POSTS);
 
     await request(app.getHttpServer())
       .get('/posts')
@@ -99,8 +99,8 @@ describe('Posts Controller', () => {
   });
 
   it('should call create and save when POST a new post', async () => {
-    const mockSave = spyOn(repository, 'save');
-    const mockCreate = spyOn(repository, 'create').and.returnValue(POST4);
+    const mockSave = jest.spyOn(repository, 'save');
+    const mockCreate = jest.spyOn(repository, 'create').mockReturnValue(POST4);
 
     await request(app.getHttpServer())
       .post('/posts')
@@ -121,8 +121,10 @@ describe('Posts Controller', () => {
   });
 
   it('success. should update post and return updated post when PUT a post and known id', async () => {
-    const mockUpdate = spyOn(repository, 'update');
-    const mockFindOne = spyOn(repository, 'findOne').and.returnValue(POST4);
+    const mockUpdate = jest.spyOn(repository, 'update');
+    const mockFindOne = jest
+      .spyOn(repository, 'findOne')
+      .mockReturnValue(POST4);
 
     await request(app.getHttpServer())
       .put('/posts/' + POST4.id)
@@ -145,8 +147,8 @@ describe('Posts Controller', () => {
   });
 
   it('not found. should return 404 when PUT a post and unknown id', async () => {
-    const mockUpdate = spyOn(repository, 'update');
-    const mockFindOne = spyOn(repository, 'findOne').and.returnValue(null);
+    const mockUpdate = jest.spyOn(repository, 'update');
+    const mockFindOne = jest.spyOn(repository, 'findOne').mockReturnValue(null);
 
     await request(app.getHttpServer())
       .put('/posts/' + POST4.id)
@@ -169,7 +171,9 @@ describe('Posts Controller', () => {
   });
 
   it('success. should return one post when GET with known id', async () => {
-    const mockFindOne = spyOn(repository, 'findOne').and.returnValue(POST4);
+    const mockFindOne = jest
+      .spyOn(repository, 'findOne')
+      .mockReturnValue(POST4);
 
     await request(app.getHttpServer())
       .get('/posts/' + POST4.id)
@@ -181,7 +185,7 @@ describe('Posts Controller', () => {
   });
 
   it('not found. should return 404 when GET with unknown id', async () => {
-    const mockFindOne = spyOn(repository, 'findOne').and.returnValue(null);
+    const mockFindOne = jest.spyOn(repository, 'findOne').mockReturnValue(null);
 
     await request(app.getHttpServer())
       .get('/posts/' + POST4.id)
@@ -193,7 +197,7 @@ describe('Posts Controller', () => {
   });
 
   it('success. should call delete with the id when DELETE with id', async () => {
-    const mockDelete = spyOn(repository, 'delete').and.returnValue({
+    const mockDelete = jest.spyOn(repository, 'delete').mockReturnValue({
       affected: true,
     });
 
@@ -207,7 +211,7 @@ describe('Posts Controller', () => {
   });
 
   it('not found. should call delete with the id when DELETE with id', async () => {
-    const mockDelete = spyOn(repository, 'delete').and.returnValue({
+    const mockDelete = jest.spyOn(repository, 'delete').mockReturnValue({
       affected: false,
     });
 

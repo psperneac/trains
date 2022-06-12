@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -49,14 +50,17 @@ export class AuthenticationController {
     const authorization = this.authenticationService.getAuthorizationBearer(
       user.id,
     );
-    response.setHeader('Authorization', authorization);
     user.password = undefined;
-    return response.send({ ...user, authorization });
+    return response
+      .setHeader('Authorization', authorization)
+      .status(HttpStatus.OK)
+      .send({ ...user, authorization });
   }
 
   // @UseGuards(JwtAuthenticationGuard)
   @Post('logout')
   @HttpCode(200)
+  @UseGuards(LoggedIn)
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     // we have no way to currently un-authenticate tokens already sent out
     // app is stateless / session less, so this doesn't do anything

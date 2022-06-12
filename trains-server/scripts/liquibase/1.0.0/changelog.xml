@@ -107,4 +107,23 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="400" author="Paul">
+        <createTable tableName="TRANSLATIONS">
+            <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="INTEGER" defaultValue="0" />
+            <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+              <constraints nullable="false"/>
+            </column>
+            <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+              <constraints nullable="false"/>
+            </column>
+            <column name="DELETED" type="DATETIME" />
+            <column name="LANGUAGE" type="VARCHAR(10)"><constraints nullable="false"/></column>
+            <column name="KEY" type="VARCHAR(250)"><constraints nullable="false"/></column>
+            <column name="CONTENT" type="VARCHAR(2000)"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

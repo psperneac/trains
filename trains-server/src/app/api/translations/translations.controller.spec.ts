@@ -1,56 +1,69 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PlacesController } from './places.controller';
-import { authMocks } from '../../../utils/mocks/auth.mock';
-import { PlacesService } from './places.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { MockRepository } from '../../../utils/mocks/repository.mock';
-import Place from './place.entity';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { authMocks } from '../../../utils/mocks/auth.mock';
+import { MockRepository } from '../../../utils/mocks/repository.mock';
 import * as request from 'supertest';
+import Translation from './translation.entity';
+import { TranslationMapper } from './translation.mapper';
+import { TranslationsController } from './translations.controller';
+import { TranslationsService } from './translations.service';
 import { getAuthorizationBearer } from '../../../utils/jwt';
-import { PlaceMapper } from './place.mapper';
-import { pick } from 'lodash';
+import { pick, range } from 'lodash';
+import { TranslationDto } from '../../../models/translation.model';
 
-const createPlace = (id: number): Place => {
+const createTranslation = (id: number): Translation => {
   return {
     id: 'ID' + id,
     version: 0,
     created: new Date(),
     updated: new Date(),
     deleted: null,
-    name: 'Name' + id,
-    description: 'Description' + id,
-    type: 'RAIL',
-    lat: 80 + id,
-    long: 20 + id,
+    language: id % 2 ? 'en-US' : 'en-GB',
+    key: 'com.ikarsoft.string-' + id,
+    content: 'This is string # ' + id,
   };
 };
 
-describe('Places Controller', () => {
+const dto = (domain: Translation): TranslationDto => {
+  return pick(domain, ['id', 'language', 'key', 'content']);
+};
+
+const createDto = (domain: Translation): TranslationDto => {
+  return pick(domain, ['language', 'key', 'content']);
+};
+
+describe('Translations Controller', () => {
   let module: TestingModule;
   let app: INestApplication;
-  let controller: PlacesController;
-  let service: PlacesService;
+  let controller: TranslationsController;
+  let service: TranslationsService;
   let repository: any;
 
-  const PLACE1 = createPlace(1);
-  const PLACE2 = createPlace(2);
-  const PLACE3 = createPlace(3);
-  const PLACE4 = createPlace(4);
-  const PLACES = [PLACE1, PLACE2, PLACE3];
+  const T1 = createTranslation(1);
+  const T2 = createTranslation(2);
+  const T3 = createTranslation(3);
+  const T4 = createTranslation(4);
+  const T5 = createTranslation(5);
+  const T6 = createTranslation(6);
+  const T7 = createTranslation(7);
+  const T8 = createTranslation(8);
+  const T9 = createTranslation(9);
+
+  const TRANSLATIONS = [T1, T2, T3, T4, T5, T6, T7, T8];
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      controllers: [PlacesController],
+      controllers: [TranslationsController],
       providers: [
         ...authMocks,
 
-        PlaceMapper,
-        PlacesService,
+        TranslationMapper,
+        TranslationsService,
         {
-          provide: getRepositoryToken(Place),
-          useValue: new MockRepository(PLACES),
+          provide: getRepositoryToken(Translation),
+          useValue: new MockRepository(TRANSLATIONS),
         },
       ],
     }).compile();
@@ -60,9 +73,9 @@ describe('Places Controller', () => {
     app.useGlobalFilters(new ExceptionsLoggerFilter());
     await app.init();
 
-    controller = module.get<PlacesController>(PlacesController);
-    service = module.get<PlacesService>(PlacesService);
-    repository = module.get(getRepositoryToken(Place));
+    controller = module.get<TranslationsController>(TranslationsController);
+    service = module.get<TranslationsService>(TranslationsService);
+    repository = module.get(getRepositoryToken(Translation));
   });
 
   afterEach(async () => {
@@ -76,12 +89,12 @@ describe('Places Controller', () => {
     expect(repository).toBeDefined();
   });
 
-  describe('GET /places', () => {
+  describe('GET /transactions', () => {
     it('should return 401 if no token is present or token is for non-existent user', async () => {
-      await request(app.getHttpServer()).get('/places').expect(401);
+      await request(app.getHttpServer()).get('/translations').expect(401);
 
       await request(app.getHttpServer())
-        .get('/places')
+        .get('/translations')
         .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
         .expect(404);
     });
@@ -90,40 +103,22 @@ describe('Places Controller', () => {
       const mockFind = jest.spyOn(repository, 'getMany');
 
       await request(app.getHttpServer())
-        .get('/places')
+        .get('/translations')
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(200)
         .expect((res) => {
           expect(res).toBeDefined();
           expect(res.body).toBeDefined();
-          expect(res.body.data.length).toEqual(3);
-          expect(res.body.totalCount).toEqual(3);
+          expect(res.body.data.length).toEqual(8);
+          expect(res.body.totalCount).toEqual(8);
           expect(res.body.page).toEqual(1);
           expect(res.body.limit).toEqual(10);
 
-          expect(res.body.data[0]).toEqual({
-            id: 'ID1',
-            name: 'Name1',
-            description: 'Description1',
-            type: 'RAIL',
-            lat: 81,
-            long: 21,
-          });
-          expect(res.body.data[1]).toEqual({
-            id: 'ID2',
-            name: 'Name2',
-            description: 'Description2',
-            type: 'RAIL',
-            lat: 82,
-            long: 22,
-          });
-          expect(res.body.data[2]).toEqual({
-            id: 'ID3',
-            name: 'Name3',
-            description: 'Description3',
-            type: 'RAIL',
-            lat: 83,
-            long: 23,
+          range(8).forEach((index) => {
+            const t = TRANSLATIONS[index];
+            const v = res.body.data[index];
+
+            expect(v).toEqual(dto(t));
           });
         });
 
@@ -131,127 +126,103 @@ describe('Places Controller', () => {
     });
   });
 
-  describe('GET /places/:id', () => {
+  describe('GET /translations/:id', () => {
     it('should return 401 if no token is present', async () => {
-      await request(app.getHttpServer()).get('/places/ID1').expect(401);
+      await request(app.getHttpServer()).get('/translations/ID1').expect(401);
     });
 
     it('should return 404 if token is for non-existent user', async () => {
       await request(app.getHttpServer())
-        .get('/places/ID1')
+        .get('/translations/ID1')
         .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
         .expect(404);
     });
 
-    it('should return 404 ilooking for non-existing place', async () => {
+    it('should return 404 if looking for non-existing place', async () => {
       await request(app.getHttpServer())
-        .get('/places/ID99')
+        .get('/translations/ID99')
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(404);
     });
 
     it('should return data when logged in as normal user', async () => {
-      jest
-        .spyOn(repository, 'findOne')
-        .mockReturnValue(Promise.resolve(PLACE1));
+      jest.spyOn(repository, 'findOne').mockReturnValue(Promise.resolve(T1));
 
       await request(app.getHttpServer())
-        .get('/places/ID1')
+        .get('/translations/ID1')
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(200)
         .expect((res) => {
           expect(res.body).toBeDefined();
-          expect(res.body).toEqual({
-            id: 'ID1',
-            name: 'Name1',
-            description: 'Description1',
-            type: 'RAIL',
-            lat: 81,
-            long: 21,
-          });
+          expect(res.body).toEqual(dto(T1));
         });
     });
   });
 
-  describe('POST /places', () => {
-    const addPlace = pick(PLACE4, [
-      'name',
-      'description',
-      'type',
-      'lat',
-      'long',
-    ]);
+  describe('POST /translations', () => {
+    const addTranslation = createDto(T9);
 
     it('should return error if no token is present, token is for non-existent user or token is for normal user', async () => {
       // unauthorized
       await request(app.getHttpServer())
-        .post('/places')
-        .send(addPlace)
+        .post('/translations')
+        .send(addTranslation)
         .expect(401);
 
       // not-found (user from token)
       await request(app.getHttpServer())
-        .post('/places')
-        .send(addPlace)
+        .post('/translations')
+        .send(addTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
         .expect(404);
 
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
-        .post('/places')
-        .send(addPlace)
+        .post('/translations')
+        .send(addTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(403);
     });
 
     it('should create a new place', async () => {
-      const mockCreate = jest
-        .spyOn(repository, 'create')
-        .mockReturnValue(PLACE4);
+      const mockCreate = jest.spyOn(repository, 'create').mockReturnValue(T9);
 
       const mockSave = jest
         .spyOn(repository, 'save')
-        .mockReturnValue(Promise.resolve(PLACE4));
+        .mockReturnValue(Promise.resolve(T9));
 
       await request(app.getHttpServer())
-        .post('/places')
-        .send(addPlace)
+        .post('/translations')
+        .send(addTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(201)
         .expect((res) => {
-          expect(res.body).toEqual({
-            id: 'ID4',
-            name: 'Name4',
-            description: 'Description4',
-            type: 'RAIL',
-            lat: 84,
-            long: 24,
-          });
+          expect(res.body).toEqual(dto(T9));
         });
 
-      expect(mockCreate).toHaveBeenCalledWith(addPlace);
-      expect(mockSave).toHaveBeenCalledWith(PLACE4);
+      expect(mockCreate).toHaveBeenCalledWith(addTranslation);
+      expect(mockSave).toHaveBeenCalledWith(T9);
     });
   });
 
-  describe('PUT /places/:id', () => {
-    const updatePlace = {
-      description: 'UpdatedDescription4',
+  describe('PUT /translations/:id', () => {
+    const updateTranslation = {
+      content: 'UpdatedContent',
     };
 
     it('should return 401 if no token is present', async () => {
       // unauthorized
       await request(app.getHttpServer())
-        .put('/places/ID4')
-        .send(updatePlace)
+        .put('/translations/ID4')
+        .send(updateTranslation)
         .expect(401);
     });
 
     it('should return 404 if token is for non-existent user', async () => {
       // not-found (user from token)
       await request(app.getHttpServer())
-        .put('/places/ID4')
-        .send(updatePlace)
+        .put('/translations/ID4')
+        .send(updateTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
         .expect(404);
     });
@@ -259,8 +230,8 @@ describe('Places Controller', () => {
     it('should return 403 token is for normal user', async () => {
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
-        .put('/places/ID4')
-        .send(updatePlace)
+        .put('/translations/ID4')
+        .send(updateTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(403);
     });
@@ -268,45 +239,43 @@ describe('Places Controller', () => {
     it('should return 404 if trying to update unknown place', async () => {
       // not-found (user from token)
       await request(app.getHttpServer())
-        .put('/places/ID99')
-        .send(updatePlace)
+        .put('/translations/ID99')
+        .send(updateTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(404);
     });
 
     it('should update existing place', async () => {
-      const mockUpdate = jest.spyOn(repository, 'update'); //.and.callThrough();
+      const mockUpdate = jest.spyOn(repository, 'update');
 
       await request(app.getHttpServer())
-        .put('/places/ID1')
-        .send(updatePlace)
+        .put('/translations/ID1')
+        .send(updateTranslation)
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(200)
         .expect((res) => {
           expect(res.body).toEqual({
-            id: 'ID1',
-            name: 'Name1',
-            description: 'UpdatedDescription4',
-            type: 'RAIL',
-            lat: 81,
-            long: 21,
+            ...dto(T1),
+            content: 'UpdatedContent',
           });
         });
 
-      expect(mockUpdate).toHaveBeenCalledWith('ID1', updatePlace);
+      expect(mockUpdate).toHaveBeenCalledWith('ID1', updateTranslation);
     });
   });
 
-  describe('DELETE /places/:id', () => {
+  describe('DELETE /translations/:id', () => {
     it('should return 401 if no token is present', async () => {
       // unauthorized
-      await request(app.getHttpServer()).delete('/places/ID4').expect(401);
+      await request(app.getHttpServer())
+        .delete('/translations/ID4')
+        .expect(401);
     });
 
     it('should return 404 if token is for non-existent user', async () => {
       // not-found (user from token)
       await request(app.getHttpServer())
-        .delete('/places/ID4')
+        .delete('/translations/ID4')
         .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
         .expect(404);
     });
@@ -314,7 +283,7 @@ describe('Places Controller', () => {
     it('should return 403 token is for normal user', async () => {
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
-        .delete('/places/ID4')
+        .delete('/translations/ID4')
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(403);
     });
@@ -322,7 +291,7 @@ describe('Places Controller', () => {
     it('should return 404 if trying to delete unknown place', async () => {
       // not-found (user from token)
       await request(app.getHttpServer())
-        .delete('/places/ID99')
+        .delete('/translations/ID99')
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(404);
     });

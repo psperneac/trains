@@ -23,7 +23,6 @@ export class PlacesService {
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
-    console.dir(pagination);
 
     return Promise.all([
       this.repository
@@ -32,11 +31,14 @@ export class PlacesService {
         .limit(pagination.limit)
         .getMany(),
       this.repository.count(),
-    ]).then(([places, count]) => ({
-      data: places.map((place) => this.mapper.toDto(place)),
-      ...pagination,
-      totalCount: count,
-    }));
+    ]).then(([places, count]) => {
+      return {
+        data: places.map((place) => this.mapper.toDto(place)),
+        page,
+        limit,
+        totalCount: count,
+      };
+    });
   }
 
   getOne(uuid: string): Promise<PlaceDto> {

@@ -120,8 +120,8 @@ describe('Users Controller', () => {
         scope: user.scope,
       };
 
-      const mockSave = spyOn(repository, 'save').and.callThrough();
-      const mockCreate = spyOn(repository, 'create').and.callThrough(); //.and.returnValue(user);
+      const mockSave = jest.spyOn(repository, 'save');
+      const mockCreate = jest.spyOn(repository, 'create'); //.and.returnValue(user);
 
       await request(app.getHttpServer())
         .post('/users')
@@ -153,7 +153,7 @@ describe('Users Controller', () => {
         scope: 'USER',
       };
 
-      const mockUpdate = spyOn(repository, 'update').and.callThrough();
+      const mockUpdate = jest.spyOn(repository, 'update');
 
       await request(app.getHttpServer())
         .put('/users/ID1')
@@ -186,7 +186,7 @@ describe('Users Controller', () => {
 
   describe('DELETE /users/:id', () => {
     it('should call delete on repo with correct id', async () => {
-      const mockDelete = spyOn(repository, 'delete').and.callThrough();
+      const mockDelete = jest.spyOn(repository, 'delete');
 
       await request(app.getHttpServer())
         .delete('/users/ID1')

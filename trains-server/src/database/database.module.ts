@@ -4,8 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import Post from '../app/api/posts/posts.entity';
 import User from '../app/api/users/users.entity';
 import Place from '../app/api/places/place.entity';
+import Translation from '../app/api/translations/translation.entity';
 
-export const ENTITIES = [Post, Place, User];
+export const ENTITIES = [Post, Place, User, Translation];
 
 @Module({
   imports: [

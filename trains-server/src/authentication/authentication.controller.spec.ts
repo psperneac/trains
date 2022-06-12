@@ -60,6 +60,7 @@ describe('Authentication Controller', () => {
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(200)
         .expect((res) => {
+          console.log(res);
           expect(res.body.id).toEqual('ID1');
         });
     });
@@ -67,7 +68,7 @@ describe('Authentication Controller', () => {
 
   describe('POST /authentication/register', () => {
     it('should call userService.create on a call to register', async () => {
-      const mockCreate = spyOn(usersService, 'create').and.callThrough();
+      const mockCreate = jest.spyOn(usersService, 'create');
 
       await request(app.getHttpServer())
         .post('/authentication/register')
@@ -88,11 +89,10 @@ describe('Authentication Controller', () => {
 
   describe('POST /authentication/login', () => {
     it('should return an Authorization header', async () => {
-      const mockAuthorization = spyOn(
-        service,
-        'getAuthorizationBearer',
-      ).and.returnValue('Bearer 1234');
-      const mockVerify = spyOn(service, 'verifyPassword').and.returnValue(true);
+      const mockAuthorization = jest
+        .spyOn(service, 'getAuthorizationBearer')
+        .mockReturnValue('Bearer 1234');
+      const mockVerify = jest.spyOn(service, 'verifyPassword');
 
       await request(app.getHttpServer())
         .post('/authentication/login')

@@ -1,16 +1,14 @@
 import User from '../../app/api/users/users.entity';
 import { isString } from 'util';
 import { cloneDeep } from 'lodash';
+import * as bcrypt from 'bcrypt';
 
-export const createMockUser = (
-  id: number,
-  prefix: string,
-  scope?: string,
-): User => {
+function createMockUser(id: number, prefix: string, scope?: string): User {
+  const password = bcrypt.hashSync(prefix + '1!', 10);
   return {
     id: 'ID' + id,
     username: prefix + id,
-    password: prefix + '1!',
+    password,
     email: prefix + id + '@trains.com',
     version: 0,
     created: new Date(),
@@ -18,7 +16,7 @@ export const createMockUser = (
     deleted: null,
     scope: scope || 'USER',
   };
-};
+}
 
 export const MOCK_USERS: User[] = [
   createMockUser(1, 'testUser'),
