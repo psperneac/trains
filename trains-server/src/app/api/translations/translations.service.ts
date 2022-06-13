@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateResult } from 'typeorm';
 import { PageDto } from '../../../models/page.model';
@@ -40,26 +40,42 @@ export class TranslationsService {
       .getMany();
   }
 
-  getOne(uuid: string): Promise<Translation> {
-    return this.repository.findOne(uuid);
+  async getOne(uuid: string) {
+    const translation = this.repository.findOne(uuid);
+    if (translation) {
+      return translation;
+    }
+
+    throw new HttpException('Translation not found', HttpStatus.NOT_FOUND);
   }
 
-  create(translation: Translation): Promise<Translation> {
+  async create(translation: Translation) {
     const newTranslation = this.repository.create(translation);
-    return this.repository.save(newTranslation);
+    return await this.repository.save(newTranslation);
   }
 
-  update(uuid: string, translation: Translation): Promise<UpdateResult> {
-    return this.repository.update(uuid, translation);
+  async update(uuid: string, translation: Translation) {
+    const updateResponse: UpdateResult = await this.repository.update(
+      uuid,
+      translation,
+    );
+    if (!updateResponse || !updateResponse.affected) {
+      throw new HttpException(
+        'Translation not updated',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    return translation;
   }
 
-  delete(uuid: string): Promise<boolean> {
-    return this.repository.delete(uuid).then((deleteResponse) => {
-      if (!deleteResponse || !deleteResponse.affected) {
-        return false;
-      }
+  async delete(uuid: string): Promise<boolean> {
+    const deleteResponse = await this.repository.delete(uuid);
 
-      return true;
-    });
+    if (!deleteResponse || !deleteResponse.affected) {
+      throw new HttpException('Translation not found', HttpStatus.NOT_FOUND);
+    }
+
+    return true;
   }
 }

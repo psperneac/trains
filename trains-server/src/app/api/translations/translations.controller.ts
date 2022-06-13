@@ -51,7 +51,9 @@ export class TranslationsController {
   @Post()
   @UseGuards(LoggedIn, Admin)
   create(@Body() dto: TranslationDto) {
-    return this.service.create(this.mapper.toDomain(dto));
+    return this.service
+      .create(this.mapper.toDomain(dto))
+      .then((newTranslation) => this.mapper.toDto(newTranslation));
   }
 
   @Put(':id')

@@ -3,7 +3,11 @@ import { isString } from 'util';
 import { cloneDeep } from 'lodash';
 import * as bcrypt from 'bcrypt';
 
-function createMockUser(id: number, prefix: string, scope?: string): User {
+export function createMockUser(
+  id: number,
+  prefix: string,
+  scope?: string,
+): User {
   const password = bcrypt.hashSync(prefix + '1!', 10);
   return {
     id: 'ID' + id,

@@ -138,7 +138,7 @@ describe('Translations Controller', () => {
         .expect(404);
     });
 
-    it('should return 404 if looking for non-existing place', async () => {
+    it('should return 404 if looking for non-existing translation', async () => {
       await request(app.getHttpServer())
         .get('/translations/ID99')
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
@@ -184,7 +184,7 @@ describe('Translations Controller', () => {
         .expect(403);
     });
 
-    it('should create a new place', async () => {
+    it('should create a new translation', async () => {
       const mockCreate = jest.spyOn(repository, 'create').mockReturnValue(T9);
 
       const mockSave = jest
@@ -246,7 +246,9 @@ describe('Translations Controller', () => {
     });
 
     it('should update existing place', async () => {
-      const mockUpdate = jest.spyOn(repository, 'update');
+      const mockUpdate = jest
+        .spyOn(repository, 'update')
+        .mockReturnValue({ affected: 1 });
 
       await request(app.getHttpServer())
         .put('/translations/ID1')
@@ -256,11 +258,14 @@ describe('Translations Controller', () => {
         .expect((res) => {
           expect(res.body).toEqual({
             ...dto(T1),
-            content: 'UpdatedContent',
+            ...updateTranslation,
           });
         });
 
-      expect(mockUpdate).toHaveBeenCalledWith('ID1', updateTranslation);
+      expect(mockUpdate).toHaveBeenCalledWith('ID1', {
+        ...T1,
+        ...updateTranslation,
+      });
     });
   });
 
