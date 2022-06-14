@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { assign } from 'lodash';
 
-import { TranslationDto } from '../../../models/translation.model';
-import Translation from './translation.entity';
+import { TranslationDto } from './dto/translation.dto';
+import Translation from './entities/translation.entity';
 
 @Injectable()
 export class TranslationMapper {

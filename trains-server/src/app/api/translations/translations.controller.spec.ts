@@ -5,13 +5,13 @@ import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter'
 import { authMocks } from '../../../utils/mocks/auth.mock';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import * as request from 'supertest';
-import Translation from './translation.entity';
+import Translation from './entities/translation.entity';
 import { TranslationMapper } from './translation.mapper';
 import { TranslationsController } from './translations.controller';
 import { TranslationsService } from './translations.service';
 import { getAuthorizationBearer } from '../../../utils/jwt';
 import { pick, range } from 'lodash';
-import { TranslationDto } from '../../../models/translation.model';
+import { TranslationDto } from './dto/translation.dto';
 
 const createTranslation = (id: number): Translation => {
   return {

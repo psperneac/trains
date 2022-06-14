@@ -15,7 +15,7 @@ import {
 
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { PageRequestDto } from '../../../models/pagination.model';
-import { TranslationDto } from '../../../models/translation.model';
+import { TranslationDto } from './dto/translation.dto';
 import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
 import { TranslationMapper } from './translation.mapper';
 import { TranslationsService } from './translations.service';

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-<!--    <changeSet id="1" author="Paul">-->
-<!--      <sql>-->
-<!--        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";-->
-<!--        CREATE EXTENSION IF NOT EXISTS "pgcrypto";-->
-<!--        CREATE EXTENSION IF NOT EXISTS "autoinc";-->
-<!--        CREATE EXTENSION IF NOT EXISTS "cube";-->
-<!--        CREATE EXTENSION IF NOT EXISTS "earthdistance";-->
-<!--        ALTER USER trains WITH NOSUPERUSER;-->
-<!--      </sql>-->
-<!--      &lt;!&ndash; impossible to rollback this one, but if it got this far with the rollback, just rerun create.sql &ndash;&gt;-->
-<!--    </changeSet>-->
+    <!--    <changeSet id="1" author="Paul">-->
+    <!--      <sql>-->
+    <!--        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";-->
+    <!--        CREATE EXTENSION IF NOT EXISTS "pgcrypto";-->
+    <!--        CREATE EXTENSION IF NOT EXISTS "autoinc";-->
+    <!--        CREATE EXTENSION IF NOT EXISTS "cube";-->
+    <!--        CREATE EXTENSION IF NOT EXISTS "earthdistance";-->
+    <!--        ALTER USER trains WITH NOSUPERUSER;-->
+    <!--      </sql>-->
+    <!--      &lt;!&ndash; impossible to rollback this one, but if it got this far with the rollback, just rerun create.sql &ndash;&gt;-->
+    <!--    </changeSet>-->
 
     <changeSet id="99" author="Paul">
-      <tagDatabase tag="initial" />
+        <tagDatabase tag="initial"/>
     </changeSet>
 
     <changeSet id="100" author="Paul">
@@ -27,14 +27,14 @@
             <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="INTEGER" defaultValue="0" />
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
             <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>
             <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>
-            <column name="DELETED" type="DATETIME" />
+            <column name="DELETED" type="DATETIME"/>
             <column name="USERNAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -67,19 +67,29 @@
             <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="INTEGER" defaultValue="0" />
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
             <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="DELETED" type="DATETIME" />
-            <column name="NAME" type="VARCHAR(100)"><constraints nullable="false"/></column>
-            <column name="DESCRIPTION" type="VARCHAR(250)"><constraints nullable="false"/></column>
-            <column name="TYPE" type="VARCHAR(20)"><constraints nullable="false"/></column>
-            <column name="LAT" type="FLOAT"><constraints nullable="false"/></column>
-            <column name="LONG" type="FLOAT"><constraints nullable="false"/></column>
+            <column name="DELETED" type="DATETIME"/>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LAT" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LONG" type="FLOAT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -94,16 +104,20 @@
             <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="INTEGER" defaultValue="0" />
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
             <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="DELETED" type="DATETIME" />
-            <column name="TITLE" type="VARCHAR(100)"><constraints nullable="false"/></column>
-            <column name="CONTENT" type="VARCHAR(250)"><constraints nullable="false"/></column>
+            <column name="DELETED" type="DATETIME"/>
+            <column name="TITLE" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CONTENT" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -112,17 +126,53 @@
             <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="INTEGER" defaultValue="0" />
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
             <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
-              <constraints nullable="false"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="DELETED" type="DATETIME" />
-            <column name="LANGUAGE" type="VARCHAR(10)"><constraints nullable="false"/></column>
-            <column name="KEY" type="VARCHAR(250)"><constraints nullable="false"/></column>
-            <column name="CONTENT" type="VARCHAR(2000)"><constraints nullable="false"/></column>
+            <column name="DELETED" type="DATETIME"/>
+            <column name="LANGUAGE" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="KEY" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CONTENT" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="500" author="Paul">
+        <createTable tableName="VEHICLE_TYPES">
+            <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
+            <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DELETED" type="DATETIME"/>
+
+            <column name="TYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEFAULT_NAME" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(250)"></column>
+            <column name="CONTENT" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
