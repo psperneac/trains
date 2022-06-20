@@ -77,6 +77,18 @@ docker ps -a
 docker start m1
 ```
 
+```JavaScript
+use
+trains
+db.createUser(
+    {
+        user: "trains",
+        pwd: passwordPrompt(),   // or cleartext password
+        roles: [{role: "readWrite", db: "trains"}]
+    }
+)
+```
+
 # Misc
 
 ## Resources
