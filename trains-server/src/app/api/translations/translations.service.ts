@@ -4,7 +4,7 @@ import { UpdateResult } from 'typeorm';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { Repository } from 'typeorm';
-import Translation from './translation.entity';
+import Translation from './entities/translation.entity';
 
 @Injectable()
 export class TranslationsService {
