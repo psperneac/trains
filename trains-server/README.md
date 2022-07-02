@@ -65,6 +65,10 @@ docker ps -a
 docker start m1
 ```
 
+```bash
+docker run -d -p 27017:27017 --name mongo1 -e MONGODB_INITDB_ROOT_USERNAME=admin -e MONGODB_INITDB_ROOT_PASSWORD=Admin1! mongo:latest
+ ```
+
 # Misc
 
 ## Resources

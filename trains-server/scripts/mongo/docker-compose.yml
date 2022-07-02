@@ -1,0 +1,14 @@
+version: '3'
+services:
+  mongodb:
+    container_name: mongo1
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: Admin1!
+    env_file:
+      - .env
+    command: ['--auth']
+    restart: always
