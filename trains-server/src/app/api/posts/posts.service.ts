@@ -1,22 +1,19 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import Post from './posts.entity';
+import { Post, PostDocument } from './posts.schema';
 import { CreatePostDto, UpdatePostDto } from '../../../models/posts.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class PostsService {
-  constructor(
-    @InjectRepository(Post)
-    private repository: Repository<Post>,
-  ) {}
+  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
   getAll() {
-    return this.repository.find();
+    return this.postModel.find();
   }
 
   async getOne(uuid: string) {
-    const post = await this.repository.findOne(uuid);
+    const post = await this.postModel.findById(uuid);
     if (post) {
       return post;
     }
@@ -24,23 +21,25 @@ export class PostsService {
   }
 
   async update(uuid: string, post: UpdatePostDto) {
-    await this.repository.update(uuid, post);
-    const updatedPost = await this.repository.findOne(uuid);
+    const updatedPost = await this.postModel
+      .findByIdAndUpdate(uuid, post)
+      .setOptions({ overwrite: true, new: true });
+
     if (updatedPost) {
       return updatedPost;
     }
+
     throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
   }
 
-  async create(post: CreatePostDto) {
-    const newPost = await this.repository.create(post);
-    await this.repository.save(newPost);
-    return newPost;
+  create(post: CreatePostDto) {
+    const newPost = new this.postModel(post);
+    return newPost.save();
   }
 
   async delete(uuid: string) {
-    const deleteResponse = await this.repository.delete(uuid);
-    if (!deleteResponse.affected) {
+    const deleteResponse = await this.postModel.findByIdAndDelete(uuid);
+    if (!deleteResponse) {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
 

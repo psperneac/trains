@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import Post from './posts.entity';
+import { Post } from './posts.schema';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { getAuthorizationBearer } from '../../../utils/jwt';

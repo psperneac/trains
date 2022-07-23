@@ -13,6 +13,7 @@ import { PostsService } from './posts.service';
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
 import { CreatePostDto, UpdatePostDto } from '../../../models/posts.model';
+import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
 
 @Controller('posts')
 @UseGuards(LoggedIn)
@@ -22,11 +23,13 @@ export class PostsController {
 
   @Get()
   getAllPosts() {
-    return this.postsService.getAll();
+    const ret = this.postsService.getAll();
+    console.log('AllPosts', ret);
+    return ret;
   }
 
   @Get(':id')
-  getPostById(@Param('id') id: string) {
+  getPostById(@Param() { id }: ParamsWithMongoId) {
     return this.postsService.getOne(id);
   }
 
@@ -36,12 +39,15 @@ export class PostsController {
   }
 
   @Put(':id')
-  async replacePost(@Param('id') id: string, @Body() post: UpdatePostDto) {
+  async replacePost(
+    @Param() { id }: ParamsWithMongoId,
+    @Body() post: UpdatePostDto,
+  ) {
     return this.postsService.update(id, post);
   }
 
   @Delete(':id')
-  async deletePost(@Param('id') id: string) {
+  async deletePost(@Param() { id }: ParamsWithMongoId) {
     return this.postsService.delete(id);
   }
 }
