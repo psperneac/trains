@@ -1,12 +1,13 @@
 import { Controller, Get, Param, UseFilters } from '@nestjs/common';
 
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { TranslationsService } from './translations.service';
 
 @Controller('translations-i18n')
-@UseFilters(ExceptionsLoggerFilter)
+@UseFilters(AllExceptionsFilter)
 export class TranslationsI18nController {
-  constructor(private readonly service: TranslationsService) {}
+  constructor(private readonly service: TranslationsService) {
+  }
 
   @Get(':language')
   getAll(@Param('language') language: string) {

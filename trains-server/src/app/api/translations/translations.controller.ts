@@ -16,17 +16,18 @@ import {
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { TranslationDto } from './dto/translation.dto';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { TranslationMapper } from './translation.mapper';
 import { TranslationsService } from './translations.service';
 
 @Controller('translations')
-@UseFilters(ExceptionsLoggerFilter)
+@UseFilters(AllExceptionsFilter)
 export class TranslationsController {
   constructor(
     private readonly service: TranslationsService,
     private readonly mapper: TranslationMapper,
-  ) {}
+  ) {
+  }
 
   @Get()
   @UseGuards(LoggedIn)

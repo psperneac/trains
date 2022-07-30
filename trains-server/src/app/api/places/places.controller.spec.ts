@@ -6,7 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import Place from './place.entity';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import * as request from 'supertest';
 import { getAuthorizationBearer } from '../../../utils/jwt';
 import { PlaceMapper } from './place.mapper';
@@ -57,7 +57,7 @@ describe('Places Controller', () => {
 
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalFilters(new ExceptionsLoggerFilter());
+    app.useGlobalFilters(new AllExceptionsFilter());
     await app.init();
 
     controller = module.get<PlacesController>(PlacesController);
@@ -82,7 +82,7 @@ describe('Places Controller', () => {
 
       await request(app.getHttpServer())
         .get('/places')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -91,7 +91,7 @@ describe('Places Controller', () => {
 
       await request(app.getHttpServer())
         .get('/places')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(200)
         .expect((res) => {
           expect(res).toBeDefined();
@@ -139,14 +139,14 @@ describe('Places Controller', () => {
     it('should return 404 if token is for non-existent user', async () => {
       await request(app.getHttpServer())
         .get('/places/ID1')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
     it('should return 404 ilooking for non-existing place', async () => {
       await request(app.getHttpServer())
         .get('/places/ID99')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(404);
     });
 
@@ -157,7 +157,7 @@ describe('Places Controller', () => {
 
       await request(app.getHttpServer())
         .get('/places/ID1')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(200)
         .expect((res) => {
           expect(res.body).toBeDefined();
@@ -193,14 +193,14 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .post('/places')
         .send(addPlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
 
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
         .post('/places')
         .send(addPlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -216,7 +216,7 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .post('/places')
         .send(addPlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(201)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -252,7 +252,7 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .put('/places/ID4')
         .send(updatePlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -261,7 +261,7 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .put('/places/ID4')
         .send(updatePlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -270,7 +270,7 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .put('/places/ID99')
         .send(updatePlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(404);
     });
 
@@ -280,7 +280,7 @@ describe('Places Controller', () => {
       await request(app.getHttpServer())
         .put('/places/ID1')
         .send(updatePlace)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(200)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -307,7 +307,7 @@ describe('Places Controller', () => {
       // not-found (user from token)
       await request(app.getHttpServer())
         .delete('/places/ID4')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -315,7 +315,7 @@ describe('Places Controller', () => {
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
         .delete('/places/ID4')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -323,7 +323,7 @@ describe('Places Controller', () => {
       // not-found (user from token)
       await request(app.getHttpServer())
         .delete('/places/ID99')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(404);
     });
 

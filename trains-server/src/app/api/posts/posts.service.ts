@@ -8,12 +8,12 @@ import { Model } from 'mongoose';
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
-  getAll() {
-    return this.postModel.find();
+  async getAll() {
+    return await this.postModel.find().exec();
   }
 
   async getOne(uuid: string) {
-    const post = await this.postModel.findById(uuid);
+    const post = await this.postModel.findById(uuid).exec();
     if (post) {
       return post;
     }

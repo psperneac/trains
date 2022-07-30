@@ -1,3 +1,7 @@
 {
-  "window.commandCenter": false
+  "window.commandCenter": false,
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#191919cc",
+    "titleBar.activeForeground":"#ffffff"
+  }
 }

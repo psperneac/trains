@@ -11,18 +11,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { CreateUserDto, UpdateUserDto } from '../../../models/user.model';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 
 @Controller('users')
 @UseGuards(LoggedIn, Admin)
 @SerializeOptions({
   strategy: 'excludeAll',
 })
-@UseFilters(ExceptionsLoggerFilter)
+@UseFilters(AllExceptionsFilter)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {
+  }
 
   @Get()
   getAllUsers() {

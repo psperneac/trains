@@ -11,15 +11,16 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { LoggedIn } from '../../../authentication/authentication.guard';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { CreatePostDto, UpdatePostDto } from '../../../models/posts.model';
 import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
 
 @Controller('posts')
 @UseGuards(LoggedIn)
-@UseFilters(ExceptionsLoggerFilter)
+@UseFilters(AllExceptionsFilter)
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) {
+  }
 
   @Get()
   getAllPosts() {
@@ -29,7 +30,7 @@ export class PostsController {
   }
 
   @Get(':id')
-  getPostById(@Param() { id }: ParamsWithMongoId) {
+  getPostById(@Param() {id}: ParamsWithMongoId) {
     return this.postsService.getOne(id);
   }
 
@@ -40,14 +41,14 @@ export class PostsController {
 
   @Put(':id')
   async replacePost(
-    @Param() { id }: ParamsWithMongoId,
+    @Param() {id}: ParamsWithMongoId,
     @Body() post: UpdatePostDto,
   ) {
     return this.postsService.update(id, post);
   }
 
   @Delete(':id')
-  async deletePost(@Param() { id }: ParamsWithMongoId) {
+  async deletePost(@Param() {id}: ParamsWithMongoId) {
     return this.postsService.delete(id);
   }
 }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { Repository } from 'typeorm';
 import User from './users.entity';
 import { CreateUserDto, UpdateUserDto } from '../../../models/user.model';
@@ -15,7 +16,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async getByEmail(email: string) {
+  async getByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOne({ email });
     if (user) {
       return user;
@@ -26,7 +27,7 @@ export class UsersService {
     );
   }
 
-  async getById(userId: string) {
+  async getById(userId: string): Promise<User> {
     const user = await this.usersRepository.findOne({ id: userId });
     if (user) {
       return user;
@@ -37,7 +38,7 @@ export class UsersService {
     );
   }
 
-  async create(userData: CreateUserDto) {
+  async create(userData: CreateUserDto): Promise<User> {
     const newUser = await this.usersRepository.create({
       ...userData
     });
@@ -46,7 +47,7 @@ export class UsersService {
     return newUser;
   }
 
-  async replace(uuid: string, user: UpdateUserDto) {
+  async replace(uuid: string, user: UpdateUserDto): Promise<User> {
     await this.usersRepository.update(uuid, user);
     const updatedUser = await this.usersRepository.findOne(uuid);
     if (updatedUser) {
@@ -56,7 +57,7 @@ export class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async delete(uuid: string) {
+  async delete(uuid: string): Promise<boolean> {
     const deleteResponse = await this.usersRepository.delete(uuid);
     if (!deleteResponse.affected) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

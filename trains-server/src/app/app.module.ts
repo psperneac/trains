@@ -5,7 +5,7 @@ import { APP_FILTER } from '@nestjs/core';
 
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
-import { ExceptionsLoggerFilter } from '../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
 import { AppController } from './app.controller';
 import { ApiModule } from './api/api.module';
 import { AppService } from './app.service';
@@ -37,8 +37,9 @@ import { AppService } from './app.service';
     AppService,
     {
       provide: APP_FILTER,
-      useClass: ExceptionsLoggerFilter,
+      useClass: AllExceptionsFilter,
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+}

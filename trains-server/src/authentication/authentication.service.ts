@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, TokenPayload } from './authentication.model';
-import { PostgresErrorCode } from '../database/postgres.model';
 import { JwtService } from '@nestjs/jwt';
 import { SCOPE_USER } from '../utils/constants';
 import { UsersService } from '../app/api/users/users.service';
+import User from '../app/api/users/users.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -13,32 +13,16 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async register(registrationData: RegisterDto) {
+  public async register(registrationData: RegisterDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
-    try {
-      console.log('before create');
-      const createdUser = await this.usersService.create({
-        ...registrationData,
-        password: hashedPassword,
-        scope: SCOPE_USER
-      });
-      console.log('after create');
-      createdUser.password = undefined;
-      return createdUser;
-    } catch (error) {
-      if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new HttpException(
-          'User with that email already exists',
-          HttpStatus.BAD_REQUEST,
-        );
-      } else {
-        console.dir(error);
-      }
-      throw new HttpException(
-        'Something went wrong',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const createdUser = await this.usersService.create({
+      ...registrationData,
+      password: hashedPassword,
+      scope: SCOPE_USER,
+    });
+
+    createdUser.password = undefined;
+    return createdUser;
   }
 
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {

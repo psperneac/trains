@@ -13,6 +13,7 @@ import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 
 import { AppModule } from './app/app.module';
+import { AllExceptionsFilter } from './utils/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.use(cookieParser());
   app.use(cors());
   const port = process.env.PORT || 3333;

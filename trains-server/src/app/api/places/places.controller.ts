@@ -10,16 +10,17 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { PlacesService } from './places.service';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { CreatePlaceDto, UpdatePlaceDto } from '../../../models/place.model';
 import { PageRequestDto } from '../../../models/pagination.model';
 
 @Controller('places')
-@UseFilters(ExceptionsLoggerFilter)
+@UseFilters(AllExceptionsFilter)
 export class PlacesController {
-  constructor(private readonly placesService: PlacesService) {}
+  constructor(private readonly placesService: PlacesService) {
+  }
 
   @Get()
   @UseGuards(LoggedIn)

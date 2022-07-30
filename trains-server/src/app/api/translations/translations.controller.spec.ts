@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ExceptionsLoggerFilter } from '../../../utils/exceptions-logger.filter';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { authMocks } from '../../../utils/mocks/auth.mock';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import * as request from 'supertest';
@@ -70,7 +70,7 @@ describe('Translations Controller', () => {
 
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalFilters(new ExceptionsLoggerFilter());
+    app.useGlobalFilters(new AllExceptionsFilter());
     await app.init();
 
     controller = module.get<TranslationsController>(TranslationsController);
@@ -95,7 +95,7 @@ describe('Translations Controller', () => {
 
       await request(app.getHttpServer())
         .get('/translations')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -104,7 +104,7 @@ describe('Translations Controller', () => {
 
       await request(app.getHttpServer())
         .get('/translations')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(200)
         .expect((res) => {
           expect(res).toBeDefined();
@@ -134,14 +134,14 @@ describe('Translations Controller', () => {
     it('should return 404 if token is for non-existent user', async () => {
       await request(app.getHttpServer())
         .get('/translations/ID1')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
     it('should return 404 if looking for non-existing translation', async () => {
       await request(app.getHttpServer())
         .get('/translations/ID99')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(404);
     });
 
@@ -150,7 +150,7 @@ describe('Translations Controller', () => {
 
       await request(app.getHttpServer())
         .get('/translations/ID1')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(200)
         .expect((res) => {
           expect(res.body).toBeDefined();
@@ -173,14 +173,14 @@ describe('Translations Controller', () => {
       await request(app.getHttpServer())
         .post('/translations')
         .send(addTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
 
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
         .post('/translations')
         .send(addTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -194,7 +194,7 @@ describe('Translations Controller', () => {
       await request(app.getHttpServer())
         .post('/translations')
         .send(addTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(201)
         .expect((res) => {
           expect(res.body).toEqual(dto(T9));
@@ -223,7 +223,7 @@ describe('Translations Controller', () => {
       await request(app.getHttpServer())
         .put('/translations/ID4')
         .send(updateTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -232,7 +232,7 @@ describe('Translations Controller', () => {
       await request(app.getHttpServer())
         .put('/translations/ID4')
         .send(updateTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -241,19 +241,19 @@ describe('Translations Controller', () => {
       await request(app.getHttpServer())
         .put('/translations/ID99')
         .send(updateTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(404);
     });
 
     it('should update existing place', async () => {
       const mockUpdate = jest
         .spyOn(repository, 'update')
-        .mockReturnValue({ affected: 1 });
+        .mockReturnValue({affected: 1});
 
       await request(app.getHttpServer())
         .put('/translations/ID1')
         .send(updateTranslation)
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(200)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -281,7 +281,7 @@ describe('Translations Controller', () => {
       // not-found (user from token)
       await request(app.getHttpServer())
         .delete('/translations/ID4')
-        .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
+        .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
         .expect(404);
     });
 
@@ -289,7 +289,7 @@ describe('Translations Controller', () => {
       // forbidden (wrong user scope)
       await request(app.getHttpServer())
         .delete('/translations/ID4')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID1')})
         .expect(403);
     });
 
@@ -297,7 +297,7 @@ describe('Translations Controller', () => {
       // not-found (user from token)
       await request(app.getHttpServer())
         .delete('/translations/ID99')
-        .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
         .expect(404);
     });
 
