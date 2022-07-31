@@ -10,7 +10,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Login",
+					"name": "Login - paul",
 					"event": [
 						{
 							"listen": "test",
@@ -85,6 +85,53 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"gepetto6@gmail.com\",\r\n    \"username\": \"admin7\",\r\n    \"password\": \"admin7admin71!\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{root}}/api/authentication/register",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"authentication",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/authentication/",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"authentication",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -131,6 +178,29 @@
 							"path": [
 								"api",
 								"posts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Places",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/places",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"places"
 							]
 						}
 					},
