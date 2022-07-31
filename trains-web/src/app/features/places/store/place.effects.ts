@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { AppState } from '../../../store';
 import { Router } from '@angular/router';
 import { PlaceActions } from './place.actions';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { PlaceService } from '../services/place.service';
 import { of } from 'rxjs';
+import { PlaceSelectors } from './place.selectors';
 
 @Injectable()
 export class PlaceEffects {
@@ -43,6 +44,14 @@ export class PlaceEffects {
           catchError(error => of(PlaceActions.createFailure({error})))
         )
       )
+    )
+  );
+
+  onCreateSuccessLoadCurrentPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PlaceActions.createSuccess),
+      withLatestFrom(this.store.pipe(select(PlaceSelectors.CurrentPageRequest))),
+      switchMap(([action, currentPageRequest]) => of(PlaceActions.getAll({ request: currentPageRequest })))
     )
   );
 

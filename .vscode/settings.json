@@ -3,5 +3,20 @@
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#191919cc",
     "titleBar.activeForeground":"#ffffff"
-  }
+  },
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "trains@localhost",
+      "database": "trains",
+      "username": "trains",
+      "password": "trains1!"
+    }
+  ]
 }

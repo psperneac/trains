@@ -35,10 +35,10 @@ export class AuthenticationController {
    */
   @UseGuards(LoggedIn)
   @Get()
-  authenticate(@Req() request: RequestWithUser) {
+  authenticate(@Req() request: RequestWithUser, @Res() response: Response) {
     const user = request.user;
     user.password = undefined;
-    return user;
+    return response.status(HttpStatus.OK).send({...user});
   }
 
   @Post('register')

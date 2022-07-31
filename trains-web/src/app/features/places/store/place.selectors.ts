@@ -3,6 +3,7 @@ import { createSelector } from '@ngrx/store';
 import { placesAdapter, PlacesState } from './place.reducer';
 import { AbstractSelectors } from '../../../helpers/abstract.selectors';
 import {PlaceDto} from "../../../models/place.model";
+import { PageRequestDto } from 'src/app/models/pagination.model';
 
 const selectors = placesAdapter.getSelectors();
 
@@ -23,6 +24,16 @@ export class PlaceSelectorsType extends AbstractSelectors<PlaceDto> {
     this.Filter = createSelector(this.PlacesState, (state: PlacesState) => state.filter);
     this.SortColumn = createSelector(this.PlacesState, (state: PlacesState) => state.sortColumn);
     this.SortDirection = createSelector(this.PlacesState, (state: PlacesState) => state.sortDescending ? 'desc' : 'asc');
+    this.CurrentPageRequest = createSelector(this.PlacesState, (state: PlacesState) =>
+      ({
+        page: state.page,
+        limit: state.limit,
+        sortColumn: state.sortColumn,
+        sortDescending: state.sortDescending,
+        filter: state.filter
+      } as PageRequestDto)
+    );
+
     this.SelectedLoading = createSelector(this.PlacesState, (state: PlacesState) => state.selectedLoading);
     this.SelectedLoaded = createSelector(this.PlacesState, (state: PlacesState) => state.selectedLoaded);
     this.Selected = createSelector(this.PlacesState, (state: PlacesState) => state.selected);
