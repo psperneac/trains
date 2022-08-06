@@ -5,10 +5,14 @@ https://docs.nestjs.com/modules
 */
 
 import { Module } from '@nestjs/common';
+import {PlaceType} from "./entities/place-type.entity";
+import {TypeOrmModule} from "@nestjs/typeorm";
+import {PlaceTypeMapper} from "./place-type.mapper";
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([PlaceType])],
   controllers: [PlaceTypesController],
-  providers: [PlaceTypesService],
+  providers: [PlaceTypesService, PlaceTypeMapper],
+  exports: [PlaceTypesService, PlaceTypeMapper],
 })
 export class PlaceTypesModule {}
