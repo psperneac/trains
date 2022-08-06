@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared.module';
-import { RouterModule, Routes } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { PlaceService } from './services/place.service';
@@ -11,11 +10,11 @@ import { PlacesListComponent } from './components/places-list.component';
 import { PlaceFormComponent } from './components/place-form.component';
 import { PlaceEditPage } from './pages/place-edit.page';
 import { ReactiveFormsModule } from '@angular/forms';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LoadOnePlaceGuard } from './load-one-place.guard';
 import { ComponentsModule } from '../../components/components.module';
 import { PlacesRoutingModule } from './places-routing.module';
-import {PlaceCreatePage} from './pages/place-create.page';
+import { PlaceCreatePage } from './pages/place-create.page';
+import { OnePlaceResolver } from './one-place.resolver';
 
 @NgModule({
   imports: [
@@ -39,7 +38,9 @@ import {PlaceCreatePage} from './pages/place-create.page';
   ],
   providers: [
     PlaceService,
-    LoadOnePlaceGuard
+    LoadOnePlaceGuard,
+    OnePlaceResolver,
   ]
 })
-export class PlacesModule { }
+export class PlacesModule {
+}

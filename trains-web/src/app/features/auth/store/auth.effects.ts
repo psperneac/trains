@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {AuthService} from '../services/auth.service';
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { AuthService } from '../services/auth.service';
 import {
   login,
   loginFailure,
@@ -11,13 +11,13 @@ import {
   register, registerFailure,
   registerSuccess
 } from './auth.actions';
-import {catchError, map, switchMap, withLatestFrom} from 'rxjs/operators';
-import {of} from 'rxjs';
-import {select, Store} from '@ngrx/store';
-import {selectLoggedIn, selectUser} from './auth.selectors';
-import {AppState, routerSelectReturnUrl} from '../../../store';
-import {Router} from '@angular/router';
-import {alertWarning, alertError} from '../../../helpers/alert.actions';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+import { selectLoggedIn, selectUser } from './auth.selectors';
+import { AppState, routerSelectReturnUrl } from '../../../store';
+import { Router } from '@angular/router';
+import { alertWarning, alertError } from '../../../helpers/alert.actions';
 
 @Injectable()
 export class AuthEffects {
@@ -43,7 +43,7 @@ export class AuthEffects {
         this.store.pipe(select(selectUser)),
         this.store.pipe(select(routerSelectReturnUrl))),
       map(([_action, loggedIn, _user, returnUrl]) => {
-        if(loggedIn) {
+        if (loggedIn) {
           console.log('LoggedIn - Navigating to Home');
           this.router.navigate([returnUrl || '/home']);
         }
@@ -87,7 +87,10 @@ export class AuthEffects {
       switchMap(action => {
         return this.service.register(action.username, action.email, action.password).pipe(
           map(user => registerSuccess({user})),
-          catchError(err => of(registerFailure({error: err})))
+          catchError(err => {
+            console.log('registerError', err);
+            return of(registerFailure({error: err}));
+          })
         );
       })
     )
@@ -108,5 +111,6 @@ export class AuthEffects {
     private readonly actions$: Actions,
     private readonly service: AuthService,
     private readonly store: Store<AppState>,
-    private readonly router: Router) {}
+    private readonly router: Router) {
+  }
 }

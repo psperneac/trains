@@ -1,40 +1,41 @@
 <div class="register-component center-screen">
-  <form [formGroup]="form" (submit)="onSubmit()">
+  <form (submit)="onSubmit()" *ngIf="form" [formGroup]="form">
     <mat-card>
       <mat-card-title>
         {{'page.register.title' | translate}}
       </mat-card-title>
       <mat-card-content>
         <p>
-          <mat-form-field  appearance="outline" style="width: 350px;">
+          <mat-form-field appearance="outline" style="width: 350px;">
             <mat-label>{{'page.register.username.label' | translate}}</mat-label>
-            <input matInput type="text" id="username" formControlName="username" placeholder="pat_the_great"/>
+            <input formControlName="username" id="username" matInput placeholder="pat_the_great" type="text"/>
           </mat-form-field>
         </p>
         <p>
-          <mat-form-field  appearance="outline" style="width: 350px;">
+          <mat-form-field appearance="outline" style="width: 350px;">
             <mat-label>{{'page.register.email.label' | translate}}</mat-label>
-            <input matInput type="text" id="email" formControlName="email" placeholder="pat@lotsoftrains.com"/>
+            <input formControlName="email" id="email" matInput placeholder="pat@lotsoftrains.com" type="text"/>
           </mat-form-field>
         </p>
         <p>
           <mat-form-field appearance="outline" style="width: 350px;">
             <mat-label>{{'page.register.password.label' | translate}}</mat-label>
-            <input matInput type="password" id="password" formControlName="password" class="form-control" />
+            <input class="form-control" formControlName="password" id="password" matInput type="password"/>
           </mat-form-field>
         </p>
         <p>
           <mat-form-field appearance="outline" style="width: 350px;">
             <mat-label>{{'page.register.passwordConfirm.label' | translate}}</mat-label>
-            <input matInput type="password" id="passwordConfirm" formControlName="passwordConfirm" class="form-control" />
+            <input class="form-control" formControlName="passwordConfirm" id="passwordConfirm" matInput
+                   type="password"/>
           </mat-form-field>
         </p>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button type="submit" class="btn btn-primary">
+        <button class="btn btn-primary" mat-raised-button type="submit">
           {{'button.register' | translate}}
         </button>
-        <button mat-raised-button routerLink="../login" class="btn btn-link">
+        <button class="btn btn-link" mat-raised-button routerLink="../login">
           {{'button.login' | translate}}
         </button>
       </mat-card-actions>

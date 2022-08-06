@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import {AppState} from './store';
-import {select, Store} from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { AppState } from './store';
+import { select, Store } from '@ngrx/store';
 import { selectLoggedIn, logout } from './features/auth/store';
 import { Route, Router } from '@angular/router';
 import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
@@ -10,6 +10,7 @@ import { DEFAULT_IDLE, DEFAULT_KEEPALIVE, DEFAULT_TIMEOUT } from './utils/consta
 import { UiService } from './services/ui.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { AuthFacade } from './features/auth/store/auth.facade';
 
 @Component({
   selector: 'trains-web-root',
@@ -30,6 +31,8 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
 
   loggedIn$ = this.store.pipe(select(selectLoggedIn));
 
+  isAdmin$ = this.authFacade.isAdmin$;
+
   constructor(
     private readonly translate: TranslateService,
     private readonly store: Store<AppState>,
@@ -37,7 +40,8 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
     private readonly idle: Idle,
     private readonly keepalive: Keepalive,
     private readonly uiService: UiService,
-    private readonly changeDetectorRef: ChangeDetectorRef) {
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly authFacade: AuthFacade) {
     this.translate.setDefaultLang(this.language);
     this.translate.use(this.language);
 
@@ -89,7 +93,7 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   menuClicked(tag: string) {
-    switch(tag) {
+    switch (tag) {
       case 'home':
         this.router.navigate(['/home']);
         break;

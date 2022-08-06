@@ -11,3 +11,6 @@ export const selectLoggedIn = createSelector(selectAuthState, (state: AuthState)
 export const selectLoggingIn = createSelector(selectAuthState, (state: AuthState) => state.loggingIn);
 export const selectLoggingOut = createSelector(selectAuthState, (state: AuthState) => state.loggingOut);
 export const selectRegistering = createSelector(selectAuthState, (state: AuthState) => state.registering);
+
+export const isAdmin = createSelector(selectAuthState, (state: AuthState) => state?.user?.scope === 'ADMIN');
+export const isUser = createSelector(selectAuthState, (state: AuthState) => state?.user?.scope === 'USER');

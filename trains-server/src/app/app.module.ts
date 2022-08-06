@@ -6,6 +6,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
 import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
+import { PlaceTypesService } from './api/place-types/place-types.service';
+import { PlaceTypesModule } from './api/place-types/place-types.module';
 import { AppController } from './app.controller';
 import { ApiModule } from './api/api.module';
 import { AppService } from './app.service';
@@ -41,5 +43,4 @@ import { AppService } from './app.service';
     },
   ],
 })
-export class AppModule {
-}
+export class AppModule {}

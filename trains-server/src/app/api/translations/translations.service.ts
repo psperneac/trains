@@ -19,11 +19,7 @@ export class TranslationsService {
     const skippedItems = (page - 1) * limit;
 
     return Promise.all([
-      this.repository
-        .createQueryBuilder()
-        .offset(skippedItems)
-        .limit(limit)
-        .getMany(),
+      this.repository.createQueryBuilder().offset(skippedItems).limit(limit).getMany(),
       this.repository.count(),
     ]).then(([translations, count]) => ({
       data: translations,
@@ -55,15 +51,9 @@ export class TranslationsService {
   }
 
   async update(uuid: string, translation: Translation) {
-    const updateResponse: UpdateResult = await this.repository.update(
-      uuid,
-      translation,
-    );
+    const updateResponse: UpdateResult = await this.repository.update(uuid, translation);
     if (!updateResponse || !updateResponse.affected) {
-      throw new HttpException(
-        'Translation not updated',
-        HttpStatus.NOT_ACCEPTABLE,
-      );
+      throw new HttpException('Translation not updated', HttpStatus.NOT_ACCEPTABLE);
     }
 
     return translation;

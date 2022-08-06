@@ -1,11 +1,12 @@
 <div class="box">
   <mat-toolbar class="row header">
-    <button [disabled]="!(loggedIn$ | async)" mat-icon-button class="example-icon" aria-label="Menu" [matMenuTriggerFor]="menu">
+    <button [disabled]="!(loggedIn$ | async)" [matMenuTriggerFor]="menu" aria-label="Menu" class="example-icon"
+            mat-icon-button>
       <mat-icon>more_vert</mat-icon>
     </button>
     <span>{{'application.title' | translate}} - {{currentTitle | translate}}</span>
     <span class="toolbar-spacer"></span>
-    <button mat-icon-button class="example-icon" aria-label="System Menu"  [matMenuTriggerFor]="systemMenu">
+    <button [matMenuTriggerFor]="systemMenu" aria-label="System Menu" class="example-icon" mat-icon-button>
       <mat-icon>face</mat-icon>
     </button>
   </mat-toolbar>
@@ -15,49 +16,49 @@
 </div>
 
 <mat-menu #menu="matMenu">
-  <button mat-menu-item  (click)="menuClicked('home')">
+  <button (click)="menuClicked('home')" mat-menu-item>
     <mat-icon>home</mat-icon>
     <span>{{'menu.home' | translate}}</span>
   </button>
-  <button mat-menu-item [matMenuTriggerFor]="adminMenu">
+  <button *ngIf="isAdmin$ | async" [matMenuTriggerFor]="adminMenu" mat-menu-item>
     <mat-icon>settings_system_daydream</mat-icon>
     <span>{{'menu.admin' | translate}}</span>
   </button>
 </mat-menu>
 
 <mat-menu #adminMenu="matMenu">
-  <button mat-menu-item (click)="menuClicked('users')">
+  <button (click)="menuClicked('users')" mat-menu-item>
     <mat-icon>supervisor_account</mat-icon>
     <span>{{'menu.users' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="menuClicked('map')">
+  <button (click)="menuClicked('map')" mat-menu-item>
     <mat-icon>map</mat-icon>
     <span>{{'menu.map' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="menuClicked('places')">
+  <button (click)="menuClicked('places')" mat-menu-item>
     <mat-icon>edit_location</mat-icon>
     <span>{{'menu.places' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="menuClicked('routes')">
+  <button (click)="menuClicked('routes')" mat-menu-item>
     <mat-icon>edit_road</mat-icon>
     <span>{{'menu.routes' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="menuClicked('vehicles')">
+  <button (click)="menuClicked('vehicles')" mat-menu-item>
     <mat-icon>directions_transit</mat-icon>
     <span>{{'menu.vehicles' | translate}}</span>
   </button>
 </mat-menu>
 
 <mat-menu #systemMenu="matMenu">
-  <button mat-menu-item (click)="menuClicked('info')">
+  <button (click)="menuClicked('info')" mat-menu-item>
     <mat-icon>info</mat-icon>
     <span>{{'menu.about' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="menuClicked('help')">
+  <button (click)="menuClicked('help')" mat-menu-item>
     <mat-icon>help_outline</mat-icon>
     <span>{{'menu.help' | translate}}</span>
   </button>
-  <button mat-menu-item (click)="logout()" [disabled]="!(loggedIn$ | async)">
+  <button (click)="logout()" [disabled]="!(loggedIn$ | async)" mat-menu-item>
     <mat-icon>exit_to_app</mat-icon>
     <span>{{'menu.logout' | translate}}</span>
   </button>

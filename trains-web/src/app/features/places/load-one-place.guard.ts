@@ -2,7 +2,7 @@ import { LoadOneGuard } from '../../guards/load-one.guard';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store';
 import { Injectable } from '@angular/core';
-import { PlaceActions } from './store/place.actions';
+import { PlaceActions } from './store';
 
 @Injectable()
 export class LoadOnePlaceGuard extends LoadOneGuard {

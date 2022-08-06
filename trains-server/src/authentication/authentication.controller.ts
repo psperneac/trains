@@ -32,6 +32,7 @@ export class AuthenticationController {
   /**
    * Verifies auth token and returns current user
    * @param request
+   * @param response contains logged-in user if login ok or error if login not ok
    */
   @UseGuards(LoggedIn)
   @Get()
@@ -41,14 +42,17 @@ export class AuthenticationController {
     return response.status(HttpStatus.OK).send({...user});
   }
 
+  /**
+   * Registers a new user in the system
+   * @param registrationData details of the new user
+   * @param response newly registered user details or error
+   */
   @Post('register')
   async register(
     @Body() registrationData: RegisterDto,
     @Res() response: Response,
   ) {
-    console.log('controller.registering', registrationData);
     const created = await this.authenticationService.register(registrationData);
-    console.log('controller', created);
     return response.status(HttpStatus.CREATED).send({...created});
   }
 

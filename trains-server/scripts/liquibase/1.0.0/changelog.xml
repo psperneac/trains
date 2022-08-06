@@ -52,13 +52,13 @@
 
     <changeSet id="110" author="Paul">
         <createIndex tableName="USERS" indexName="USERS_NAME" unique="true">
-            <column name="USERNAME"></column>
+            <column name="USERNAME"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="120" author="Paul">
         <createIndex tableName="USERS" indexName="USERS_EMAIL" unique="true">
-            <column name="EMAIL"></column>
+            <column name="EMAIL"/>
         </createIndex>
     </changeSet>
 
@@ -95,7 +95,7 @@
 
     <changeSet id="210" author="Paul">
         <createIndex tableName="PLACES" indexName="POINTS_NAME">
-            <column name="NAME"></column>
+            <column name="NAME"/>
         </createIndex>
     </changeSet>
 
@@ -169,11 +169,42 @@
             <column name="DEFAULT_NAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="DESCRIPTION" type="VARCHAR(250)"></column>
+            <column name="DESCRIPTION" type="VARCHAR(250)"/>
             <column name="CONTENT" type="VARCHAR(2000)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="600" author="Paul">
+        <createTable tableName="PLACE_TYPES">
+            <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
+            <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DELETED" type="DATETIME"/>
+
+            <column name="TYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEFAULT_NAME" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(250)"/>
+            <column name="CONTENT" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>
