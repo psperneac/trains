@@ -19,7 +19,7 @@ export class VehicleTypeMapper {
 
   toDomain(dto: VehicleTypeDto, vehicleType?: VehicleType): VehicleType {
     const ret = {
-      ...vehicleType
+      ...vehicleType,
     };
 
     assign(ret, {

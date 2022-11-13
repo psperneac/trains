@@ -1,46 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, UseGuards, Query } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { VehicleTypeService } from './vehicle-type.service';
 import { VehicleTypeDto } from './dto/vehicle-type.dto';
 import { VehicleTypeMapper } from './vehicle-type.mapper';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
-import { PageRequestDto } from '../../../models/pagination.model';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { VehicleType } from './entities/vehicle-type.entity';
+import { AbstractService } from '../../../utils/abstract.service';
+import { Mapper } from '../../../utils/mapper';
 
 @Controller('vehicle-types')
 @UseFilters(AllExceptionsFilter)
-export class VehicleTypeController {
-  constructor(private readonly service: VehicleTypeService, private readonly mapper: VehicleTypeMapper) {}
-
-  @Get()
-  @UseGuards(LoggedIn)
-  findAll(@Query() pagination: PageRequestDto) {
-    return this.service.findAll(pagination).then((page) => ({
-      ...page,
-      data: page?.data?.map((item) => this.mapper.toDto(item)),
-    }));
+export class VehicleTypeController extends AbstractServiceController<VehicleType, VehicleTypeDto> {
+  constructor(private readonly service: VehicleTypeService, private readonly mapper: VehicleTypeMapper) {
+    super();
   }
 
-  @Get(':id')
-  @UseGuards(LoggedIn)
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  public getService(): AbstractService<VehicleType> {
+    return this.service;
   }
-
-  @Post()
-  @UseGuards(LoggedIn, Admin)
-  create(@Body() createVehicleTypeDto: VehicleTypeDto) {
-    return this.service.create(createVehicleTypeDto);
-  }
-
-  @Patch(':id')
-  @UseGuards(LoggedIn, Admin)
-  update(@Param('id') id: string, @Body() updateVehicleTypeDto: VehicleTypeDto) {
-    return this.service.update(id, updateVehicleTypeDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(LoggedIn, Admin)
-  remove(@Param('id') id: string) {
-    return this.service.delete(id);
+  public getMapper(): Mapper<VehicleType, VehicleTypeDto> {
+    return this.mapper;
   }
 }

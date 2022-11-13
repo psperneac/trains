@@ -5,10 +5,11 @@ module.exports = {
         sourceType: 'module',
     },
     plugins: ['@typescript-eslint/eslint-plugin'],
-    extends: [
-        'plugin:@typescript-eslint/recommended',
-        'plugin:prettier/recommended',
-    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
     root: true,
     env: {
         node: true,
@@ -20,10 +21,13 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
-        'max-len': ['error', {'code': 120}],
+        'max-len': ['error', {'code': 140}],
         'prettier/prettier': ['error', {
             'endOfLine': 'auto',
-            'printWidth': 120
-        }]
+            'printWidth': 140
+        }],
+        // disable standard no-unused-vars, enable typescript-eslint one
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["warn", {"args": "all", "argsIgnorePattern": "^_"}],
     },
 };

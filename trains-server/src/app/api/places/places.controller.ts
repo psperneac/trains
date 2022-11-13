@@ -1,54 +1,29 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseFilters,
-  UseGuards,
+  UseFilters
 } from '@nestjs/common';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { PlacesService } from './places.service';
-import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
-import { CreatePlaceDto, UpdatePlaceDto } from '../../../models/place.model';
-import { PageRequestDto } from '../../../models/pagination.model';
+import { PlaceDto } from '../../../models/place.model';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import Place from './place.entity';
+import { PlaceMapper } from './place.mapper';
+import { AbstractService } from '../../../utils/abstract.service';
+import { Mapper } from '../../../utils/mapper';
 
 @Controller('places')
 @UseFilters(AllExceptionsFilter)
-export class PlacesController {
-  constructor(private readonly placesService: PlacesService) {
+export class PlacesController extends AbstractServiceController<Place, PlaceDto> {
+  constructor(
+    private readonly placesService: PlacesService,
+    private readonly placesMapper: PlaceMapper) {
+    super();
   }
 
-  @Get()
-  @UseGuards(LoggedIn)
-  getAll(@Query() pagination: PageRequestDto) {
-    return this.placesService.getAll(pagination);
+  public getService(): AbstractService<Place> {
+    return this.placesService;
   }
-
-  @Get(':id')
-  @UseGuards(LoggedIn)
-  getOn(@Param('id') id: string) {
-    return this.placesService.getOne(id);
-  }
-
-  @Post()
-  @UseGuards(LoggedIn, Admin)
-  create(@Body() place: CreatePlaceDto) {
-    return this.placesService.create(place);
-  }
-
-  @Put(':id')
-  @UseGuards(LoggedIn, Admin)
-  update(@Param('id') id: string, @Body() place: UpdatePlaceDto) {
-    return this.placesService.update(id, place);
-  }
-
-  @Delete(':id')
-  @UseGuards(LoggedIn, Admin)
-  delete(@Param('id') id: string) {
-    return this.placesService.delete(id);
+  public getMapper(): Mapper<Place, PlaceDto> {
+    return this.placesMapper;
   }
 }

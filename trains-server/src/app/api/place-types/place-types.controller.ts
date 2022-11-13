@@ -1,51 +1,27 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseFilters, UseGuards} from '@nestjs/common';
-import {AllExceptionsFilter} from "../../../utils/all-exceptions.filter";
-import {PlaceTypesService} from "./place-types.service";
-import {PlaceTypeMapper} from "./place-type.mapper";
-import {Admin, LoggedIn} from "../../../authentication/authentication.guard";
-import {PageRequestDto} from "../../../models/pagination.model";
-import Place from "../places/place.entity";
-import {PlaceTypeDto} from "./dto/place-type.dto";
+import { Controller, UseFilters } from '@nestjs/common';
+import { AllExceptionsFilter } from "../../../utils/all-exceptions.filter";
+import { PlaceTypesService } from "./place-types.service";
+import { PlaceTypeMapper } from "./place-type.mapper";
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { PlaceType } from './entities/place-type.entity';
+import { AbstractService } from '../../../utils/abstract.service';
+import { Mapper } from '../../../utils/mapper';
+import { PlaceTypeDto } from './dto/place-type.dto';
 
 @Controller('place-types')
 @UseFilters(AllExceptionsFilter)
-export class PlaceTypesController {
+export class PlaceTypesController extends AbstractServiceController<PlaceType, PlaceTypeDto> {
   constructor(
     private readonly service: PlaceTypesService,
     private readonly mapper: PlaceTypeMapper
-  ) {}
-
-
-  @Get()
-  @UseGuards(LoggedIn)
-  findAll(@Query() pagination: PageRequestDto) {
-    return this.service.findAll(pagination).then((page) => ({
-      ...page,
-      data: page?.data?.map((item) => this.mapper.toDto(item)),
-    }));
+  ) {
+    super();
   }
 
-  @Get(':id')
-  @UseGuards(LoggedIn)
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  public getService(): AbstractService<PlaceType> {
+    return this.service;
   }
-
-  @Post()
-  @UseGuards(LoggedIn, Admin)
-  create(@Body() createPlaceTypeDto: PlaceTypeDto) {
-    return this.service.create(createPlaceTypeDto);
-  }
-
-  @Patch(':id')
-  @UseGuards(LoggedIn, Admin)
-  update(@Param('id') id: string, @Body() updatePlaceTypeDto: PlaceTypeDto) {
-    return this.service.update(id, updatePlaceTypeDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(LoggedIn, Admin)
-  remove(@Param('id') id: string) {
-    return this.service.delete(id);
+  public getMapper(): Mapper<PlaceType, PlaceTypeDto> {
+    return this.mapper;
   }
 }
