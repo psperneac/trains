@@ -1,18 +1,18 @@
-import * as Joi from 'joi';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as Joi from 'joi';
+import { ApiModule } from '../app/api/api.module';
+import { VehicleType } from '../app/api/vehicle-types/entities/vehicle-type.entity';
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
-import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
-import { AppController } from './app.controller';
-import { ApiModule } from './api/api.module';
-import { AppService } from './app.service';
+import { Seeder } from './seeder';
+import { VehicleTypeSeederService } from './vehicle-type-seeder.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath: '.env',
       validationSchema: Joi.object({
         MYSQL_HOST: Joi.string().required(),
         MYSQL_PORT: Joi.number().required(),
@@ -31,14 +31,11 @@ import { AppService } from './app.service';
     DatabaseModule,
     AuthenticationModule,
     ApiModule,
-  ],
-  controllers: [AppController],
+    TypeOrmModule.forFeature([VehicleType])],
   providers: [
-    AppService,
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-  ],
+    Logger,
+    Seeder,
+    VehicleTypeSeederService],
 })
-export class AppModule {}
+export class SeederModule {
+}

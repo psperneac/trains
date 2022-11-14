@@ -166,17 +166,59 @@
             <column name="NAME" type="VARCHAR(250)">
                 <constraints nullable="false"/>
             </column>
-            <column name="DEFAULT_NAME" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
             <column name="DESCRIPTION" type="VARCHAR(250)"/>
-            <column name="CONTENT" type="VARCHAR(2000)">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
     </changeSet>
 
+    <changeSet id="510" author="Paul">
+        <createIndex tableName="VEHICLE_TYPES" indexName="VEHICLE_TYPES_TYPE" unique="true">
+            <column name="TYPE"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="520" author="Paul">
+        <createIndex tableName="VEHICLE_TYPES" indexName="VEHICLE_TYPES_NAME" unique="true">
+            <column name="NAME"/>
+        </createIndex>
+    </changeSet>
+
     <changeSet id="600" author="Paul">
+        <createTable tableName="VEHICLE_SUBTYPES">
+            <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="INTEGER" defaultValue="0"/>
+            <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DELETED" type="DATETIME"/>
+
+            <column name="SUBTYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(250)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="610" author="Paul">
+        <createIndex tableName="VEHICLE_SUBTYPES" indexName="VEHICLE_SUBTYPES_SUBTYPE" unique="true">
+            <column name="SUBTYPE"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="620" author="Paul">
+        <createIndex tableName="VEHICLE_SUBTYPES" indexName="VEHICLE_SUBTYPES_NAME" unique="true">
+            <column name="NAME"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="700" author="Paul">
         <createTable tableName="PLACE_TYPES">
             <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -196,14 +238,20 @@
             <column name="NAME" type="VARCHAR(250)">
                 <constraints nullable="false"/>
             </column>
-            <column name="DEFAULT_NAME" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
             <column name="DESCRIPTION" type="VARCHAR(250)"/>
-            <column name="CONTENT" type="VARCHAR(2000)">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="710" author="Paul">
+        <createIndex tableName="PLACE_TYPES" indexName="PLACE_TYPES_TYPE" unique="true">
+            <column name="TYPE"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="720" author="Paul">
+        <createIndex tableName="PLACE_TYPES" indexName="PLACE_TYPES_NAME" unique="true">
+            <column name="NAME"/>
+        </createIndex>
     </changeSet>
 
 

@@ -12,15 +12,7 @@ export class PlaceType extends AbstractEntity {
   @Expose()
   name: string;
 
-  @Column('varchar', { name: 'DEFAULT_NAME', length: 250 })
-  @Expose()
-  defaultName: string;
-
   @Column('varchar', { length: 250 })
   @Expose()
   description: string;
-
-  @Column('varchar', { length: 2000 })
-  @Expose()
-  content: string;
 }

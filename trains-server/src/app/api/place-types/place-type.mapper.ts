@@ -10,9 +10,7 @@ export class PlaceTypeMapper {
     return {
       id: placeType.id,
       name: placeType.name,
-      defaultName: placeType.defaultName,
       description: placeType.description,
-      content: JSON.parse(placeType.content)
     } as PlaceTypeDto;
   }
 
@@ -23,7 +21,6 @@ export class PlaceTypeMapper {
 
     assign(ret, {
       ...dto,
-      content: JSON.stringify(dto.content)
     });
 
     return ret;
