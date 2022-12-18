@@ -2,6 +2,7 @@ import { AbstractEntity } from '../abstract.entity';
 import { cloneDeep } from 'lodash';
 import { isString } from 'util';
 import * as uuid from 'uuid-v4';
+import { UpdateResult } from 'typeorm';
 
 export class MockRepository<T extends AbstractEntity> {
   private data: T[];
@@ -63,7 +64,7 @@ export class MockRepository<T extends AbstractEntity> {
     };
   }
 
-  update(id: string, entity: T) {
+  update(id: string, entity: T): Promise<UpdateResult> {
     entity = {
       ...this.data.find((u) => u.id === id),
       ...entity,
@@ -71,7 +72,10 @@ export class MockRepository<T extends AbstractEntity> {
 
     this.data = [...this.data.filter((u) => u.id !== id), entity];
 
-    return Promise.resolve(entity);
+    return Promise.resolve({
+      raw: 0,
+      affected: 1
+    } as UpdateResult);
   }
 
   save(entity: T) {
@@ -82,7 +86,7 @@ export class MockRepository<T extends AbstractEntity> {
   delete(id: string) {
     const entity = this.data.find((u) => u.id === id);
     this.data = this.data.filter((u) => u.id !== id);
-    return Promise.resolve({ affected: !!entity });
+    return Promise.resolve({affected: !!entity});
   }
 
   count() {

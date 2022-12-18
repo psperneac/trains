@@ -4,7 +4,7 @@ import {
   ExceptionFilter,
   HttpStatus,
   HttpException,
-  Logger, UnauthorizedException,
+  Logger, UnauthorizedException, ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { QueryFailedError, EntityNotFoundError, CannotCreateEntityIdMapError } from 'typeorm';
@@ -82,6 +82,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = (ex as UnauthorizedException).message;
         code = (ex as any).code;
         break;
+      case ForbiddenException:
+        status = HttpStatus.FORBIDDEN;
+        message = (ex as ForbiddenException).message;
+        code = (ex as any).code;
+        break;
       default:
         status = HttpStatus.INTERNAL_SERVER_ERROR
         code = ex.constructor.toString();
@@ -89,7 +94,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     response.status(status).json(GlobalResponseError(status, message, code, request,
-      (ex as any)?.stack.split('\n').map(str => str.trim())));
+      (ex as any)?.stack?.split('\n').map(str => str.trim())));
   }
 }
 

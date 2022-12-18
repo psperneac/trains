@@ -36,14 +36,15 @@ export abstract class AbstractService<T> {
   }
 
   update(uuid: string, entity): Promise<T> {
-    return this.getRepository().update(uuid, entity)
-      .then((updateResult) => {
-        if (updateResult.affected) {
-          return this.findOne(uuid);
-        }
+    const updatePromise = this.getRepository().update(uuid, entity);
 
-        throw new SqlException(updateResult.raw);
-      });
+    return updatePromise.then((updateResult) => {
+      if (updateResult.affected) {
+        return this.findOne(uuid);
+      }
+
+      throw new SqlException(updateResult.raw);
+    });
   }
 
   delete(uuid: string): Promise<boolean> {

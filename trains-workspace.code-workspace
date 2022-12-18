@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "trains-server"
+		},
+		{
+			"path": "trains-web"
+		},
+		{
+			"path": "trains-docs"
+		}
+	]
+}

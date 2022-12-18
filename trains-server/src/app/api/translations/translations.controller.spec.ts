@@ -53,6 +53,10 @@ describe('Translations Controller', () => {
 
   const TRANSLATIONS = [T1, T2, T3, T4, T5, T6, T7, T8];
 
+  beforeAll(() => {
+    jest.setTimeout(120000);
+  });
+
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [TranslationsController],
@@ -99,7 +103,8 @@ describe('Translations Controller', () => {
         .expect(404);
     });
 
-    it('should return posts when logged in as normal user', async () => {
+    it('should return translations when logged in as normal user', async () => {
+      jest.setTimeout(120000);
       const mockFind = jest.spyOn(repository, 'getMany');
 
       await request(app.getHttpServer())
@@ -245,10 +250,9 @@ describe('Translations Controller', () => {
         .expect(404);
     });
 
-    it('should update existing place', async () => {
+    it('should update existing translation', async () => {
       const mockUpdate = jest
-        .spyOn(repository, 'update')
-        .mockReturnValue({affected: 1});
+        .spyOn(repository, 'update');
 
       await request(app.getHttpServer())
         .put('/translations/ID1')
@@ -293,7 +297,7 @@ describe('Translations Controller', () => {
         .expect(403);
     });
 
-    it('should return 404 if trying to delete unknown place', async () => {
+    it('should return 404 if trying to delete unknown translation', async () => {
       // not-found (user from token)
       await request(app.getHttpServer())
         .delete('/translations/ID99')
@@ -301,10 +305,11 @@ describe('Translations Controller', () => {
         .expect(404);
     });
 
-    //     .expect(200)
-    //     .expect('true');
-    //
-    //   expect(mockDelete).toHaveBeenCalledWith('ID1');
-    // });
+    it('should delete a known translation', async () => {
+      await request(app.getHttpServer())
+        .delete('/translations/ID1')
+        .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+        .expect(200);
+    });
   });
 });

@@ -3,10 +3,18 @@ import { assign } from 'lodash';
 
 import { TranslationDto } from './dto/translation.dto';
 import Translation from './entities/translation.entity';
+import { AbstractMapper } from '../../../utils/abstract.mapper';
 
 @Injectable()
-export class TranslationMapper {
+export class TranslationMapper implements AbstractMapper<Translation, TranslationDto> {
+  constructor() {
+  }
+
   toDto(translation: Translation): TranslationDto {
+    if (!translation) {
+      return null;
+    }
+
     return {
       id: translation.id,
       language: translation.language,
@@ -15,13 +23,7 @@ export class TranslationMapper {
     };
   }
 
-  toDomain(dto: TranslationDto, translations?: Translation): Translation {
-    const ret = {
-      ...translations,
-    };
-
-    assign(ret, dto);
-
-    return ret;
+  toDomain(dto: TranslationDto, translation?: Translation): Translation {
+    return assign({}, translation ?? {}, dto ?? {});
   }
 }

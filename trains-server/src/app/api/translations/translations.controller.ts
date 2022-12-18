@@ -25,7 +25,8 @@ export class TranslationsController extends AbstractServiceController<Translatio
   public getService(): AbstractService<Translation> {
     return this.service;
   }
+
   public getMapper(): Mapper<Translation, TranslationDto> {
-    throw this.mapper;
+    return this.mapper;
   }
 }
