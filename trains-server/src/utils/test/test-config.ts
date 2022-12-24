@@ -1,9 +1,10 @@
 import { AbstractServiceController } from '../abstract-service.controller';
 import { AbstractService } from '../abstract.service';
 import { AbstractMapper } from '../abstract.mapper';
+import {AbstractEntity} from "../abstract.entity";
 
 /** config class to be used in abstract controller test */
-export interface TestConfig<T, R> {
+export interface TestConfig<T extends AbstractEntity, R> {
   /** name to be displayed in test */
   name: string;
   /** url at which the entity's controller is served */
@@ -13,6 +14,7 @@ export interface TestConfig<T, R> {
   createEntity: (id: number) => T;
   /** method to produce a new update dto with a number seed */
   createUpdateDto: (id: number) => Partial<R>;
+  /** method to produce a new patch dto with a number seed */
   createPatchDto: (id: number) => Partial<R>;
 
   /** the class of the entity, used in setting up the test */
@@ -36,7 +38,8 @@ export interface TestConfig<T, R> {
   /** repository created by nest */
   repository?: any;
 
+  /** id of a new entity to be created using POST */
   newEntityId: number;
-  updateEntityId: number;
-  patchEntityId: number;
+  /** id of an existing entity to be updated using PUT or PATCH and deleted via DELETE */
+  existingEntityId: number;
 }

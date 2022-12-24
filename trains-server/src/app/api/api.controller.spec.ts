@@ -126,7 +126,7 @@ describe('Abstract Controller', () => {
     });
 
     describe('POST /translations', () => {
-      const addTranslation = config.createUpdateDto(config.updateEntityId);
+      const addTranslation = config.createUpdateDto(config.newEntityId);
 
       it('should return error if no token is present, token is for non-existent user or token is for normal user', async () => {
         // unauthorized
@@ -161,13 +161,12 @@ describe('Abstract Controller', () => {
           .set({Authorization: getAuthorizationBearer(module, 'ID10')})
           .expect(201)
           .expect((res) => {
-            const updated = pick(res.body, keys(addTranslation));
-
-            expect(updated).toEqual(addTranslation);
+            const created = pick(res.body, keys(addTranslation));
+            expect(created).toEqual(addTranslation);
           });
 
         expect(mockCreate).toHaveBeenCalledWith(addTranslation);
-        expect(mockSave).toHaveBeenCalledWith(T9);
+        expect(mockSave).toHaveBeenCalled();
       });
     });
 
