@@ -7,9 +7,6 @@ import { AbstractMapper } from '../../../utils/abstract.mapper';
 
 @Injectable()
 export class TranslationMapper implements AbstractMapper<Translation, TranslationDto> {
-  constructor() {
-  }
-
   toDto(translation: Translation): TranslationDto {
     if (!translation) {
       return null;

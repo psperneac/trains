@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CreatePlaceDto,
-  PlaceDto,
-  UpdatePlaceDto,
-} from '../../../models/place.model';
+import { CreatePlaceDto, PlaceDto, UpdatePlaceDto } from '../../../models/place.model';
 import Place from './place.entity';
 import { assign } from 'lodash';
 
 @Injectable()
 export class PlaceMapper {
   toDto(place: Place): PlaceDto {
+    if (!place) {
+      return null;
+    }
+
     return {
       id: place.id,
       name: place.name,
@@ -20,10 +20,7 @@ export class PlaceMapper {
     };
   }
 
-  toDomain(
-    dto: PlaceDto | CreatePlaceDto | UpdatePlaceDto,
-    place?: Place,
-  ): Place {
+  toDomain(dto: PlaceDto | CreatePlaceDto | UpdatePlaceDto, place?: Place): Place {
     const ret = {
       ...place,
     };

@@ -1,7 +1,4 @@
-import {
-  Controller,
-  UseFilters
-} from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { PlacesService } from './places.service';
 import { PlaceDto } from '../../../models/place.model';
@@ -14,9 +11,7 @@ import { Mapper } from '../../../utils/mapper';
 @Controller('places')
 @UseFilters(AllExceptionsFilter)
 export class PlacesController extends AbstractServiceController<Place, PlaceDto> {
-  constructor(
-    private readonly placesService: PlacesService,
-    private readonly placesMapper: PlaceMapper) {
+  constructor(private readonly placesService: PlacesService, private readonly placesMapper: PlaceMapper) {
     super();
   }
 

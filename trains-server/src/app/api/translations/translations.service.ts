@@ -14,10 +14,7 @@ export class TranslationsService extends AbstractService<Translation> {
   }
 
   getAllByLanguage(language: string): Promise<Translation[]> {
-    return this.repository
-      .createQueryBuilder('translation')
-      .where('translation.language = :language', {language})
-      .getMany();
+    return this.repository.createQueryBuilder('translation').where('translation.language = :language', { language }).getMany();
   }
 
   public getRepository(): Repository<Translation> {

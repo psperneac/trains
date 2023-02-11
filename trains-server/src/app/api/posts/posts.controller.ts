@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, UseFilters } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
@@ -25,7 +15,6 @@ export class PostsController {
   @Get()
   getAllPosts() {
     const ret = this.postsService.getAll();
-    console.log('AllPosts', ret);
     return ret;
   }
 
@@ -40,10 +29,7 @@ export class PostsController {
   }
 
   @Put(':id')
-  async replacePost(
-    @Param() {id}: ParamsWithMongoId,
-    @Body() post: UpdatePostDto,
-  ) {
+  async replacePost(@Param() { id }: ParamsWithMongoId, @Body() post: UpdatePostDto) {
     return this.postsService.update(id, post);
   }
 

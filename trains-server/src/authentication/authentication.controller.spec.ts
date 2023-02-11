@@ -64,7 +64,7 @@ describe('Authentication Controller', () => {
 
   describe('POST /authentication/register', () => {
     it('should call userService.create on a call to register', async () => {
-      const mockCreate = jest.spyOn(usersService, 'create');
+      const mockCreate = jest.spyOn(usersService, 'create').mockReturnValue(Promise.resolve({} as User));
 
       await request(app.getHttpServer())
         .post('/authentication/register')
@@ -85,9 +85,7 @@ describe('Authentication Controller', () => {
 
   describe('POST /authentication/login', () => {
     it('should return an Authorization header', async () => {
-      const mockAuthorization = jest
-        .spyOn(service, 'getAuthorizationBearer')
-        .mockReturnValue('Bearer 1234');
+      const mockAuthorization = jest.spyOn(service, 'getAuthorizationBearer').mockReturnValue('Bearer 1234');
       const mockVerify = jest.spyOn(service, 'verifyPassword');
 
       await request(app.getHttpServer())

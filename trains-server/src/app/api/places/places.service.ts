@@ -8,7 +8,7 @@ import { AbstractService } from '../../../utils/abstract.service';
 export class PlacesService extends AbstractService<Place> {
   constructor(
     @InjectRepository(Place)
-    private repository: Repository<Place>
+    private repository: Repository<Place>,
   ) {
     super();
   }

@@ -26,8 +26,7 @@ import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
   strategy: 'excludeAll',
 })
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {
-  }
+  constructor(private readonly authenticationService: AuthenticationService) {}
 
   /**
    * Verifies auth token and returns current user
@@ -39,7 +38,7 @@ export class AuthenticationController {
   authenticate(@Req() request: RequestWithUser, @Res() response: Response) {
     const user = request.user;
     user.password = undefined;
-    return response.status(HttpStatus.OK).send({...user});
+    return response.status(HttpStatus.OK).send({ ...user });
   }
 
   /**
@@ -48,27 +47,22 @@ export class AuthenticationController {
    * @param response newly registered user details or error
    */
   @Post('register')
-  async register(
-    @Body() registrationData: RegisterDto,
-    @Res() response: Response,
-  ) {
+  async register(@Body() registrationData: RegisterDto, @Res() response: Response) {
     const created = await this.authenticationService.register(registrationData);
-    return response.status(HttpStatus.CREATED).send({...created});
+    return response.status(HttpStatus.CREATED).send({ ...created });
   }
 
   @HttpCode(200)
   @UseGuards(LocalAuthenticationGuard)
   @Post('login')
   async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
-    const {user} = request;
-    const authorization = this.authenticationService.getAuthorizationBearer(
-      user.id,
-    );
+    const { user } = request;
+    const authorization = this.authenticationService.getAuthorizationBearer(user.id);
     user.password = undefined;
     return response
       .setHeader('Authorization', authorization)
       .status(HttpStatus.OK)
-      .send({...user, authorization});
+      .send({ ...user, authorization });
   }
 
   // @UseGuards(JwtAuthenticationGuard)
@@ -78,6 +72,6 @@ export class AuthenticationController {
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     // we have no way to currently un-authenticate tokens already sent out
     // app is stateless / session less, so this doesn't do anything
-    return response.send(JSON.stringify({ok: true}));
+    return response.send(JSON.stringify({ ok: true }));
   }
 }

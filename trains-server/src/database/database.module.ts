@@ -42,8 +42,6 @@ export const ENTITIES = [Place, User, Translation, PlaceType, VehicleType];
           dbName: database,
         };
 
-        // console.log('Mongo connection config', config);
-
         return config;
       },
       inject: [ConfigService],

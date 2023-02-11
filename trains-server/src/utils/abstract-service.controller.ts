@@ -2,19 +2,7 @@ import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
 import { Mapper } from './mapper';
 import { AbstractService } from './abstract.service';
-import {
-  Body,
-  Delete,
-  Get,
-  HttpException,
-  HttpStatus,
-  Logger,
-  Param,
-  Patch,
-  Post, Put,
-  Query,
-  UseGuards
-} from '@nestjs/common';
+import { Body, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Admin, LoggedIn } from '../authentication/authentication.guard';
 
 /**
@@ -22,13 +10,12 @@ import { Admin, LoggedIn } from '../authentication/authentication.guard';
  * R - entity dto type
  */
 export abstract class AbstractServiceController<T, R> {
-  private readonly logger = new Logger(AbstractServiceController.name);
-
   @Get(':id')
   @UseGuards(LoggedIn)
   findOne(@Param('id') id: string): Promise<R> {
-    return this.getService().findOne(id)
-      .then(domain => {
+    return this.getService()
+      .findOne(id)
+      .then((domain) => {
         const found = this.getMapper().toDto(domain);
 
         if (!found) {
@@ -41,7 +28,6 @@ export abstract class AbstractServiceController<T, R> {
         if (e instanceof HttpException) {
           throw e;
         } else {
-          this.logger.warn(e);
           throw new HttpException('Entity cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
@@ -53,14 +39,9 @@ export abstract class AbstractServiceController<T, R> {
     return this.getService()
       .findAll(pagination)
       .then((page) => {
-        console.log('page');
-        console.log(page);
-        console.log('mapper');
-        console.log(this.getMapper());
         const mappedData = page?.data?.map((item) => {
-          return this.getMapper().toDto(item)
+          return this.getMapper().toDto(item);
         });
-        console.log(mappedData);
         return {
           ...page,
           data: mappedData,
@@ -72,13 +53,13 @@ export abstract class AbstractServiceController<T, R> {
   @UseGuards(LoggedIn, Admin)
   create(@Body() dto: R): Promise<R> {
     const domain = this.getMapper().toDomain(dto);
-    return this.getService().create(domain)
-      .then(created => this.getMapper().toDto(created))
+    return this.getService()
+      .create(domain)
+      .then((created) => this.getMapper().toDto(created))
       .catch((e) => {
         if (e instanceof HttpException) {
           throw e;
         } else {
-          this.logger.warn(e);
           throw new HttpException('Entity cannot be created', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
@@ -95,19 +76,18 @@ export abstract class AbstractServiceController<T, R> {
         }
         return {
           ...this.getMapper().toDomain(dto, entity),
-          id: uuid  // don't allow id updating
+          id: uuid, // don't allow id updating
         };
       })
-      .then(domain => {
+      .then((domain) => {
         const service = this.getService();
         return service.update(uuid, domain);
       })
-      .then(updated => this.getMapper().toDto(updated))
+      .then((updated) => this.getMapper().toDto(updated))
       .catch((e) => {
         if (e instanceof HttpException) {
           throw e;
         } else {
-          this.logger.warn(e);
           throw new HttpException('Entity cannot be created', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
@@ -125,7 +105,7 @@ export abstract class AbstractServiceController<T, R> {
 
         return {
           ...this.getMapper().toDomain(dto, entity),
-          id: uuid  // don't allow id updating
+          id: uuid, // don't allow id updating
         };
       })
       .then((entity) => {
@@ -143,7 +123,6 @@ export abstract class AbstractServiceController<T, R> {
         if (e instanceof HttpException) {
           throw e;
         } else {
-          this.logger.warn(e);
           throw new HttpException('Entity cannot be updated', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
@@ -152,12 +131,12 @@ export abstract class AbstractServiceController<T, R> {
   @Delete(':id')
   @UseGuards(LoggedIn, Admin)
   remove(@Param('id') id: string) {
-    return this.getService().delete(id)
+    return this.getService()
+      .delete(id)
       .catch((e) => {
         if (e instanceof HttpException) {
           throw e;
         } else {
-          this.logger.warn(e);
           throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });

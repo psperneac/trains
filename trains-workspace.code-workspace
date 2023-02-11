@@ -8,6 +8,14 @@
 		},
 		{
 			"path": "trains-docs"
+		},
+		{
+			"path": "trains-react-web"
 		}
-	]
+	],
+	"settings": {
+		"jest.disabledWorkspaceFolders": [
+			"trains-docs"
+		]
+	}
 }

@@ -1,7 +1,4 @@
-import {
-  Controller,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 
 import { TranslationDto } from './dto/translation.dto';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
@@ -15,10 +12,7 @@ import { Mapper } from '../../../utils/mapper';
 @Controller('translations')
 @UseFilters(AllExceptionsFilter)
 export class TranslationsController extends AbstractServiceController<Translation, TranslationDto> {
-  constructor(
-    private readonly service: TranslationsService,
-    private readonly mapper: TranslationMapper,
-  ) {
+  constructor(private readonly service: TranslationsService, private readonly mapper: TranslationMapper) {
     super();
   }
 

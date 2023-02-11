@@ -1,6 +1,5 @@
 import { AbstractEntity } from '../abstract.entity';
 import { cloneDeep } from 'lodash';
-import { isString } from 'util';
 import * as uuid from 'uuid-v4';
 import { UpdateResult } from 'typeorm';
 
@@ -13,19 +12,21 @@ export class MockRepository<T extends AbstractEntity> {
     this.reset();
   }
 
+  internalGetData() {
+    return this.data;
+  }
+
+  internalFind(id) {
+    return this.data.find((d) => d.id === id);
+  }
+
   reset() {
     this.data = cloneDeep([...this.initialData]);
     this.dataLimit = this.data.length;
   }
 
   getMany() {
-    const ret = this.data.slice(
-      this.dataOffset,
-      Math.min(
-        this.dataOffset + (this.dataLimit || this.data.length),
-        this.data.length,
-      ),
-    );
+    const ret = this.data.slice(this.dataOffset, Math.min(this.dataOffset + (this.dataLimit || this.data.length), this.data.length));
     return Promise.resolve(ret);
   }
 
@@ -34,15 +35,15 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   findOne(param: string | any) {
-    if (isString(param)) {
-      return Promise.resolve(this.data.find((user) => user.id === param));
+    if (typeof param === 'string') {
+      return Promise.resolve(this.data.find((d) => d.id === param));
     }
 
     let ret = null;
     if (param['email']) {
       ret = this.data.find((d) => d['email'] === param['email']);
     } else if (param.id) {
-      ret = this.data.find((user) => user.id === param.id);
+      ret = this.data.find((d) => d.id === param.id);
     }
 
     return Promise.resolve(ret);
@@ -65,16 +66,22 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   update(id: string, entity: T): Promise<UpdateResult> {
+    const existing = this.data.find((u) => u.id === id);
+
+    // TODO: return error if it doesn't exist
+
     entity = {
-      ...this.data.find((u) => u.id === id),
+      ...existing,
       ...entity,
+      version: existing.version + 1,
+      updated: new Date(),
     };
 
     this.data = [...this.data.filter((u) => u.id !== id), entity];
 
     return Promise.resolve({
       raw: 0,
-      affected: 1
+      affected: 1,
     } as UpdateResult);
   }
 
@@ -86,7 +93,7 @@ export class MockRepository<T extends AbstractEntity> {
   delete(id: string) {
     const entity = this.data.find((u) => u.id === id);
     this.data = this.data.filter((u) => u.id !== id);
-    return Promise.resolve({affected: !!entity});
+    return Promise.resolve({ affected: !!entity });
   }
 
   count() {

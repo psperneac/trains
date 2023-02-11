@@ -7,28 +7,27 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import * as request from 'supertest';
 import { getAuthorizationBearer } from '../../utils/jwt';
 import { keys, pick, range } from 'lodash';
-import { TranstationTestConfig } from './translations/translations-test-config';
+import { TranslationTestConfig } from './translations/translations-test-config';
 import { TestConfig } from '../../utils/test/test-config';
-
+import { PlaceTestConfig } from './places/places-test-config';
+import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;
   let app: INestApplication;
-  const configs: TestConfig<any, any>[] = [
-    TranstationTestConfig
-  ];
+  const configs: TestConfig<any, any>[] = [PlaceTestConfig, TranslationTestConfig, VehicleTypeTestConfig];
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      controllers: [...configs.map(config => config.controllerClass)],
+      controllers: [...configs.map((config) => config.controllerClass)],
       providers: [
         ...authMocks,
 
-        ...configs.map(config => config.mapperClass),
-        ...configs.map(config => config.serviceClass),
-        ...configs.map(config => ({
+        ...configs.map((config) => config.mapperClass),
+        ...configs.map((config) => config.serviceClass),
+        ...configs.map((config) => ({
           provide: getRepositoryToken(config.entityClass),
-          useValue: new MockRepository(config.data)
+          useValue: new MockRepository(config.data),
         })),
       ],
     }).compile();
@@ -38,12 +37,12 @@ describe('Abstract Controller', () => {
     app.useGlobalFilters(new AllExceptionsFilter());
     await app.init();
 
-    configs.forEach(config => {
+    configs.forEach((config) => {
       config.controller = module.get(config.controllerClass);
       config.service = module.get(config.serviceClass);
       config.repository = module.get(getRepositoryToken(config.entityClass));
       config.mapper = module.get(config.mapperClass);
-    })
+    });
   });
 
   afterEach(async () => {
@@ -52,13 +51,13 @@ describe('Abstract Controller', () => {
   });
 
   describe.each(configs)('For all configs', (config) => {
-    describe('GET ' + config.url, () => {
+    describe(`GET ${config.url}`, () => {
       it('should return 401 if no token is present or token is for non-existent user', async () => {
         await request(app.getHttpServer()).get(config.url).expect(401);
 
         await request(app.getHttpServer())
           .get(config.url)
-          .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
+          .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
           .expect(404);
       });
 
@@ -67,7 +66,7 @@ describe('Abstract Controller', () => {
 
         await request(app.getHttpServer())
           .get(config.url)
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(200)
           .expect((res) => {
             expect(res).toBeDefined();
@@ -100,14 +99,14 @@ describe('Abstract Controller', () => {
       it('should return 404 if token is for non-existent user', async () => {
         await request(app.getHttpServer())
           .get(`${config.url}/${goodId}`)
-          .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
+          .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
           .expect(404);
       });
 
       it('should return 404 if looking for non-existing', async () => {
         await request(app.getHttpServer())
           .get(`${config.url}/${badId}`)
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(404);
       });
 
@@ -116,7 +115,7 @@ describe('Abstract Controller', () => {
 
         await request(app.getHttpServer())
           .get(`${config.url}/${goodId}`)
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(200)
           .expect((res) => {
             expect(res.body).toBeDefined();
@@ -125,150 +124,143 @@ describe('Abstract Controller', () => {
       });
     });
 
-    describe('POST /translations', () => {
-      const addTranslation = config.createUpdateDto(config.newEntityId);
+    describe(`POST ${config.url}`, () => {
+      const addEntity = config.createUpdateDto(config.newEntityId);
 
       it('should return error if no token is present, token is for non-existent user or token is for normal user', async () => {
         // unauthorized
-        await request(app.getHttpServer())
-          .post('/translations')
-          .send(addTranslation)
-          .expect(401);
+        await request(app.getHttpServer()).post(config.url).send(addEntity).expect(401);
 
         // not-found (user from token)
         await request(app.getHttpServer())
           .post(config.url)
-          .send(addTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
+          .send(addEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
           .expect(404);
 
         // forbidden (wrong user scope)
         await request(app.getHttpServer())
           .post(config.url)
-          .send(addTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .send(addEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(403);
       });
 
-      it('should create a new translation', async () => {
+      it(`should create a new ${config.name}`, async () => {
         const mockCreate = jest.spyOn(config.repository, 'create');
-
         const mockSave = jest.spyOn(config.repository, 'save');
 
         await request(app.getHttpServer())
-          .post('/translations')
-          .send(addTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+          .post(config.url)
+          .send(addEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(201)
           .expect((res) => {
-            const created = pick(res.body, keys(addTranslation));
-            expect(created).toEqual(addTranslation);
+            const created = pick(res.body, keys(addEntity));
+            expect(created).toEqual(addEntity);
           });
 
-        expect(mockCreate).toHaveBeenCalledWith(addTranslation);
+        expect(mockCreate).toHaveBeenCalledWith(addEntity);
         expect(mockSave).toHaveBeenCalled();
       });
     });
 
-    describe('PUT /translations/:id', () => {
-      const updateTranslation = {
-        content: 'UpdatedContent',
-      };
+    describe(`PUT ${config.url}/:id`, () => {
+      const updateEntity = config.createUpdateDto(config.existingEntityId);
 
       it('should return 401 if no token is present', async () => {
         // unauthorized
-        await request(app.getHttpServer())
-          .put('/translations/ID4')
-          .send(updateTranslation)
-          .expect(401);
+        await request(app.getHttpServer()).put(`${config.url}/ID${config.existingEntityId}`).send(updateEntity).expect(401);
       });
 
       it('should return 404 if token is for non-existent user', async () => {
         // not-found (user from token)
         await request(app.getHttpServer())
-          .put('/translations/ID4')
-          .send(updateTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
+          .put(`${config.url}/ID${config.existingEntityId}`)
+          .send(updateEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
           .expect(404);
       });
 
       it('should return 403 token is for normal user', async () => {
         // forbidden (wrong user scope)
         await request(app.getHttpServer())
-          .put('/translations/ID4')
-          .send(updateTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .put(`${config.url}/ID${config.existingEntityId}`)
+          .send(updateEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(403);
       });
 
-      it('should return 404 if trying to update unknown place', async () => {
+      it('should return 404 if trying to update unknown entity', async () => {
         // not-found (user from token)
         await request(app.getHttpServer())
-          .put('/translations/ID99')
-          .send(updateTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+          .put(`${config.url}/ID99`)
+          .send(updateEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(404);
       });
 
-      it('should update existing translation', async () => {
-        const mockUpdate = jest
-          .spyOn(repository, 'update');
+      it(`should update existing ${config.name}`, async () => {
+        const mockUpdate = jest.spyOn(config.repository, 'update');
+
+        const repo = config.repository as MockRepository<any>;
+        const existing = repo.internalFind(`ID${config.existingEntityId}`);
 
         await request(app.getHttpServer())
-          .put('/translations/ID1')
-          .send(updateTranslation)
-          .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+          .put(`${config.url}/ID${config.existingEntityId}`)
+          .send(updateEntity)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(200)
           .expect((res) => {
-            expect(res.body).toEqual({
-              ...dto(T1),
-              ...updateTranslation,
-            });
+            expect(res.body).toEqual(
+              config.mapper.toDto({
+                ...existing,
+                ...updateEntity,
+              }),
+            );
           });
 
-        expect(mockUpdate).toHaveBeenCalledWith('ID1', {
-          ...T1,
-          ...updateTranslation,
+        expect(mockUpdate).toHaveBeenCalledWith(`ID${config.existingEntityId}`, {
+          ...existing,
+          ...updateEntity,
         });
       });
     });
 
-    describe('DELETE /translations/:id', () => {
+    describe(`DELETE ${config.url}/:id`, () => {
       it('should return 401 if no token is present', async () => {
         // unauthorized
-        await request(app.getHttpServer())
-          .delete('/translations/ID4')
-          .expect(401);
+        await request(app.getHttpServer()).delete(`${config.url}/ID${config.existingEntityId}`).expect(401);
       });
 
       it('should return 404 if token is for non-existent user', async () => {
         // not-found (user from token)
         await request(app.getHttpServer())
-          .delete('/translations/ID4')
-          .set({Authorization: getAuthorizationBearer(module, 'UnknownID')})
+          .delete(`${config.url}/ID${config.existingEntityId}`)
+          .set({ Authorization: getAuthorizationBearer(module, 'UnknownID') })
           .expect(404);
       });
 
       it('should return 403 token is for normal user', async () => {
         // forbidden (wrong user scope)
         await request(app.getHttpServer())
-          .delete('/translations/ID4')
-          .set({Authorization: getAuthorizationBearer(module, 'ID1')})
+          .delete(`${config.url}/ID${config.existingEntityId}`)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(403);
       });
 
       it('should return 404 if trying to delete unknown translation', async () => {
         // not-found (user from token)
         await request(app.getHttpServer())
-          .delete('/translations/ID99')
-          .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+          .delete(`${config.url}/ID99`)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(404);
       });
 
       it('should delete a known translation', async () => {
         await request(app.getHttpServer())
-          .delete('/translations/ID1')
-          .set({Authorization: getAuthorizationBearer(module, 'ID10')})
+          .delete(`${config.url}/ID${config.existingEntityId}`)
+          .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(200);
       });
     });

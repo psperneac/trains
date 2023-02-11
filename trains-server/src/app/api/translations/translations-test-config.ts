@@ -24,18 +24,18 @@ const createUpdateDto = (id: number): TranslationDto => {
     language: id % 2 ? 'en-US' : 'en-GB',
     key: 'com.ikarsoft.string-' + id,
     content: 'This is updated string # ' + id,
-  }
-}
+  };
+};
 
 const createPatchDto = (id: number): Partial<TranslationDto> => {
   return {
     language: id % 2 ? 'en-US' : 'en-GB',
     key: 'com.ikarsoft.string-' + id,
     content: 'This is patched string # ' + id,
-  }
-}
+  };
+};
 
-export const TranstationTestConfig: TestConfig<Translation, TranslationDto> = {
+export const TranslationTestConfig: TestConfig<Translation, TranslationDto> = {
   name: 'Translations',
   url: '/translations',
 
@@ -56,11 +56,10 @@ export const TranstationTestConfig: TestConfig<Translation, TranslationDto> = {
   ],
 
   newEntityId: 10,
-  updateEntityId: 10,
-  patchEntityId: 33,
+  existingEntityId: 4,
 
   entityClass: Translation,
   mapperClass: TranslationMapper,
   serviceClass: TranslationsService,
-  controllerClass: TranslationsController
-}
+  controllerClass: TranslationsController,
+};

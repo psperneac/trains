@@ -1,7 +1,7 @@
 import { AbstractServiceController } from '../abstract-service.controller';
 import { AbstractService } from '../abstract.service';
 import { AbstractMapper } from '../abstract.mapper';
-import {AbstractEntity} from "../abstract.entity";
+import { AbstractEntity } from '../abstract.entity';
 
 /** config class to be used in abstract controller test */
 export interface TestConfig<T extends AbstractEntity, R> {
