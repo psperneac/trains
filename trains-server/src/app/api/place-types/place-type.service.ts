@@ -8,7 +8,7 @@ import { PlaceType } from './entities/place-type.entity';
 import { PlaceTypeMapper } from './place-type.mapper';
 
 @Injectable()
-export class PlaceTypesService extends AbstractService<PlaceType> {
+export class PlaceTypeService extends AbstractService<PlaceType> {
   constructor(
     @InjectRepository(PlaceType) private readonly repository: Repository<PlaceType>,
     private readonly mapper: PlaceTypeMapper,

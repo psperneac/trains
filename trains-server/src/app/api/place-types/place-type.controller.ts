@@ -1,6 +1,6 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { AllExceptionsFilter } from "../../../utils/all-exceptions.filter";
-import { PlaceTypesService } from "./place-types.service";
+import { PlaceTypeService } from "./place-type.service";
 import { PlaceTypeMapper } from "./place-type.mapper";
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { PlaceType } from './entities/place-type.entity';
@@ -10,9 +10,9 @@ import { PlaceTypeDto } from './dto/place-type.dto';
 
 @Controller('place-types')
 @UseFilters(AllExceptionsFilter)
-export class PlaceTypesController extends AbstractServiceController<PlaceType, PlaceTypeDto> {
+export class PlaceTypeController extends AbstractServiceController<PlaceType, PlaceTypeDto> {
   constructor(
-    private readonly service: PlaceTypesService,
+    private readonly service: PlaceTypeService,
     private readonly mapper: PlaceTypeMapper
   ) {
     super();

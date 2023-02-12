@@ -1,5 +1,5 @@
-import { PlaceTypesController } from './place-types.controller';
-import { PlaceTypesService } from './place-types.service';
+import { PlaceTypeController } from './place-type.controller';
+import { PlaceTypeService } from './place-type.service';
 /*
 https://docs.nestjs.com/modules
 */
@@ -11,8 +11,8 @@ import {PlaceTypeMapper} from "./place-type.mapper";
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlaceType])],
-  controllers: [PlaceTypesController],
-  providers: [PlaceTypesService, PlaceTypeMapper],
-  exports: [PlaceTypesService, PlaceTypeMapper],
+  controllers: [PlaceTypeController],
+  providers: [PlaceTypeService, PlaceTypeMapper],
+  exports: [PlaceTypeService, PlaceTypeMapper],
 })
-export class PlaceTypesModule {}
+export class PlaceTypeModule {}

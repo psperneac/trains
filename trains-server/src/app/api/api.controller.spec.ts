@@ -11,12 +11,14 @@ import { TranslationTestConfig } from './translations/translations-test-config';
 import { TestConfig } from '../../utils/test/test-config';
 import { PlaceTestConfig } from './places/places-test-config';
 import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config';
+import { PlaceTypeTestConfig } from './place-types/place-type-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;
   let app: INestApplication;
   const configs: TestConfig<any, any>[] = [
-    PlaceTestConfig, 
+    PlaceTestConfig,
+    PlaceTypeTestConfig,
     TranslationTestConfig, 
     VehicleTypeTestConfig
   ];
