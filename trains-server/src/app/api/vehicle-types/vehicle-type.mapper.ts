@@ -7,6 +7,10 @@ import { VehicleType } from './entities/vehicle-type.entity';
 @Injectable()
 export class VehicleTypeMapper {
   toDto(vehicleType: VehicleType): VehicleTypeDto {
+    if (!vehicleType) {
+      return null;
+    }
+
     return {
       id: vehicleType.id,
       name: vehicleType.name,

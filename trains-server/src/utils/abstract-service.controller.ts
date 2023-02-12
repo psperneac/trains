@@ -16,8 +16,14 @@ export abstract class AbstractServiceController<T, R> {
     return this.getService()
       .findOne(id)
       .then((domain) => {
+        // if domain not found, return 404
+        if (!domain) {
+          throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+        }
+
         const found = this.getMapper().toDto(domain);
 
+        // mapping can fail too; maybe on econdary entities
         if (!found) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }

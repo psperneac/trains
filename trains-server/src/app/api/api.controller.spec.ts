@@ -15,7 +15,11 @@ import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config'
 describe('Abstract Controller', () => {
   let module: TestingModule;
   let app: INestApplication;
-  const configs: TestConfig<any, any>[] = [PlaceTestConfig, TranslationTestConfig, VehicleTypeTestConfig];
+  const configs: TestConfig<any, any>[] = [
+    PlaceTestConfig, 
+    TranslationTestConfig, 
+    VehicleTypeTestConfig
+  ];
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -108,7 +112,8 @@ describe('Abstract Controller', () => {
           .get(`${config.url}/${badId}`)
           .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(404);
-      });
+        });
+
 
       it('should return data when logged in as normal user', async () => {
         jest.spyOn(config.repository, 'findOne');
