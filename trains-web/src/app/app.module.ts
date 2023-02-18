@@ -1,4 +1,3 @@
-import { PlaceTypeModule } from './../../../trains-server/src/app/api/place-types/place-type.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -27,25 +26,26 @@ import { HelpersModule } from './helpers/helpers.module';
 import { ServicesModule } from './services/services.module';
 import { AlertService } from './services/alert.service';
 import { AppRoutingModule } from './app-routing.module';
-import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { AuthModule } from './features/auth/auth.module';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { SharedModule } from './shared.module';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { PlacesModule } from './features/places/places.module';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
+import { PLACES_FEATURE } from './features/places/places.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent,
+    ...PLACES_FEATURE.declarations
+  ],
   imports: [
-    PlaceTypeModule,
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
@@ -77,7 +77,6 @@ export function createTranslationLoader(http: HttpClient) {
     SharedModule,
 
     ComponentsModule,
-    PlacesModule,
 
     HelpersModule,
     ServicesModule,
@@ -86,12 +85,14 @@ export function createTranslationLoader(http: HttpClient) {
     MomentModule,
 
     AuthModule,
+
+    ...PLACES_FEATURE.imports
   ],
   providers: [
-    { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     AlertService,
+    ...PLACES_FEATURE.providers
   ],
   bootstrap: [AppComponent],
 })

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import { AdminAuthGuard } from './features/auth/guards/admin-auth.guard';
+import {PLACES_FEATURE} from "./features/places/places.feature";
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
 //   which load data and implement app logic
@@ -25,7 +25,7 @@ const ROUTES: Routes = [
   },
   {
     path: 'places',
-    loadChildren: () => import('./features/places/places.module').then(m => m.PlacesModule),
+    children: [...PLACES_FEATURE.routes],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },
@@ -38,8 +38,8 @@ const ROUTES: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(ROUTES, { useHash: true, onSameUrlNavigation: 'reload', initialNavigation: 'enabled', relativeLinkResolution: 'legacy' })],
+  imports: [RouterModule.forRoot(ROUTES, { useHash: false, onSameUrlNavigation: 'reload', initialNavigation: 'enabled', relativeLinkResolution: 'legacy' })],
   exports: [RouterModule],
-  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }]
+  providers: []
 })
 export class AppRoutingModule {}

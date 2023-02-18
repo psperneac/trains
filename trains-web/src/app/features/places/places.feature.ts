@@ -12,14 +12,12 @@ import { PlaceEditPage } from './pages/place-edit.page';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoadOnePlaceGuard } from './load-one-place.guard';
 import { ComponentsModule } from '../../components/components.module';
-import { PlacesRoutingModule } from './places-routing.module';
 import { PlaceCreatePage } from './pages/place-create.page';
 import { OnePlaceResolver } from './one-place.resolver';
+import {FeaturePart} from "../../utils/feature-part";
 
-@NgModule({
+export const PLACES_FEATURE: FeaturePart = {
   imports: [
-    PlacesRoutingModule,
-
     CommonModule,
     SharedModule,
     ReactiveFormsModule,
@@ -40,7 +38,10 @@ import { OnePlaceResolver } from './one-place.resolver';
     PlaceService,
     LoadOnePlaceGuard,
     OnePlaceResolver,
+  ],
+  routes: [
+    { path: '', component: PlacesPage, canActivate: [], canDeactivate: []},
+    { path: 'create', component: PlaceCreatePage, canActivate: [], canDeactivate: []},
+    { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: []},
   ]
-})
-export class PlacesModule {
 }
