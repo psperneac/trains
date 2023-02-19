@@ -24,6 +24,8 @@ export class AbstractActions<T> {
   public deleteSuccess: ActionCreator<string, (props: ({ result: boolean } & NotAllowedCheck<{ result: boolean }>)) => ({ result: boolean } & TypedAction<string>)>;
   public deleteFailure: ActionCreator<string, (props: ({ error: any } & NotAllowedCheck<{ error: any }>)) => ({ error: any } & TypedAction<string>)>;
 
+  public selectOne: ActionCreator<`[${string}] Select One`, (props: ({ payload: T } & NotAllowedCheck<{ payload: T }>)) => ({ payload: T } & TypedAction<`[${string}] Select One`>)>;
+
   constructor(type: string) {
     this.getAll = createAction(`[${type}] Get All`, props<{request: PageRequestDto}>());
     this.getAllSuccess = createAction(`[${type}] Get All Success`, props<{result: PageDto<T>}>());
@@ -44,5 +46,7 @@ export class AbstractActions<T> {
     this.delete = createAction(`[${type}] Delete`, props<{uuid: string}>());
     this.deleteSuccess = createAction(`[${type}] Delete Success`, props<{result: boolean}>());
     this.deleteFailure = createAction(`[${type}] Delete Failure`, props<{error: any}>());
+
+    this.selectOne = createAction(`[${type}] Select One`, props<{payload: T}>());
   }
 }

@@ -1,0 +1,13 @@
+<div class="app-full-height-page">
+  <div class="places-form-page">
+    <div class="place-form-container">
+      <div class="place-actions">
+        <button mat-button (click)="onSave()" [disabled]="!form?.valid()">{{'button.save' | translate}}</button>
+        <button mat-button (click)="onCancel()">{{'button.cancel' | translate}}</button>
+      </div>
+      <trains-place-type-form #placeForm *ngIf="placeType" [placeType]="placeType"
+                         class="place-form"
+                         (valueChange)="placeTypeChanged($event)"></trains-place-type-form>
+    </div>
+  </div>
+</div>

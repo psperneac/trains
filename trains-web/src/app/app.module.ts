@@ -41,6 +41,9 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
+import { PlaceTypeFormComponent } from './features/place-types/components/place-type-form.component';
+import { PlaceTypeEditPage } from './features/place-types/pages/place-type-edit.page';
+import { CreateOnePlaceTypeGuard } from './features/place-types/create-one-place-type.guard';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -53,7 +56,9 @@ export function createTranslationLoader(http: HttpClient) {
 
     // PLACE TYPES
     PlaceTypesPage,
-    PlaceTypesListComponent
+    PlaceTypeEditPage,
+    PlaceTypesListComponent,
+    PlaceTypeFormComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -111,7 +116,8 @@ export function createTranslationLoader(http: HttpClient) {
 
     // PLACE TYPES
     PlaceTypeService,
-    LoadOnePlaceTypeGuard
+    LoadOnePlaceTypeGuard,
+    CreateOnePlaceTypeGuard
   ],
   bootstrap: [AppComponent],
 })

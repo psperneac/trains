@@ -10,6 +10,7 @@ export class PlaceTypeMapper {
     return {
       id: placeType.id,
       name: placeType.name,
+      type: placeType.type,
       description: placeType.description,
     } as PlaceTypeDto;
   }

@@ -8,5 +8,8 @@ export const DEFAULT_KEEPALIVE = 30;
 
 export const PAGE_SIZE = 10;
 
-export const PLACES_LIST = '/places';
+export const PLACES = '/places';
 export const PLACES_CREATE = '/places/create';
+
+export const PLACE_TYPES = '/place-types';
+export const PLACE_TYPES_CREATE = '/place-types/create';

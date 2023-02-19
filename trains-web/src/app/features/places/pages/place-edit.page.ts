@@ -7,7 +7,7 @@ import { filter, take } from 'rxjs/operators';
 import { AppState } from '../../../store';
 import { cloneDeep, isNil } from 'lodash';
 import { PlaceFormComponent } from '../components/place-form.component';
-import {PLACE_MAP_DEFAULT_ZOOM, PLACES_LIST} from '../../../utils/constants';
+import {PLACE_MAP_DEFAULT_ZOOM, PLACES} from '../../../utils/constants';
 import { Subject } from 'rxjs';
 import { UiService } from '../../../services/ui.service';
 import { PlaceActions } from '../store';
@@ -89,7 +89,7 @@ export class PlaceEditPage implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigateByUrl(PLACES_LIST);
+    this.router.navigateByUrl(PLACES);
   }
 
   onSave() {

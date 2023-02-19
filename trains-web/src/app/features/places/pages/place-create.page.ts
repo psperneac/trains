@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {PlaceDto} from '../../../models/place.model';
 import {latLng, Layer, marker, tileLayer} from 'leaflet';
-import {PLACE_MAP_DEFAULT_ZOOM, PLACES_LIST} from '../../../utils/constants';
+import {PLACE_MAP_DEFAULT_ZOOM, PLACES} from '../../../utils/constants';
 import {Subject} from 'rxjs';
 import {PlaceActions} from '../store';
 import {Store} from '@ngrx/store';
@@ -91,11 +91,11 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigateByUrl(PLACES_LIST);
+    this.router.navigateByUrl(PLACES);
   }
 
   onSave() {
     this.store.dispatch(PlaceActions.create({payload: this.place}));
-    this.router.navigateByUrl(PLACES_LIST);
+    this.router.navigateByUrl(PLACES);
   }
 }

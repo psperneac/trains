@@ -27,7 +27,7 @@ export function createAdapter<T extends AbstractEntity>(idSelector = defaultIdSe
   return createEntityAdapter<T>({
     selectId: idSelector
   });
-};
+}
 
 const defaultInitialState = {
   error: undefined,
@@ -68,6 +68,7 @@ export function defaultCreateReducer<T extends AbstractEntity>(
     on(actions.getAllSuccess, (state, action) => {
       return {
         ...adapter.setAll(action.result.data, state),
+        error: undefined,
         loading: false,
         loaded: true,
         totalCount: action.result.totalCount,
@@ -86,6 +87,7 @@ export function defaultCreateReducer<T extends AbstractEntity>(
     on(actions.getOneSuccess, (state, action) => {
       return {
         ...state,
+        error: true,
         selectedLoading: false,
         selectedLoaded: true,
         selected: action.result
@@ -96,6 +98,12 @@ export function defaultCreateReducer<T extends AbstractEntity>(
         ...state,
         selectedLoading: false,
         error: action.error
+      }
+    }),
+    on(actions.selectOne, (state, action) => {
+      return {
+        ...state,
+        selected: action.payload
       }
     })
   );

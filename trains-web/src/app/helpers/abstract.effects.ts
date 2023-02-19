@@ -1,7 +1,5 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
-import { PlaceActions } from "../features/places/store";
-import { PlaceSelectors } from "../features/places/store/place.selectors";
 import { AppState } from '../store';
 import { Router } from '@angular/router';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
@@ -69,7 +67,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
       switchMap(action =>
         this.service.update(action.payload.id, action.payload).pipe(
           map(result => this.actions.createSuccess({result})),
-          catchError(error => of(this.actions.createFailure({error})))
+          catchError(error => of(this.actions.updateFailure({error})))
         )
       )
     )

@@ -51,7 +51,9 @@
       "longitude": "Longitude"
     },
     "placeType": {
-      "listTitle": "Place Types"
+      "listTitle": "Place Types",
+      "createTitle": "Create Place Type",
+      "editTitle": "Edit Place Type"
     }
   }
 }
