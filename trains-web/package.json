@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start:prod": "ng serve --configuration production --open",
+    "start:dev": "ng serve --configuration development --open",
+    "build:prod": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -41,6 +43,7 @@
     "moment-timezone": "^0.5.33",
     "ngx-moment": "^5.0.0",
     "rxjs": "^6.6.7",
+    "source-map-support": "^0.5.21",
     "tslib": "^2.3.0",
     "url-join": "^4.0.1",
     "uuid-v4": "^0.1.0",

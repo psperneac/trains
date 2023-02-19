@@ -10,11 +10,9 @@ export class PlacesPage implements OnInit {
 
   constructor(
     private readonly uiService: UiService) {
-    console.log('Places page constructor');
   }
 
   ngOnInit(): void {
     this.uiService.setPageTitle('page.place.listTitle');
-    console.log('Places page init');
   }
 }

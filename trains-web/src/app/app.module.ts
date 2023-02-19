@@ -8,6 +8,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
+import { PlaceTypesListComponent } from "./features/place-types/components/place-types-list.component";
+import { LoadOnePlaceTypeGuard } from "./features/place-types/load-one-place-type.guard";
+import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
+import { PlaceTypeService } from "./features/place-types/services/place-type.service";
+import { PlaceTypeEffects } from "./features/place-types/store/place-type.effects";
+import { reducer as placeTypesReducer } from "./features/place-types/store/place-type.reducer";
 import { reducers, metaReducers } from './store';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,7 +41,6 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
-import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -45,7 +50,10 @@ export function createTranslationLoader(http: HttpClient) {
   declarations: [
     AppComponent,
     ...PLACES_FEATURE.declarations,
-    ...PLACE_TYPES_FEATURE.declarations
+
+    // PLACE TYPES
+    PlaceTypesPage,
+    PlaceTypesListComponent
   ],
   imports: [
     AppRoutingModule,
@@ -89,14 +97,21 @@ export function createTranslationLoader(http: HttpClient) {
     AuthModule,
 
     ...PLACES_FEATURE.imports,
-    ...PLACE_TYPES_FEATURE.imports
+
+    // PLACE TYPES
+    StoreModule.forFeature('placeTypes', placeTypesReducer),
+    EffectsModule.forFeature([PlaceTypeEffects])
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     AlertService,
+
     ...PLACES_FEATURE.providers,
-    ...PLACE_TYPES_FEATURE.providers
+
+    // PLACE TYPES
+    PlaceTypeService,
+    LoadOnePlaceTypeGuard
   ],
   bootstrap: [AppComponent],
 })

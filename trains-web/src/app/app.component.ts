@@ -100,6 +100,9 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
       case 'places':
         this.router.navigate(['/places']);
         break;
+      case 'placeTypes':
+        this.router.navigate(['/place-types']);
+        break;
     }
   }
 

@@ -47,6 +47,10 @@
     <mat-icon>directions_transit</mat-icon>
     <span>{{'menu.vehicles' | translate}}</span>
   </button>
+  <button (click)="menuClicked('placeTypes')" mat-menu-item>
+    <mat-icon>edit_location</mat-icon>
+    <span>{{'menu.placeTypes' | translate}}</span>
+  </button>
 </mat-menu>
 
 <mat-menu #systemMenu="matMenu">

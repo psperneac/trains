@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import { AdminAuthGuard } from './features/auth/guards/admin-auth.guard';
+import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
 import {PLACES_FEATURE} from "./features/places/places.feature";
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
@@ -26,6 +27,14 @@ const ROUTES: Routes = [
   {
     path: 'places',
     children: [...(PLACES_FEATURE.routes ?? [])],
+    canActivate: [AdminAuthGuard],
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'place-types',
+    children: [
+      { path: '', component: PlaceTypesPage, canActivate: [], canDeactivate: [] }
+    ],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

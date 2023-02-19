@@ -17,6 +17,7 @@
     "logout": "Logout",
     "map": "Map",
     "places": "Places",
+    "placeTypes": "Place Types",
     "register": "Register",
     "routes": "Routes",
     "users": "Users",
@@ -27,13 +28,11 @@
       "title": "Home"
     },
     "login": {
-      "title": "Login",
       "email.label": "Email",
       "password.label": "Password",
       "title": "Login"
     },
     "register": {
-      "title": "Register",
       "email.label": "Email",
       "password.label": "Password",
       "passwordConfirm.label": "Password Confirmation",
@@ -50,6 +49,9 @@
       "type": "Type",
       "latitude": "Latitude",
       "longitude": "Longitude"
+    },
+    "placeType": {
+      "listTitle": "Place Types"
     }
   }
 }

@@ -1,20 +1,25 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
+import { PlaceActions } from "../features/places/store";
+import { PlaceSelectors } from "../features/places/store/place.selectors";
 import { AppState } from '../store';
 import { Router } from '@angular/router';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AbstractActions } from './abstract.actions';
+import { AbstractEntityState } from "./abstract.reducer";
+import { AbstractSelectors } from "./abstract.selectors";
 import { AbstractService } from './abstract.service';
 import { AbstractEntity } from './abstract.entity';
 
-export class AbstractEffects<T extends AbstractEntity> {
+export class AbstractEffects<S extends AbstractEntityState<T>, T extends AbstractEntity> {
   constructor(
     readonly actions$: Actions,
     readonly service: AbstractService<T>,
     readonly store: Store<AppState>,
     readonly router: Router,
-    readonly actions: AbstractActions<T>) {
+    readonly actions: AbstractActions<T>,
+    readonly selectors: AbstractSelectors<S, T>) {
     this.actions$ = actions$;
     this.service = service;
     this.store = store;
@@ -89,6 +94,14 @@ export class AbstractEffects<T extends AbstractEntity> {
         this.actions.createFailure,
         this.actions.updateFailure,
         this.actions.deleteFailure)
+    )
+  );
+
+  onCreateSuccessLoadCurrentPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(this.actions.createSuccess),
+      withLatestFrom(this.store.pipe(select(this.selectors.CurrentPageRequest))),
+      switchMap(([_action, currentPageRequest]) => of(this.actions.getAll({ request: currentPageRequest })))
     )
   );
 }

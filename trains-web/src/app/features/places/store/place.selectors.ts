@@ -1,7 +1,7 @@
+import { AbstractSelectors } from '../../../helpers/abstract.selectors';
+import { PlaceDto } from "../../../models/place.model";
 import { AppState } from '../../../store';
 import { placesAdapter, PlacesState } from './place.reducer';
-import { AbstractSelectors } from '../../../helpers/abstract.selectors';
-import {PlaceDto} from "../../../models/place.model";
 
 const selectors = placesAdapter.getSelectors();
 const placesState = (state: AppState) => state['places'] as PlacesState;
