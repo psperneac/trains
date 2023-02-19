@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PlaceTypeDto } from '../../../models/place-type.model';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -18,9 +18,9 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
   @Output()
   valueChange: EventEmitter<PlaceTypeDto> = new EventEmitter<PlaceTypeDto>();
 
-  placeTypeForm: FormGroup;
+  placeTypeForm: UntypedFormGroup;
 
-  constructor(private readonly formBuilder: FormBuilder) {}
+  constructor(private readonly formBuilder: UntypedFormBuilder) {}
 
   ngOnInit() {
     this.placeTypeForm = this.toForm(this.placeType);
@@ -41,12 +41,12 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
     return this.placeTypeForm.valid;
   }
 
-  toForm(placeType: PlaceTypeDto): FormGroup {
+  toForm(placeType: PlaceTypeDto): UntypedFormGroup {
     return this.formBuilder.group({
-      id: new FormControl({ value: placeType.id, disabled: true }),
-      name: new FormControl(placeType.name, [Validators.required]),
-      type: new FormControl(placeType.type, [Validators.required]),
-      description: new FormControl(placeType.description, [Validators.required]),
+      id: new UntypedFormControl({ value: placeType.id, disabled: true }),
+      name: new UntypedFormControl(placeType.name, [Validators.required]),
+      type: new UntypedFormControl(placeType.type, [Validators.required]),
+      description: new UntypedFormControl(placeType.description, [Validators.required]),
     })
   }
 }

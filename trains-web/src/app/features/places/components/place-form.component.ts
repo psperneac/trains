@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { PlaceDto } from "../../../models/place.model";
@@ -18,10 +18,10 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
   @Output()
   valueChange: EventEmitter<PlaceDto> = new EventEmitter<PlaceDto>();
 
-  placeForm: FormGroup;
+  placeForm: UntypedFormGroup;
 
   constructor(
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: UntypedFormBuilder
   ) {}
 
   ngOnInit() {
@@ -41,18 +41,18 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
     this.placeForm.controls['long'].setValue(place.long);
   }
 
-  toForm(place: PlaceDto): FormGroup {
+  toForm(place: PlaceDto): UntypedFormGroup {
     return this.formBuilder.group({
-      id: new FormControl({ value: place.id, disabled: true }),
-      name: new FormControl(place.name, [Validators.required]),
-      description: new FormControl(place.description, [Validators.required]),
-      type: new FormControl(place.type, [Validators.required]),
-      lat: new FormControl(place.lat, [
+      id: new UntypedFormControl({ value: place.id, disabled: true }),
+      name: new UntypedFormControl(place.name, [Validators.required]),
+      description: new UntypedFormControl(place.description, [Validators.required]),
+      type: new UntypedFormControl(place.type, [Validators.required]),
+      lat: new UntypedFormControl(place.lat, [
         Validators.required,
         Validators.pattern('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$'),
         Validators.max(90),
         Validators.min(-90)]),
-      long: new FormControl(place.long, [
+      long: new UntypedFormControl(place.long, [
         Validators.required,
         Validators.pattern('^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'),
         Validators.max(180),

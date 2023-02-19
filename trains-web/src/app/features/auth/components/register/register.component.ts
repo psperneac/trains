@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthState, register} from '../../store';
 import {Store} from '@ngrx/store';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import { UiService } from '../../../../services/ui.service';
 
 @Component({
@@ -10,11 +10,11 @@ import { UiService } from '../../../../services/ui.service';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   constructor(
     private readonly store: Store<AuthState>,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly uiService: UiService
   ) { }
 

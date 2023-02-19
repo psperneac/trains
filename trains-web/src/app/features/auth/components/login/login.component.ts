@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {AuthState, login} from '../../store';
 import {Store} from '@ngrx/store';
 import { UiService } from '../../../../services/ui.service';
@@ -11,12 +11,12 @@ import { UiService } from '../../../../services/ui.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
   returnUrl: string;
 
   constructor(
     private readonly store: Store<AuthState>,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly route: ActivatedRoute,
     private readonly uiService: UiService
   ) { }
