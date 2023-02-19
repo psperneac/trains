@@ -25,7 +25,7 @@ const ROUTES: Routes = [
   },
   {
     path: 'places',
-    children: [...PLACES_FEATURE.routes],
+    children: [...(PLACES_FEATURE.routes ?? [])],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

@@ -7,11 +7,13 @@ import { AbstractActions } from './abstract.actions';
 import { take, takeUntil } from 'rxjs/operators';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { PAGE_SIZE } from '../utils/constants';
+import { AbstractEntityState } from './abstract.reducer';
+import { AbstractEntity } from './abstract.entity';
 
 @Component({
   template: ''
 })
-export abstract class AbstractListComponent<T> implements OnInit, OnDestroy {
+export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T extends AbstractEntity> implements OnInit, OnDestroy {
   destroy$ = new Subject();
 
   page$ = this.store.pipe(select(this.selectors.Page));
@@ -31,7 +33,7 @@ export abstract class AbstractListComponent<T> implements OnInit, OnDestroy {
 
   protected constructor(
     public actions: AbstractActions<T>,
-    public selectors: AbstractSelectors<T>,
+    public selectors: AbstractSelectors<S, T>,
     public store: Store<AppState>
   ) {}
 

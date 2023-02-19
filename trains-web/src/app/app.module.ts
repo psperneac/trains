@@ -35,6 +35,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
+import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -43,7 +44,8 @@ export function createTranslationLoader(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-    ...PLACES_FEATURE.declarations
+    ...PLACES_FEATURE.declarations,
+    ...PLACE_TYPES_FEATURE.declarations
   ],
   imports: [
     AppRoutingModule,
@@ -86,13 +88,15 @@ export function createTranslationLoader(http: HttpClient) {
 
     AuthModule,
 
-    ...PLACES_FEATURE.imports
+    ...PLACES_FEATURE.imports,
+    ...PLACE_TYPES_FEATURE.imports
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     AlertService,
-    ...PLACES_FEATURE.providers
+    ...PLACES_FEATURE.providers,
+    ...PLACE_TYPES_FEATURE.providers
   ],
   bootstrap: [AppComponent],
 })

@@ -8,13 +8,14 @@ import { AbstractListComponent } from '../../../helpers/abstract-list.component'
 import { PlaceActions } from '../store/place.actions';
 import { Router } from '@angular/router';
 import {PlaceDto} from "../../../models/place.model";
+import { PlacesState } from '../store';
 
 @Component({
   selector: 'trains-places-list',
   templateUrl: './places-list.component.html',
   styleUrls: ['./places-list.component.scss']
 })
-export class PlacesListComponent extends AbstractListComponent<PlaceDto> implements OnInit {
+export class PlacesListComponent extends AbstractListComponent<PlacesState, PlaceDto> implements OnInit {
   @ViewChild(MatPaginator, {static: true})
   paginator: MatPaginator;
   @ViewChild(MatSort, {static: true})

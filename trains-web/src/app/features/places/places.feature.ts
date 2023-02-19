@@ -1,6 +1,3 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SharedModule } from '../../shared.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { PlaceService } from './services/place.service';
@@ -9,21 +6,13 @@ import { PlacesPage } from './pages/places.page';
 import { PlacesListComponent } from './components/places-list.component';
 import { PlaceFormComponent } from './components/place-form.component';
 import { PlaceEditPage } from './pages/place-edit.page';
-import { ReactiveFormsModule } from '@angular/forms';
 import { LoadOnePlaceGuard } from './load-one-place.guard';
-import { ComponentsModule } from '../../components/components.module';
 import { PlaceCreatePage } from './pages/place-create.page';
 import { OnePlaceResolver } from './one-place.resolver';
 import {FeaturePart} from "../../utils/feature-part";
 
 export const PLACES_FEATURE: FeaturePart = {
   imports: [
-    CommonModule,
-    SharedModule,
-    ReactiveFormsModule,
-    // LeafletModule,
-    ComponentsModule,
-
     StoreModule.forFeature('places', placeReducer),
     EffectsModule.forFeature([PlaceEffects]),
   ],
