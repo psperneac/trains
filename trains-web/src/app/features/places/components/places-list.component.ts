@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppState } from '../../../store';
+import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { PlaceSelectors } from '../store/place.selectors';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { AbstractListComponent } from '../../../helpers/abstract-list.component';
-import { PlaceActions } from '../store/place.actions';
-import { Router } from '@angular/router';
-import {PlaceDto} from "../../../models/place.model";
-import { PlacesState } from '../store';
+import { AppState } from '../../../store';
+import { PlaceDto } from '../../../models/place.model';
+import { PlaceActions, PlaceSelectors, PlacesState } from '../store';
 
 @Component({
   selector: 'trains-places-list',

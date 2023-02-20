@@ -5,7 +5,7 @@ import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { AbstractActions } from './abstract.actions';
 import { take, takeUntil } from 'rxjs/operators';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatLegacyPaginator as MatPaginator, LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
 import { PAGE_SIZE } from '../utils/constants';
 import { AbstractEntityState } from './abstract.reducer';
 import { AbstractEntity } from './abstract.entity';

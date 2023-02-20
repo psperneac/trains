@@ -3,7 +3,7 @@ import {Actions, createEffect, ofType} from '@ngrx/effects';
 
 import {alertError, alertWarning, alertInfo} from './alert.actions';
 import {map} from 'rxjs/operators';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatLegacySnackBar as MatSnackBar} from '@angular/material/legacy-snack-bar';
 
 @Injectable()
 export class AlertEffects {
