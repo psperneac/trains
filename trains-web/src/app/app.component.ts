@@ -124,7 +124,7 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
 
   ngOnDestroy(): void {
     console.log('AppComponent - destroyed');
-    this.destroy$.next();
+    this.destroy$.next(true);
   }
 
   printpath(parent: String, config: Route[]) {

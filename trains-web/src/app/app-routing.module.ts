@@ -52,7 +52,11 @@ const ROUTES: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(ROUTES, { useHash: false, onSameUrlNavigation: 'reload', initialNavigation: 'enabled' })],
+  imports: [RouterModule.forRoot(ROUTES, {
+    useHash: false,
+    onSameUrlNavigation: 'reload',
+    initialNavigation: 'enabledNonBlocking'
+  })],
   exports: [RouterModule],
   providers: []
 })

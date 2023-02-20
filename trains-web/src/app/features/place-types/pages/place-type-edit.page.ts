@@ -48,7 +48,7 @@ export class PlaceTypeEditPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next();
+    this.destroy$.next(true);
   }
 
   onCancel() {

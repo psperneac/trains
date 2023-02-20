@@ -33,7 +33,7 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next();
+    this.destroy$.next(true);
   }
 
   public externalPlaceUpdate(place: PlaceDto) {

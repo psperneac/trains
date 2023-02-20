@@ -1,4 +1,121 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$my-primary: mat.define-palette(mat.$indigo-palette, 500);
+$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+$my-theme: mat.define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($my-theme);
+
+@import "leaflet";
+@import "@runette/leaflet-fullscreen/dist/leaflet.fullscreen.css";
+@import "leaflet.locatecontrol/dist/L.Control.Locate.css";
+@import "leaflet-loading/src/Control.Loading.css";
+
+// Handle buttons appropriately, with respect to line-height
+.mat-mdc-raised-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button {
+  padding: 0 1.15em;
+  margin: 0 .65em;
+  min-width: 3em;
+  line-height: 36.4px
+}
+
+.mat-mdc-standard-chip {
+  padding: .5em .85em;
+  min-height: 2.5em;
+}
+
+.material-icons {
+  font-size: 24px;
+  font-family: 'Material Icons Sharp', 'Material Icons', cursive;
+  .mat-badge-content {
+    font-family: 'Roboto', cursive;
+  }
+}
+
 /* You can add global styles to this file, and also import other style files */
-@import './_base.scss';
-@import './_app.scss';
-@import 'src/app';
+
+// APP
+
+$app-table-background-hover: lightgray;
+
+.mat-mdc-card-actions {
+  margin-bottom: 0.5rem;
+}
+
+html { height: 100%; }
+body { margin: 0; height: 100%; }
+
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 80vh;
+}
+
+.alert-error{
+  background-color: rgb(153, 50, 50);
+}
+
+.alert-warning{
+  background-color: rgb(255,213,0);
+  color: rgb(0,0,0);
+}
+
+.alert-info{
+  background-color: rgb(255,255,255);
+  color: rgb(0,0,0);
+}
+
+.app-page {
+  margin: 1rem;
+}
+
+.app-full-height-page {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.input-row {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.mat-mdc-form-field {
+  margin: 0.5rem;
+}
+
+
+.mat-mdc-table {
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  &.hover {
+    background-color: $app-table-background-hover;
+  }
+}
+
+.mat-mdc-row {
+  height: auto;
+}
+
+.mat-mdc-cell {
+  padding: 8px 8px 8px 0;
+}
+

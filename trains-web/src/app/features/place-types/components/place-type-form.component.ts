@@ -34,7 +34,7 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next();
+    this.destroy$.next(true);
   }
 
   public valid() {

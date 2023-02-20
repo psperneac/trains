@@ -73,7 +73,7 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
+    this.destroy$.next(true);
   }
 
   onMap(map: L.Map) {

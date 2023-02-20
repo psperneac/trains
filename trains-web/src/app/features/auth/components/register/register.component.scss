@@ -1,8 +1,8 @@
-@import "styles";
-
-.register-component {
-  .mat-card-actions {
-    padding-top: 0;
-    margin-bottom: 0.5rem;
+:host {
+  .register-component {
+    .mat-mdc-card-actions {
+      padding-top: 0;
+      margin-bottom: 0.5rem;
+    }
   }
 }
