@@ -105,6 +105,10 @@ export function defaultCreateReducer<T extends AbstractEntity>(
         ...state,
         selected: action.payload
       }
-    })
+    }),
+    on(actions.createFailure, actions.updateFailure, actions.deleteFailure, (state, action) => ({
+      ...state,
+      error: action.error
+    }))
   );
 }
