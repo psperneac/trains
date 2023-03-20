@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
+import Button from 'react-bootstrap/Button';
 
 import { authActions } from '../../store';
 
@@ -21,6 +22,7 @@ function Login() {
   // get functions to build form with useForm() hook
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors, isSubmitting } = formState;
+  const navigate = useNavigate();
 
   function onSubmit({ username, password }) {
     return dispatch(authActions.login({ username, password }));
@@ -41,11 +43,11 @@ function Login() {
             <input name="password" type="password" {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
             <div className="invalid-feedback">{errors.password?.message}</div>
           </div>
-          <button disabled={isSubmitting} className="btn btn-primary">
+          <Button type="submit" disabled={isSubmitting} variant="primary">
             {isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
             Login
-          </button>
-          <Link to="../register" className="btn btn-link">Register</Link>
+          </Button>
+          <Button variant="link" onClick={() => navigate('../register')}>Register</Button>
         </form>
       </div>
     </div>

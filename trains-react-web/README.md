@@ -1,3 +1,9 @@
+# React-toolkin auth
+
+- https://jasonwatmore.com/react-18-redux-user-registration-and-login-example-tutorial
+- https://getbootstrap.com/docs/5.0/getting-started/introduction/
+- https://react-bootstrap.github.io/getting-started/introduction/
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

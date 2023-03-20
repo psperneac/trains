@@ -72,6 +72,7 @@ export class AuthenticationController {
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     // we have no way to currently un-authenticate tokens already sent out
     // app is stateless / session less, so this doesn't do anything
+    // TODO: find way to un-authenticate tokens
     return response.send(JSON.stringify({ ok: true }));
   }
 }

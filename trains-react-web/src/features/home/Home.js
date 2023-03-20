@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from "leaflet";
 
 import parkData from "../../data/skateboard-parks.js";
-import { Counter } from '../../features/counter/Counter';
 
 import './Home.css';
 
@@ -15,7 +14,6 @@ function Home() {
   const auth = useSelector(x => x.auth.value);
 
   const [activePark, setActivePark] = useState(null);
-  console.log('activePark', activePark);
   const icon = new Icon({
     iconUrl: "/skateboarding.svg",
     iconSize: [25, 25]
@@ -60,7 +58,7 @@ function Home() {
         >
           <div>
             <h2>{activePark.properties.NAME}</h2>
-            <p>{activePark.properties.DESCRIPTIO}</p>
+            <p>{activePark.properties.DESCRIPTION}</p>
           </div>
         </Popup>
       )}

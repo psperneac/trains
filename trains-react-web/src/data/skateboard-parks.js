@@ -5,7 +5,7 @@ var parkData = {
         properties: {
           PARK_ID: 960,
           NAME: "Bearbrook Skateboard Park",
-          DESCRIPTIO: "Flat asphalt surface, 5 components"
+          DESCRIPTION: "Flat asphalt surface, 5 components"
         },
         geometry: {
           type: "Point",
@@ -17,7 +17,7 @@ var parkData = {
         properties: {
           PARK_ID: 1219,
           NAME: "Bob MacQuarrie Skateboard Park (SK8 Extreme Park)",
-          DESCRIPTIO: "Flat asphalt surface, 10 components, City run learn to skateboard programs, City run skateboard camps in summer"
+          DESCRIPTION: "Flat asphalt surface, 10 components, City run learn to skateboard programs, City run skateboard camps in summer"
         },
         geometry: {
           type: "Point",

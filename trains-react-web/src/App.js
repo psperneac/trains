@@ -5,12 +5,14 @@ import { Nav, Alert, PrivateRoute } from './components';
 import { Home } from './features/home/Home';
 import { AccountLayout } from './features/account/AccountLayout';
 import { UsersLayout } from './features/users/UsersLayout';
+import { PostsLayout } from './features/posts/PostsLayout';
 
 export { App };
 
 function App() {
+
   // init custom history object to allow navigation from 
-  // anywhere in the react app (inside or outside components)
+  // anywhere in the React app (inside or outside components)
   history.navigate = useNavigate();
   history.location = useLocation();
 
@@ -24,6 +26,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<Home />} />
             <Route path="users/*" element={<UsersLayout />} />
+            <Route path="posts/*" element={<PostsLayout />} />
           </Route>
           {/* public */}
           <Route path="account/*" element={<AccountLayout />} />
