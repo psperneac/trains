@@ -12,7 +12,7 @@ function PostsLayout() {
         <Routes>
           <Route index element={<PostsList />} />
           <Route path="add" element={<AddPostForm />} />
-          <Route path="view/:postId" element={<ViewPostPage />} />
+          <Route path=":postId" element={<ViewPostPage />} />
           <Route path="edit/:postId" element={<EditPostForm />} />
         </Routes>
       </div>

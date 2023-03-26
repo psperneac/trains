@@ -1,32 +1,70 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { TimeAgo } from '../../helpers/TimeAgo';
+import {ReactionButtons} from "./ReactionButtons";
+import {fetchPosts} from "../../store/posts.slice";
+import {PostAuthor} from "./PostsAuthor";
+import {Spinner} from "react-bootstrap";
+import {AddPostForm} from "./AddPostForm";
 
-export const PostsList = () => {
-  const posts = useSelector(state => state.posts)
-
-  const renderedPosts = posts.map(post => (
-    <article className="post-excerpt" key={post.id}>
+let PostExcerpt = ({ post }) => {
+  return (
+    <article className="post-excerpt">
       <h3>{post.title}</h3>
+      <div>
+        <PostAuthor userId={post.user} />
+        <TimeAgo timestamp={post.date} />
+      </div>
       <p className="post-content">{post.content.substring(0, 100)}</p>
-      <p className="post-content">Author: {post.user ?? '<no user>'}</p>
-      <TimeAgo timestamp={post.date} />
-      <Link to={`view/${post.id}`} className="button muted-button">
+
+      <ReactionButtons post={post} />
+      <Link to={`/posts/${post.id}`} className="button muted-button">
         View Post
       </Link>
-      <Link to={`edit/${post.id}`} className="button muted-button">Edit Post</Link>
     </article>
-  ))
+  )
+}
+
+PostExcerpt = React.memo(PostExcerpt)
+
+export const PostsList = () => {
+
+  const dispatch = useDispatch()
+  const posts = useSelector(state => state.posts.posts)
+
+  const postStatus = useSelector(state => state.posts.status)
+  const error = useSelector(state => state.posts.error)
+
+  useEffect(() => {
+    if (postStatus === 'idle') {
+      console.log('Loading posts')
+      dispatch(fetchPosts())
+    }
+  }, [postStatus, dispatch])
+
+  let content
+
+  if (postStatus === 'loading') {
+    content = <Spinner text="Loading..." />
+  } else if (postStatus === 'succeeded') {
+    // Sort posts in reverse chronological order by datetime string
+    const orderedPosts = posts
+      .slice()
+      .sort((a, b) => b.date.localeCompare(a.date))
+
+    content = orderedPosts.map(post => (
+      <PostExcerpt key={post.id} post={post} />
+    ))
+  } else if (postStatus === 'failed') {
+    content = <div>{error}</div>
+  }
 
   return (
-    <>
-      <section className="posts-list">
-        <h2>Posts</h2>
-        {renderedPosts}
-      </section>
-
-      <Link to="./Add" className="btn btn-link">Add</Link>
-    </>
+    <section className="posts-list">
+      <AddPostForm />
+      <h2>Posts</h2>
+      {content}
+    </section>
   )
 }

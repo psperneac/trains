@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -5,7 +6,7 @@ import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 
 import { history } from '../../helpers';
-import { userActions, alertActions } from '../../store';
+import { alertActions } from '../../store';
 
 export { Register };
 
@@ -33,7 +34,7 @@ function Register() {
   async function onSubmit(data) {
     dispatch(alertActions.clear());
     try {
-      await dispatch(userActions.register(data)).unwrap();
+      // await dispatch(userActions.register(data)).unwrap();
 
       // redirect to login page and display success alert
       history.navigate('/account/login');

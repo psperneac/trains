@@ -5,9 +5,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { history } from '../../helpers/history';
-import { userActions, alertActions } from '../../store';
-
 export { AddEdit };
 
 function AddEdit() {
@@ -37,36 +34,36 @@ function AddEdit() {
   const { errors, isSubmitting } = formState;
 
   useEffect(() => {
-    if (id) {
-      setTitle('Edit User');
-      // fetch user details into redux state and 
-      // populate form fields with reset()
-      dispatch(userActions.getById(id)).unwrap()
-        .then(user => reset(user));
-    } else {
-      setTitle('Add User');
-    }
+    // if (id) {
+    //   setTitle('Edit User');
+    //   // fetch user details into redux state and
+    //   // populate form fields with reset()
+    //   dispatch(userActions.getById(id)).unwrap()
+    //     .then(user => reset(user));
+    // } else {
+    //   setTitle('Add User');
+    // }
   }, [dispatch, id, reset]);
 
   async function onSubmit(data) {
-    dispatch(alertActions.clear());
-    try {
-      // create or update user based on id param
-      let message;
-      if (id) {
-        await dispatch(userActions.update({ id, data })).unwrap();
-        message = 'User updated';
-      } else {
-        await dispatch(userActions.register(data)).unwrap();
-        message = 'User added';
-      }
-
-      // redirect to user list with success message
-      history.navigate('/users');
-      dispatch(alertActions.success({ message, showAfterRedirect: true }));
-    } catch (error) {
-      dispatch(alertActions.error(error));
-    }
+    // dispatch(alertActions.clear());
+    // try {
+    //   // create or update user based on id param
+    //   let message;
+    //   if (id) {
+    //     await dispatch(userActions.update({ id, data })).unwrap();
+    //     message = 'User updated';
+    //   } else {
+    //     await dispatch(userActions.register(data)).unwrap();
+    //     message = 'User added';
+    //   }
+    //
+    //   // redirect to user list with success message
+    //   history.navigate('/users');
+    //   dispatch(alertActions.success({ message, showAfterRedirect: true }));
+    // } catch (error) {
+    //   dispatch(alertActions.error(error));
+    // }
   }
 
   return (

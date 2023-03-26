@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { authActions } from '../store/auth.slice';
-import { fetchWrapper } from '../helpers';
+import { authActions } from './auth.slice';
+import {client} from "../helpers/client";
 
 // create slice
 
@@ -25,6 +25,11 @@ function createInitialState() {
   }
 }
 
+// export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+//   const response = await client.get('/fakeApi/users')
+//   return response.data
+// })
+
 function createExtraActions() {
   const baseUrl = `${process.env.REACT_APP_API_URL}/users`;
 
@@ -39,21 +44,21 @@ function createExtraActions() {
   function register() {
     return createAsyncThunk(
       `${name}/register`,
-      async (user) => await fetchWrapper.post(`${baseUrl}/register`, user)
+      async (user) => await client.post(`${baseUrl}/register`, user)
     );
   }
 
   function getAll() {
     return createAsyncThunk(
       `${name}/getAll`,
-      async () => await fetchWrapper.get(baseUrl)
+      async () => await client.get(baseUrl)
     );
   }
 
   function getById() {
     return createAsyncThunk(
       `${name}/getById`,
-      async (id) => await fetchWrapper.get(`${baseUrl}/${id}`)
+      async (id) => await client.get(`${baseUrl}/${id}`)
     );
   }
 
@@ -61,7 +66,7 @@ function createExtraActions() {
     return createAsyncThunk(
       `${name}/update`,
       async function ({ id, data }, { getState, dispatch }) {
-        await fetchWrapper.put(`${baseUrl}/${id}`, data);
+        await client.put(`${baseUrl}/${id}`, data);
 
         // update stored user if the logged in user updated their own record
         const auth = getState().auth.value;
@@ -82,7 +87,7 @@ function createExtraActions() {
     return createAsyncThunk(
       `${name}/delete`,
       async function (id, { getState, dispatch }) {
-        await fetchWrapper.delete(`${baseUrl}/${id}`);
+        await client.delete(`${baseUrl}/${id}`);
 
         // auto logout if the logged in user deleted their own record
         if (id === getState().auth.value?.id) {
@@ -99,6 +104,10 @@ function createExtraReducers() {
     getById();
     _delete();
 
+    // builder.addCase(fetchUsers.fulfilled, (state, action) => {
+    //   return action.payload
+    // })
+
     function getAll() {
       var { pending, fulfilled, rejected } = extraActions.getAll;
       builder
@@ -106,10 +115,10 @@ function createExtraReducers() {
           state.list = { loading: true };
         })
         .addCase(fulfilled, (state, action) => {
-          state.list = { value: action.payload };
+          state.list = { value: action.payload.data, loading: false };
         })
         .addCase(rejected, (state, action) => {
-          state.list = { error: action.error };
+          state.list = { error: action.error, loading: false };
         });
     }
 
@@ -144,3 +153,33 @@ function createExtraReducers() {
     }
   }
 }
+
+export const selectAllUsers = state => state.users.list.value
+
+export const selectUserById = (state, userId) =>
+  state.users.list.value.find(user => user.id === userId)
+
+/*
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import {client} from "../helpers/client";
+
+const initialState = []
+
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+  const response = await client.get('/fakeApi/users')
+  return response.data
+})
+
+const usersSlice = createSlice({
+  name: 'users',
+  initialState,
+  reducers: {},
+  extraReducers(builder) {
+    builder.addCase(fetchUsers.fulfilled, (state, action) => {
+      return action.payload
+    })
+  },
+})
+
+export const usersReducer = usersSlice.reducer
+ */

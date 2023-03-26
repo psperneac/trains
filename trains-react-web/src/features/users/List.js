@@ -1,8 +1,5 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { userActions } from '../../store';
 
 export { List };
 
@@ -10,9 +7,9 @@ function List() {
   const users = useSelector(x => x.users.list);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(userActions.getAll());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(userActions.getAll());
+  // }, [dispatch]);
 
   return (
     <div>
@@ -35,7 +32,8 @@ function List() {
               <td>{user.username}</td>
               <td style={{ whiteSpace: 'nowrap' }}>
                 <Link to={`edit/${user.id}`} className="btn btn-sm btn-primary me-1">Edit</Link>
-                <button onClick={() => dispatch(userActions.delete(user.id))} className="btn btn-sm btn-danger" style={{ width: '60px' }} disabled={user.isDeleting}>
+                {/*onClick={() => dispatch(userActions.delete(user.id))}*/}
+                <button className="btn btn-sm btn-danger" style={{ width: '60px' }} disabled={user.isDeleting}>
                   {user.isDeleting
                     ? <span className="spinner-border spinner-border-sm"></span>
                     : <span>Delete</span>

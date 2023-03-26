@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-
 const name = 'alert';
 const initialState = createInitialState();
 const reducers = createReducers();

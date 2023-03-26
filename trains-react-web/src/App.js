@@ -1,3 +1,4 @@
+import React from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import { history } from './helpers';
@@ -6,6 +7,7 @@ import { Home } from './features/home/Home';
 import { AccountLayout } from './features/account/AccountLayout';
 import { UsersLayout } from './features/users/UsersLayout';
 import { PostsLayout } from './features/posts/PostsLayout';
+import {NotificationsList} from "./features/notifications/NotificationsList";
 
 export { App };
 
@@ -27,6 +29,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="users/*" element={<UsersLayout />} />
             <Route path="posts/*" element={<PostsLayout />} />
+            <Route exact path="/notifications" element={<NotificationsList />} />
           </Route>
           {/* public */}
           <Route path="account/*" element={<AccountLayout />} />

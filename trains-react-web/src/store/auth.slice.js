@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { alertActions } from './alert.slice';
-import { history } from '../helpers/history';
-import { fetchWrapper } from '../helpers/fetch-wrapper';
+import { history } from '../helpers';
+import {client} from "../helpers/client";
 
 function createInitialState() {
   return {
@@ -35,7 +35,8 @@ function createExtraActions() {
       async function ({ username, password }, { dispatch }) {
         dispatch(alertActions.clear());
         try {
-          const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
+          const userResponse = await client.post(`${baseUrl}/authenticate`, { username, password });
+          const user = userResponse.data;
 
           // set auth user in redux state
           dispatch(authActions.setAuth(user));
