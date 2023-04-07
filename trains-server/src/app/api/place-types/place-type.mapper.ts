@@ -12,12 +12,13 @@ export class PlaceTypeMapper {
       name: placeType.name,
       type: placeType.type,
       description: placeType.description,
+      content: placeType.content,
     } as PlaceTypeDto;
   }
 
   toDomain(dto: PlaceTypeDto, placeType?: PlaceType): PlaceType {
     const ret = {
-      ...placeType
+      ...placeType,
     };
 
     assign(ret, {

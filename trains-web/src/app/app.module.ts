@@ -41,9 +41,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
-import { PlaceTypeFormComponent } from './features/place-types/components/place-type-form.component';
-import { PlaceTypeEditPage } from './features/place-types/pages/place-type-edit.page';
-import { CreateOnePlaceTypeGuard } from './features/place-types/create-one-place-type.guard';
+import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -53,12 +51,7 @@ export function createTranslationLoader(http: HttpClient) {
   declarations: [
     AppComponent,
     ...PLACES_FEATURE.declarations,
-
-    // PLACE TYPES
-    PlaceTypesPage,
-    PlaceTypeEditPage,
-    PlaceTypesListComponent,
-    PlaceTypeFormComponent,
+    ...PLACE_TYPES_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -102,10 +95,7 @@ export function createTranslationLoader(http: HttpClient) {
     AuthModule,
 
     ...PLACES_FEATURE.imports,
-
-    // PLACE TYPES
-    StoreModule.forFeature('placeTypes', placeTypesReducer),
-    EffectsModule.forFeature([PlaceTypeEffects])
+    ...PLACE_TYPES_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -113,11 +103,7 @@ export function createTranslationLoader(http: HttpClient) {
     AlertService,
 
     ...PLACES_FEATURE.providers,
-
-    // PLACE TYPES
-    PlaceTypeService,
-    LoadOnePlaceTypeGuard,
-    CreateOnePlaceTypeGuard
+    ...PLACE_TYPES_FEATURE.providers,
   ],
   bootstrap: [AppComponent],
 })

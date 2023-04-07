@@ -15,4 +15,8 @@ export class PlaceType extends AbstractEntity {
   @Column('varchar', { length: 250 })
   @Expose()
   description: string;
+
+  @Column({ type: 'json' })
+  @Expose()
+  content: any;
 }

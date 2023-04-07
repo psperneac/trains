@@ -1,7 +1,8 @@
 export class PageRequestDto {
-  page: number;
-  limit: number;
-  sortColumn = '';
-  sortDescending = false;
-  filter = '';
+  unpaged?: boolean;
+  page?: number;
+  limit?: number;
+  sortColumn? = '';
+  sortDescending? = false;
+  filter? = '';
 }

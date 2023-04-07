@@ -59,10 +59,16 @@ export abstract class AbstractServiceController<T, R> {
   @UseGuards(LoggedIn, Admin)
   create(@Body() dto: R): Promise<R> {
     const domain = this.getMapper().toDomain(dto);
+    console.dir(domain);
     return this.getService()
       .create(domain)
-      .then((created) => this.getMapper().toDto(created))
+      .then((created) => {
+        const createdDto = this.getMapper().toDto(created);
+        console.dir(createdDto);
+        return createdDto;
+      })
       .catch((e) => {
+        console.dir(e);
         if (e instanceof HttpException) {
           throw e;
         } else {

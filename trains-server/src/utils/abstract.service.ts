@@ -1,13 +1,11 @@
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Mapper } from './mapper';
 import { SqlException } from './sql.exception';
 
 /**
  * T - entity type
- * R - dto type
  */
 export abstract class AbstractService<T> {
   findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
@@ -15,13 +13,18 @@ export abstract class AbstractService<T> {
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
 
-    return Promise.all([
-      this.getRepository().createQueryBuilder().offset(skippedItems).limit(limit).getMany(),
-      this.getRepository().count(),
-    ]).then(([data, count]) => ({
+    let query = this.getRepository().createQueryBuilder();
+    if (!pagination.unpaged) {
+      query = query.offset(skippedItems).limit(limit);
+    }
+    if (pagination.sortColumn) {
+      query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
+    }
+
+    return Promise.all([query.getMany(), this.getRepository().count()]).then(([data, count]) => ({
       data,
-      page,
-      limit,
+      page: pagination.unpaged ? page : 1,
+      limit: pagination.unpaged ? limit : count,
       totalCount: count,
     }));
   }
@@ -30,8 +33,8 @@ export abstract class AbstractService<T> {
     return this.getRepository().findOne(uuid);
   }
 
-  create(dto: T): Promise<T> {
-    const newData = this.getRepository().create(dto);
+  create(entity: DeepPartial<T>): Promise<T> {
+    const newData = this.getRepository().create(entity);
     return this.getRepository().save(newData);
   }
 

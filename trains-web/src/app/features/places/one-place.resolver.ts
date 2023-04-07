@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
-  Router, Resolve,
+  Resolve,
   RouterStateSnapshot,
   ActivatedRouteSnapshot
 } from '@angular/router';
@@ -16,9 +16,6 @@ export class OnePlaceResolver implements Resolve<boolean> {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    console.log('OnePlaceResolver', this.store, route, state);
-    console.log('OnePlaceResolver.id', route.paramMap.get('id'));
-
     return of(true);
   }
 }

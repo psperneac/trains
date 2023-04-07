@@ -3,6 +3,8 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { PlaceDto } from "../../../models/place.model";
+import { Store, select } from '@ngrx/store';
+import { PlaceTypeSelectors } from '../../place-types/store/place-type.selectors';
 
 @Component({
   selector: 'trains-place-form',
@@ -20,7 +22,10 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
 
   placeForm: UntypedFormGroup;
 
+  placeTypes$ = this.store.pipe(select(PlaceTypeSelectors.All));
+
   constructor(
+    private readonly store: Store<{}>,
     private readonly formBuilder: UntypedFormBuilder
   ) {}
 

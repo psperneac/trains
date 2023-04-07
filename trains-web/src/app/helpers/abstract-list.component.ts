@@ -9,6 +9,8 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { PAGE_SIZE } from '../utils/constants';
 import { AbstractEntityState } from './abstract.reducer';
 import { AbstractEntity } from './abstract.entity';
+import { Sort } from '@angular/material/sort';
+import { SortDirection } from '@angular/material/sort';
 
 @Component({
   template: ''
@@ -28,7 +30,7 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
   error$ = this.store.pipe(select(this.selectors.Error));
 
   sortColumn: string;
-  sortDirection: 'asc' | 'desc';
+  sortDirection: SortDirection;
   filter = '';
 
   protected constructor(
@@ -39,11 +41,15 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
 
   ngOnInit(): void {
     this.page$.pipe(take(1)).subscribe(value => {
-      this.getPaginator().pageIndex = value || 0;
+      if (!this.isUnpaged()) {
+        this.getPaginator().pageIndex = value || 0;
+      }
     });
 
     this.pageSize$.pipe(take(1)).subscribe(value => {
-      this.getPaginator().pageIndex = value || PAGE_SIZE;
+      if (!this.isUnpaged()) {
+        this.getPaginator().pageIndex = value || PAGE_SIZE;
+      }
     });
 
     this.filter$.pipe(take(1)).subscribe(value => {
@@ -59,7 +65,9 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
     });
 
     this.totalCount$.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.getPaginator().length = value;
+      if (!this.isUnpaged()) {
+        this.getPaginator().length = value;
+      }
     });
   }
 
@@ -69,7 +77,9 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
 
   applyFilter(value: string) {
     this.filter = value;
-    this.getPaginator().pageIndex = 0;
+    if (!this.isUnpaged()) {
+      this.getPaginator().pageIndex = 0;
+    }
     this.loadEntities(0);
   }
 
@@ -77,16 +87,26 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
     this.loadEntities(event.pageIndex);
   }
 
+  sortData($event: Sort) {
+    this.sortColumn = $event.active;
+    this.sortDirection = $event.direction;
+    this.loadEntities(this.isUnpaged() ? this.getPaginator().pageIndex : 0);
+  }
+
   loadEntities(page: number) {
     this.store.dispatch(
       this.actions.getAll({ request: {
-          page,
-          limit: this.getPaginator().pageSize,
-          sortColumn: this.sortColumn,
-          sortDescending: this.sortDirection === 'desc',
+          unpaged: this.isUnpaged() ? true : undefined,
+          page: this.isUnpaged() ? 0 : page + 1,
+          sortColumn: this.sortDirection === '' ? undefined : this.sortColumn,
+          sortDescending: this.sortDirection === '' ? undefined : this.sortDirection === 'desc',
           filter: this.filter
       }})
     )
+  }
+
+  isUnpaged() { 
+    return !this.getPaginator();
   }
 
   abstract getPaginator(): MatPaginator;

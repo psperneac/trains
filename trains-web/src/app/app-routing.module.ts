@@ -6,6 +6,7 @@ import {PLACES_FEATURE} from "./features/places/places.feature";
 import { PlaceTypeEditPage } from './features/place-types/pages/place-type-edit.page';
 import { LoadOnePlaceTypeGuard } from './features/place-types/load-one-place-type.guard';
 import { CreateOnePlaceTypeGuard } from './features/place-types/create-one-place-type.guard';
+import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
 //   which load data and implement app logic
@@ -35,11 +36,7 @@ const ROUTES: Routes = [
   },
   {
     path: 'place-types',
-    children: [
-      { path: '', component: PlaceTypesPage, canActivate: [], canDeactivate: [] },
-      { path: 'create', component: PlaceTypeEditPage, canActivate: [CreateOnePlaceTypeGuard], canDeactivate: []},
-      { path: ':id', component: PlaceTypeEditPage, canActivate: [LoadOnePlaceTypeGuard], canDeactivate: []}
-    ],
+    children: [...(PLACE_TYPES_FEATURE.routes ?? [])],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

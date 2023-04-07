@@ -3,4 +3,5 @@ export interface PlaceTypeDto {
   type: string;
   name: string;
   description: string;
+  content: any;
 }

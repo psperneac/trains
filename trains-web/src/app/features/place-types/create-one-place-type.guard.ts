@@ -17,7 +17,8 @@ export class CreateOnePlaceTypeGuard implements CanActivate {
     this.store.dispatch(PlaceTypeActions.selectOne({ payload: {
       type: '',
       name: '',
-      description: ''
+      description: '',
+      content: {},
     }}));
     return true;
   }

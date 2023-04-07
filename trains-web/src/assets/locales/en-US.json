@@ -53,7 +53,12 @@
     "placeType": {
       "listTitle": "Place Types",
       "createTitle": "Create Place Type",
-      "editTitle": "Edit Place Type"
+      "editTitle": "Edit Place Type",
+      "name": "Name",
+      "defaultName": "Default Name",
+      "type": "Type",
+      "description": "Description",
+      "content": "Content"
     }
   }
 }

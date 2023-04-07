@@ -1,3 +1,5 @@
+@import "styles";
+
 :host {
   .container-bottom {
     display: flex;
@@ -16,5 +18,17 @@
 
   .container-bottom-paginator {
     flex: 0 1 28rem;
+  }
+
+  .column-name {
+    @include ik_table_size(20rem);
+  }
+
+  .column-type {
+    @include ik_table_size(10rem);
+  }
+
+  .column-description {
+    @include ik_table_size_fill(30rem);
   }
 }

@@ -28,6 +28,12 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
       debounceTime(1000)
     ).subscribe(updatedValues => {
+      if (updatedValues.content) {
+        updatedValues.content = JSON.parse(updatedValues.content);
+      } else {
+        updatedValues.content = {};
+      }
+
       this.placeType = { ...this.placeType, ...updatedValues};
       this.valueChange.emit(this.placeType);
     })
@@ -47,6 +53,7 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
       name: new UntypedFormControl(placeType.name, [Validators.required]),
       type: new UntypedFormControl(placeType.type, [Validators.required]),
       description: new UntypedFormControl(placeType.description, [Validators.required]),
+      content: new UntypedFormControl(JSON.stringify(placeType.content || {})),
     })
   }
 }

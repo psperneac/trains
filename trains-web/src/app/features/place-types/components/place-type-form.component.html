@@ -1,18 +1,26 @@
 <form [formGroup]="placeTypeForm">
   <div class="input-row">
-    <mat-form-field class="input-place-name">
-      <mat-label>{{'page.place.name' | translate}}</mat-label>
-      <input matInput formControlName="name" width="40">
-    </mat-form-field>
-    <mat-form-field class="input-place-type">
-      <mat-label>{{'page.place.type' | translate}}</mat-label>
-      <input matInput formControlName="type" width="20">
+    <mat-form-field class="input-place-name fill-container" appearance="fill">
+      <mat-label>{{'page.placeType.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40" />
     </mat-form-field>
   </div>
   <div class="input-row">
-    <mat-form-field class="input-place-description">
-      <mat-label>{{'page.place.description' | translate}}</mat-label>
-      <input matInput formControlName="description" width="50">
+    <mat-form-field class="input-place-type fill-container" appearance="fill">
+      <mat-label>{{'page.placeType.type' | translate}}</mat-label>
+      <input matInput formControlName="type" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-description fill-container" appearance="fill">
+      <mat-label>{{'page.placeType.description' | translate}}</mat-label>
+      <textarea matInput formControlName="description" rows="5"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-content fill-container" appearance="fill">
+      <mat-label>{{'page.placeType.content' | translate}}</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
     </mat-form-field>
   </div>
 </form>

@@ -15,8 +15,9 @@ const createPlaceType = (id: number): PlaceType => {
     type: 'TYPE' + id,
     name: 'NAME' + id,
     description: 'DESCRIPTION' + id,
+    content: {},
   };
-}
+};
 
 export const PlaceTypeTestConfig: TestConfig<PlaceType, PlaceTypeDto> = {
   name: 'PlaceTypes',

@@ -10,6 +10,7 @@ import { LoadOnePlaceGuard } from './load-one-place.guard';
 import { PlaceCreatePage } from './pages/place-create.page';
 import { OnePlaceResolver } from './one-place.resolver';
 import {FeaturePart} from "../../utils/feature-part";
+import { PlaceTypesResolver } from '../place-types/place-types.resolver';
 
 export const PLACES_FEATURE: FeaturePart = {
   imports: [
@@ -31,6 +32,8 @@ export const PLACES_FEATURE: FeaturePart = {
   routes: [
     { path: '', component: PlacesPage, canActivate: [], canDeactivate: []},
     { path: 'create', component: PlaceCreatePage, canActivate: [], canDeactivate: []},
-    { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: []},
+    { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: [], 
+      resolve: [PlaceTypesResolver]
+    },
   ]
 }

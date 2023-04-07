@@ -9,6 +9,8 @@ import { AppState } from "../../../store";
 import { PlaceTypeActions } from "../store/place-type.actions";
 import { PlaceTypesState } from "../store/place-type.reducer";
 import { PlaceTypeSelectors } from "../store/place-type.selectors";
+import { map } from "rxjs";
+import { PAGE_SIZE } from "src/app/utils/constants";
 
 @Component({
   selector: 'trains-place-types-list',
@@ -16,17 +18,17 @@ import { PlaceTypeSelectors } from "../store/place-type.selectors";
   styleUrls: ['./place-types-list.component.scss']
 })
 export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesState, PlaceTypeDto> implements OnInit {
-  @ViewChild(MatPaginator, {static: true})
-  paginator: MatPaginator;
   @ViewChild(MatSort, {static: true})
   sort: MatSort;
 
   entities$ = this.store.pipe(select(PlaceTypeSelectors.All));
+  total$ = this.store.pipe(select(PlaceTypeSelectors.TotalCount));
+  page$ = this.store.pipe(select(PlaceTypeSelectors.Page));
 
   public displayColumns = [
     'name',
+    'type',
     'description',
-    'type'
   ];
   public filterColumns = [];
 
@@ -39,8 +41,7 @@ export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesSta
 
   ngOnInit(): void {
     this.store.dispatch(PlaceTypeActions.getAll({ request: {
-      page: 0,
-      limit: 10,
+      unpaged: true,
       sortColumn: this.sortColumn,
       sortDescending: this.sortDirection === 'desc',
       filter: ''
@@ -48,7 +49,7 @@ export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesSta
   }
 
   getPaginator(): MatPaginator {
-    return this.paginator;
+    return null;
   }
 
   addPlaceType() {
