@@ -103,7 +103,10 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
       case 'placeTypes':
         this.router.navigate(['/place-types']);
         break;
-    }
+      case 'vehicleTypes':
+        this.router.navigate(['/vehicle-types']);
+        break;
+      }
   }
 
   ngOnInit(): void {

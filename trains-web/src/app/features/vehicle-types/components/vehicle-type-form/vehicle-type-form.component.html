@@ -1,0 +1,26 @@
+<form [formGroup]="vehicleTypeForm">
+  <div class="input-row">
+    <mat-form-field class="input-place-name fill-container" appearance="fill">
+      <mat-label>{{'page.vehicleType.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-type fill-container" appearance="fill">
+      <mat-label>{{'page.vehicleType.type' | translate}}</mat-label>
+      <input matInput formControlName="type" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-description fill-container" appearance="fill">
+      <mat-label>{{'page.vehicleType.description' | translate}}</mat-label>
+      <textarea matInput formControlName="description" rows="5"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-place-content fill-container" appearance="fill">
+      <mat-label>{{'page.vehicleType.content' | translate}}</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
+    </mat-form-field>
+  </div>
+</form>

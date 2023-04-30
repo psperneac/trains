@@ -13,8 +13,10 @@ export class VehicleTypeMapper {
 
     return {
       id: vehicleType.id,
+      type: vehicleType.type,
       name: vehicleType.name,
       description: vehicleType.description,
+      content: vehicleType.content,
     } as VehicleTypeDto;
   }
 

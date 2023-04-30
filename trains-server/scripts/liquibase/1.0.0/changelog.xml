@@ -261,5 +261,11 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="740" author="Paul">
+        <addColumn tableName="VEHICLE_TYPES">
+          <column name="CONTENT" type="JSON">
+          </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

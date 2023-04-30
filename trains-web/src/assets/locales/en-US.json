@@ -21,7 +21,8 @@
     "register": "Register",
     "routes": "Routes",
     "users": "Users",
-    "vehicles": "Vehicles"
+    "vehicles": "Vehicles",
+    "vehicleTypes": "Vehicle Types"
   },
   "page": {
     "home": {
@@ -54,6 +55,16 @@
       "listTitle": "Place Types",
       "createTitle": "Create Place Type",
       "editTitle": "Edit Place Type",
+      "name": "Name",
+      "defaultName": "Default Name",
+      "type": "Type",
+      "description": "Description",
+      "content": "Content"
+    },
+    "vehicleType": {
+      "listTitle": "Vehicle Types",
+      "createTitle": "Create Vehicle Type",
+      "editTitle": "Edit Vehicle Type",
       "name": "Name",
       "defaultName": "Default Name",
       "type": "Type",

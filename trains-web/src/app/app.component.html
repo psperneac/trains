@@ -51,6 +51,10 @@
     <mat-icon>edit_location</mat-icon>
     <span>{{'menu.placeTypes' | translate}}</span>
   </button>
+  <button (click)="menuClicked('vehicleTypes')" mat-menu-item>
+    <mat-icon>edit_location</mat-icon>
+    <span>{{'menu.vehicleTypes' | translate}}</span>
+  </button>
 </mat-menu>
 
 <mat-menu #systemMenu="matMenu">

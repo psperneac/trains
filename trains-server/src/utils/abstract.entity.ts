@@ -1,11 +1,4 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  Generated,
-  PrimaryColumn,
-  UpdateDateColumn,
-  VersionColumn,
-} from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, Generated, PrimaryColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 import { Expose } from 'class-transformer';
 
 export abstract class AbstractEntity {

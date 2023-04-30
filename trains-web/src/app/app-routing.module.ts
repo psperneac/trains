@@ -7,6 +7,7 @@ import { PlaceTypeEditPage } from './features/place-types/pages/place-type-edit.
 import { LoadOnePlaceTypeGuard } from './features/place-types/load-one-place-type.guard';
 import { CreateOnePlaceTypeGuard } from './features/place-types/create-one-place-type.guard';
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
+import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
 //   which load data and implement app logic
@@ -37,6 +38,12 @@ const ROUTES: Routes = [
   {
     path: 'place-types',
     children: [...(PLACE_TYPES_FEATURE.routes ?? [])],
+    canActivate: [AdminAuthGuard],
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'vehicle-types',
+    children: [...(VEHICLE_TYPES_FEATURE.routes ?? [])],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

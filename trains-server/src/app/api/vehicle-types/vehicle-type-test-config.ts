@@ -15,6 +15,7 @@ const createVehicleType = (id: number): VehicleType => {
     type: 'TYPE' + id,
     name: 'NAME' + id,
     description: 'DESCRIPTION' + id,
+    content: {}
   };
 };
 

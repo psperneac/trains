@@ -42,6 +42,7 @@ import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
+import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -52,6 +53,7 @@ export function createTranslationLoader(http: HttpClient) {
     AppComponent,
     ...PLACES_FEATURE.declarations,
     ...PLACE_TYPES_FEATURE.declarations,
+    ...VEHICLE_TYPES_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -96,6 +98,7 @@ export function createTranslationLoader(http: HttpClient) {
 
     ...PLACES_FEATURE.imports,
     ...PLACE_TYPES_FEATURE.imports,
+    ...VEHICLE_TYPES_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -104,6 +107,7 @@ export function createTranslationLoader(http: HttpClient) {
 
     ...PLACES_FEATURE.providers,
     ...PLACE_TYPES_FEATURE.providers,
+    ...VEHICLE_TYPES_FEATURE.providers,
   ],
   bootstrap: [AppComponent],
 })
