@@ -25,6 +25,7 @@ export class AuthenticationService {
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.usersService.getByEmail(email);
+      console.dir(user);
       await this.verifyPassword(plainTextPassword, user.password);
       user.password = undefined;
       return user;
@@ -34,6 +35,7 @@ export class AuthenticationService {
   }
 
   public async verifyPassword(plainTextPassword: string, hashedPassword: string) {
+    console.log(plainTextPassword, hashedPassword);
     const isPasswordMatching = await bcrypt.compare(plainTextPassword, hashedPassword);
     if (!isPasswordMatching) {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);

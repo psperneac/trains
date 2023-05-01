@@ -1,0 +1,5 @@
+id,version,created,updated,deleted,type,name,description,content
+24a1ddf1-7992-437f-8a40-06e78441df7b,1,2023-05-01 04:59:45,2023-05-01 04:59:45,,TRUCK,Truck,Carries freight by road,{}
+2b004930-30fa-476a-9ab2-99ad938ce600,1,2023-05-01 04:59:08,2023-05-01 04:59:08,,SHIP,Ship,"Goes on water, carries a lot",{}
+34bf425e-e4dd-4507-b0b5-45184debc6bd,1,2023-04-30 07:52:24,2023-04-30 07:52:24,,TRAIN,Train,A vehicle that runs on tracks,{}
+c5089125-5a49-4ed5-ba28-e0ea9cb29937,1,2023-04-30 07:10:08,2023-04-30 07:10:08,,CAR,Car,Small road vehicle,{}
