@@ -332,6 +332,18 @@
         <constraints nullable="false" />
       </column>
       <column name="DESCRIPTION" type="VARCHAR(250)" />
+
+      <column name="ENGINE_MAX" type="INTEGER" defaultValue="1" />
+      <column name="AUX_MAX" type="INTEGER" defaultValue="0" />
+
+      <column name="ENGINE_LOAD" type="INTEGER" defaultValue="1" />
+      <column name="ENGINE_FUEL" type="INTEGER" defaultValue="50" />
+
+      <column name="AUX_LOAD" type="INTEGER" defaultValue="1" />
+      <column name="AUX_FUEL" type="INTEGER" defaultValue="50" />
+
+      <column name="SPEED" type="INTEGER" defaultValue="10" />
+
       <column name="CONTENT" type="JSON"> </column>
     </createTable>
   </changeSet>
@@ -349,6 +361,35 @@
     <createIndex tableName="VEHICLES" indexName="VEHICLES_NAME" unique="true">
       <column name="NAME" />
     </createIndex>
+  </changeSet>
+
+  <changeSet id="799" author="Paul">
+    <loadData
+            commentLineStartsWith="//"
+            encoding="UTF-8"
+            file="../data/vehicles.csv"
+            quotchar="&quot;"
+            relativeToChangelogFile="true"
+            separator=","
+            tableName="VEHICLES"
+    >
+      <column header="id" name="ID" type="varchar(36)" />
+      <column header="version" name="VERSION" type="INTEGER" />
+      <column header="created" name="CREATED" type="DATETIME" />
+      <column header="updated" name="UPDATED" type="DATETIME" />
+      <column header="deleted" name="DELETED" type="DATETIME" />
+      <column header="type" name="TYPE" type="VARCHAR(20)" />
+      <column header="name" name="NAME" type="VARCHAR(250)" />
+      <column header="description" name="DESCRIPTION" type="VARCHAR(250)" />
+      <column header="engine_max" name="ENGINE_MAX" type="INTEGER" />
+      <column header="engine_load" name="ENGINE_LOAd" type="INTEGER" />
+      <column header="engine_fuel" name="ENGINE_FUEL" type="INTEGER" />
+      <column header="aux_max" name="AUX_MAX" type="INTEGER" />
+      <column header="aux_load" name="AUX_LOAD" type="INTEGER" />
+      <column header="aux_fuel" name="AUX_FUEL" type="INTEGER" />
+      <column header="speed" name="SPEED" type="INTEGER" />
+      <column header="content" name="CONTENT" type="JSON" />
+    </loadData>
   </changeSet>
 
 </databaseChangeLog>
