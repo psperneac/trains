@@ -1,3 +1,4 @@
+import { PlaceTypeFeatureService } from "./place-type-feature.service";
 import { PlaceTypeController } from './place-type.controller';
 import { PlaceTypeService } from './place-type.service';
 /*
@@ -12,7 +13,7 @@ import {PlaceTypeMapper} from "./place-type.mapper";
 @Module({
   imports: [TypeOrmModule.forFeature([PlaceType])],
   controllers: [PlaceTypeController],
-  providers: [PlaceTypeService, PlaceTypeMapper],
-  exports: [PlaceTypeService, PlaceTypeMapper],
+  providers: [PlaceTypeService, PlaceTypeMapper, PlaceTypeFeatureService],
+  exports: [PlaceTypeService, PlaceTypeMapper, PlaceTypeFeatureService],
 })
 export class PlaceTypeModule {}

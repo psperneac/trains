@@ -1,34 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { assign } from 'lodash';
+import { AbstractDtoMapper } from "../../../utils/abstract-dto-mapper";
 
 import { VehicleTypeDto } from './dto/vehicle-type.dto';
 import { VehicleType } from './entities/vehicle-type.entity';
+import { VehicleTypeFeatureService } from "./vehicle-type-feature.service";
 
 @Injectable()
-export class VehicleTypeMapper {
-  toDto(vehicleType: VehicleType): VehicleTypeDto {
-    if (!vehicleType) {
-      return null;
-    }
-
-    return {
-      id: vehicleType.id,
-      type: vehicleType.type,
-      name: vehicleType.name,
-      description: vehicleType.description,
-      content: vehicleType.content,
-    } as VehicleTypeDto;
-  }
-
-  toDomain(dto: VehicleTypeDto, vehicleType?: VehicleType): VehicleType {
-    const ret = {
-      ...vehicleType,
-    };
-
-    assign(ret, {
-      ...dto,
-    });
-
-    return ret;
+export class VehicleTypeMapper extends AbstractDtoMapper<VehicleType, VehicleTypeDto> {
+  constructor(private feature: VehicleTypeFeatureService) {
+    super(feature);
   }
 }

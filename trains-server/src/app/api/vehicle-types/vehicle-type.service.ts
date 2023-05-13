@@ -1,26 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { VehicleTypeDto } from "./dto/vehicle-type.dto";
 
 import { VehicleType } from './entities/vehicle-type.entity';
 import { AbstractService } from '../../../utils/abstract.service';
-import { VehicleTypeMapper } from './vehicle-type.mapper';
-import { Mapper } from '../../../utils/mapper';
+import { VehicleTypeFeatureService } from "./vehicle-type-feature.service";
 
 @Injectable()
-export class VehicleTypeService extends AbstractService<VehicleType> {
+export class VehicleTypeService extends AbstractService<VehicleType, VehicleTypeDto> {
   constructor(
-    @InjectRepository(VehicleType) private readonly repository: Repository<VehicleType>,
-    private readonly mapper: VehicleTypeMapper,
+    private readonly feature: VehicleTypeFeatureService,
   ) {
-    super();
-  }
-
-  getRepository(): Repository<VehicleType> {
-    return this.repository;
-  }
-
-  getMapper(): Mapper<any, any> {
-    return this.mapper;
+    super(feature);
   }
 }

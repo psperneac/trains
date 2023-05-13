@@ -1,13 +1,18 @@
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, Entity, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { AbstractEntity } from "./abstract.entity";
+import { FeatureService } from "./feature.service";
 import { SqlException } from './sql.exception';
 
 /**
  * T - entity type
  */
-export abstract class AbstractService<T> {
+export class AbstractService<T extends AbstractEntity,R> {
+
+  constructor(private readonly featureService: FeatureService<T,R>) {}
+
   findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
@@ -35,7 +40,7 @@ export abstract class AbstractService<T> {
 
   create(entity: DeepPartial<T>): Promise<T> {
     const newData = this.getRepository().create(entity);
-    return this.getRepository().save(newData);
+    return this.getRepository().save(newData as any as DeepPartial<T>, {});
   }
 
   update(uuid: string, entity): Promise<T> {
@@ -62,5 +67,7 @@ export abstract class AbstractService<T> {
       });
   }
 
-  public abstract getRepository(): Repository<T>;
+  getRepository(): Repository<T> {
+    return this.featureService.getRepository();
+  }
 }

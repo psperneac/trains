@@ -1,7 +1,8 @@
 import { CreateDateColumn, DeleteDateColumn, Generated, PrimaryColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 import { Expose } from 'class-transformer';
+import { ObjectLiteral } from "typeorm/common/ObjectLiteral";
 
-export abstract class AbstractEntity {
+export abstract class AbstractEntity implements ObjectLiteral {
   @PrimaryColumn()
   @Generated('uuid')
   @Expose()

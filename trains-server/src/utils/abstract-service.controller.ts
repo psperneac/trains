@@ -1,15 +1,21 @@
+import { DeepPartial } from "typeorm";
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { Mapper } from './mapper';
+import { Mapper } from "./abstract-dto-mapper";
+import { AbstractEntity } from "./abstract.entity";
 import { AbstractService } from './abstract.service';
 import { Body, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Admin, LoggedIn } from '../authentication/authentication.guard';
+import { FeatureService } from "./feature.service";
 
 /**
  * T - entity type
  * R - entity dto type
  */
-export abstract class AbstractServiceController<T, R> {
+export class AbstractServiceController<T extends AbstractEntity, R> {
+
+  constructor(private readonly featureService: FeatureService<T, R>) {}
+
   @Get(':id')
   @UseGuards(LoggedIn)
   findOne(@Param('id') id: string): Promise<R> {
@@ -61,7 +67,7 @@ export abstract class AbstractServiceController<T, R> {
     const domain = this.getMapper().toDomain(dto);
     console.dir(domain);
     return this.getService()
-      .create(domain)
+      .create(domain as any as DeepPartial<T>)
       .then((created) => {
         const createdDto = this.getMapper().toDto(created);
         console.dir(createdDto);
@@ -154,7 +160,11 @@ export abstract class AbstractServiceController<T, R> {
       });
   }
 
-  public abstract getService(): AbstractService<T>;
+  public getService(): AbstractService<T,R> {
+    return this.featureService.getService();
+  }
 
-  public abstract getMapper(): Mapper<T, R>;
+  public getMapper(): Mapper<T, R> {
+    return this.featureService.getMapper();1
+  }
 }

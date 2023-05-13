@@ -32,7 +32,7 @@ export interface TestConfig<T extends AbstractEntity, R> {
   /** controller created by nest */
   controller?: AbstractServiceController<T, R>;
   /** service created by nest */
-  service?: AbstractService<T>;
+  service?: AbstractService<T, R>;
   /** mapper created  by nest */
   mapper?: AbstractMapper<T, R>;
   /** repository created by nest */
