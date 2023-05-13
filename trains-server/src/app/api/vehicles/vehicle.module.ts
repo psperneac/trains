@@ -1,4 +1,4 @@
-import { Injectable, Module } from "@nestjs/common";
+import { Injectable, Module, OnModuleInit } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AbstractDtoMapper, Mapper } from "../../../utils/abstract-dto-mapper";
@@ -6,16 +6,24 @@ import { AbstractServiceController } from "../../../utils/abstract-service.contr
 import { AbstractService } from "../../../utils/abstract.service";
 import { FeatureService } from "../../../utils/feature.service";
 import { Vehicle, VehicleDto } from "./vehicle.entity";
+import { ModuleTokens } from '../../../utils/module-tokens';
+import { ModuleRef } from '@nestjs/core';
 
-export const VEHICLE_SERVICE = Symbol('VEHICLE_SERVICE');
-export const VEHICLE_CONTROLLER = Symbol('VEHICLE_CONTROLLER');
-export const VEHICLE_REPOSITORY = Symbol('VEHICLE_REPOSITORY');
-export const VEHICLE_MAPPER = Symbol('VEHICLE_MAPPER');
+export const TOKENS = new ModuleTokens('VEHICLE');
 
 @Injectable()
-export class VehicleService extends AbstractService<Vehicle, VehicleDto> {
-  constructor(private feature: VehicleFeatureService) {
-    super(feature);
+export class VehicleRepository {
+  constructor(
+    @InjectRepository(Vehicle) private readonly repository: Repository<Vehicle>
+  ) {}
+
+  getRepository(): Repository<Vehicle> { return this.repository; }
+}
+
+@Injectable()
+export class VehicleService extends AbstractService<Vehicle, VehicleDto> implements OnModuleInit {
+  constructor(private moduleRef: ModuleRef) {
+    super(moduleRef, TOKENS);
   }
 }
 
@@ -68,7 +76,21 @@ export class VehicleFeatureService implements FeatureService<Vehicle, VehicleDto
 @Module({
   imports: [TypeOrmModule.forFeature([Vehicle])],
   controllers: [VehicleController],
-  providers: [VehicleMapper, VehicleService, VehicleFeatureService
+  providers: [VehicleMapper, VehicleService, VehicleFeatureService,
+    {
+      provide: TOKENS.repository,
+      inject: [VehicleRepository],
+      useFactory: (repositoryHolder) => repositoryHolder.getRepository()
+    },
+    {
+      provide: TOKENS.mappedProperties,
+      useValue: [
+        'id', 'type', 'name', 'description', 'content',
+        'engineMax', 'engineLoad', 'engineFuel',
+        'auxMax', 'auxLoad', 'auxFuel',
+        'speed'
+      ]
+    }
   ],
   exports: [VehicleMapper, VehicleService, VehicleFeatureService]
 })
