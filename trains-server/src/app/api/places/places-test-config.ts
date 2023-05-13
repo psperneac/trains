@@ -1,9 +1,6 @@
-import { PlaceDto } from '../../../models/place.model';
 import { TestConfig } from '../../../utils/test/test-config';
-import Place from './place.entity';
-import { PlaceMapper } from './place.mapper';
-import { PlacesController } from './places.controller';
-import { PlacesService } from './places.service';
+import { Place, PlaceDto } from './place.entity';
+import { PlaceMapper, PlacesController, PlacesService } from "./places.module";
 
 const createPlace = (id: number): Place => {
   return {

@@ -1,8 +1,5 @@
-import Translation from './entities/translation.entity';
-import { TranslationDto } from './dto/translation.dto';
-import { TranslationMapper } from './translation.mapper';
-import { TranslationsService } from './translations.service';
-import { TranslationsController } from './translations.controller';
+import { Translation, TranslationDto } from './translation.entity';
+import { TranslationMapper, TranslationsController, TranslationsService } from "./translations.module";
 import { TestConfig } from '../../../utils/test/test-config';
 
 const createTranslation = (id: number): Translation => {

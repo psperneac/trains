@@ -4,7 +4,6 @@ import { Column, Entity } from "typeorm";
 import { AbstractDto } from "../../../utils/abstract-dto";
 import { AbstractDtoMapper } from "../../../utils/abstract-dto-mapper";
 import { AbstractEntity } from "../../../utils/abstract.entity";
-import { VehicleFeatureService } from "./vehicle.module";
 
 @Entity({ name: 'VEHICLES' })
 export class Vehicle extends AbstractEntity {

@@ -1,19 +1,45 @@
-import { PlaceTypeFeatureService } from "./place-type-feature.service";
-import { PlaceTypeController } from './place-type.controller';
-import { PlaceTypeService } from './place-type.service';
-/*
-https://docs.nestjs.com/modules
-*/
+import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
+import { AbstractDtoMapper } from "../../../utils/abstract-dto-mapper";
+import { AbstractServiceController } from "../../../utils/abstract-service.controller";
+import { AbstractService } from "../../../utils/abstract.service";
+import { AllExceptionsFilter } from "../../../utils/all-exceptions.filter";
+import { RepositoryAccessor } from "../../../utils/repository-accessor";
+import { PlaceType, PlaceTypeDto } from "./place-type.entity";
 
-import { Module } from '@nestjs/common';
-import {PlaceType} from "./entities/place-type.entity";
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {PlaceTypeMapper} from "./place-type.mapper";
+@Injectable()
+export class PlaceTypeRepository extends RepositoryAccessor<PlaceType> {
+  constructor(@InjectRepository(PlaceType) injectedRepository) {
+    super(injectedRepository);
+  }
+}
+
+@Injectable()
+export class PlaceTypeService extends AbstractService<PlaceType, PlaceTypeDto> {
+  constructor(repo: PlaceTypeRepository) {
+    super(repo);
+  }
+}
+
+@Injectable()
+export class PlaceTypeMapper extends AbstractDtoMapper<PlaceType, PlaceTypeDto> {
+  getMappedProperties(): string[] {
+    return ['id', 'type', 'name', 'description', 'content'];
+  }
+}
+
+@Controller('place-types')
+@UseFilters(AllExceptionsFilter)
+export class PlaceTypeController extends AbstractServiceController<PlaceType, PlaceTypeDto> {
+  constructor(service: PlaceTypeService, mapper: PlaceTypeMapper) {
+    super(service, mapper);
+  }
+}
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlaceType])],
   controllers: [PlaceTypeController],
-  providers: [PlaceTypeService, PlaceTypeMapper, PlaceTypeFeatureService],
-  exports: [PlaceTypeService, PlaceTypeMapper, PlaceTypeFeatureService],
+  providers: [PlaceTypeService, PlaceTypeMapper, PlaceTypeRepository],
+  exports: [PlaceTypeService, PlaceTypeMapper],
 })
 export class PlaceTypeModule {}

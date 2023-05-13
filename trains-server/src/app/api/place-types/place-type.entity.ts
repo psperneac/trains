@@ -1,6 +1,6 @@
-import { Column, Entity } from 'typeorm';
 import { Expose } from 'class-transformer';
-import { AbstractEntity } from '../../../../utils/abstract.entity';
+import { Column, Entity } from 'typeorm';
+import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'PLACE_TYPES' })
 export class PlaceType extends AbstractEntity {
@@ -18,5 +18,13 @@ export class PlaceType extends AbstractEntity {
 
   @Column({ type: 'json' })
   @Expose()
+  content: any;
+}
+
+export class PlaceTypeDto {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
   content: any;
 }

@@ -21,8 +21,6 @@ export interface Mapper<T, R> {
  * R - entity dto type
  */
 export class AbstractDtoMapper<T extends AbstractEntity,R> implements Mapper<T,R> {
-  constructor(private readonly featureService: FeatureService<T, R>) {}
-
   toDomain(dto: R, domain?: T | Partial<T>): T {
     const ret = {
       ...domain,
@@ -40,6 +38,15 @@ export class AbstractDtoMapper<T extends AbstractEntity,R> implements Mapper<T,R
       return null;
     }
 
-    return pick(cloneDeep(domain), this.featureService.getMappedProperties());
+    const prop = this.getMappedProperties();
+    if (!prop || prop.length === 0) {
+      return cloneDeep(domain) as any as R;
+    }
+
+    return pick(cloneDeep(domain), this.getMappedProperties()) as any as R;
+  }
+
+  getMappedProperties() {
+    return [];
   }
 }

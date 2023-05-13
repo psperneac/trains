@@ -1,9 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
-import { PlaceTypeDto } from './dto/place-type.dto';
-import { PlaceType } from './entities/place-type.entity';
-import { PlaceTypeController } from './place-type.controller';
-import { PlaceTypeMapper } from './place-type.mapper';
-import { PlaceTypeService } from './place-type.service';
+import { PlaceType, PlaceTypeDto } from './place-type.entity';
+import { PlaceTypeController, PlaceTypeMapper, PlaceTypeService } from "./place-type.module";
 
 const createPlaceType = (id: number): PlaceType => {
   return {

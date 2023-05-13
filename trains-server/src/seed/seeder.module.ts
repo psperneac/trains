@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ApiModule } from '../app/api/api.module';
-import { VehicleType } from '../app/api/vehicle-types/entities/vehicle-type.entity';
+import { VehicleType } from '../app/api/vehicle-types/vehicle-type.entity';
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
 import { Seeder } from './seeder';

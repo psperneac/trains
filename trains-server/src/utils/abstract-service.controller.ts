@@ -1,7 +1,7 @@
 import { DeepPartial } from "typeorm";
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { Mapper } from "./abstract-dto-mapper";
+import { AbstractDtoMapper, Mapper } from "./abstract-dto-mapper";
 import { AbstractEntity } from "./abstract.entity";
 import { AbstractService } from './abstract.service';
 import { Body, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
@@ -14,12 +14,14 @@ import { FeatureService } from "./feature.service";
  */
 export class AbstractServiceController<T extends AbstractEntity, R> {
 
-  constructor(private readonly featureService: FeatureService<T, R>) {}
+  constructor(
+    private readonly service: AbstractService<T, R>,
+    private readonly mapper: AbstractDtoMapper<T, R>) {}
 
   @Get(':id')
   @UseGuards(LoggedIn)
   findOne(@Param('id') id: string): Promise<R> {
-    return this.getService()
+    return this.service
       .findOne(id)
       .then((domain) => {
         // if domain not found, return 404
@@ -27,7 +29,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
 
-        const found = this.getMapper().toDto(domain);
+        const found = this.mapper.toDto(domain);
 
         // mapping can fail too; maybe on econdary entities
         if (!found) {
@@ -48,11 +50,11 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
-    return this.getService()
+    return this.service
       .findAll(pagination)
       .then((page) => {
         const mappedData = page?.data?.map((item) => {
-          return this.getMapper().toDto(item);
+          return this.mapper.toDto(item);
         });
         return {
           ...page,
@@ -64,12 +66,12 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Post()
   @UseGuards(LoggedIn, Admin)
   create(@Body() dto: R): Promise<R> {
-    const domain = this.getMapper().toDomain(dto);
+    const domain = this.mapper.toDomain(dto);
     console.dir(domain);
-    return this.getService()
+    return this.service
       .create(domain as any as DeepPartial<T>)
       .then((created) => {
-        const createdDto = this.getMapper().toDto(created);
+        const createdDto = this.mapper.toDto(created);
         console.dir(createdDto);
         return createdDto;
       })
@@ -86,22 +88,19 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Put(':id')
   @UseGuards(LoggedIn, Admin)
   update(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
-    return this.getService()
+    return this.service
       .findOne(uuid)
       .then((entity: T) => {
         if (!entity) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
         return {
-          ...this.getMapper().toDomain(dto, entity),
+          ...this.mapper.toDomain(dto, entity),
           id: uuid, // don't allow id updating
         };
       })
-      .then((domain) => {
-        const service = this.getService();
-        return service.update(uuid, domain);
-      })
-      .then((updated) => this.getMapper().toDto(updated))
+      .then((domain) => this.service.update(uuid, domain))
+      .then((updated) => this.mapper.toDto(updated))
       .catch((e) => {
         if (e instanceof HttpException) {
           throw e;
@@ -114,7 +113,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Patch(':id')
   @UseGuards(LoggedIn, Admin)
   patch(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
-    return this.getService()
+    return this.service
       .findOne(uuid)
       .then((entity) => {
         if (!entity) {
@@ -122,17 +121,17 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
         }
 
         return {
-          ...this.getMapper().toDomain(dto, entity),
+          ...this.mapper.toDomain(dto, entity),
           id: uuid, // don't allow id updating
         };
       })
       .then((entity) => {
-        return this.getService().update(uuid, entity);
+        return this.service.update(uuid, entity);
       })
-      .then(() => this.getService().findOne(uuid))
+      .then(() => this.service.findOne(uuid))
       .then((updatedEntity) => {
         if (updatedEntity) {
-          return this.getMapper().toDto(updatedEntity);
+          return this.mapper.toDto(updatedEntity);
         }
 
         throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
@@ -149,7 +148,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Delete(':id')
   @UseGuards(LoggedIn, Admin)
   remove(@Param('id') id: string) {
-    return this.getService()
+    return this.service
       .delete(id)
       .catch((e) => {
         if (e instanceof HttpException) {
@@ -158,13 +157,5 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
           throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
-  }
-
-  public getService(): AbstractService<T,R> {
-    return this.featureService.getService();
-  }
-
-  public getMapper(): Mapper<T, R> {
-    return this.featureService.getMapper();1
   }
 }

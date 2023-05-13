@@ -1,21 +1,22 @@
+import { VehicleRepository } from "../app/api/vehicles/vehicles.module";
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
 import { DeepPartial, Entity, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { AbstractEntity } from "./abstract.entity";
-import { FeatureService } from "./feature.service";
+import { RepositoryAccessor } from "./repository-accessor";
 import { SqlException } from './sql.exception';
-import { ModuleRef } from '@nestjs/core';
-import { ModuleTokens } from './module-tokens';
 
 /**
  * T - entity type
  */
 export class AbstractService<T extends AbstractEntity,R> {
 
-  private repository: Repository<T>;
+  repository: Repository<T>;
 
-  constructor(private moduleRef: ModuleRef, private tokens: ModuleTokens) {}
+  constructor(private readonly repositoryAccessor: RepositoryAccessor<T>) {
+    this.repository = repositoryAccessor.getRepository();
+  }
 
   findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
     const page = pagination.page || 1;
@@ -69,9 +70,5 @@ export class AbstractService<T extends AbstractEntity,R> {
 
         return true;
       });
-  }
-
-  onModuleInit() {
-    this.repository = this.moduleRef.get(this.tokens.repository)
   }
 }

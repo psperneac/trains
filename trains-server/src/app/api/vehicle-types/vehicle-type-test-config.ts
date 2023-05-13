@@ -1,9 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
-import { VehicleTypeDto } from './dto/vehicle-type.dto';
-import { VehicleType } from './entities/vehicle-type.entity';
-import { VehicleTypeController } from './vehicle-type.controller';
-import { VehicleTypeMapper } from './vehicle-type.mapper';
-import { VehicleTypeService } from './vehicle-type.service';
+import { VehicleType, VehicleTypeDto } from './vehicle-type.entity';
+import { VehicleTypeController, VehicleTypeMapper, VehicleTypeService } from "./vehicle-types.module";
 
 const createVehicleType = (id: number): VehicleType => {
   return {

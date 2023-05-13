@@ -2,7 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'PLACES' })
-class Place extends AbstractEntity {
+export class Place extends AbstractEntity {
   @Column()
   name: string;
 
@@ -19,4 +19,28 @@ class Place extends AbstractEntity {
   long: number;
 }
 
-export default Place;
+export interface PlaceDto {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  lat: number;
+  long: number;
+}
+
+export interface CreatePlaceDto {
+  name: string;
+  description: string;
+  type: string;
+  lat: number;
+  long: number;
+}
+
+export interface UpdatePlaceDto {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  lat: number;
+  long: number;
+}
