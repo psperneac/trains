@@ -23,31 +23,31 @@ export class Vehicle extends AbstractEntity {
   @Expose()
   content: any;
 
-  @Column('number', { name: 'ENGINE_MAX' })
+  @Column('int', { name: 'ENGINE_MAX' })
   @Expose()
   engineMax: number;
 
-  @Column('number', { name: 'ENGINE_LOAD' })
+  @Column('int', { name: 'ENGINE_LOAD' })
   @Expose()
   engineLoad: number;
 
-  @Column('number', { name: 'ENGINE_FUEL' })
+  @Column('int', { name: 'ENGINE_FUEL' })
   @Expose()
   engineFuel: number;
 
-  @Column('number', { name: 'AUX_MAX' })
+  @Column('int', { name: 'AUX_MAX' })
   @Expose()
   auxMax: number;
 
-  @Column('number', { name: 'AUX_LOAD' })
+  @Column('int', { name: 'AUX_LOAD' })
   @Expose()
   auxLoad: number;
 
-  @Column('number', { name: 'AUX_FUEL' })
+  @Column('int', { name: 'AUX_FUEL' })
   @Expose()
   auxFuel: number;
 
-  @Column('number')
+  @Column('int')
   @Expose()
   speed: number;
 }

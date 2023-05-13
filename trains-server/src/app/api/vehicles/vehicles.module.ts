@@ -1,8 +1,9 @@
-import { Injectable, Module, OnModuleInit } from '@nestjs/common';
+import { Controller, Injectable, Module, OnModuleInit, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
 import { AbstractDtoMapper, Mapper } from "../../../utils/abstract-dto-mapper";
 import { AbstractServiceController } from "../../../utils/abstract-service.controller";
 import { AbstractService } from "../../../utils/abstract.service";
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from "../../../utils/repository-accessor";
 import { Vehicle, VehicleDto } from "./vehicle.entity";
 
@@ -21,13 +22,6 @@ export class VehicleService extends AbstractService<Vehicle, VehicleDto> {
 }
 
 @Injectable()
-export class VehicleController extends AbstractServiceController<Vehicle, VehicleDto> {
-  constructor(service: VehicleService, mapper: VehicleMapper) {
-    super(service, mapper);
-  }
-}
-
-@Injectable()
 export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
   getMappedProperties(): string[] {
     return [
@@ -39,10 +33,18 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
   }
 }
 
+@Controller('vehicles')
+@UseFilters(AllExceptionsFilter)
+export class VehicleController extends AbstractServiceController<Vehicle, VehicleDto> {
+  constructor(service: VehicleService, mapper: VehicleMapper) {
+    super(service, mapper);
+  }
+}
+
 @Module({
   imports: [TypeOrmModule.forFeature([Vehicle])],
   controllers: [VehicleController],
-  providers: [VehicleMapper, VehicleService],
+  providers: [VehicleMapper, VehicleService, VehicleRepository],
   exports: [VehicleMapper, VehicleService]
 })
 export class VehiclesModule {}

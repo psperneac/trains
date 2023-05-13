@@ -7,8 +7,9 @@ import { Translation } from '../app/api/translations/translation.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PlaceType } from '../app/api/place-types/place-type.entity';
 import { VehicleType } from '../app/api/vehicle-types/vehicle-type.entity';
+import { Vehicle } from '../app/api/vehicles/vehicle.entity';
 
-export const ENTITIES = [Place, User, Translation, PlaceType, VehicleType];
+export const ENTITIES = [Place, User, Translation, PlaceType, VehicleType, Vehicle];
 
 @Module({
   imports: [

@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { TranslationsModule } from './translations/translations.module';
 import { VehicleTypesModule } from './vehicle-types/vehicle-types.module';
 import {PlaceTypeModule} from "./place-types/place-type.module";
+import { VehiclesModule } from './vehicles/vehicles.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import {PlaceTypeModule} from "./place-types/place-type.module";
     TranslationsModule,
     VehicleTypesModule,
     PlaceTypeModule,
+    VehiclesModule
   ],
 })
 export class ApiModule {
