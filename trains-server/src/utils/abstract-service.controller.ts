@@ -15,23 +15,23 @@ import { FeatureService } from "./feature.service";
 export class AbstractServiceController<T extends AbstractEntity, R> {
 
   constructor(
-    private readonly service: AbstractService<T, R>,
+    private readonly service: AbstractService<T>,
     private readonly mapper: AbstractDtoMapper<T, R>) {}
 
   @Get(':id')
   @UseGuards(LoggedIn)
-  findOne(@Param('id') id: string): Promise<R> {
+  public async findOne(@Param('id') id: string): Promise<R> {
     return this.service
       .findOne(id)
-      .then((domain) => {
+      .then(async (domain) => {
         // if domain not found, return 404
         if (!domain) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
 
-        const found = this.mapper.toDto(domain);
+        const found = await this.mapper.toDto(domain);
 
-        // mapping can fail too; maybe on econdary entities
+        // mapping can fail too; maybe on secondary entities
         if (!found) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
@@ -49,13 +49,17 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Get()
   @UseGuards(LoggedIn)
-  findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
+  async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
     return this.service
       .findAll(pagination)
-      .then((page) => {
-        const mappedData = page?.data?.map((item) => {
+      .then(async (page) => {
+        console.dir(page);
+        const mappedDataPromises = page?.data?.map((item) => {
           return this.mapper.toDto(item);
         });
+
+        const mappedData = await Promise.all(mappedDataPromises);
+
         return {
           ...page,
           data: mappedData,
@@ -65,13 +69,13 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Post()
   @UseGuards(LoggedIn, Admin)
-  create(@Body() dto: R): Promise<R> {
-    const domain = this.mapper.toDomain(dto);
+  async create(@Body() dto: R): Promise<R> {
+    const domain = await this.mapper.toDomain(dto);
     console.dir(domain);
     return this.service
       .create(domain as any as DeepPartial<T>)
-      .then((created) => {
-        const createdDto = this.mapper.toDto(created);
+      .then(async (created) => {
+        const createdDto = await this.mapper.toDto(created);
         console.dir(createdDto);
         return createdDto;
       })
@@ -87,15 +91,17 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Put(':id')
   @UseGuards(LoggedIn, Admin)
-  update(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
+  async update(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
     return this.service
       .findOne(uuid)
-      .then((entity: T) => {
+      .then(async (entity: T) => {
+        console.log('infind');
+        console.dir(entity);
         if (!entity) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
         return {
-          ...this.mapper.toDomain(dto, entity),
+          ...(await this.mapper.toDomain(dto, entity)),
           id: uuid, // don't allow id updating
         };
       })

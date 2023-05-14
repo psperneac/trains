@@ -18,31 +18,13 @@ export class PlaceRepository extends RepositoryAccessor<Place> {
 
 @Injectable()
 export class PlaceMapper extends AbstractDtoMapper<Place, PlaceDto > {
-  toDomain(dto: PlaceDto | CreatePlaceDto | UpdatePlaceDto, place?: Place): Place {
-    if (!dto) {
-      return place;
-    }
-
-    if (!place) {
-      place = {} as Place;
-    }
-
-    const ret = {
-      ...place,
-    };
-
-    assign(ret, dto);
-
-    return ret;
-  }
-
   getMappedProperties(): string[] {
     return ['id', 'name', 'description', 'type', 'lat', 'long'];
   }
 }
 
 @Injectable()
-export class PlacesService extends AbstractService<Place, PlaceDto> {
+export class PlacesService extends AbstractService<Place> {
   constructor(repo: PlaceRepository) {
     super(repo);
   }

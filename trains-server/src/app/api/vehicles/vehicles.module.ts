@@ -15,7 +15,7 @@ export class VehicleRepository extends RepositoryAccessor<Vehicle> {
 }
 
 @Injectable()
-export class VehicleService extends AbstractService<Vehicle, VehicleDto> {
+export class VehicleService extends AbstractService<Vehicle> {
   constructor(repo: VehicleRepository) {
     super(repo);
   }

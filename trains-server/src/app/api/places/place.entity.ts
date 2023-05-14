@@ -1,8 +1,20 @@
-import { Column, Entity } from 'typeorm';
+import { Expose } from 'class-transformer';
+import {
+  Column,
+  CreateDateColumn, DeleteDateColumn,
+  Entity,
+  Generated,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+  VersionColumn
+} from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
+import { PlaceConnection } from '../place-connections/place-connection.entity';
 
 @Entity({ name: 'PLACES' })
 export class Place extends AbstractEntity {
+
   @Column()
   name: string;
 

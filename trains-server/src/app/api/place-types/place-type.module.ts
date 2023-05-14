@@ -15,7 +15,7 @@ export class PlaceTypeRepository extends RepositoryAccessor<PlaceType> {
 }
 
 @Injectable()
-export class PlaceTypeService extends AbstractService<PlaceType, PlaceTypeDto> {
+export class PlaceTypeService extends AbstractService<PlaceType> {
   constructor(repo: PlaceTypeRepository) {
     super(repo);
   }

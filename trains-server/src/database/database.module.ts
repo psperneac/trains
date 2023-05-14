@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PlaceConnection } from '../app/api/place-connections/place-connection.entity';
 import User from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
 import { Translation } from '../app/api/translations/translation.entity';
@@ -9,7 +10,15 @@ import { PlaceType } from '../app/api/place-types/place-type.entity';
 import { VehicleType } from '../app/api/vehicle-types/vehicle-type.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
 
-export const ENTITIES = [Place, User, Translation, PlaceType, VehicleType, Vehicle];
+export const ENTITIES = [
+  Place,
+  User,
+  Translation,
+  PlaceType,
+  VehicleType,
+  Vehicle,
+  PlaceConnection
+];
 
 @Module({
   imports: [

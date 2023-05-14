@@ -392,4 +392,56 @@
     </loadData>
   </changeSet>
 
+  <changeSet id="800" author="Paul">
+    <createTable tableName="PLACE_CONNECTIONS">
+      <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="VERSION" type="INTEGER" defaultValue="0" />
+      <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+        <constraints nullable="false" />
+      </column>
+      <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+        <constraints nullable="false" />
+      </column>
+      <column name="DELETED" type="DATETIME" />
+
+      <column name="TYPE" type="VARCHAR(20)">
+        <constraints nullable="false" />
+      </column>
+      <column name="NAME" type="VARCHAR(250)">
+        <constraints nullable="false" />
+      </column>
+      <column name="DESCRIPTION" type="VARCHAR(250)" />
+
+      <column name="START" type="${uuid_type}">
+        <constraints nullable="false" />
+      </column>
+
+      <column name="END" type="${uuid_type}">
+        <constraints nullable="false" />
+      </column>
+
+      <column name="CONTENT" type="JSON"> </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="810" author="Paul">
+    <addForeignKeyConstraint
+            constraintName="PLACE_CONNECTIONS_START_PLACES"
+            baseTableName="PLACE_CONNECTIONS"
+            baseColumnNames="START"
+            referencedTableName="PLACES"
+            referencedColumnNames="ID" />
+  </changeSet>
+
+  <changeSet id="820" author="Paul">
+    <addForeignKeyConstraint
+            constraintName="PLACE_CONNECTIONS_END_PLACES"
+            baseTableName="PLACE_CONNECTIONS"
+            baseColumnNames="END"
+            referencedTableName="PLACES"
+            referencedColumnNames="ID" />
+  </changeSet>
+
 </databaseChangeLog>

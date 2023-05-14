@@ -10,8 +10,8 @@ import { FeatureService } from "./feature.service";
  * R - entity dto type
  */
 export interface Mapper<T, R> {
-  toDto: (domain: T) => R;
-  toDomain: (dto: R, domain?: T | Partial<T>) => T;
+  toDto: (domain: T) => Promise<R>;
+  toDomain: (dto: R, domain?: T | Partial<T>) => Promise<T>;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface Mapper<T, R> {
  * R - entity dto type
  */
 export class AbstractDtoMapper<T extends AbstractEntity,R> implements Mapper<T,R> {
-  toDomain(dto: R, domain?: T | Partial<T>): T {
+  async toDomain(dto: R, domain?: T | Partial<T>): Promise<T> {
     const ret = {
       ...domain,
     };
@@ -33,7 +33,7 @@ export class AbstractDtoMapper<T extends AbstractEntity,R> implements Mapper<T,R
     return ret as T;
   }
 
-  toDto(domain: T): R {
+  async toDto(domain: T): Promise<R> {
     if (!domain) {
       return null;
     }

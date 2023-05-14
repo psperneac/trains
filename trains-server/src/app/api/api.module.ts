@@ -1,3 +1,4 @@
+import { PlaceConnectionsModule } from './place-connections/place-connections.module';
 import { PostsModule } from './posts/posts.module';
 import { PlacesModule } from './places/places.module';
 import { UsersModule } from './users/users.module';
@@ -15,7 +16,8 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     TranslationsModule,
     VehicleTypesModule,
     PlaceTypeModule,
-    VehiclesModule
+    VehiclesModule,
+    PlaceConnectionsModule,
   ],
 })
 export class ApiModule {

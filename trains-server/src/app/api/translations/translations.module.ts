@@ -15,7 +15,7 @@ export class TranslationRepository extends RepositoryAccessor<Translation> {
 }
 
 @Injectable()
-export class TranslationsService extends AbstractService<Translation, TranslationDto> {
+export class TranslationsService extends AbstractService<Translation> {
   constructor(private readonly repo: TranslationRepository) {
     super(repo);
   }

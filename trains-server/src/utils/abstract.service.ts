@@ -1,7 +1,7 @@
 import { VehicleRepository } from "../app/api/vehicles/vehicles.module";
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { DeepPartial, Entity, Repository } from 'typeorm';
+import { DeepPartial, Entity, FindOptionsUtils, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { AbstractEntity } from "./abstract.entity";
 import { RepositoryAccessor } from "./repository-accessor";
@@ -10,12 +10,14 @@ import { SqlException } from './sql.exception';
 /**
  * T - entity type
  */
-export class AbstractService<T extends AbstractEntity,R> {
+export class AbstractService<T extends AbstractEntity> {
 
   repository: Repository<T>;
+  relationships: string[];
 
   constructor(private readonly repositoryAccessor: RepositoryAccessor<T>) {
     this.repository = repositoryAccessor.getRepository();
+    this.relationships = repositoryAccessor.getRelationships();
   }
 
   findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
@@ -24,6 +26,11 @@ export class AbstractService<T extends AbstractEntity,R> {
     const skippedItems = (page - 1) * limit;
 
     let query = this.repository.createQueryBuilder();
+    if (this.relationships) {
+      // clone relationships because the method empties it
+      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships],
+        query.alias, this.repository.metadata, '');
+    }
     if (!pagination.unpaged) {
       query = query.offset(skippedItems).limit(limit);
     }
@@ -31,12 +38,16 @@ export class AbstractService<T extends AbstractEntity,R> {
       query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
     }
 
-    return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => ({
-      data,
-      page: pagination.unpaged ? page : 1,
-      limit: pagination.unpaged ? limit : count,
-      totalCount: count,
-    }));
+
+    return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
+      console.log(data, count);
+      return ({
+        data,
+        page: pagination.unpaged ? page : 1,
+        limit: pagination.unpaged ? limit : count,
+        totalCount: count,
+      });
+    });
   }
 
   async findOne(uuid: string): Promise<T> {
