@@ -14,6 +14,7 @@ import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
 import { PlaceTypeService } from "./features/place-types/services/place-type.service";
 import { PlaceTypeEffects } from "./features/place-types/store/place-type.effects";
 import { reducer as placeTypesReducer } from "./features/place-types/store/place-type.reducer";
+import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
 import { reducers, metaReducers } from './store';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -54,6 +55,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACES_FEATURE.declarations,
     ...PLACE_TYPES_FEATURE.declarations,
     ...VEHICLE_TYPES_FEATURE.declarations,
+    ...VEHICLES_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -99,6 +101,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACES_FEATURE.imports,
     ...PLACE_TYPES_FEATURE.imports,
     ...VEHICLE_TYPES_FEATURE.imports,
+    ...VEHICLES_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -108,6 +111,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACES_FEATURE.providers,
     ...PLACE_TYPES_FEATURE.providers,
     ...VEHICLE_TYPES_FEATURE.providers,
+    ...VEHICLES_FEATURE.providers,
   ],
   bootstrap: [AppComponent],
 })

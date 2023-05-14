@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+
 import { AdminAuthGuard } from './features/auth/guards/admin-auth.guard';
-import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
 import {PLACES_FEATURE} from "./features/places/places.feature";
-import { PlaceTypeEditPage } from './features/place-types/pages/place-type-edit.page';
-import { LoadOnePlaceTypeGuard } from './features/place-types/load-one-place-type.guard';
-import { CreateOnePlaceTypeGuard } from './features/place-types/create-one-place-type.guard';
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
+import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
 //   which load data and implement app logic
@@ -44,6 +42,12 @@ const ROUTES: Routes = [
   {
     path: 'vehicle-types',
     children: [...(VEHICLE_TYPES_FEATURE.routes ?? [])],
+    canActivate: [AdminAuthGuard],
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'vehicles',
+    children: [...(VEHICLES_FEATURE.routes ?? [])],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

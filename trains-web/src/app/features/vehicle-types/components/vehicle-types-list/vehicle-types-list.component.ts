@@ -15,7 +15,8 @@ import { MatPaginator } from '@angular/material/paginator';
   templateUrl: './vehicle-types-list.component.html',
   styleUrls: ['./vehicle-types-list.component.scss']
 })
-export class VehicleTypesListComponent extends AbstractListComponent<VehicleTypeState, VehicleTypeDto> implements OnInit {
+export class VehicleTypesListComponent extends AbstractListComponent<VehicleTypeState, VehicleTypeDto>
+  implements OnInit {
 
   @ViewChild(MatSort, { static: true })
   sort: MatSort;

@@ -45,7 +45,7 @@ export class VehicleTypeFormComponent implements OnInit, OnDestroy {
   }
 
   public valid() {
-    return this.vehicleTypeForm.valid;
+    return this.vehicleTypeForm?.valid;
   }
 
   toForm(vehicleType: VehicleTypeDto): UntypedFormGroup {

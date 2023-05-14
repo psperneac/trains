@@ -16,3 +16,6 @@ export const PLACE_TYPES_CREATE = '/place-types/create';
 
 export const VEHICLE_TYPES = '/vehicle-types';
 export const VEHICLE_TYPES_CREATE = 'vehicle-types/create';
+
+export const VEHICLES = '/vehicles';
+export const VEHICLES_CREATE = 'vehicles/create';

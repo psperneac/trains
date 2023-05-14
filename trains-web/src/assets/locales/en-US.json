@@ -70,6 +70,28 @@
       "type": "Type",
       "description": "Description",
       "content": "Content"
+    },
+    "vehicle": {
+      "listTitle": "Vehicles",
+      "createTitle": "Create Vehicle",
+      "editTitle": "Edit Vehicle",
+      "name": "Name",
+      "defaultName": "Default Name",
+      "type": "Type",
+      "description": "Description",
+      "content": "Content",
+      "engine": {
+        "sectionTitle": "Engine",
+        "max": "Max engines",
+        "load": "Load per engine",
+        "fuel": "Fuel per engine"
+      },
+      "aux": {
+        "sectionTitle": "Auxiliary",
+        "max": "Max auxiliary",
+        "load": "Load per auxiliary",
+        "fuel": "Fuel per auxiliary"
+      }
     }
   }
 }

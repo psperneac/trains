@@ -35,7 +35,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"paul@ikarsoft.com\",\"password\":\"paulpaul1!\"}",
+							"raw": "{\"email\":\"gepetto@gmail.com\",\"password\":\"#7LY&pLdz9Q*\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -93,7 +93,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"gepetto6@gmail.com\",\r\n    \"username\": \"admin7\",\r\n    \"password\": \"admin7admin71!\"\r\n}\r\n",
+							"raw": "{\r\n    \"email\": \"gepetto@gmail.com\",\r\n    \"username\": \"admin\",\r\n    \"password\": \"adminadmin1!\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,6 +201,98 @@
 							"path": [
 								"api",
 								"places"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VehicleTypes",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/vehicle-types",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"vehicle-types"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PlaceTypes",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/place-types",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"place-types"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Translations",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/translations",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"translations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vehicles",
+			"item": [
+				{
+					"name": "GetAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{root}}/api/vehicles",
+							"host": [
+								"{{root}}"
+							],
+							"path": [
+								"api",
+								"vehicles"
 							]
 						}
 					},

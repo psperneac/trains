@@ -106,6 +106,9 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
       case 'vehicleTypes':
         this.router.navigate(['/vehicle-types']);
         break;
+      case 'vehicles':
+        this.router.navigate(['/vehicles']);
+        break;
       }
   }
 

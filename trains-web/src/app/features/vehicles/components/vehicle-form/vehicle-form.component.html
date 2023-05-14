@@ -1,0 +1,66 @@
+<form [formGroup]="vehicleForm">
+  <div class="input-row">
+    <mat-form-field class="input-vehicle-name fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-vehicle-type fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.type' | translate}}</mat-label>
+      <input matInput formControlName="type" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-vehicle-description fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.description' | translate}}</mat-label>
+      <textarea matInput formControlName="description" rows="5"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row fill-container">
+    <mat-label class="section-label">{{'page.vehicle.engine.sectionTitle' | translate}}</mat-label>
+  </div>
+  <div class="input-row fill-container">
+    <mat-form-field class="input-vehicle-engine-max fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.engine.max' | translate}}</mat-label>
+      <input matInput formControlName="engineMax" width="30%" />
+    </mat-form-field>
+    <mat-form-field class="input-vehicle-engine-load fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.engine.load' | translate}}</mat-label>
+      <input matInput formControlName="engineLoad" width="30%" />
+    </mat-form-field>
+    <mat-form-field class="input-vehicle-engine-fuel fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.engine.fuel' | translate}}</mat-label>
+      <input matInput formControlName="engineFuel" width="30%" />
+    </mat-form-field>
+  </div>
+  <div class="input-row fill-container">
+    <mat-label class="section-label">{{'page.vehicle.aux.sectionTitle' | translate}}</mat-label>
+  </div>
+  <div class="input-row fill-container">
+    <mat-form-field class="input-vehicle-aux-max fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.aux.max' | translate}}</mat-label>
+      <input matInput formControlName="auxMax" width="30%" />
+    </mat-form-field>
+    <mat-form-field class="input-vehicle-aux-load fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.aux.load' | translate}}</mat-label>
+      <input matInput formControlName="auxLoad" width="30%" />
+    </mat-form-field>
+    <mat-form-field class="input-vehicle-aux-fuel fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.aux.fuel' | translate}}</mat-label>
+      <input matInput formControlName="auxFuel" width="30%" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-vehicle-speed fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.speed' | translate}}</mat-label>
+      <input matInput formControlName="speed" width="30%" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="input-vehicle-content fill-container" appearance="fill">
+      <mat-label>{{'page.vehicle.content' | translate}}</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
+    </mat-form-field>
+  </div>
+</form>
