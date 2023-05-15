@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
 import { AdminAuthGuard } from './features/auth/guards/admin-auth.guard';
+import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import {PLACES_FEATURE} from "./features/places/places.feature";
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
@@ -48,6 +49,12 @@ const ROUTES: Routes = [
   {
     path: 'vehicles',
     children: [...(VEHICLES_FEATURE.routes ?? [])],
+    canActivate: [AdminAuthGuard],
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'place-connections',
+    children: [...(PLACE_CONNECTIONS_FEATURE.routes ?? [])],
     canActivate: [AdminAuthGuard],
     runGuardsAndResolvers: 'always'
   },

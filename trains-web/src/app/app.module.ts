@@ -8,6 +8,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
+import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import { PlaceTypesListComponent } from "./features/place-types/components/place-types-list.component";
 import { LoadOnePlaceTypeGuard } from "./features/place-types/load-one-place-type.guard";
 import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
@@ -56,6 +57,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACE_TYPES_FEATURE.declarations,
     ...VEHICLE_TYPES_FEATURE.declarations,
     ...VEHICLES_FEATURE.declarations,
+    ...PLACE_CONNECTIONS_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -102,6 +104,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACE_TYPES_FEATURE.imports,
     ...VEHICLE_TYPES_FEATURE.imports,
     ...VEHICLES_FEATURE.imports,
+    ...PLACE_CONNECTIONS_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -112,6 +115,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACE_TYPES_FEATURE.providers,
     ...VEHICLE_TYPES_FEATURE.providers,
     ...VEHICLES_FEATURE.providers,
+    ...PLACE_CONNECTIONS_FEATURE.providers
   ],
   bootstrap: [AppComponent],
 })
