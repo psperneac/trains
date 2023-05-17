@@ -92,22 +92,25 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
     this.store.dispatch(logout());
   }
 
-  menuClicked(tag: string) {
+  async menuClicked(tag: string) {
     switch (tag) {
       case 'home':
-        this.router.navigate(['/home']);
+        await this.router.navigate(['/home']);
         break;
       case 'places':
-        this.router.navigate(['/places']);
+        await this.router.navigate(['/places']);
+        break;
+      case 'placeConnections':
+        await this.router.navigate(['/place-connections']);
         break;
       case 'placeTypes':
-        this.router.navigate(['/place-types']);
+        await this.router.navigate(['/place-types']);
         break;
       case 'vehicleTypes':
-        this.router.navigate(['/vehicle-types']);
+        await this.router.navigate(['/vehicle-types']);
         break;
       case 'vehicles':
-        this.router.navigate(['/vehicles']);
+        await this.router.navigate(['/vehicles']);
         break;
       }
   }

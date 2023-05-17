@@ -17,6 +17,7 @@
     "logout": "Logout",
     "map": "Map",
     "places": "Places",
+    "placeConnections": "Place Connections",
     "placeTypes": "Place Types",
     "register": "Register",
     "routes": "Routes",
@@ -50,6 +51,17 @@
       "type": "Type",
       "latitude": "Latitude",
       "longitude": "Longitude"
+    },
+    "placeConnection": {
+      "listTitle": "Place Connections",
+      "createTitle": "Create Place Connection",
+      "editTitle": "Edit Place Connection",
+      "name": "Name",
+      "type": "Type",
+      "description": "Description",
+      "content": "Content",
+      "start": "Start",
+      "end": "End"
     },
     "placeType": {
       "listTitle": "Place Types",

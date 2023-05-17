@@ -15,6 +15,7 @@ import { VehicleSelectors } from '../../store/vehicle.selectors';
   templateUrl: './vehicles-list.component.html',
   styleUrls: ['./vehicles-list.component.scss']
 })
+// @ts-ignore
 export class VehiclesListComponent extends AbstractListComponent<VehicleState, VehicleDto>
   implements OnInit {
 
@@ -35,7 +36,7 @@ export class VehiclesListComponent extends AbstractListComponent<VehicleState, V
   public filterColumns = [];
 
   constructor(
-    readonly store: Store<AppState>,
+    private readonly store: Store<AppState>,
     private readonly router: Router
   ) {
     super(VehicleActions, VehicleSelectors, store);

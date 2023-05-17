@@ -39,6 +39,10 @@
     <mat-icon>edit_location</mat-icon>
     <span>{{'menu.places' | translate}}</span>
   </button>
+  <button (click)="menuClicked('placeConnections')" mat-menu-item>
+    <mat-icon>link</mat-icon>
+    <span>{{'menu.placeConnections' | translate}}</span>
+  </button>
   <button (click)="menuClicked('routes')" mat-menu-item>
     <mat-icon>edit_road</mat-icon>
     <span>{{'menu.routes' | translate}}</span>
@@ -52,7 +56,7 @@
     <span>{{'menu.placeTypes' | translate}}</span>
   </button>
   <button (click)="menuClicked('vehicleTypes')" mat-menu-item>
-    <mat-icon>edit_location</mat-icon>
+    <mat-icon>directions_car</mat-icon>
     <span>{{'menu.vehicleTypes' | translate}}</span>
   </button>
 </mat-menu>
