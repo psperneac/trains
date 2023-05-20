@@ -1,5 +1,6 @@
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { PlacesResolver } from './places.resolver';
 import { PlaceService } from './services/place.service';
 import { PlaceEffects, reducer as placeReducer } from './store';
 import { PlacesPage } from './pages/places.page';
@@ -28,11 +29,12 @@ export const PLACES_FEATURE: FeaturePart = {
     PlaceService,
     LoadOnePlaceGuard,
     OnePlaceResolver,
+    PlacesResolver,
   ],
   routes: [
     { path: '', component: PlacesPage, canActivate: [], canDeactivate: []},
     { path: 'create', component: PlaceCreatePage, canActivate: [], canDeactivate: []},
-    { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: [], 
+    { path: ':id', component: PlaceEditPage, canActivate: [LoadOnePlaceGuard], canDeactivate: [],
       resolve: [PlaceTypesResolver]
     },
   ]

@@ -1,3 +1,5 @@
+import { PlaceDto } from './place.model';
+
 export class PlaceConnectionDto {
   id: string;
   type: string;
@@ -7,4 +9,7 @@ export class PlaceConnectionDto {
 
   startId: string;
   endId: string;
+
+  start?: PlaceDto;
+  end?: PlaceDto;
 }

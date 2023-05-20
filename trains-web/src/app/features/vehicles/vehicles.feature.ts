@@ -31,9 +31,20 @@ export const VEHICLES_FEATURE: FeaturePart = {
     LoadOneVehicleGuard,
   ],
   routes: [
-    { path: '', component: VehiclesPage, canActivate: [], canDeactivate: [] },
-    { path: 'create', component: VehicleEditPage, canActivate: [CreateOneVehicleGuard], canDeactivate: []},
-    { path: ':id', component: VehicleEditPage, canActivate: [LoadOneVehicleGuard], canDeactivate: []}
-
+    {
+      path: '',
+      component: VehiclesPage,
+      canActivate: [],
+      canDeactivate: [] },
+    {
+      path: 'create',
+      component: VehicleEditPage,
+      canActivate: [CreateOneVehicleGuard],
+      canDeactivate: []},
+    {
+      path: ':id',
+      component: VehicleEditPage,
+      canActivate: [LoadOneVehicleGuard],
+      canDeactivate: []}
   ]
 }
