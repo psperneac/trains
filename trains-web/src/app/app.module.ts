@@ -9,12 +9,6 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
-import { PlaceTypesListComponent } from "./features/place-types/components/place-types-list.component";
-import { LoadOnePlaceTypeGuard } from "./features/place-types/load-one-place-type.guard";
-import { PlaceTypesPage } from "./features/place-types/pages/place-types.page";
-import { PlaceTypeService } from "./features/place-types/services/place-type.service";
-import { PlaceTypeEffects } from "./features/place-types/store/place-type.effects";
-import { reducer as placeTypesReducer } from "./features/place-types/store/place-type.reducer";
 import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
 import { reducers, metaReducers } from './store';
 

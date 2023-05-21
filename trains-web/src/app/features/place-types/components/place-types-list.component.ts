@@ -17,7 +17,7 @@ import { PAGE_SIZE } from "src/app/utils/constants";
   templateUrl: './place-types-list.component.html',
   styleUrls: ['./place-types-list.component.scss']
 })
-export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesState, PlaceTypeDto> implements OnInit {
+export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesState, PlaceTypeDto> {
   @ViewChild(MatSort, {static: true})
   sort: MatSort;
 
@@ -37,15 +37,6 @@ export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesSta
     private readonly router: Router
   ) {
     super(PlaceTypeActions, PlaceTypeSelectors, store);
-  }
-
-  ngOnInit(): void {
-    this.store.dispatch(PlaceTypeActions.getAll({ request: {
-      unpaged: true,
-      sortColumn: this.sortColumn,
-      sortDescending: this.sortDirection === 'desc',
-      filter: ''
-    }}));
   }
 
   getPaginator(): MatPaginator {

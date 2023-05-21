@@ -10,7 +10,7 @@ import { PLACE_TYPES } from '../../../utils/constants';
 import { PlaceTypeActions } from '../store/place-type.actions';
 import { PlaceTypeSelectors } from '../store/place-type.selectors';
 import { filter, take } from 'rxjs/operators';
-import { cloneDeep, isNil } from 'lodash';
+import { cloneDeep, isNil } from 'lodash-es';
 
 @Component({
   selector: 'trains-place-type-create-page',

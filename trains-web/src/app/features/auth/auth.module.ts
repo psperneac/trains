@@ -4,13 +4,12 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { RouterModule, Routes } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
+import { AuthDataService } from './services/auth-data.service';
 import { authReducer } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './store';
 import { AuthService } from './services/auth.service';
 import { SharedModule } from '../../shared.module';
-import { AuthGuard } from './guards/auth.guard';
-import { AdminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [], canDeactivate: [] },
@@ -32,8 +31,7 @@ const routes: Routes = [
   ],
   providers: [
     AuthService,
-    AuthGuard,
-    AdminAuthGuard,
+    AuthDataService,
   ]
 })
 export class AuthModule { }

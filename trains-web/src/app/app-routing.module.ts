@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
-import { AdminAuthGuard } from './features/auth/guards/admin-auth.guard';
+import { isAdminFn } from './features/auth/services/auth-data.service';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import {PLACES_FEATURE} from "./features/places/places.feature";
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
@@ -31,31 +31,31 @@ const ROUTES: Routes = [
   {
     path: 'places',
     children: [...(PLACES_FEATURE.routes ?? [])],
-    canActivate: [AdminAuthGuard],
+    canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'place-types',
     children: [...(PLACE_TYPES_FEATURE.routes ?? [])],
-    canActivate: [AdminAuthGuard],
+    canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'vehicle-types',
     children: [...(VEHICLE_TYPES_FEATURE.routes ?? [])],
-    canActivate: [AdminAuthGuard],
+    canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'vehicles',
     children: [...(VEHICLES_FEATURE.routes ?? [])],
-    canActivate: [AdminAuthGuard],
+    canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },
   {
     path: 'place-connections',
     children: [...(PLACE_CONNECTIONS_FEATURE.routes ?? [])],
-    canActivate: [AdminAuthGuard],
+    canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },
   {

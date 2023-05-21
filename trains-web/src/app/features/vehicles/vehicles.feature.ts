@@ -3,14 +3,12 @@ import { StoreModule } from '@ngrx/store';
 import { FeaturePart } from '../../utils/feature-part';
 import { VehicleFormComponent } from './components/vehicle-form/vehicle-form.component';
 import { VehiclesListComponent } from './components/vehicles-list/vehicles-list.component';
-import { CreateOneVehicleGuard } from './create-one-vehicle.guard';
-import { LoadOneVehicleGuard } from './load-one-vehicle.guard';
 import { VehicleEditPage } from './pages/vehicle-edit.page';
 import { VehiclesPage } from './pages/vehicles-page.component';
+import { createVehicleGuardFn, loadOneVehicleGuardFn, VehicleDataService } from './services/vehicle-data.service';
 import { VehicleService } from './services/vehicle.service';
 import { VehicleEffects } from './store/vehicle.effects';
 import { reducer as vehiclesReducer } from './store/vehicle.reducer';
-import { VehiclesResolver } from './vehicles.resolver';
 
 export const VEHICLES_FEATURE: FeaturePart = {
   imports: [
@@ -26,9 +24,7 @@ export const VEHICLES_FEATURE: FeaturePart = {
   ],
   providers: [
     VehicleService,
-    VehiclesResolver,
-    CreateOneVehicleGuard,
-    LoadOneVehicleGuard,
+    VehicleDataService,
   ],
   routes: [
     {
@@ -39,12 +35,12 @@ export const VEHICLES_FEATURE: FeaturePart = {
     {
       path: 'create',
       component: VehicleEditPage,
-      canActivate: [CreateOneVehicleGuard],
+      canActivate: [createVehicleGuardFn],
       canDeactivate: []},
     {
       path: ':id',
       component: VehicleEditPage,
-      canActivate: [LoadOneVehicleGuard],
+      canActivate: [loadOneVehicleGuardFn],
       canDeactivate: []}
   ]
 }

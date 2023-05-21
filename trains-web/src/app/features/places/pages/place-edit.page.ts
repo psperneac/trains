@@ -5,7 +5,7 @@ import { select, Store } from '@ngrx/store';
 import { PlaceSelectors } from '../store/place.selectors';
 import { filter, take } from 'rxjs/operators';
 import { AppState } from '../../../store';
-import { cloneDeep, isNil } from 'lodash';
+import { cloneDeep, isNil } from 'lodash-es';
 import { PlaceFormComponent } from '../components/place-form.component';
 import {PLACE_MAP_DEFAULT_ZOOM, PLACES} from '../../../utils/constants';
 import { Subject } from 'rxjs';

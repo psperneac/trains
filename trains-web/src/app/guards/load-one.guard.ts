@@ -1,8 +1,8 @@
-import { ActivatedRouteSnapshot, CanActivate } from '@angular/router';
+import { ActivatedRouteSnapshot } from '@angular/router';
 import { AppState } from '../store';
 import { Action, Store } from '@ngrx/store';
 
-export class LoadOneGuard implements CanActivate {
+export class LoadOneGuard  {
   constructor(
     private store: Store<AppState>,
     private onLoad: (id: string) => Action
