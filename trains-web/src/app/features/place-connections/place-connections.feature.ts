@@ -1,9 +1,16 @@
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { FeaturePart } from '../../utils/feature-part';
-import { PlaceDataService, placesResolverFn } from '../places/services/place-data.service';
+import { resolvePlaceTypesFn } from '../place-types/services/place-type-data.service';
+import { loadOnePlaceGuardFn, placesResolverFn } from '../places/services/place-data.service';
 import { PlaceConnectionFormComponent } from './components/place-connection-form/place-connection-form.component';
+import { PlaceConnectionEditPage } from './pages/place-connection-edit.page';
 import { PlaceConnectionsPage } from './pages/place-connections.page';
+import {
+  createPlaceConnectionGuardFn, loadOnePlaceConnectionGuardFn,
+  PlaceConnectionDataService,
+  placeConnectionsResolversFn
+} from './services/place-connection-data.service';
 import { reducer as placeConnectorsReducer} from './store/place-connection.reducer';
 import { PlaceConnectionsListComponent } from './components/place-connections-list/place-connections-list.component';
 import { PlaceConnectionService } from './services/place-connection.service';
@@ -18,9 +25,11 @@ export const PLACE_CONNECTIONS_FEATURE: FeaturePart = {
     PlaceConnectionsPage,
     PlaceConnectionsListComponent,
     PlaceConnectionFormComponent,
+    PlaceConnectionEditPage,
   ],
   providers: [
     PlaceConnectionService,
+    PlaceConnectionDataService,
   ],
   routes: [
     {
@@ -28,6 +37,29 @@ export const PLACE_CONNECTIONS_FEATURE: FeaturePart = {
       component: PlaceConnectionsPage,
       canActivate: [],
       canDeactivate: [],
-      resolve: [placesResolverFn] },
+      resolve: {
+        places: placesResolverFn,
+        placeConnections: placeConnectionsResolversFn,
+      }
+    },
+    {
+      path: 'create',
+      component: PlaceConnectionEditPage,
+      canActivate: [createPlaceConnectionGuardFn],
+      canDeactivate: [],
+      resolve: {
+        places: placesResolverFn,
+      }
+    },
+    {
+      path: ':id',
+      component: PlaceConnectionEditPage,
+      canActivate: [loadOnePlaceConnectionGuardFn],
+      canDeactivate: [],
+      resolve: {
+        places: placesResolverFn,
+        placeConnections: placeConnectionsResolversFn,
+      }
+    },
   ]
 }

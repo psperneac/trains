@@ -1,0 +1,40 @@
+@import 'styles';
+
+.map {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.place-connections-form-page-actions {
+  width: 100%;
+}
+
+.place-connections-form-page {
+  display: flex;
+  flex-flow: row;
+  height: 100%;
+}
+
+@media (max-width: 599px) {
+  .place-connections-form-page {
+    flex-direction: column;
+  }
+}
+
+.place-connections-form-container {
+  display: block;
+  flex-flow: column;
+}
+
+.place-connections-map {
+  flex: 1 1 30rem;
+}
+
+.place-connections-actions {
+  flex: 0 0 2rem;
+}
+
+.place-connections-form {
+  flex: 1 1  20rem;
+}

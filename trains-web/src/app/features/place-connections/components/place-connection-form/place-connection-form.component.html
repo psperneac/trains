@@ -1,0 +1,42 @@
+<form [formGroup]="form">
+  <div class="input-row">
+    <mat-form-field class="name fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="type fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.type' | translate}}</mat-label>
+      <input matInput formControlName="type" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="description fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.description' | translate}}</mat-label>
+      <textarea matInput formControlName="description" rows="5"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="content fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.content' | translate}}</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="start fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.start' | translate}}</mat-label>
+      <mat-select formControlName="startId" [placeholder]="'page.placeConnection.startPlaceholder' | translate">
+        <mat-option *ngFor="let place of (placesById$ | async)" [value]="place.id">{{place.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="end fill-container" appearance="fill">
+      <mat-label>{{'page.placeConnection.end' | translate}}</mat-label>
+      <mat-select formControlName="endId" [placeholder]="'page.placeConnection.endPlaceholder' | translate">
+        <mat-option *ngFor="let place of (placesById$ | async)" [value]="place.id">{{place.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</form>

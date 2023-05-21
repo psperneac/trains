@@ -11,6 +11,9 @@ export const PAGE_SIZE = 5;
 export const PLACES = '/places';
 export const PLACES_CREATE = '/places/create';
 
+export const PLACE_CONNECTIONS = '/place-connections';
+export const PLACE_CONNECTIONS_CREATE = '/place-connections/create';
+
 export const PLACE_TYPES = '/place-types';
 export const PLACE_TYPES_CREATE = '/place-types/create';
 

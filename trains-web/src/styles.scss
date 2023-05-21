@@ -119,7 +119,7 @@ body { margin: 0; height: 100%; }
   padding: 8px 8px 8px 0;
 }
 
-.mat-form-field.fill-container,
+.mat-mdc-form-field.fill-container,
 .mat-form-field.fill-container .mat-form-field-infix,
 .mat-form-field.fill-container .mat-form-field-flex,
 .mat-form-field.fill-container .mat-form-field-wrapper {
@@ -127,7 +127,7 @@ body { margin: 0; height: 100%; }
   width: 100%;
 }
 
-.mat-form-field.fill-container textarea {
+.mat-mdc-form-field.fill-container textarea {
   height: calc(100% - 25px);
 }
 

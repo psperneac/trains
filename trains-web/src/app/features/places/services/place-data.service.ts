@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
+import { keyBy } from 'lodash';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { PlaceDto } from '../../../models/place.model';
@@ -28,6 +29,13 @@ export class PlaceDataService {
     const id = route.paramMap.get('id');
     this.store.dispatch(PlaceActions.getOne({ uuid: id }));
     return true;
+  }
+
+  placesById$(): Observable<{[key: string]: PlaceDto}> {
+    return this.store.pipe(
+      select(PlaceSelectors.All),
+      map(places => keyBy(places, place => place.id))
+    );
   }
 }
 

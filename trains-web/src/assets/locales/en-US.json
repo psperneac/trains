@@ -61,7 +61,9 @@
       "description": "Description",
       "content": "Content",
       "start": "Start",
-      "end": "End"
+      "startPlaceholder": "Select starting place",
+      "end": "End",
+      "endPlaceholder": "Select ending place"
     },
     "placeType": {
       "listTitle": "Place Types",

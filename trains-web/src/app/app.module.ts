@@ -19,7 +19,7 @@ import {
   HttpClientModule,
 } from '@angular/common/http';
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ComponentsModule } from './components/components.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -58,7 +58,7 @@ export function createTranslationLoader(http: HttpClient) {
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    FormsModule,
+    // FormsModule,
     ReactiveFormsModule,
 
     TranslateModule.forRoot({

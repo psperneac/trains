@@ -65,12 +65,6 @@ export class PlaceConnectionsListComponent extends AbstractListComponent<PlaceCo
   }
 
   ngOnInit() {
-    this.store.dispatch(PlaceConnectionActions.getAll({ request: {
-        unpaged: true,
-        sortColumn: this.sortColumn,
-        sortDescending: this.sortDirection === 'desc',
-        filter: ''
-    }}));
   }
 
   getPaginator(): MatPaginator {

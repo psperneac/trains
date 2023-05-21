@@ -1,0 +1,33 @@
+@import 'styles';
+
+:host {
+  .name {
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .type {
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .description {
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .start {
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .end {
+    width: 100%;
+    max-width: 32rem;
+  }
+}
