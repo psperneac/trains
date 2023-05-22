@@ -8,6 +8,7 @@ on May 22nd, 2023
 
 - Add delete to table/list views
 - Fix new PlaceConnection errors before start/end are set
+- ? Add custome marker class that keeps old state (position) and can trigger through some events reorder of a path
 - Add marker on edit to show what Save does.
   - some green checkmark somewhere that gets orange on changes, green after successful save, red on error. tooltip is last error. Can be general component that gets selectors and a valid accessor for a type.
 - Add all places for cities in Romania
