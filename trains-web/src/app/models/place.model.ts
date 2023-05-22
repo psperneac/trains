@@ -7,3 +7,5 @@ export interface PlaceDto extends AbstractEntity {
   lat: number;
   long: number;
 }
+
+export type PlaceDtoMap = { [id: string]: PlaceDto };

@@ -6,6 +6,7 @@ import { featureGroup, FeatureGroup, icon, latLng, Layer, marker, point, polylin
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { PlaceConnectionDto } from '../../../models/place-connection.model';
+import { PlaceDtoMap } from '../../../models/place.model';
 import { MapService } from '../../../services/map.service';
 import { UiService } from '../../../services/ui.service';
 import { AppState } from '../../../store';
@@ -102,19 +103,43 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
   }
 
   setRoute() {
-    this.placeDataService.placesById$().pipe(take(1)).subscribe(placesMap => {
-      if (!this.placeConnection) {
-        return;
-      }
+    if (!this.placeConnection) {
+      return;
+    }
 
+    this.placeDataService.placesById$().pipe(take(1))
+      .subscribe((placesMap: PlaceDtoMap) => {
       const start = placesMap[this.placeConnection.startId];
       const end = placesMap[this.placeConnection.endId];
 
       if (this.routeLayer) {
         this.map.removeLayer(this.routeLayer);
       }
-      this.routeLayer = polyline([[start.lat, start.long], ...this.addedMarkers, [end.lat, end.long]], {color: 'red'}).addTo(this.map);
+      this.routeLayer = polyline([[start.lat, start.long], ...this.addedMarkers, [end.lat, end.long]],
+        {color: 'red'}).addTo(this.map);
     });
+  }
+
+  makeMarker(aLatLong) {
+    const aMarker = marker(aLatLong,
+      { icon: this.mapService.iconGreen, draggable: true });
+    let original_latlng = [aLatLong[0], aLatLong[1]];
+
+    aMarker.on('dragend', (event) => {
+      const latlng = event.target.getLatLng();
+
+      const index = findIndex(this.addedMarkers,
+        (mLatlng) => mLatlng[0] === original_latlng[0] && mLatlng[1] === original_latlng[1]);
+      if(index !== -1) {
+        this.addedMarkers = [...slice(this.addedMarkers, 0, index), [latlng.lat, latlng.lng] ,...slice(this.addedMarkers, index+1, this.addedMarkers.length)];
+        original_latlng = [latlng.lat, latlng.lng];
+        this.setRoute();
+      }
+
+      console.log(latlng.lat, latlng.lng)
+    });
+
+    return aMarker;
   }
 
   ngOnDestroy(): void {
@@ -167,30 +192,7 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
         { icon: this.mapService.iconBlue, opacity: 0.4 });
 
       const markers = [startMarker, endMarker, ...this.addedMarkers.map(
-        aLatLong => {
-          const aMarker = marker(aLatLong,
-            { icon: this.mapService.iconGreen, draggable: true });
-          let original_latlng = [aLatLong[0], aLatLong[1]];
-
-          aMarker.on('dragend', (event) => {
-            const latlng = event.target.getLatLng();
-
-            const index = findIndex(this.addedMarkers,
-              (mLatlng) => mLatlng[0] === original_latlng[0] && mLatlng[1] === original_latlng[1]);
-            if(index !== -1) {
-              this.addedMarkers = [...slice(this.addedMarkers, 0, index), [latlng.lat, latlng.lng] ,...slice(this.addedMarkers, index+1, this.addedMarkers.length)];
-              original_latlng = [latlng.lat, latlng.lng];
-              if (this.routeLayer) {
-                this.map.removeLayer(this.routeLayer);
-              }
-              this.routeLayer = polyline([[start.lat, start.long], ...this.addedMarkers, [end.lat, end.long]], {color: 'red'}).addTo(this.map);
-            }
-
-            console.log(latlng.lat, latlng.lng)
-          });
-
-          return aMarker;
-        })];
+        aLatLong => this.makeMarker(aLatLong))];
       this.markers$.next(markers);
 
       if (this.routeLayer) {
