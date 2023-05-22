@@ -38,6 +38,7 @@ declare module 'leaflet' {
 export class CustomMapComponent implements OnInit, OnDestroy {
   @Output() mapChanged: EventEmitter<L.Map> = new EventEmitter();
   @Output() zoomEnd: EventEmitter<number> = new EventEmitter();
+  @Output() addClicked = new EventEmitter<any>();
 
   @Input() options: MapOptions= {
     layers:[tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -71,6 +72,9 @@ export class CustomMapComponent implements OnInit, OnDestroy {
       false: 'View Fullscreen',
     }
   };
+
+  @Input()
+  addEnabled = false;
 
   public map: L.Map;
   public zoom: number;
@@ -152,5 +156,12 @@ export class CustomMapComponent implements OnInit, OnDestroy {
 
   onNewLocation($event: LocationEvent) {
     console.log('onNewLocation: %O', $event);
+  }
+
+  clickAdd($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    console.log('Clicked');
+    this.addClicked.emit($event);
   }
 }

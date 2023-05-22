@@ -3,7 +3,11 @@
      [leafletLayers]="layers"
      (leafletMapReady)="onMapReady($event)"
      (leafletMapZoomEnd)="onMapZoomEnd($event)"
-></div>
+>
+  <div class="leaflet-bottom leaflet-left" style="pointer-events: auto; cursor: pointer;">
+    <input type="button" id="button-add" value="Add" (click)="clickAdd($event)" />
+  </div>
+</div>
 <leaflet-loading-control [options]="loadingOptions" [map]='map'></leaflet-loading-control>
 <!--<leaflet-locate-control [map]="map" [options]="locateOptions" (location$)="onNewLocation($event)"></leaflet-locate-control>-->
 <leaflet-fullscreen-control [options]="fullscreenOptions" [map]="map"></leaflet-fullscreen-control>

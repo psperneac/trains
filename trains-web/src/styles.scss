@@ -156,3 +156,14 @@ body { margin: 0; height: 100%; }
   @include ik_table_size($width);
   flex: $grow $shrink $width !important;
 }
+
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-marker-draggable {
+  cursor: none !important;
+}
+
+// .leaflet-dragging .leaflet-grab,
+// .leaflet-dragging .leaflet-grab .leaflet-interactive,
+// .leaflet-dragging .leaflet-marker-draggable {
+// 	cursor: none !important;
+// }

@@ -11,7 +11,10 @@
       </trains-place-connection-form>
     </div>
     <trains-custom-map class="place-connections-map" [options]="options" [layers]="markers$ | async"
-      (mapChanged)="onMap($event)">
+      [addEnabled]="true"
+      (mapChanged)="onMap($event)"
+      (addClicked)="addClicked()"
+    >
 
     </trains-custom-map>
   </div>
