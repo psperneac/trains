@@ -2,7 +2,8 @@
   <div class="place-connections-form-page">
     <div class="place-connections-form-container">
       <div class="place-connections-actions">
-        <button mat-button (click)="onSave()" [disabled]="!form?.valid()">{{'button.save' | translate}}</button>
+        <!-- [disabled]="!form?.valid()" -->
+        <button mat-button (click)="onSave()">{{'button.save' | translate}}</button>
         <button mat-button (click)="onCancel()">{{'button.cancel' | translate}}</button>
       </div>
       <trains-place-connection-form #placeConnectionForm *ngIf="placeConnection" [placeConnection]="placeConnection"
@@ -10,7 +11,9 @@
                               (valueChange)="placeConnectionChanged($event)">
       </trains-place-connection-form>
     </div>
-    <trains-custom-map class="place-connections-map" [options]="options" [layers]="markers$ | async"
+    <!--  -->
+    <trains-custom-map class="place-connections-map" [options]="options"
+                       [layers]="markers$ | async"
       [addEnabled]="true"
       (mapChanged)="onMap($event)"
       (addClicked)="addClicked()"

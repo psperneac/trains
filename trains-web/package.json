@@ -46,7 +46,7 @@
     "source-map-support": "^0.5.21",
     "tslib": "^2.3.0",
     "url-join": "^4.0.1",
-    "uuid-v4": "^0.1.0",
+    "uuid": "^9.0.0",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {

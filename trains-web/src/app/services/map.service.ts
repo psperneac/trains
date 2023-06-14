@@ -5,14 +5,14 @@ import { icon } from 'leaflet';
 export class MapService {
   icBlue = icon({
     iconUrl: 'icons/circle-blue-64.png',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
   });
 
   icRed = icon({
     iconUrl: 'icons/circle-red-64.png',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
   });
 
   icGreen = icon({
