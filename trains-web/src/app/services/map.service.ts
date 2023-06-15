@@ -21,8 +21,27 @@ export class MapService {
     iconAnchor: [6, 6]
   });
 
+  icYellow = icon({
+    iconUrl: 'icons/circle-yellow-64.png',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
   get iconRed() {
     return this.icRed;
+  }
+
+  get iconYellow() {
+    return this.icYellow;
+  }
+
+  iconYellowWithClass(className: string) {
+    return icon({
+      iconUrl: 'icons/circle-yellow-64.png',
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+      className
+    });
   }
 
   get iconGreen() {

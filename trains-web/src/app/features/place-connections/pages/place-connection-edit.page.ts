@@ -16,6 +16,7 @@ import 'leaflet';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { filter, take, withLatestFrom } from 'rxjs/operators';
 import * as uuid from 'uuid';
+import { AnimatedMarker } from '../../../helpers/plugins/AnimatedMarker';
 import { PlaceConnectionDto } from '../../../models/place-connection.model';
 import { TrainsMarker } from '../../../models/trains-leaflet';
 import { MapService } from '../../../services/map.service';
@@ -207,8 +208,6 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
           this.routeCoords = [...this.routeCoords.slice(0, insertPoint + 1), e.latlng, ...this.routeCoords.slice(insertPoint + 1)];
         }
 
-        this.markers$.next([this.startMarker, ...this.routeMarkers, this.endMarker]);
-
         this.setRoute();
       }
     });
@@ -284,23 +283,23 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
   }
 
   addClicked() {
-    this.placeDataService.placesById$().pipe(take(1)).subscribe(placesMap => {
-      if (!this.placeConnection) {
-        return;
-      }
-      const start = placesMap[this.placeConnection.startId];
-      const end = placesMap[this.placeConnection.endId];
+    const markers = [this.startMarker, ...this.routeMarkers, this.endMarker];
 
-      const center = this.map.getBounds().getCenter();
-      const centerMarker = this.makeMarker([center.lat, center.lng]);
-      centerMarker.addTo(this.map);
-      this.routeMarkers = [...this.routeMarkers, centerMarker];
+    let i = 0;
+    let distance: number = 0;
+    while(i < markers.length -1) {
+      distance += markers[i].getLatLng().distanceTo(markers[i+1].getLatLng());
+      i++;
+    }
 
-      if (this.routeLayer) {
-        this.map.removeLayer(this.routeLayer);
-      }
-      const line = this.makePolyline();
-      this.routeLayer = line.addTo(this.map);
-    });
+    const animatedMarker = new AnimatedMarker(this.map, 'train', 'train-icon', markers.map(m => m.getLatLng()), {
+      autoStart: false,
+      icon: this.mapService.iconYellowWithClass('train-icon'),
+      distance,
+      interval: 10000,
+      onEnd: () => { animatedMarker.removeFrom(this.map); }
+    }).addTo(this.map);
+
+    animatedMarker.start();
   }
 }
