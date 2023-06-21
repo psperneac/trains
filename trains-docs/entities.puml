@@ -1,0 +1,105 @@
+@startuml
+
+class VehicleType {
+    +id
+    +type: string
+    +name: string
+    +description: string
+    +content: json
+}
+
+class Vehicle {
+    +id
+    +type: string
+    +description: string
+    +content: json
+    +engineMax: number
+    +engineLoad: number
+    +engineFuel: number
+    +auxMax: number
+    +auxLoad: number
+    +auxFuel: number
+    +speed: number
+}
+
+Vehicle --> VehicleType: type
+
+class PlaceType {
+    +id
+    +type: string
+    +name: string
+    +description: string
+    +content: string
+}
+
+class Place {
+    +id
+    +type: string
+    +name: string
+    +description: string
+    lat: number
+    long: number
+}
+
+Place --> PlaceType: type
+
+class PlaceConnection {
+    +id
+    +type: string
+    +name: string
+    +description: string
+    +content: json
+    +start: Place
+    +end: Place
+}
+
+PlaceConnection --> Place: start, end
+
+class Map {
+    +connections: PlaceConnection*
+}
+
+Map --* PlaceConnection: connections
+
+class Job {
+    +id
+    +type: string
+    +name: string
+    +description: string
+    +start: Place
+    +end: Place
+    +load: number # number of containers in load
+    +payType: string # gold, tokens, crates, materials
+    +pay: number
+    +startTime: Date # date when job taken
+}
+
+class VehicleInstance {
+    +id
+    +name: string
+    +vehicle: Vehicle
+    +jobs: Jobs*
+    +start: Place
+    +end: Place
+    +startTime: Date
+    +endTime: Date
+}
+
+VehicleInstance --> Place: start, end
+VehicleInstance --> Vehicle: vehicle
+VehicleInstance --* Job: jobs
+
+class Player {
+    +id
+    +name: string
+    +user: User
+    +description: string
+    +connections: PlaceConnection*
+    +vehicleInstances: VehicleInstance*
+}
+
+Player *--> User: user
+Player --* PlaceConnection: connections
+Player --* VehicleInstance: vehicleInstances
+
+@enduml
