@@ -31,6 +31,7 @@ function Nav() {
                 <NavLink to="/" className="nav-item nav-link">Home</NavLink>
                 <NavLink to="/users" className="nav-item nav-link">Users</NavLink>
                 <NavLink to="/posts" className="nav-item nav-link">Posts</NavLink>
+                <NavLink to="/place-types" className="nav-item nav-link">Place Types</NavLink>
                 <NavLink to="/notifications" className="nav-item nav-link">Notifications {unreadNotificationsBadge}</NavLink>
                 <button onClick={logout} className="btn btn-link nav-item nav-link">Logout</button>
             </div>

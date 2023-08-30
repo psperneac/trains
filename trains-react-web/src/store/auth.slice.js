@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { alertActions } from './alert.slice';
 import { history } from '../helpers';
-import {client} from "../helpers/client";
+import { client } from "../helpers/client";
 
 function createInitialState() {
   return {
@@ -22,7 +22,7 @@ function createReducers() {
 }
 
 function createExtraActions() {
-  const baseUrl = `${process.env.REACT_APP_API_URL}/users`;
+  const baseUrl = `${process.env.REACT_APP_API_URL}/authentication`;
 
   return {
     login: login(),
@@ -35,7 +35,7 @@ function createExtraActions() {
       async function ({ username, password }, { dispatch }) {
         dispatch(alertActions.clear());
         try {
-          const userResponse = await client.post(`${baseUrl}/authenticate`, { username, password });
+          const userResponse = await client.post(`${baseUrl}/login`, { email: username, password });
           const user = userResponse.data;
 
           // set auth user in redux state

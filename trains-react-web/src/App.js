@@ -7,7 +7,8 @@ import { Home } from './features/home/Home';
 import { AccountLayout } from './features/account/AccountLayout';
 import { UsersLayout } from './features/users/UsersLayout';
 import { PostsLayout } from './features/posts/PostsLayout';
-import {NotificationsList} from "./features/notifications/NotificationsList";
+import { NotificationsList } from "./features/notifications/NotificationsList";
+import { PlaceTypesLayout } from "./features/place-types/PlaceTypesLayout";
 
 export { App };
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="users/*" element={<UsersLayout />} />
             <Route path="posts/*" element={<PostsLayout />} />
+            <Route path="place-types/*" element={<PlaceTypesLayout />} />
             <Route exact path="/notifications" element={<NotificationsList />} />
           </Route>
           {/* public */}

@@ -6,6 +6,7 @@ import { usersReducer } from './users.slice';
 import { counterReducer } from './counter.slice';
 import { postsReducer } from './posts.slice';
 import {notificationsReducer} from "./notifications.slice";
+import * as placeTypeApi from "./place-type.api";
 
 export * from './alert.slice';
 export * from './auth.slice';
@@ -20,6 +21,8 @@ export const store = configureStore({
     counter: counterReducer,
     notifications: notificationsReducer,
     users: usersReducer,
-    posts: postsReducer
+    posts: postsReducer,
+    [placeTypeApi.reducerPath]: placeTypeApi.reducer
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(placeTypeApi.middleware)
 });
