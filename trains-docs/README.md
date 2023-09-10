@@ -18,6 +18,12 @@ npm run start
 - https://medium.com/runic-software/the-simple-guide-to-angular-leaflet-maps-41de83db45f1 - series of articles on adding
   custom controls to maps
 
+# Trains React Web
+
+- https://react-data-table-component.netlify.app/?path=/docs/getting-started-examples--page 
+- https://react-bootstrap.netlify.app/
+- Translations: https://www.codeandweb.com/babeledit/tutorials/how-to-translate-your-react-app-with-react-i18next
+
 # TrainsServer
 
 ```bash

@@ -114,8 +114,8 @@ function AddEdit() {
         </div>
       }
       {user?.error &&
-        <div class="text-center m-5">
-          <div class="text-danger">Error loading user: {user.error}</div>
+        <div className="text-center m-5">
+          <div className="text-danger">Error loading user: {user.error}</div>
         </div>
       }
     </>

@@ -6,7 +6,7 @@ import { usersReducer } from './users.slice';
 import { counterReducer } from './counter.slice';
 import { postsReducer } from './posts.slice';
 import {notificationsReducer} from "./notifications.slice";
-import * as apiSlice from "./place-type.api";
+import * as apiSlice from "./data.api";
 
 export * from './alert.slice';
 export * from './auth.slice';
