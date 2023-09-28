@@ -1,17 +1,15 @@
-import { VehicleRepository } from "../app/api/vehicles/vehicles.module";
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { DeepPartial, Entity, FindOptionsUtils, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { AbstractEntity } from "./abstract.entity";
-import { RepositoryAccessor } from "./repository-accessor";
+import { AbstractEntity } from './abstract.entity';
+import { RepositoryAccessor } from './repository-accessor';
 import { SqlException } from './sql.exception';
 
 /**
  * T - entity type
  */
 export class AbstractService<T extends AbstractEntity> {
-
   repository: Repository<T>;
   relationships: string[];
 
@@ -28,8 +26,7 @@ export class AbstractService<T extends AbstractEntity> {
     let query = this.repository.createQueryBuilder();
     if (this.relationships) {
       // clone relationships because the method empties it
-      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships],
-        query.alias, this.repository.metadata, '');
+      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships], query.alias, this.repository.metadata, '');
     }
     if (!pagination.unpaged) {
       query = query.offset(skippedItems).limit(limit);
@@ -38,15 +35,14 @@ export class AbstractService<T extends AbstractEntity> {
       query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
     }
 
-
     return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
       console.log(data, count);
-      return ({
+      return {
         data,
         page: pagination.unpaged ? page : 1,
-        limit: pagination.unpaged ? limit : count,
+        limit: pagination.unpaged ? count : limit,
         totalCount: count,
-      });
+      };
     });
   }
 
@@ -72,14 +68,12 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   delete(uuid: string): Promise<boolean> {
-    return this.repository
-      .delete(uuid)
-      .then((deleteResponse) => {
-        if (!deleteResponse || !deleteResponse.affected) {
-          throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
-        }
+    return this.repository.delete(uuid).then((deleteResponse) => {
+      if (!deleteResponse || !deleteResponse.affected) {
+        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+      }
 
-        return true;
-      });
+      return true;
+    });
   }
 }

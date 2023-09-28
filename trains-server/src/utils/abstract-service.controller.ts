@@ -1,22 +1,18 @@
-import { DeepPartial } from "typeorm";
+import { DeepPartial } from 'typeorm';
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
-import { AbstractDtoMapper, Mapper } from "./abstract-dto-mapper";
-import { AbstractEntity } from "./abstract.entity";
+import { AbstractDtoMapper } from './abstract-dto-mapper';
+import { AbstractEntity } from './abstract.entity';
 import { AbstractService } from './abstract.service';
 import { Body, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Admin, LoggedIn } from '../authentication/authentication.guard';
-import { FeatureService } from "./feature.service";
 
 /**
  * T - entity type
  * R - entity dto type
  */
 export class AbstractServiceController<T extends AbstractEntity, R> {
-
-  constructor(
-    private readonly service: AbstractService<T>,
-    private readonly mapper: AbstractDtoMapper<T, R>) {}
+  constructor(private readonly service: AbstractService<T>, private readonly mapper: AbstractDtoMapper<T, R>) {}
 
   @Get(':id')
   @UseGuards(LoggedIn)
@@ -50,21 +46,19 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
-    return this.service
-      .findAll(pagination)
-      .then(async (page) => {
-        console.dir(page);
-        const mappedDataPromises = page?.data?.map((item) => {
-          return this.mapper.toDto(item);
-        });
-
-        const mappedData = await Promise.all(mappedDataPromises);
-
-        return {
-          ...page,
-          data: mappedData,
-        };
+    return this.service.findAll(pagination).then(async (page) => {
+      console.dir(page);
+      const mappedDataPromises = page?.data?.map((item) => {
+        return this.mapper.toDto(item);
       });
+
+      const mappedData = await Promise.all(mappedDataPromises);
+
+      return {
+        ...page,
+        data: mappedData,
+      };
+    });
   }
 
   @Post()
@@ -154,14 +148,12 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Delete(':id')
   @UseGuards(LoggedIn, Admin)
   remove(@Param('id') id: string) {
-    return this.service
-      .delete(id)
-      .catch((e) => {
-        if (e instanceof HttpException) {
-          throw e;
-        } else {
-          throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-      });
+    return this.service.delete(id).catch((e) => {
+      if (e instanceof HttpException) {
+        throw e;
+      } else {
+        throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    });
   }
 }

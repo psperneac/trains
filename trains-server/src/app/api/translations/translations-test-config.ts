@@ -1,5 +1,5 @@
 import { Translation, TranslationDto } from './translation.entity';
-import { TranslationMapper, TranslationsController, TranslationsService } from "./translations.module";
+import { TranslationMapper, TranslationRepository, TranslationsController, TranslationsService } from "./translations.module";
 import { TestConfig } from '../../../utils/test/test-config';
 
 const createTranslation = (id: number): Translation => {
@@ -59,4 +59,5 @@ export const TranslationTestConfig: TestConfig<Translation, TranslationDto> = {
   mapperClass: TranslationMapper,
   serviceClass: TranslationsService,
   controllerClass: TranslationsController,
+  repositoryAccessor: TranslationRepository,
 };

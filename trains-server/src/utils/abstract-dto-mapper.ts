@@ -1,6 +1,5 @@
 import { assign, cloneDeep, pick } from 'lodash';
-import { AbstractEntity } from "./abstract.entity";
-import { FeatureService } from "./feature.service";
+import { AbstractEntity } from './abstract.entity';
 
 /**
  * Base interface for a mapper. Implement either of the 2 methods to restrict
@@ -10,8 +9,8 @@ import { FeatureService } from "./feature.service";
  * R - entity dto type
  */
 export interface Mapper<T, R> {
-  toDto: (domain: T) => Promise<R>;
-  toDomain: (dto: R, domain?: T | Partial<T>) => Promise<T>;
+  toDto: (domain: T) => R;
+  toDomain: (dto: R, domain?: T | Partial<T>) => T;
 }
 
 /**
@@ -20,20 +19,20 @@ export interface Mapper<T, R> {
  * T - entity type
  * R - entity dto type
  */
-export class AbstractDtoMapper<T extends AbstractEntity,R> implements Mapper<T,R> {
-  async toDomain(dto: R, domain?: T | Partial<T>): Promise<T> {
+export class AbstractDtoMapper<T extends AbstractEntity, R> implements Mapper<T, R> {
+  toDomain(dto: R, domain?: T | Partial<T>): T {
     const ret = {
       ...domain,
     };
 
     assign(ret, {
-      ...dto
+      ...dto,
     });
 
     return ret as T;
   }
 
-  async toDto(domain: T): Promise<R> {
+  toDto(domain: T): R {
     if (!domain) {
       return null;
     }

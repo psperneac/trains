@@ -1,6 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
 import { VehicleType, VehicleTypeDto } from './vehicle-type.entity';
-import { VehicleTypeController, VehicleTypeMapper, VehicleTypeService } from "./vehicle-types.module";
+import { VehicleTypeController, VehicleTypeMapper, VehicleTypeRepository, VehicleTypeService } from './vehicle-types.module';
 
 const createVehicleType = (id: number): VehicleType => {
   return {
@@ -12,7 +12,7 @@ const createVehicleType = (id: number): VehicleType => {
     type: 'TYPE' + id,
     name: 'NAME' + id,
     description: 'DESCRIPTION' + id,
-    content: {}
+    content: {},
   };
 };
 
@@ -53,4 +53,5 @@ export const VehicleTypeTestConfig: TestConfig<VehicleType, VehicleTypeDto> = {
   controllerClass: VehicleTypeController,
   mapperClass: VehicleTypeMapper,
   serviceClass: VehicleTypeService,
+  repositoryAccessor: VehicleTypeRepository,
 };

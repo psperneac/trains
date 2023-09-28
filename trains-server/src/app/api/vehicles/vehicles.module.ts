@@ -1,22 +1,22 @@
-import { Controller, Injectable, Module, OnModuleInit, UseFilters } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
-import { AbstractDtoMapper, Mapper } from "../../../utils/abstract-dto-mapper";
-import { AbstractServiceController } from "../../../utils/abstract-service.controller";
-import { AbstractService } from "../../../utils/abstract.service";
+import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from "../../../utils/repository-accessor";
-import { Vehicle, VehicleDto } from "./vehicle.entity";
+import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { Vehicle, VehicleDto } from './vehicle.entity';
 
 @Injectable()
 export class VehicleRepository extends RepositoryAccessor<Vehicle> {
-  constructor(@InjectRepository(Vehicle) injectedRepository) {
+  constructor(@InjectRepository(Vehicle) private readonly injectedRepository) {
     super(injectedRepository);
   }
 }
 
 @Injectable()
 export class VehicleService extends AbstractService<Vehicle> {
-  constructor(repo: VehicleRepository) {
+  constructor(private readonly repo: VehicleRepository) {
     super(repo);
   }
 }
@@ -25,10 +25,18 @@ export class VehicleService extends AbstractService<Vehicle> {
 export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
   getMappedProperties(): string[] {
     return [
-      'id', 'type', 'name', 'description', 'content',
-      'engineMax', 'engineLoad', 'engineFuel',
-      'auxMax', 'auxLoad', 'auxFuel',
-      'speed'
+      'id',
+      'type',
+      'name',
+      'description',
+      'content',
+      'engineMax',
+      'engineLoad',
+      'engineFuel',
+      'auxMax',
+      'auxLoad',
+      'auxFuel',
+      'speed',
     ];
   }
 }
@@ -45,7 +53,6 @@ export class VehicleController extends AbstractServiceController<Vehicle, Vehicl
   imports: [TypeOrmModule.forFeature([Vehicle])],
   controllers: [VehicleController],
   providers: [VehicleMapper, VehicleService, VehicleRepository],
-  exports: [VehicleMapper, VehicleService]
+  exports: [VehicleMapper, VehicleService],
 })
 export class VehiclesModule {}
-

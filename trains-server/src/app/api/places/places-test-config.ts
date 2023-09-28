@@ -1,6 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
 import { Place, PlaceDto } from './place.entity';
-import { PlaceMapper, PlacesController, PlacesService } from "./places.module";
+import { PlaceMapper, PlacesController, PlacesRepository, PlacesService } from "./places.module";
 
 const createPlace = (id: number): Place => {
   return {
@@ -55,4 +55,5 @@ export const PlaceTestConfig: TestConfig<Place, PlaceDto> = {
   controllerClass: PlacesController,
   mapperClass: PlaceMapper,
   serviceClass: PlacesService,
+  repositoryAccessor: PlacesRepository,
 };

@@ -1,13 +1,13 @@
-import { Repository } from "typeorm";
+import { Repository } from 'typeorm';
 
 export class RepositoryAccessor<T> {
   constructor(private readonly repository: Repository<T>, private readonly relationships?: string[]) {}
 
-  getRepository(): Repository<T> {
+  public getRepository(): Repository<T> {
     return this.repository;
   }
 
-  getRelationships(): string[] {
+  public getRelationships(): string[] {
     return this.relationships;
   }
 }

@@ -1,10 +1,10 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import { AbstractDtoMapper } from "../../../utils/abstract-dto-mapper";
-import { AbstractServiceController } from "../../../utils/abstract-service.controller";
-import { AbstractService } from "../../../utils/abstract.service";
-import { AllExceptionsFilter } from "../../../utils/all-exceptions.filter";
-import { RepositoryAccessor } from "../../../utils/repository-accessor";
+import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { AbstractService } from '../../../utils/abstract.service';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
+import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { VehicleType, VehicleTypeDto } from './vehicle-type.entity';
 
 @Injectable()
@@ -16,8 +16,8 @@ export class VehicleTypeRepository extends RepositoryAccessor<VehicleType> {
 
 @Injectable()
 export class VehicleTypeService extends AbstractService<VehicleType> {
-  constructor(private readonly repo: VehicleTypeRepository) {
-    super(repo);
+  constructor(private readonly repoAccessor: VehicleTypeRepository) {
+    super(repoAccessor);
   }
 }
 

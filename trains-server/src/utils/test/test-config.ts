@@ -2,6 +2,7 @@ import { AbstractServiceController } from '../abstract-service.controller';
 import { AbstractService } from '../abstract.service';
 import { AbstractMapper } from '../abstract.mapper';
 import { AbstractEntity } from '../abstract.entity';
+// import { RepositoryAccessor } from '../repository-accessor';
 
 /** config class to be used in abstract controller test */
 export interface TestConfig<T extends AbstractEntity, R> {
@@ -35,6 +36,8 @@ export interface TestConfig<T extends AbstractEntity, R> {
   service?: AbstractService<T>;
   /** mapper created  by nest */
   mapper?: AbstractMapper<T, R>;
+  /** repository accessor */
+  repositoryAccessor?: any;
   /** repository created by nest */
   repository?: any;
 

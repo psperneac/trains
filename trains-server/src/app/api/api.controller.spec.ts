@@ -12,6 +12,7 @@ import { TestConfig } from '../../utils/test/test-config';
 import { PlaceTestConfig } from './places/places-test-config';
 import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config';
 import { PlaceTypeTestConfig } from './place-types/place-type-test-config';
+import { VehicleTestConfig } from './vehicles/vehicle-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;
@@ -19,8 +20,9 @@ describe('Abstract Controller', () => {
   const configs: TestConfig<any, any>[] = [
     PlaceTestConfig,
     PlaceTypeTestConfig,
-    TranslationTestConfig, 
-    VehicleTypeTestConfig
+    TranslationTestConfig,
+    VehicleTypeTestConfig,
+    VehicleTestConfig,
   ];
 
   beforeEach(async () => {
@@ -31,6 +33,7 @@ describe('Abstract Controller', () => {
 
         ...configs.map((config) => config.mapperClass),
         ...configs.map((config) => config.serviceClass),
+        ...configs.map((config) => config.repositoryAccessor),
         ...configs.map((config) => ({
           provide: getRepositoryToken(config.entityClass),
           useValue: new MockRepository(config.data),
@@ -85,8 +88,9 @@ describe('Abstract Controller', () => {
             range(8).forEach((index) => {
               const t = config.data[index];
               const v = res.body.data[index];
+              const fromDto = config.mapper.toDto(t);
 
-              expect(v).toEqual(config.mapper.toDto(t));
+              expect(v).toEqual(fromDto);
             });
           });
 
