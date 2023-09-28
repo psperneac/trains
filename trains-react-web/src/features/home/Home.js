@@ -23,7 +23,7 @@ function Home() {
     <>
     <div>
       <h1>Hi {auth?.firstName}!</h1>
-      <p>You're logged in with React 18 + Redux & JWT!!</p>
+      <p>You&apos;re logged in with React 18 + Redux & JWT!!</p>
       <p><Link to="/users">Manage Users</Link></p>
     </div>
     <MapContainer center={[45.4, -75.7]} zoom={12} scrollWheelZoom={true}>

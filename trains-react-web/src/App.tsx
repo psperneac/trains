@@ -1,4 +1,3 @@
-import React from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import { history } from './helpers';
@@ -9,6 +8,7 @@ import { UsersLayout } from './features/users/UsersLayout';
 import { PostsLayout } from './features/posts/PostsLayout';
 import { NotificationsList } from "./features/notifications/NotificationsList";
 import { PlaceTypesLayout } from "./features/place-types/PlaceTypesLayout";
+import { VehicleTypesLayout } from './features/vehicle-types/VehicleTypesLayout';
 
 export { App };
 
@@ -31,7 +31,8 @@ function App() {
             <Route path="users/*" element={<UsersLayout />} />
             <Route path="posts/*" element={<PostsLayout />} />
             <Route path="place-types/*" element={<PlaceTypesLayout />} />
-            <Route exact path="/notifications" element={<NotificationsList />} />
+            <Route path="vehicle-types/*" element={<VehicleTypesLayout />} />
+            <Route path="/notifications" element={<NotificationsList />} />
           </Route>
           {/* public */}
           <Route path="account/*" element={<AccountLayout />} />

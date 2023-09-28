@@ -1,17 +1,33 @@
-import reportWebVitals from './reportWebVitals';
 
 import React from 'react';
+
+import reportWebVitals from './reportWebVitals';
+
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import {userActions, store} from './store';
 import { App } from './App';
+import common_en from './translations/en/common.json';
 import './index.css';
 
 // setup fake backend
-import {worker} from "./helpers/server";
-import {fetchPosts} from "./store/posts.slice";
+import {worker} from './helpers/server';
+import {fetchPosts} from './store/posts.slice';
+
+import i18next from "i18next";
+import { I18nextProvider } from 'react-i18next';
+
+i18next.init({
+  interpolation: { escapeValue: false },  // React already does escaping
+  lng: 'en',
+  resources: {
+    en: {
+      common: common_en               // 'common' is our custom namespace
+    }
+  }
+});
 
 async function main() {
   // Start our mock API server
@@ -28,9 +44,11 @@ async function main() {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <BrowserRouter>
-          <App/>
-        </BrowserRouter>
+        <I18nextProvider i18n={i18next}>
+          <BrowserRouter>
+            <App/>
+          </BrowserRouter>
+        </I18nextProvider>
       </Provider>
     </React.StrictMode>
   );
@@ -41,4 +59,4 @@ async function main() {
   reportWebVitals();
 }
 
-main();
+main().then();
