@@ -33,7 +33,6 @@ export class TranslationMapper extends AbstractDtoMapper<Translation, Translatio
   }
 }
 
-
 @Controller('translations')
 @UseFilters(AllExceptionsFilter)
 export class TranslationsController extends AbstractServiceController<Translation, TranslationDto> {

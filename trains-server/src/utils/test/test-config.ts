@@ -2,6 +2,9 @@ import { AbstractServiceController } from '../abstract-service.controller';
 import { AbstractService } from '../abstract.service';
 import { AbstractMapper } from '../abstract.mapper';
 import { AbstractEntity } from '../abstract.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { MockRepository } from '../mocks/repository.mock';
+import { Provider } from '@nestjs/common';
 // import { RepositoryAccessor } from '../repository-accessor';
 
 /** config class to be used in abstract controller test */
@@ -26,9 +29,19 @@ export interface TestConfig<T extends AbstractEntity, R> {
   mapperClass: any;
   /** the class of the service, used in setting up the test */
   serviceClass: any;
+  /** repository accessor */
+  repositoryAccessorClass?: any;
+
+  /** extra providers to install for a type */
+  extraProviders?: any[];
 
   /** data to be used in test */
   data: T[];
+
+  /** id of a new entity to be created using POST */
+  newEntityId: number;
+  /** id of an existing entity to be updated using PUT or PATCH and deleted via DELETE */
+  existingEntityId: number;
 
   /** controller created by nest */
   controller?: AbstractServiceController<T, R>;
@@ -36,13 +49,23 @@ export interface TestConfig<T extends AbstractEntity, R> {
   service?: AbstractService<T>;
   /** mapper created  by nest */
   mapper?: AbstractMapper<T, R>;
-  /** repository accessor */
-  repositoryAccessor?: any;
   /** repository created by nest */
   repository?: any;
 
-  /** id of a new entity to be created using POST */
-  newEntityId: number;
-  /** id of an existing entity to be updated using PUT or PATCH and deleted via DELETE */
-  existingEntityId: number;
+  createProviders?: (config: TestConfig<any, any>) => Provider[];
 }
+
+export const getTestProviders = (config: TestConfig<any, any>): Provider[] => {
+  const ret = [
+    config.mapperClass,
+    config.serviceClass,
+    config.repositoryAccessorClass,
+    {
+      provide: getRepositoryToken(config.entityClass),
+      useValue: new MockRepository([...config.data]) // clone data because tests movify the array
+    },
+    ...(config.extraProviders ?? [])
+  ];
+
+  return ret;
+};

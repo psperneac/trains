@@ -59,5 +59,5 @@ export const TranslationTestConfig: TestConfig<Translation, TranslationDto> = {
   mapperClass: TranslationMapper,
   serviceClass: TranslationsService,
   controllerClass: TranslationsController,
-  repositoryAccessor: TranslationRepository,
+  repositoryAccessorClass: TranslationRepository,
 };

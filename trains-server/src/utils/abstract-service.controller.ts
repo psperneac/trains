@@ -19,7 +19,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   public async findOne(@Param('id') id: string): Promise<R> {
     return this.service
       .findOne(id)
-      .then(async (domain) => {
+      .then(async domain => {
         // if domain not found, return 404
         if (!domain) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
@@ -34,7 +34,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
         return found;
       })
-      .catch((e) => {
+      .catch(e => {
         if (e instanceof HttpException) {
           throw e;
         } else {
@@ -46,35 +46,22 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
-    return this.service.findAll(pagination).then(async (page) => {
-      console.dir(page);
-      const mappedDataPromises = page?.data?.map((item) => {
-        return this.mapper.toDto(item);
-      });
-
-      const mappedData = await Promise.all(mappedDataPromises);
-
-      return {
+    return this.service.findAll(pagination).then(async page => {
+      return Promise.all(page?.data?.map(item => this.mapper.toDto(item))).then(mappedData => ({
         ...page,
-        data: mappedData,
-      };
+        data: mappedData
+      }));
     });
   }
 
   @Post()
   @UseGuards(LoggedIn, Admin)
   async create(@Body() dto: R): Promise<R> {
-    const domain = await this.mapper.toDomain(dto);
-    console.dir(domain);
-    return this.service
-      .create(domain as any as DeepPartial<T>)
-      .then(async (created) => {
-        const createdDto = await this.mapper.toDto(created);
-        console.dir(createdDto);
-        return createdDto;
-      })
-      .catch((e) => {
-        console.dir(e);
+    return this.mapper
+      .toDomain(dto)
+      .then(domain => this.service.create(domain as any as DeepPartial<T>))
+      .then(created => this.mapper.toDto(created))
+      .catch(e => {
         if (e instanceof HttpException) {
           throw e;
         } else {
@@ -88,20 +75,21 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   async update(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
     return this.service
       .findOne(uuid)
-      .then(async (entity: T) => {
-        console.log('infind');
-        console.dir(entity);
+      .then((entity: T) => {
         if (!entity) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
+        return this.mapper.toDomain(dto, entity);
+      })
+      .then(domain => {
         return {
-          ...(await this.mapper.toDomain(dto, entity)),
-          id: uuid, // don't allow id updating
+          ...domain,
+          id: uuid // don't allow id updating
         };
       })
-      .then((domain) => this.service.update(uuid, domain))
-      .then((updated) => this.mapper.toDto(updated))
-      .catch((e) => {
+      .then(domain => this.service.update(uuid, domain))
+      .then(updated => this.mapper.toDto(updated))
+      .catch(e => {
         if (e instanceof HttpException) {
           throw e;
         } else {
@@ -115,28 +103,28 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   patch(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
     return this.service
       .findOne(uuid)
-      .then((entity) => {
+      .then(entity => {
         if (!entity) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
 
         return {
           ...this.mapper.toDomain(dto, entity),
-          id: uuid, // don't allow id updating
+          id: uuid // don't allow id updating
         };
       })
-      .then((entity) => {
+      .then(entity => {
         return this.service.update(uuid, entity);
       })
       .then(() => this.service.findOne(uuid))
-      .then((updatedEntity) => {
+      .then(updatedEntity => {
         if (updatedEntity) {
           return this.mapper.toDto(updatedEntity);
         }
 
         throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
       })
-      .catch((e) => {
+      .catch(e => {
         if (e instanceof HttpException) {
           throw e;
         } else {
@@ -148,7 +136,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Delete(':id')
   @UseGuards(LoggedIn, Admin)
   remove(@Param('id') id: string) {
-    return this.service.delete(id).catch((e) => {
+    return this.service.delete(id).catch(e => {
       if (e instanceof HttpException) {
         throw e;
       } else {

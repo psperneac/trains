@@ -7,6 +7,7 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { PlacesModule, PlacesService } from '../places/places.module';
 import { PlaceConnection, PlaceConnectionDto } from './place-connection.entity';
+import { omit } from 'lodash';
 
 @Injectable()
 export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnection> {
@@ -29,7 +30,6 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
   }
 
   async toDto(domain: PlaceConnection): Promise<PlaceConnectionDto> {
-
     if (!domain) {
       return null;
     }
@@ -56,22 +56,34 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       domain = {};
     }
 
-    return {
-      ...domain,
-      id: dto.id,
-      type: dto.type,
-      name: dto.name,
-      description: dto.description,
-      content: dto.content,
-      start: await this.service.findOne(dto.startId),
-      end: await this.service.findOne(dto.endId)
-    } as any as PlaceConnection;
+    const startId = dto.startId ?? domain.start?.id;
+    const endId = dto.endId ?? domain.end?.id;
+
+    const fixedDto = omit(
+      {
+        ...dto
+      },
+      ['startId', 'endId']
+    );
+
+    return Promise.all([this.getPlace(startId), this.getPlace(endId)]).then(([start, end]) => {
+      return {
+        ...domain,
+        ...fixedDto,
+        start,
+        end
+      } as any as PlaceConnection;
+    });
+  }
+
+  getPlace(id: string) {
+    return id ? this.service.findOne(id) : null;
   }
 }
 
 @Controller('place-connections')
 @UseFilters(AllExceptionsFilter)
-export class PlaceConnectionsController extends AbstractServiceController<PlaceConnection, PlaceConnectionDto> {
+export class PlaceConnectionController extends AbstractServiceController<PlaceConnection, PlaceConnectionDto> {
   constructor(service: PlaceConnectionService, mapper: PlaceConnectionMapper) {
     super(service, mapper);
   }
@@ -79,7 +91,7 @@ export class PlaceConnectionsController extends AbstractServiceController<PlaceC
 
 @Module({
   imports: [PlacesModule, TypeOrmModule.forFeature([PlaceConnection])],
-  controllers: [PlaceConnectionsController],
+  controllers: [PlaceConnectionController],
   providers: [PlaceConnectionService, PlaceConnectionMapper, PlaceConnectionRepository],
   exports: [PlaceConnectionService, PlaceConnectionMapper]
 })

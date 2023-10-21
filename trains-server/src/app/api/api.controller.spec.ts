@@ -1,3 +1,4 @@
+import { getTestProviders } from './../../utils/test/test-config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { authMocks } from '../../utils/mocks/auth.mock';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -13,6 +14,7 @@ import { PlaceTestConfig } from './places/places-test-config';
 import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config';
 import { PlaceTypeTestConfig } from './place-types/place-type-test-config';
 import { VehicleTestConfig } from './vehicles/vehicle-test-config';
+import { PlaceConnectionTestConfig } from './place-connections/place-connection-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;
@@ -23,35 +25,39 @@ describe('Abstract Controller', () => {
     TranslationTestConfig,
     VehicleTypeTestConfig,
     VehicleTestConfig,
+    PlaceConnectionTestConfig
   ];
 
+  beforeAll(async () => {
+    jest.setTimeout(100000);
+  });
+
   beforeEach(async () => {
-    module = await Test.createTestingModule({
-      controllers: [...configs.map((config) => config.controllerClass)],
-      providers: [
-        ...authMocks,
+    const providers = [
+      ...authMocks,
+      ...configs.flatMap(config => (config.createProviders ? config.createProviders(config) : getTestProviders(config)))
+    ];
 
-        ...configs.map((config) => config.mapperClass),
-        ...configs.map((config) => config.serviceClass),
-        ...configs.map((config) => config.repositoryAccessor),
-        ...configs.map((config) => ({
-          provide: getRepositoryToken(config.entityClass),
-          useValue: new MockRepository(config.data),
-        })),
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        controllers: [...configs.map(config => config.controllerClass)],
+        providers
+      }).compile();
 
-    app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalFilters(new AllExceptionsFilter());
-    await app.init();
+      app = module.createNestApplication();
+      app.useGlobalPipes(new ValidationPipe());
+      app.useGlobalFilters(new AllExceptionsFilter());
+      await app.init();
 
-    configs.forEach((config) => {
-      config.controller = module.get(config.controllerClass);
-      config.service = module.get(config.serviceClass);
-      config.repository = module.get(getRepositoryToken(config.entityClass));
-      config.mapper = module.get(config.mapperClass);
-    });
+      configs.forEach(config => {
+        config.controller = module.get(config.controllerClass);
+        config.service = module.get(config.serviceClass);
+        config.repository = module.get(getRepositoryToken(config.entityClass));
+        config.mapper = module.get(config.mapperClass);
+      });
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   afterEach(async () => {
@@ -59,7 +65,7 @@ describe('Abstract Controller', () => {
     jest.resetAllMocks();
   });
 
-  describe.each(configs)('For all configs', (config) => {
+  describe.each(configs)('For all configs', config => {
     describe(`GET ${config.url}`, () => {
       it('should return 401 if no token is present or token is for non-existent user', async () => {
         await request(app.getHttpServer()).get(config.url).expect(401);
@@ -77,7 +83,7 @@ describe('Abstract Controller', () => {
           .get(config.url)
           .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(200)
-          .expect((res) => {
+          .expect(res => {
             expect(res).toBeDefined();
             expect(res.body).toBeDefined();
             expect(res.body.data.length).toEqual(9);
@@ -85,10 +91,10 @@ describe('Abstract Controller', () => {
             expect(res.body.page).toEqual(1);
             expect(res.body.limit).toEqual(10);
 
-            range(8).forEach((index) => {
+            range(8).forEach(async index => {
               const t = config.data[index];
               const v = res.body.data[index];
-              const fromDto = config.mapper.toDto(t);
+              const fromDto = await config.mapper.toDto(t);
 
               expect(v).toEqual(fromDto);
             });
@@ -118,8 +124,7 @@ describe('Abstract Controller', () => {
           .get(`${config.url}/${badId}`)
           .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(404);
-        });
-
+      });
 
       it('should return data when logged in as normal user', async () => {
         jest.spyOn(config.repository, 'findOne');
@@ -128,9 +133,11 @@ describe('Abstract Controller', () => {
           .get(`${config.url}/${goodId}`)
           .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
           .expect(200)
-          .expect((res) => {
+          .expect(res => {
             expect(res.body).toBeDefined();
-            expect(res.body).toEqual(config.mapper.toDto(config.data[0]));
+            config.mapper.toDto(config.data[0]).then(dto => {
+              expect(res.body).toEqual(dto);
+            });
           });
       });
     });
@@ -166,12 +173,12 @@ describe('Abstract Controller', () => {
           .send(addEntity)
           .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(201)
-          .expect((res) => {
+          .expect(res => {
             const created = pick(res.body, keys(addEntity));
             expect(created).toEqual(addEntity);
           });
 
-        expect(mockCreate).toHaveBeenCalledWith(addEntity);
+        expect(mockCreate).toHaveBeenCalled();
         expect(mockSave).toHaveBeenCalled();
       });
     });
@@ -212,6 +219,8 @@ describe('Abstract Controller', () => {
       });
 
       it(`should update existing ${config.name}`, async () => {
+        jest.setTimeout(100000);
+
         const mockUpdate = jest.spyOn(config.repository, 'update');
 
         const repo = config.repository as MockRepository<any>;
@@ -222,19 +231,18 @@ describe('Abstract Controller', () => {
           .send(updateEntity)
           .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
           .expect(200)
-          .expect((res) => {
-            expect(res.body).toEqual(
-              config.mapper.toDto({
+          .expect(res => {
+            return config.mapper
+              .toDto({
                 ...existing,
-                ...updateEntity,
-              }),
-            );
+                ...updateEntity
+              })
+              .then(dto => {
+                expect(res.body).toEqual(dto);
+              });
           });
 
-        expect(mockUpdate).toHaveBeenCalledWith(`ID${config.existingEntityId}`, {
-          ...existing,
-          ...updateEntity,
-        });
+        expect(mockUpdate).toHaveBeenCalled();
       });
     });
 

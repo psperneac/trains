@@ -1,6 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
 import { PlaceType, PlaceTypeDto } from './place-type.entity';
-import { PlaceTypeController, PlaceTypeMapper, PlaceTypeRepository, PlaceTypeService } from "./place-type.module";
+import { PlaceTypeController, PlaceTypeMapper, PlaceTypeRepository, PlaceTypeService } from './place-type.module';
 
 const createPlaceType = (id: number): PlaceType => {
   return {
@@ -12,7 +12,7 @@ const createPlaceType = (id: number): PlaceType => {
     type: 'TYPE' + id,
     name: 'NAME' + id,
     description: 'DESCRIPTION' + id,
-    content: {},
+    content: {}
   };
 };
 
@@ -25,13 +25,13 @@ export const PlaceTypeTestConfig: TestConfig<PlaceType, PlaceTypeDto> = {
     return {
       id: 'ID' + id,
       name: 'UpdatePlaceType' + id,
-      description: 'UpdatedPlaceTypeDescription' + id,
+      description: 'UpdatedPlaceTypeDescription' + id
     };
   },
   createPatchDto: function (id: number): Partial<PlaceTypeDto> {
     return {
       name: 'UpdatePlaceType' + id,
-      description: 'UpdatedPlaceTypeDescription' + id,
+      description: 'UpdatedPlaceTypeDescription' + id
     };
   },
   data: [
@@ -43,7 +43,7 @@ export const PlaceTypeTestConfig: TestConfig<PlaceType, PlaceTypeDto> = {
     createPlaceType(6),
     createPlaceType(7),
     createPlaceType(8),
-    createPlaceType(9),
+    createPlaceType(9)
   ],
 
   newEntityId: 10,
@@ -53,5 +53,5 @@ export const PlaceTypeTestConfig: TestConfig<PlaceType, PlaceTypeDto> = {
   controllerClass: PlaceTypeController,
   mapperClass: PlaceTypeMapper,
   serviceClass: PlaceTypeService,
-  repositoryAccessor: PlaceTypeRepository,
+  repositoryAccessorClass: PlaceTypeRepository
 };

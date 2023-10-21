@@ -1,6 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
 import { Place, PlaceDto } from './place.entity';
-import { PlaceMapper, PlacesController, PlacesRepository, PlacesService } from "./places.module";
+import { PlaceMapper, PlacesController, PlacesRepository, PlacesService } from './places.module';
 
 const createPlace = (id: number): Place => {
   return {
@@ -13,7 +13,7 @@ const createPlace = (id: number): Place => {
     description: 'PlaceDescription' + id,
     type: 'RAIL',
     lat: 47.38 + id / 10,
-    long: 120.77 + id / 7,
+    long: 120.77 + id / 7
   };
 };
 
@@ -26,13 +26,13 @@ export const PlaceTestConfig: TestConfig<Place, PlaceDto> = {
     return {
       id: 'ID' + id,
       name: 'UpdatedPlace' + id,
-      description: 'UpdatedPlaceDescription' + id,
+      description: 'UpdatedPlaceDescription' + id
     };
   },
   createPatchDto: function (id: number): Partial<PlaceDto> {
     return {
       name: 'PatchedPlace' + id,
-      description: 'PatchedPlaceDescription' + id,
+      description: 'PatchedPlaceDescription' + id
     };
   },
 
@@ -45,7 +45,7 @@ export const PlaceTestConfig: TestConfig<Place, PlaceDto> = {
     createPlace(6),
     createPlace(7),
     createPlace(8),
-    createPlace(9),
+    createPlace(9)
   ],
 
   newEntityId: 10,
@@ -55,5 +55,5 @@ export const PlaceTestConfig: TestConfig<Place, PlaceDto> = {
   controllerClass: PlacesController,
   mapperClass: PlaceMapper,
   serviceClass: PlacesService,
-  repositoryAccessor: PlacesRepository,
+  repositoryAccessorClass: PlacesRepository
 };

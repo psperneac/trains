@@ -17,7 +17,7 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   internalFind(id) {
-    return this.data.find((d) => d.id === id);
+    return this.data.find(d => d.id === id);
   }
 
   reset() {
@@ -36,14 +36,14 @@ export class MockRepository<T extends AbstractEntity> {
 
   findOne(param: string | any) {
     if (typeof param === 'string') {
-      return Promise.resolve(this.data.find((d) => d.id === param));
+      return Promise.resolve(this.data.find(d => d.id === param));
     }
 
     let ret = null;
     if (param['email']) {
-      ret = this.data.find((d) => d['email'] === param['email']);
+      ret = this.data.find(d => d['email'] === param['email']);
     } else if (param.id) {
-      ret = this.data.find((d) => d.id === param.id);
+      ret = this.data.find(d => d.id === param.id);
     }
 
     return Promise.resolve(ret);
@@ -53,7 +53,7 @@ export class MockRepository<T extends AbstractEntity> {
     if (entity.id) {
       return {
         ...entity,
-        modified: new Date(),
+        modified: new Date()
       };
     }
 
@@ -61,12 +61,12 @@ export class MockRepository<T extends AbstractEntity> {
       ...entity,
       id: uuid(),
       created: new Date(),
-      modified: new Date(),
+      modified: new Date()
     };
   }
 
   update(id: string, entity: T): Promise<UpdateResult> {
-    const existing = this.data.find((u) => u.id === id);
+    const existing = this.data.find(u => u.id === id);
 
     // TODO: return error if it doesn't exist
 
@@ -74,25 +74,25 @@ export class MockRepository<T extends AbstractEntity> {
       ...existing,
       ...entity,
       version: existing.version + 1,
-      updated: new Date(),
+      updated: new Date()
     };
 
-    this.data = [...this.data.filter((u) => u.id !== id), entity];
+    this.data = [...this.data.filter(u => u.id !== id), entity];
 
     return Promise.resolve({
       raw: 0,
-      affected: 1,
+      affected: 1
     } as UpdateResult);
   }
 
   save(entity: T) {
-    this.data = [...this.data.filter((u) => u.id !== entity.id), entity];
+    this.data = [...this.data.filter(u => u.id !== entity.id), entity];
     return Promise.resolve(entity);
   }
 
   delete(id: string) {
-    const entity = this.data.find((u) => u.id === id);
-    this.data = this.data.filter((u) => u.id !== id);
+    const entity = this.data.find(u => u.id === id);
+    this.data = this.data.filter(u => u.id !== id);
     return Promise.resolve({ affected: !!entity });
   }
 

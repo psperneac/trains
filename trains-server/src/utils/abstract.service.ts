@@ -36,12 +36,11 @@ export class AbstractService<T extends AbstractEntity> {
     }
 
     return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
-      console.log(data, count);
       return {
         data,
         page: pagination.unpaged ? page : 1,
         limit: pagination.unpaged ? count : limit,
-        totalCount: count,
+        totalCount: count
       };
     });
   }
@@ -58,7 +57,7 @@ export class AbstractService<T extends AbstractEntity> {
   update(uuid: string, entity): Promise<T> {
     const updatePromise = this.repository.update(uuid, entity);
 
-    return updatePromise.then((updateResult) => {
+    return updatePromise.then(updateResult => {
       if (updateResult.affected) {
         return this.findOne(uuid);
       }
@@ -68,7 +67,7 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   delete(uuid: string): Promise<boolean> {
-    return this.repository.delete(uuid).then((deleteResponse) => {
+    return this.repository.delete(uuid).then(deleteResponse => {
       if (!deleteResponse || !deleteResponse.affected) {
         throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
       }

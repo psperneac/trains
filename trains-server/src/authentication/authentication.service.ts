@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, TokenPayload } from './authentication.model';
 import { JwtService } from '@nestjs/jwt';
@@ -8,6 +8,8 @@ import User from '../app/api/users/users.entity';
 
 @Injectable()
 export class AuthenticationService {
+  logger = new Logger(AuthenticationService.name);
+
   constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) {}
 
   public async register(registrationData: RegisterDto): Promise<User> {
@@ -25,7 +27,7 @@ export class AuthenticationService {
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.usersService.getByEmail(email);
-      console.dir(user);
+      this.logger.debug('getAuthenticatedUser: ' + JSON.stringify(user));
       await this.verifyPassword(plainTextPassword, user.password);
       user.password = undefined;
       return user;
@@ -35,7 +37,6 @@ export class AuthenticationService {
   }
 
   public async verifyPassword(plainTextPassword: string, hashedPassword: string) {
-    console.log(plainTextPassword, hashedPassword);
     const isPasswordMatching = await bcrypt.compare(plainTextPassword, hashedPassword);
     if (!isPasswordMatching) {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);

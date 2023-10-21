@@ -23,12 +23,12 @@ export class PlaceConnection extends AbstractEntity {
   content: any;
 
   @ManyToOne(type => Place, { eager: true })
-  @JoinColumn({ name: "START" })
+  @JoinColumn({ name: 'START' })
   @Expose()
   start: Place;
 
   @ManyToOne(type => Place, { eager: true })
-  @JoinColumn({ name: "END" })
+  @JoinColumn({ name: 'END' })
   @Expose()
   end: Place;
 }

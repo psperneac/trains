@@ -60,5 +60,5 @@ export const VehicleTestConfig: TestConfig<Vehicle, VehicleDto> = {
   controllerClass: VehicleController,
   mapperClass: VehicleMapper,
   serviceClass: VehicleService,
-  repositoryAccessor: VehicleRepository,
+  repositoryAccessorClass: VehicleRepository,
 };

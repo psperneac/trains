@@ -12,7 +12,7 @@ export class Player extends AbstractEntity {
   @Expose()
   description: string;
 
-  @ManyToOne(type => User, { eager: true })
-  @JoinColumn({ name: "USER" })
+  @ManyToOne((_type) => User, { eager: true })
+  @JoinColumn({ name: 'USER' })
   user: User;
 }
