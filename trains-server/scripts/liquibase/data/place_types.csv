@@ -1,7 +1,0 @@
-id,version,created,updated,deleted,type,name,description,content
-54bac172-7f9a-436d-9ec3-245499f83cb0,1,2023-04-02 21:08:36,2023-04-02 21:08:36,,RAIL,Railway station,Railway station,{}
-6469bf81-38a8-4eab-aad0-41f5333a727b,1,2023-04-03 02:06:55,2023-04-03 02:06:55,,WAREHOUSE,Warehouse,Warehouse,{}
-77cc0e7c-032a-48e1-ad6f-900f997f9163,1,2023-04-03 02:09:33,2023-04-03 02:09:33,,PORT,Port,Port,{}
-8c41c3ab-c3cd-4a47-a803-026454e853bb,1,2023-04-03 02:19:30,2023-04-03 02:19:30,,BUSINESS,Business,A business place,{}
-af977f8f-cc73-45ab-9e2f-eb53c89551e5,1,2023-04-03 02:09:18,2023-04-03 02:09:18,,TRANSIT,Transit Station,Mass Transit Station,{}
-e7f1daf4-e27e-4fd1-8635-b797a7b8844c,1,2023-04-03 02:20:14,2023-04-03 02:20:14,,YARD,Yard,"Vehicle, Train, Mass Transit or Shipyard",{}

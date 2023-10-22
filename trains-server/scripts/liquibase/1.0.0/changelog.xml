@@ -62,8 +62,8 @@
   </changeSet>
 
   <changeSet id="199" author="Paul">
-    <loadData
-            commentLineStartsWith="//"
+    <loadUpdateData
+            primaryKey="id"
             encoding="UTF-8"
             file="../data/users.csv"
             quotchar="'"
@@ -80,7 +80,7 @@
       <column header="password" name="PASSWORD" type="VARCHAR(512)" />
       <column header="email" name="EMAIL" type="VARCHAR(512)" />
       <column header="scope" name="SCOPE" type="VARCHAR(20)" />
-    </loadData>
+    </loadUpdateData>
   </changeSet>
 
 
@@ -112,7 +112,7 @@
       <column name="LONG" type="FLOAT">
         <constraints nullable="false" />
       </column>
-      <column name="CONTENT" type="JSON"></column>
+      <column name="CONTENT" type="JSON" />
     </createTable>
   </changeSet>
 
@@ -123,8 +123,8 @@
   </changeSet>
 
   <changeSet id="299" author="Paul">
-    <loadData
-        commentLineStartsWith="//"
+    <loadUpdateData
+        primaryKey="id"
         encoding="UTF-8"
         file="../data/places.csv"
         quotchar="'"
@@ -143,7 +143,7 @@
       <column header="lat" name="LAT" type="FLOAT" />
       <column header="long" name="Long" type="FLOAT" />
       <column header="content" name="CONTENT" type="JSON" />
-    </loadData>
+    </loadUpdateData>
   </changeSet>
 
   <changeSet id="300" author="Paul">
@@ -193,124 +193,6 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="500" author="Paul">
-    <createTable tableName="VEHICLE_TYPES">
-      <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
-        <constraints primaryKey="true" nullable="false" />
-      </column>
-      <column name="VERSION" type="INTEGER" defaultValue="0" />
-      <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
-        <constraints nullable="false" />
-      </column>
-      <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
-        <constraints nullable="false" />
-      </column>
-      <column name="DELETED" type="DATETIME" />
-
-      <column name="TYPE" type="VARCHAR(20)">
-        <constraints nullable="false" />
-      </column>
-      <column name="NAME" type="VARCHAR(250)">
-        <constraints nullable="false" />
-      </column>
-      <column name="DESCRIPTION" type="VARCHAR(250)" />
-      <column name="CONTENT" type="JSON"> </column>
-    </createTable>
-  </changeSet>
-
-  <changeSet id="510" author="Paul">
-    <createIndex tableName="VEHICLE_TYPES" indexName="VEHICLE_TYPES_TYPE" unique="true">
-      <column name="TYPE" />
-    </createIndex>
-  </changeSet>
-
-  <changeSet id="520" author="Paul">
-    <createIndex tableName="VEHICLE_TYPES" indexName="VEHICLE_TYPES_NAME" unique="true">
-      <column name="NAME" />
-    </createIndex>
-  </changeSet>
-
-  <changeSet id="599" author="Paul">
-    <loadData
-            commentLineStartsWith="//"
-            encoding="UTF-8"
-            file="../data/vehicle_types.csv"
-            quotchar="&quot;"
-            relativeToChangelogFile="true"
-            separator=","
-            tableName="VEHICLE_TYPES"
-    >
-      <column header="id" name="ID" type="varchar(36)" />
-      <column header="version" name="VERSION" type="INTEGER" />
-      <column header="created" name="CREATED" type="DATETIME" />
-      <column header="updated" name="UPDATED" type="DATETIME" />
-      <column header="deleted" name="DELETED" type="DATETIME" />
-      <column header="type" name="TYPE" type="VARCHAR(20)" />
-      <column header="name" name="NAME" type="VARCHAR(250)" />
-      <column header="description" name="DESCRIPTION" type="VARCHAR(250)" />
-      <column header="content" name="CONTENT" type="JSON" />
-    </loadData>
-  </changeSet>
-
-  <changeSet id="600" author="Paul">
-    <createTable tableName="PLACE_TYPES">
-      <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
-        <constraints primaryKey="true" nullable="false" />
-      </column>
-      <column name="VERSION" type="INTEGER" defaultValue="0" />
-      <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
-        <constraints nullable="false" />
-      </column>
-      <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
-        <constraints nullable="false" />
-      </column>
-      <column name="DELETED" type="DATETIME" />
-
-      <column name="TYPE" type="VARCHAR(20)">
-        <constraints nullable="false" />
-      </column>
-      <column name="NAME" type="VARCHAR(250)">
-        <constraints nullable="false" />
-      </column>
-      <column name="DESCRIPTION" type="VARCHAR(250)" />
-      <column name="CONTENT" type="JSON"> </column>
-    </createTable>
-  </changeSet>
-
-  <changeSet id="610" author="Paul">
-    <createIndex tableName="PLACE_TYPES" indexName="PLACE_TYPES_TYPE" unique="true">
-      <column name="TYPE" />
-    </createIndex>
-  </changeSet>
-
-  <changeSet id="620" author="Paul">
-    <createIndex tableName="PLACE_TYPES" indexName="PLACE_TYPES_NAME" unique="true">
-      <column name="NAME" />
-    </createIndex>
-  </changeSet>
-
-  <changeSet id="699" author="Paul">
-    <loadData
-            commentLineStartsWith="//"
-            encoding="UTF-8"
-            file="../data/place_types.csv"
-            quotchar="&quot;"
-            relativeToChangelogFile="true"
-            separator=","
-            tableName="PLACE_TYPES"
-    >
-      <column header="id" name="ID" type="varchar(36)" />
-      <column header="version" name="VERSION" type="INTEGER" />
-      <column header="created" name="CREATED" type="DATETIME" />
-      <column header="updated" name="UPDATED" type="DATETIME" />
-      <column header="deleted" name="DELETED" type="DATETIME" />
-      <column header="type" name="TYPE" type="VARCHAR(20)" />
-      <column header="name" name="NAME" type="VARCHAR(250)" />
-      <column header="description" name="DESCRIPTION" type="VARCHAR(250)" />
-      <column header="content" name="CONTENT" type="JSON" />
-    </loadData>
-  </changeSet>
-
   <changeSet id="700" author="Paul">
     <createTable tableName="VEHICLES">
       <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
@@ -348,15 +230,6 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="710" author="Paul">
-    <addForeignKeyConstraint 
-      baseTableName="VEHICLES" 
-      constraintName="VEHICLES_VEHICLES_TYPE"
-      baseColumnNames="TYPE"
-      referencedTableName="VEHICLE_TYPES"
-      referencedColumnNames="TYPE" />
-  </changeSet>
-
   <changeSet id="720" author="Paul">
     <createIndex tableName="VEHICLES" indexName="VEHICLES_NAME" unique="true">
       <column name="NAME" />
@@ -364,8 +237,8 @@
   </changeSet>
 
   <changeSet id="799" author="Paul">
-    <loadData
-            commentLineStartsWith="//"
+    <loadUpdateData
+            primaryKey="id"
             encoding="UTF-8"
             file="../data/vehicles.csv"
             quotchar="&quot;"
@@ -389,7 +262,7 @@
       <column header="aux_fuel" name="AUX_FUEL" type="INTEGER" />
       <column header="speed" name="SPEED" type="INTEGER" />
       <column header="content" name="CONTENT" type="JSON" />
-    </loadData>
+    </loadUpdateData>
   </changeSet>
 
   <changeSet id="800" author="Paul">
@@ -442,6 +315,114 @@
             baseColumnNames="END"
             referencedTableName="PLACES"
             referencedColumnNames="ID" />
+  </changeSet>
+
+  <changeSet id="899" author="Paul">
+    <loadUpdateData
+            primaryKey="id"
+            encoding="UTF-8"
+            file="../data/place_connections.csv"
+            quotchar="&quot;"
+            relativeToChangelogFile="true"
+            separator=","
+            tableName="PLACE_CONNECTIONS"
+    >
+      <column header="id" name="ID" type="varchar(36)" />
+      <column header="version" name="VERSION" type="INTEGER" />
+      <column header="created" name="CREATED" type="DATETIME" />
+      <column header="updated" name="UPDATED" type="DATETIME" />
+      <column header="deleted" name="DELETED" type="DATETIME" />
+      <column header="type" name="TYPE" type="VARCHAR(20)" />
+      <column header="name" name="NAME" type="VARCHAR(250)" />
+      <column header="description" name="DESCRIPTION" type="VARCHAR(250)" />
+      <column header="start" name="START" type="varchar(36)" />
+      <column header="end" name="END" type="varchar(36)" />
+      <column header="content" name="CONTENT" type="JSON" />
+    </loadUpdateData>
+  </changeSet>
+
+  <changeSet id="900" author="Paul">
+    <createTable tableName="JOBS">
+      <column name="ID" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+        <constraints primaryKey="true" nullable="false" />
+      </column>
+      <column name="VERSION" type="INTEGER" defaultValue="0" />
+      <column name="CREATED" type="DATETIME" defaultValueComputed="now()">
+        <constraints nullable="false" />
+      </column>
+      <column name="UPDATED" type="DATETIME" defaultValueComputed="now()">
+        <constraints nullable="false" />
+      </column>
+      <column name="DELETED" type="DATETIME" />
+
+      <column name="TYPE" type="VARCHAR(20)">
+        <constraints nullable="false" />
+      </column>
+      <column name="NAME" type="VARCHAR(250)">
+        <constraints nullable="false" />
+      </column>
+      <column name="DESCRIPTION" type="VARCHAR(250)" />
+
+      <column name="START" type="${uuid_type}">
+        <constraints nullable="false" />
+      </column>
+
+      <column name="END" type="${uuid_type}">
+        <constraints nullable="false" />
+      </column>
+
+      <column name="LOAD" type="INTEGER" defaultValue="1" />
+
+      <column name="PAY_TYPE" type="VARCHAR(20)" defaultValue="GOLD" />
+
+      <column name="PAY" type="INTEGER" defaultValue="100" />
+
+      <column name="START_TIME" type="DATETIME" defaultValueComputed="now()">
+        <constraints nullable="false" />
+      </column>
+
+      <column name="CONTENT" type="JSON"> </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="910" author="Paul">
+    <addForeignKeyConstraint
+            constraintName="JOBS_START_PLACES"
+            baseTableName="JOBS"
+            baseColumnNames="START"
+            referencedTableName="PLACES"
+            referencedColumnNames="ID" />
+  </changeSet>
+
+  <changeSet id="920" author="Paul">
+    <addForeignKeyConstraint
+            constraintName="JOBS_END_PLACES"
+            baseTableName="JOBS"
+            baseColumnNames="END"
+            referencedTableName="PLACES"
+            referencedColumnNames="ID" />
+  </changeSet>
+
+  <changeSet id="930" author="Paul">
+    <sql>
+      ALTER TABLE JOBS ADD CONSTRAINT CK_JOBS_TYPE CHECK (TYPE IN ('DELIVERY', 'PASSENGER', 'REPAIR', 'RESCUE', 'TOW'));
+    </sql>
+    <rollback>
+      <sql>
+        ALTER TABLE JOBS DROP CONSTRAINT CK_JOBS_TYPE;
+      </sql>
+    </rollback>
+  </changeSet>
+
+  <changeSet id="940" author="Paul">
+    <sql>
+      ALTER TABLE JOBS ADD CONSTRAINT CK_JOBS_PAY_TYPE CHECK (PAY_TYPE IN ('GOLD', 'TOKEN', 'CRATE', 'MATERIAL'));
+    </sql>
+    <rollback>
+      <sql>
+        ALTER TABLE JOBS DROP CONSTRAINT CK_JOBS_PAY_TYPE;
+      </sql>
+    </rollback>
   </changeSet>
 
 </databaseChangeLog>

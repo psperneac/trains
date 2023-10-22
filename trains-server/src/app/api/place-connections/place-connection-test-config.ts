@@ -10,7 +10,6 @@ import {
   PlaceConnectionRepository
 } from './place-connections.module';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
-import { PlaceTestConfig } from '../places/places-test-config';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 
 const createPlace = (id: number): Place => {

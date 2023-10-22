@@ -49,7 +49,6 @@ export class PlaceTypeFormComponent implements OnInit, OnDestroy {
 
   toForm(placeType: PlaceTypeDto): UntypedFormGroup {
     return this.formBuilder.group({
-      id: new UntypedFormControl({ value: placeType.id, disabled: true }),
       name: new UntypedFormControl(placeType.name, [Validators.required]),
       type: new UntypedFormControl(placeType.type, [Validators.required]),
       description: new UntypedFormControl(placeType.description, [Validators.required]),

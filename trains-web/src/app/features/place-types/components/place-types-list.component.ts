@@ -9,8 +9,6 @@ import { AppState } from "../../../store";
 import { PlaceTypeActions } from "../store/place-type.actions";
 import { PlaceTypesState } from "../store/place-type.reducer";
 import { PlaceTypeSelectors } from "../store/place-type.selectors";
-import { map } from "rxjs";
-import { PAGE_SIZE } from "src/app/utils/constants";
 
 @Component({
   selector: 'trains-place-types-list',
@@ -41,9 +39,5 @@ export class PlaceTypesListComponent extends AbstractListComponent<PlaceTypesSta
 
   getPaginator(): MatPaginator {
     return null;
-  }
-
-  addPlaceType() {
-    this.router.navigateByUrl('/place-types/create');
   }
 }

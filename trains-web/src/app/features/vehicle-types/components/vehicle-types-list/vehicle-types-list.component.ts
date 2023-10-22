@@ -51,8 +51,4 @@ export class VehicleTypesListComponent extends AbstractListComponent<VehicleType
   getPaginator(): MatPaginator {
     return null;
   }
-
-  addVehicleType() {
-    this.router.navigateByUrl('/vehicle-types/create');
-  }
 }

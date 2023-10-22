@@ -23,7 +23,6 @@ export const PlaceTypeTestConfig: TestConfig<PlaceType, PlaceTypeDto> = {
   createEntity: createPlaceType,
   createUpdateDto: function (id: number): Partial<PlaceTypeDto> {
     return {
-      id: 'ID' + id,
       name: 'UpdatePlaceType' + id,
       description: 'UpdatedPlaceTypeDescription' + id
     };

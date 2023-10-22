@@ -17,7 +17,7 @@ export class AuthenticationService {
     const createdUser = await this.usersService.create({
       ...registrationData,
       password: hashedPassword,
-      scope: SCOPE_USER,
+      scope: SCOPE_USER
     });
 
     createdUser.password = undefined;
