@@ -3,7 +3,7 @@ import { Expose } from 'class-transformer';
 import { ObjectLiteral } from "typeorm/common/ObjectLiteral";
 
 export abstract class AbstractEntity implements ObjectLiteral {
-  @PrimaryColumn({ name: 'ID' })
+  @PrimaryColumn({ name: 'id' })
   @Generated('uuid')
   @Expose()
   public id: string;

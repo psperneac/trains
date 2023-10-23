@@ -4,7 +4,7 @@ import { AbstractDto } from '../../../utils/abstract-dto';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { Place } from '../places/place.entity';
 
-@Entity({ name: 'PLACE_CONNECTIONS'})
+@Entity({ name: 'place_connections'})
 export class PlaceConnection extends AbstractEntity {
   @Column('varchar', { length: 20 })
   @Expose()
@@ -23,12 +23,12 @@ export class PlaceConnection extends AbstractEntity {
   content: any;
 
   @ManyToOne(type => Place, { eager: true })
-  @JoinColumn({ name: 'START' })
+  @JoinColumn({ name: 'start' })
   @Expose()
   start: Place;
 
   @ManyToOne(type => Place, { eager: true })
-  @JoinColumn({ name: 'END' })
+  @JoinColumn({ name: 'end' })
   @Expose()
   end: Place;
 }

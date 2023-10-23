@@ -12,7 +12,7 @@
     <property name="uuid_type" value="RAW(16)" dbms="oracle"/>
     <property name="uuid_type" value="varchar(36)" dbms="mysql"/>
 
-    <property name="uuid_function" value="uuid_generate_v4()" dbms="postgresql"/>
+    <property name="uuid_function" value="gen_random_uuid()" dbms="postgresql"/>
     <property name="uuid_function" value="NEWID()" dbms="mssql"/>
     <property name="uuid_function" value="sys_guid()" dbms="oracle"/>
     <property name="uuid_function" value="(UUID())" dbms="mysql"/>

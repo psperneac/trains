@@ -10,6 +10,17 @@ import { PlaceType } from '../app/api/place-types/place-type.entity';
 import { VehicleType } from '../app/api/vehicle-types/vehicle-type.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
 
+export const TABLES = {
+  USERS: 'users',
+  JOBS: 'jobs',
+  PLACE_CONNECTIONS: 'place_connections',
+  PLACES: 'places',
+  POSTS: 'posts',
+  TRANSLATIONS: 'translations',
+  VEHICLE_TYPES: 'vehicle_types',
+  VEHICLES: 'vehicles'
+}
+
 export const ENTITIES = [
   Place,
   User,
@@ -26,13 +37,23 @@ export const ENTITIES = [
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        // return {
+        //   type: 'mysql',
+        //   host: configService.get('MYSQL_HOST'),
+        //   port: configService.get('MYSQL_PORT'),
+        //   username: configService.get('MYSQL_USER'),
+        //   password: configService.get('MYSQL_PASSWORD'),
+        //   database: configService.get('MYSQL_DB'),
+        //   entities: ENTITIES,
+        //   synchronize: false,
+        // };
         return {
-          type: 'mysql',
-          host: configService.get('MYSQL_HOST'),
-          port: configService.get('MYSQL_PORT'),
-          username: configService.get('MYSQL_USER'),
-          password: configService.get('MYSQL_PASSWORD'),
-          database: configService.get('MYSQL_DB'),
+          type: 'postgres',
+          host: configService.get('POSTGRESQL_HOST'),
+          port: configService.get('POSTGRESQL_PORT'),
+          username: configService.get('POSTGRESQL_USER'),
+          password: configService.get('POSTGRESQL_PASSWORD'),
+          database: configService.get('POSTGRESQL_DB'),
           entities: ENTITIES,
           synchronize: false,
         };

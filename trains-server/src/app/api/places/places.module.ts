@@ -18,7 +18,7 @@ export class PlacesRepository extends RepositoryAccessor<Place> {
 @Injectable()
 export class PlaceMapper extends AbstractDtoMapper<Place, PlaceDto> {
   getMappedProperties(): string[] {
-    return ['id', 'name', 'description', 'type', 'lat', 'long'];
+    return ['id', 'name', 'description', 'type', 'lat', 'lng'];
   }
 }
 

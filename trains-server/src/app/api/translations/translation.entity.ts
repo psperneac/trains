@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { AbstractDto } from '../../../utils/abstract-dto';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 
-@Entity({ name: 'TRANSLATIONS' })
+@Entity({ name: 'translations' })
 export class Translation extends AbstractEntity {
   @Column('varchar', { length: 10 })
   @Expose()

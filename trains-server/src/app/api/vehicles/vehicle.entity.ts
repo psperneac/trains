@@ -1,11 +1,9 @@
-import { Injectable } from "@nestjs/common";
 import { Expose } from "class-transformer";
 import { Column, Entity } from "typeorm";
 import { AbstractDto } from "../../../utils/abstract-dto";
-import { AbstractDtoMapper } from "../../../utils/abstract-dto-mapper";
 import { AbstractEntity } from "../../../utils/abstract.entity";
 
-@Entity({ name: 'VEHICLES' })
+@Entity({ name: 'vehicles' })
 export class Vehicle extends AbstractEntity {
   @Column('varchar', { length: 20 })
   @Expose()
@@ -23,27 +21,27 @@ export class Vehicle extends AbstractEntity {
   @Expose()
   content: any;
 
-  @Column('int', { name: 'ENGINE_MAX' })
+  @Column('int', { name: 'engine_max' })
   @Expose()
   engineMax: number;
 
-  @Column('int', { name: 'ENGINE_LOAD' })
+  @Column('int', { name: 'engine_load' })
   @Expose()
   engineLoad: number;
 
-  @Column('int', { name: 'ENGINE_FUEL' })
+  @Column('int', { name: 'engine_fuel' })
   @Expose()
   engineFuel: number;
 
-  @Column('int', { name: 'AUX_MAX' })
+  @Column('int', { name: 'aux_max' })
   @Expose()
   auxMax: number;
 
-  @Column('int', { name: 'AUX_LOAD' })
+  @Column('int', { name: 'aux_load' })
   @Expose()
   auxLoad: number;
 
-  @Column('int', { name: 'AUX_FUEL' })
+  @Column('int', { name: 'aux_fuel' })
   @Expose()
   auxFuel: number;
 
