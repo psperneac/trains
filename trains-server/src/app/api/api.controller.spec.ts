@@ -11,8 +11,6 @@ import { keys, pick, range } from 'lodash';
 import { TranslationTestConfig } from './translations/translations-test-config';
 import { TestConfig } from '../../utils/test/test-config';
 import { PlaceTestConfig } from './places/places-test-config';
-import { VehicleTypeTestConfig } from './vehicle-types/vehicle-type-test-config';
-import { PlaceTypeTestConfig } from './place-types/place-type-test-config';
 import { VehicleTestConfig } from './vehicles/vehicle-test-config';
 import { PlaceConnectionTestConfig } from './place-connections/place-connection-test-config';
 
@@ -21,9 +19,7 @@ describe('Abstract Controller', () => {
   let app: INestApplication;
   const configs: TestConfig<any, any>[] = [
     PlaceTestConfig,
-    PlaceTypeTestConfig,
     TranslationTestConfig,
-    VehicleTypeTestConfig,
     VehicleTestConfig,
     PlaceConnectionTestConfig
   ];
