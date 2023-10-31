@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+import { AuthenticationModule } from '../../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { PlacesService } from '../places/places.module';
 import { Job, JobDto } from './job.entity';
@@ -11,13 +14,6 @@ import { Job, JobDto } from './job.entity';
 export class JobRepository extends RepositoryAccessor<Job> {
   constructor(@InjectRepository(Job) injectedRepo) {
     super(injectedRepo, ['start', 'end']);
-  }
-}
-
-@Injectable()
-export class JobsService extends AbstractService<Job> {
-  constructor(repo: JobRepository) {
-    super(repo);
   }
 }
 
@@ -78,3 +74,26 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
     return id ? this.service.findOne(id) : null;
   }
 }
+
+@Injectable()
+export class JobsService extends AbstractService<Job> {
+  constructor(repo: JobRepository) {
+    super(repo);
+  }
+}
+
+@Controller('jobs')
+@UseFilters(AllExceptionsFilter)
+export class JobsController extends AbstractServiceController<Job, JobDto> {
+  constructor(service: JobsService, mapper: JobMapper) {
+    super(service, mapper);
+  }
+}
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Job]), AuthenticationModule],
+  controllers: [JobsController],
+  providers: [JobsService, JobMapper, JobRepository],
+  exports: [JobsService, JobMapper],
+})
+export class JobsModule {}

@@ -1,3 +1,4 @@
+import { JobsModule } from './jobs/jobs.module';
 import { PlaceConnectionsModule } from './place-connections/place-connections.module';
 import { PostsModule } from './posts/posts.module';
 import { PlacesModule } from './places/places.module';
@@ -18,6 +19,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     PlaceTypeModule,
     VehiclesModule,
     PlaceConnectionsModule,
+    JobsModule,
   ],
 })
 export class ApiModule {

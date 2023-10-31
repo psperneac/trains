@@ -1,5 +1,4 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
@@ -48,7 +47,7 @@ export class PlaceTypeController extends AbstractServiceController<PlaceType, Pl
 }
 
 @Module({
-  // imports: [TypeOrmModule.forFeature([PlaceType])],
+  //imports: [TypeOrmModule.forFeature([PlaceType])],
   controllers: [PlaceTypeController],
   providers: [PlaceTypeService, PlaceTypeMapper, PlaceTypeRepository],
   exports: [PlaceTypeService, PlaceTypeMapper]

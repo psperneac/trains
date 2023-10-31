@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Job } from '../app/api/jobs/job.entity';
 import { PlaceConnection } from '../app/api/place-connections/place-connection.entity';
 import User from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
@@ -28,7 +29,8 @@ export const ENTITIES = [
   PlaceType,
   VehicleType,
   Vehicle,
-  PlaceConnection
+  PlaceConnection,
+  Job,
 ];
 
 @Module({
