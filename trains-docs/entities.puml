@@ -55,12 +55,6 @@ class PlaceConnection {
 
 PlaceConnection --> Place: start, end
 
-class Map {
-    +connections: PlaceConnection*
-}
-
-Map --* PlaceConnection: connections
-
 class Job {
     +id
     +type: string
@@ -89,17 +83,42 @@ VehicleInstance --> Place: start, end
 VehicleInstance --> Vehicle: vehicle
 VehicleInstance --* Job: jobs
 
+class PlaceInstance {
+    +id
+    +place: Place
+    +jobs: Jobs*
+    +jobOffers: Jobs*
+    +jobOfferExpiry: Date
+}
+
+PlaceInstance --> Place: place
+PlaceInstance --* Job: jobs
+PlaceInstance --* Job: jobOffers
+
+class Map {
+    +id
+    +connections: PlaceConnection*
+    +places: Place*
+}
+
+Map --* PlaceConnection: connections
+Map --* Place: places
+
 class Player {
     +id
     +name: string
     +user: User
     +description: string
-    +connections: PlaceConnection*
     +vehicleInstances: VehicleInstance*
+    +placeInstances: PlaceInstance*
+    +connections: PlaceConnection*
+    +map: Map
 }
 
 Player *--> User: user
-Player --* PlaceConnection: connections
+Player --* PlaceInstance: placeInstances
 Player --* VehicleInstance: vehicleInstances
+Player --* PlaceConnection: connections
+Player *--> Map: map
 
 @enduml
