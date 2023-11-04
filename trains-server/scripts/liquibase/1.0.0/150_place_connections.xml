@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="10" author="paul">
+        <createTable tableName="place_connections">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)" />
+
+            <column name="start_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="end_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="content" type="json"> </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_connections_start_places"
+                baseTableName="place_connections"
+                baseColumnNames="start_id"
+                referencedTableName="places"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="30" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_connections_end_places"
+                baseTableName="place_connections"
+                baseColumnNames="end_id"
+                referencedTableName="places"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="99" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/place_connections.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="place_connections"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="type" name="type" type="varchar(20)" />
+            <column header="name" name="name" type="varchar(250)" />
+            <column header="description" name="description" type="varchar(250)" />
+            <column header="start" name="start_id" type="varchar(36)" />
+            <column header="end" name="end_id" type="varchar(36)" />
+            <column header="content" name="content" type="json" />
+        </loadUpdateData>
+    </changeSet>
+
+</databaseChangeLog>

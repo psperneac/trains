@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="10" author="paul">
+        <createTable tableName="place_instance_job_offers">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)" />
+
+            <column name="start_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="end_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="load" type="integer" defaultValue="1" />
+
+            <column name="pay_type" type="varchar(20)" defaultValue="gold" />
+
+            <column name="pay" type="integer" defaultValue="100" />
+
+            <column name="start_time" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="place_instance_id" type="${uuid_type}">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="job_offer_expiry" type="datetime"></column>
+
+            <column name="player_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="content" type="json"> </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_instance_job_offers_start_places"
+                baseTableName="place_instance_job_offers"
+                baseColumnNames="start_id"
+                referencedTableName="places"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="30" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_instance_job_offers_end_places"
+                baseTableName="place_instance_job_offers"
+                baseColumnNames="end_id"
+                referencedTableName="places"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="40" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_instance_job_offers_place_instance"
+                baseTableName="place_instance_job_offers"
+                baseColumnNames="place_instance_id"
+                referencedTableName="place_instances"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="50" author="paul">
+        <sql>
+            alter table place_instance_job_offers add constraint ck_jobs_type check (type in ('delivery', 'passenger', 'repair', 'rescue', 'tow'));
+        </sql>
+        <rollback>
+            <sql>
+                alter table place_instance_job_offers drop constraint ck_jobs_type;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="60" author="paul">
+        <sql>
+            alter table place_instance_job_offers add constraint ck_jobs_pay_type check (pay_type in ('gold', 'token', 'crate', 'material'));
+        </sql>
+        <rollback>
+            <sql>
+                alter table place_instance_job_offers drop constraint ck_jobs_pay_type;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="70" author="paul">
+        <addForeignKeyConstraint
+                constraintName="place_instance_job_offers_players"
+                baseTableName="place_instance_job_offers"
+                baseColumnNames="player_id"
+                referencedTableName="players"
+                referencedColumnNames="id" />
+    </changeSet>
+
+</databaseChangeLog>

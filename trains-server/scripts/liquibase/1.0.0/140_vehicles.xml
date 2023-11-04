@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="10" author="paul">
+        <createTable tableName="vehicles">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version" type="integer" defaultValue="0"/>
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="datetime"/>
+
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(250)"/>
+
+            <column name="engine_max" type="integer" defaultValue="1"/>
+            <column name="aux_max" type="integer" defaultValue="0"/>
+
+            <column name="engine_load" type="integer" defaultValue="1"/>
+            <column name="engine_fuel" type="integer" defaultValue="50"/>
+
+            <column name="aux_load" type="integer" defaultValue="1"/>
+            <column name="aux_fuel" type="integer" defaultValue="50"/>
+
+            <column name="speed" type="integer" defaultValue="10"/>
+
+            <column name="content" type="json"></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20" author="paul">
+        <createIndex tableName="vehicles" indexName="vehicles_name" unique="true">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="99" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/vehicles.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="vehicles"
+        >
+            <column header="id" name="id" type="varchar(36)"/>
+            <column header="version" name="version" type="integer"/>
+            <column header="created" name="created" type="datetime"/>
+            <column header="updated" name="updated" type="datetime"/>
+            <column header="deleted" name="deleted" type="datetime"/>
+            <column header="type" name="type" type="varchar(20)"/>
+            <column header="name" name="name" type="varchar(250)"/>
+            <column header="description" name="description" type="varchar(250)"/>
+            <column header="engine_max" name="engine_max" type="integer"/>
+            <column header="engine_load" name="engine_load" type="integer"/>
+            <column header="engine_fuel" name="engine_fuel" type="integer"/>
+            <column header="aux_max" name="aux_max" type="integer"/>
+            <column header="aux_load" name="aux_load" type="integer"/>
+            <column header="aux_fuel" name="aux_fuel" type="integer"/>
+            <column header="speed" name="speed" type="integer"/>
+            <column header="content" name="content" type="json"/>
+        </loadUpdateData>
+    </changeSet>
+
+</databaseChangeLog>

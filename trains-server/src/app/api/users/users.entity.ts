@@ -1,10 +1,9 @@
 import { Column, Entity } from 'typeorm';
 import { Expose } from 'class-transformer';
-import { TABLES } from '../../../database/database.module';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'users' })
-class User extends AbstractEntity {
+export class User extends AbstractEntity {
   @Column()
   @Expose()
   public username: string;
@@ -20,5 +19,3 @@ class User extends AbstractEntity {
   @Expose()
   public scope: string;
 }
-
-export default User;

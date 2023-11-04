@@ -97,12 +97,21 @@ PlaceInstance --* Job: jobOffers
 
 class Map {
     +id
-    +connections: PlaceConnection*
-    +places: Place*
+    +name
+    +description
+    +connections: PlaceConnection* // join table
+    +places: Place* // join table
 }
 
 Map --* PlaceConnection: connections
 Map --* Place: places
+
+class PlaceConnectionInstance {
+    +id
+    +connection: PlaceConnection
+}
+
+PlaceConnectionInstance --> PlaceConnection: connection
 
 class Player {
     +id
@@ -111,14 +120,14 @@ class Player {
     +description: string
     +vehicleInstances: VehicleInstance*
     +placeInstances: PlaceInstance*
-    +connections: PlaceConnection*
+    +connectionInstances: PlaceConnectionInstance*
     +map: Map
 }
 
-Player *--> User: user
+Player --> User: user
 Player --* PlaceInstance: placeInstances
 Player --* VehicleInstance: vehicleInstances
-Player --* PlaceConnection: connections
+Player --* PlaceConnectionInstance: connectionInstances
 Player *--> Map: map
 
 @enduml

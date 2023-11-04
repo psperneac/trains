@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+    <changeSet id="10" author="paul">
+        <createTable tableName="maps">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- join tables -->
+
+    <changeSet id="20" author="paul">
+        <createTable tableName="map_places">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="place_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="map_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="30" author="paul">
+        <addForeignKeyConstraint
+                constraintName="map_places_places"
+                baseTableName="map_places"
+                baseColumnNames="place_id"
+                referencedTableName="places"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="40" author="paul">
+        <addForeignKeyConstraint
+                constraintName="map_places_maps"
+                baseTableName="map_places"
+                baseColumnNames="map_id"
+                referencedTableName="maps"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="50" author="paul">
+        <createTable tableName="map_place_connections">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="place_connection_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="map_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="60" author="paul">
+        <addForeignKeyConstraint
+                constraintName="map_place_connections_places"
+                baseTableName="map_place_connections"
+                baseColumnNames="place_connection_id"
+                referencedTableName="place_connections"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="70" author="paul">
+        <addForeignKeyConstraint
+                constraintName="map_place_connections_maps"
+                baseTableName="map_place_connections"
+                baseColumnNames="map_id"
+                referencedTableName="maps"
+                referencedColumnNames="id" />
+    </changeSet>
+
+</databaseChangeLog>

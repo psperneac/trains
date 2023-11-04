@@ -8,6 +8,7 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import * as request from 'supertest';
 import { getAuthorizationBearer } from '../../utils/jwt';
 import { keys, pick, range } from 'lodash';
+import { JobTestConfig } from './jobs/job-test-config';
 import { TranslationTestConfig } from './translations/translations-test-config';
 import { TestConfig } from '../../utils/test/test-config';
 import { PlaceTestConfig } from './places/places-test-config';
@@ -21,7 +22,8 @@ describe('Abstract Controller', () => {
     PlaceTestConfig,
     TranslationTestConfig,
     VehicleTestConfig,
-    PlaceConnectionTestConfig
+    PlaceConnectionTestConfig,
+    JobTestConfig
   ];
 
   beforeAll(async () => {

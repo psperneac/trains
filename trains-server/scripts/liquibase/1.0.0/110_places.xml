@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="10" author="paul">
+        <createTable tableName="places">
+            <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="version" type="integer" defaultValue="0" />
+            <column name="created" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="deleted" type="datetime" />
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(250)">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="lat" type="float">
+                <constraints nullable="false" />
+            </column>
+            <column name="lng" type="float">
+                <constraints nullable="false" />
+            </column>
+            <column name="content" type="json" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20" author="paul">
+        <createIndex tableName="places" indexName="points_name">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="99" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/places.csv"
+                quotchar="'"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="places"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="name" name="name" type="varchar(100)" />
+            <column header="description" name="description" type="varchar(250)" />
+            <column header="type" name="type" type="varchar(20)" />
+            <column header="lat" name="lat" type="float" />
+            <column header="lng" name="lng" type="float" />
+            <column header="content" name="content" type="json" />
+        </loadUpdateData>
+    </changeSet>
+
+</databaseChangeLog>

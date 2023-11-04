@@ -7,7 +7,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlacesService } from '../places/places.module';
+import { PlacesModule, PlacesService } from '../places/places.module';
 import { Job, JobDto } from './job.entity';
 
 @Injectable()
@@ -17,6 +17,14 @@ export class JobRepository extends RepositoryAccessor<Job> {
   }
 }
 
+@Injectable()
+export class JobsService extends AbstractService<Job> {
+  constructor(repo: JobRepository) {
+    super(repo);
+  }
+}
+
+@Injectable()
 export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
   constructor(private readonly service: PlacesService) {
     super();
@@ -36,7 +44,7 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       load: domain.load,
       payType: domain.payType,
       pay: domain.pay,
-      startTime: domain.startTime,
+      startTime: domain.startTime?.toISOString(),
       startId: domain.start?.id,
       endId: domain.end?.id
     };
@@ -55,30 +63,27 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
 
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
+    const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
     const fixedDto = omit(
       { ...dto },
-      ['startId', 'endId']);
+      ['startId', 'endId', 'startTime']);
 
     return Promise.all([this.getPlace(startId), this.getPlace(endId)]).then(([start, end]) => {
-      return {
+      const ret = {
         ...domain,
         ...fixedDto,
         start,
-        end
+        end,
+        startTime,
       } as Job;
+
+      return ret;
     });
   }
 
   getPlace(id: string) {
     return id ? this.service.findOne(id) : null;
-  }
-}
-
-@Injectable()
-export class JobsService extends AbstractService<Job> {
-  constructor(repo: JobRepository) {
-    super(repo);
   }
 }
 
@@ -91,7 +96,7 @@ export class JobsController extends AbstractServiceController<Job, JobDto> {
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Job]), AuthenticationModule],
+  imports: [PlacesModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
   controllers: [JobsController],
   providers: [JobsService, JobMapper, JobRepository],
   exports: [JobsService, JobMapper],
