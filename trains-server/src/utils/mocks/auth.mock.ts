@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '../../authentication/jwt.strategy';
 import { UsersService } from '../../app/api/users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import User from '../../app/api/users/users.entity';
+import { User } from '../../app/api/users/users.entity';
 import { mockedUsersRepository } from './users.repository.mock';
 import { LocalStrategy } from '../../authentication/local.strategy';
 import { AuthenticationService } from '../../authentication/authentication.service';

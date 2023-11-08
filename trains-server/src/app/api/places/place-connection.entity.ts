@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractDto } from '../../../utils/abstract-dto';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { Place } from '../places/place.entity';
+import { Place } from './place.entity';
 
 @Entity({ name: 'place_connections'})
 export class PlaceConnection extends AbstractEntity {

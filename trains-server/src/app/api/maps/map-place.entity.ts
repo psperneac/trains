@@ -15,10 +15,10 @@ export class MapPlace extends AbstractEntity {
   description: string;
 
   @OneToOne((_type) => Place, { eager: true })
-  @JoinColumn({ name: 'PLACE_ID' })
+  @JoinColumn({ name: 'place_id' })
   place: Place;
 
-  @ManyToOne(type => Map, { eager: true })
-  @JoinColumn({ name: 'MAP_ID' })
+  @ManyToOne(type => MapTemplate, { eager: true })
+  @JoinColumn({ name: 'map_id' })
   map: MapTemplate;
 }

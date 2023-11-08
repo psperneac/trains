@@ -5,7 +5,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlacesModule, PlacesService } from '../places/places.module';
+import { PlacesModule, PlacesService } from './places.module';
 import { PlaceConnection, PlaceConnectionDto } from './place-connection.entity';
 import { omit } from 'lodash';
 
@@ -59,12 +59,7 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
 
-    const fixedDto = omit(
-      {
-        ...dto
-      },
-      ['startId', 'endId']
-    );
+    const fixedDto = omit(dto, ['startId', 'endId']);
 
     return Promise.all([this.getPlace(startId), this.getPlace(endId)]).then(([start, end]) => {
       return {

@@ -46,7 +46,7 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   async findOne(uuid: string): Promise<T> {
-    return this.repository.findOne(uuid);
+    return uuid ? this.repository.findOne(uuid) : null;
   }
 
   create(entity: DeepPartial<T>): Promise<T> {

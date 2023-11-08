@@ -4,7 +4,7 @@ import { RegisterDto, TokenPayload } from './authentication.model';
 import { JwtService } from '@nestjs/jwt';
 import { SCOPE_USER } from '../utils/constants';
 import { UsersService } from '../app/api/users/users.service';
-import User from '../app/api/users/users.entity';
+import { User } from '../app/api/users/users.entity';
 
 @Injectable()
 export class AuthenticationService {

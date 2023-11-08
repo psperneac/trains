@@ -13,7 +13,7 @@ import { TranslationTestConfig } from './translations/translations-test-config';
 import { TestConfig } from '../../utils/test/test-config';
 import { PlaceTestConfig } from './places/places-test-config';
 import { VehicleTestConfig } from './vehicles/vehicle-test-config';
-import { PlaceConnectionTestConfig } from './place-connections/place-connection-test-config';
+import { PlaceConnectionTestConfig } from './places/place-connection-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;

@@ -3,8 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { Place } from '../places/place.entity';
 
-@Entity({ name: 'jobs' })
-export class Job extends AbstractEntity {
+export abstract class Job extends AbstractEntity {
   @Column('varchar', { length: 20 })
   @Expose()
   type: string;

@@ -1,14 +1,14 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TestConfig } from '../../../utils/test/test-config';
-import { Place } from '../places/place.entity';
+import { Place } from './place.entity';
 import { PlaceConnection, PlaceConnectionDto } from './place-connection.entity';
 import {
   PlaceConnectionMapper,
   PlaceConnectionService,
   PlaceConnectionController,
   PlaceConnectionRepository
-} from './place-connections.module';
+} from './place-connection.module';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 

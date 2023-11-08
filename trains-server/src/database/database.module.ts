@@ -1,14 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Job } from '../app/api/jobs/job.entity';
-import { PlaceConnection } from '../app/api/place-connections/place-connection.entity';
-import User from '../app/api/users/users.entity';
+import { MapPlaceConnection } from '../app/api/maps/map-place-connection.entity';
+import { MapPlace } from '../app/api/maps/map-place.entity';
+import { MapTemplate } from '../app/api/maps/map-template.entity';
+import { PlaceConnectionInstance } from '../app/api/places/place-connection-instance.entity';
+import { PlaceConnection } from '../app/api/places/place-connection.entity';
+import { PlaceInstanceJobOffer } from '../app/api/places/place-instance-job-offer.entity';
+import { PlaceInstanceJob } from '../app/api/places/place-instance-job.entity';
+import { PlaceInstance } from '../app/api/places/place-instance.entity';
+import { Player } from '../app/api/players/player.entity';
+import { User } from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
 import { Translation } from '../app/api/translations/translation.entity';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PlaceType } from '../app/api/place-types/place-type.entity';
-import { VehicleType } from '../app/api/vehicle-types/vehicle-type.entity';
+import { PlaceType } from '../app/api/places/place-type.entity';
+import { VehicleInstanceJob } from '../app/api/vehicles/vehicle-instance-job.entity';
+import { VehicleInstance } from '../app/api/vehicles/vehicle-instance.entity';
+import { VehicleType } from '../app/api/vehicles/vehicle-type.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
 
 export const TABLES = {
@@ -30,7 +39,17 @@ export const ENTITIES = [
   VehicleType,
   Vehicle,
   PlaceConnection,
-  Job,
+  PlaceConnectionInstance,
+  PlaceInstance,
+  PlaceInstanceJob,
+  PlaceInstanceJobOffer,
+  VehicleInstance,
+  VehicleInstanceJob,
+  MapTemplate,
+  MapPlace,
+  MapPlaceConnection,
+
+  Player
 ];
 
 @Module({

@@ -3,9 +3,10 @@ import { Repository } from 'typeorm';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { TestConfig } from '../../../utils/test/test-config';
-import { PlaceConnection } from '../place-connections/place-connection.entity';
+import { PlaceConnection } from '../places/place-connection.entity';
 import { Place } from '../places/place.entity';
 import { PlaceTestConfig } from '../places/places-test-config';
+import { VehicleInstanceJob } from '../vehicles/vehicle-instance-job.entity';
 import { Job, JobDto } from './job.entity';
 import { JobMapper, JobRepository, JobsController, JobsService } from './jobs.module';
 
@@ -25,7 +26,7 @@ const createPlace = (id: number): Place => {
 };
 
 const createJob = (id: number): Job => {
-  const job = new Job();
+  const job = new VehicleInstanceJob();
   job.id = 'ID' + id;
   job.name = 'Job' + id;
   job.description = 'JobDescription' + id;

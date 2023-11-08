@@ -1,4 +1,4 @@
-import User from '../../app/api/users/users.entity';
+import { User } from '../../app/api/users/users.entity';
 import { isString } from 'util';
 import { cloneDeep } from 'lodash';
 import * as bcrypt from 'bcrypt';

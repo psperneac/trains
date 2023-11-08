@@ -1,9 +1,10 @@
 import { Expose } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { Place } from '../places/place.entity';
 import { Player } from '../players/player.entity';
-import { Vehicle } from '../vehicles/vehicle.entity';
+import { VehicleInstanceJob } from './vehicle-instance-job.entity';
+import { Vehicle, VehicleDto } from './vehicle.entity';
 
 @Entity({ name: 'vehicle_instances' })
 export class VehicleInstance extends AbstractEntity {
@@ -43,7 +44,25 @@ export class VehicleInstance extends AbstractEntity {
   @Expose()
   player: Player;
 
+  @OneToMany(type => VehicleInstanceJob, job => job.vehicleInstance)
+  @Expose()
+  jobs: VehicleInstanceJob[];
+
   @Column({ type: 'json' })
   @Expose()
+  content: any;
+}
+
+export interface VehicleInstanceDto {
+  id: string;
+  name: string;
+  description: string;
+  vehicleId: string;
+  startId: string;
+  endId: string;
+  startTime: string;
+  endTime: string;
+  playerId: string;
+  jobs: string[];
   content: any;
 }
