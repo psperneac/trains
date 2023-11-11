@@ -17,6 +17,8 @@ Short term plan on what to add to the app:
 - times arrival at the destination place - vehicle is shown as moving marker on map
 - automatic unloading of jobs with destination to that place and payout
 - ability to unload any job from a vehicle in a place where a vehicle is
+- backup of db data (to csv files?); import of data later while app is running?
+- deployment to web / domain etc
 
 Bugs, misc:
 
