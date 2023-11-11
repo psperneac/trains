@@ -1,10 +1,24 @@
 # Trains
 
+Transportation game where players send jobs by vehicles from one place to another to earn cash
+
+## short-term-plan
+
 ## .plan
 
-Short term plan on what to add to the app
+Short term plan on what to add to the app:
 
-on May 22nd, 2023
+- admin defined places and connections
+- player can buy places and connections
+- player can buy vehicles from predefined list
+- jobs appear when player clicks on places at predefined times
+- jobs can be loaded to vehicles in a places
+- vehicles can be sent to another place
+- times arrival at the destination place - vehicle is shown as moving marker on map
+- automatic unloading of jobs with destination to that place and payout
+- ability to unload any job from a vehicle in a place where a vehicle is
+
+Bugs, misc:
 
 - Add delete to table/list views
 - ? Add custom marker class that keeps old state (position) and can trigger through some events reorder of a path
@@ -31,6 +45,16 @@ on May 22nd, 2023
 - Add marker size depending on zoom level
   - probably MapService.icon* should check zoom level of map and return proper size
 - Find way to check if a marker or route is hit when user clicks map
+
+## .long-term-plan
+
+- special types of jobs that give materials or vehicle parts
+- manufacturing facilities where vehicles are built when all components or materials are present
+- multiplayer - sharing jobs between players
+- companies - players can create companies and share jobs between them
+- ability to add places and connections on map depending on neighbourhood a player is in - for pay?
+- premium features
+- ability to control sections of maps for player/corporation
 
 ## Terms
 
