@@ -46,7 +46,7 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
       name: '',
       description: '',
       lat: 45.753567,
-      long: 21.225689
+      lng: 21.225689
     } as PlaceDto;
 
     if (this.map) {
@@ -59,17 +59,17 @@ export class PlaceCreatePage implements OnInit, OnDestroy {
   }
 
   private moveMarker(place: PlaceDto) {
-    const currentPosition = marker([place.lat, place.long], { draggable: true });
+    const currentPosition = marker([place.lat, place.lng], { draggable: true });
     const self = this;
     currentPosition.on('dragend', function(_e) {
       self.place.lat = currentPosition.getLatLng().lat;
-      self.place.long = currentPosition.getLatLng().lng;
+      self.place.lng = currentPosition.getLatLng().lng;
       if (self.form) {
         self.form.externalPlaceUpdate(self.place);
       }
     });
     this.markers = [currentPosition];
-    this.map.setView(latLng(place.lat, place.long), this.map.getZoom());
+    this.map.setView(latLng(place.lat, place.lng), this.map.getZoom());
   }
 
   ngOnDestroy(): void {

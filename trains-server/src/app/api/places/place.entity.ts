@@ -15,8 +15,8 @@ export class Place extends AbstractEntity {
   @Column()
   lat: number;
 
-  @Column({ name: 'lng' })
-  long: number;
+  @Column()
+  lng: number;
 }
 
 export interface PlaceDto {
@@ -25,7 +25,7 @@ export interface PlaceDto {
   description: string;
   type: string;
   lat: number;
-  long: number;
+  lng: number;
 }
 
 export interface CreatePlaceDto {
@@ -33,7 +33,7 @@ export interface CreatePlaceDto {
   description: string;
   type: string;
   lat: number;
-  long: number;
+  lng: number;
 }
 
 export interface UpdatePlaceDto {
@@ -42,5 +42,5 @@ export interface UpdatePlaceDto {
   description: string;
   type: string;
   lat: number;
-  long: number;
+  lng: number;
 }

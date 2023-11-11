@@ -6,9 +6,9 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { PlaceInstance, PlaceInstanceDto } from './place-instance.entity';
-import { PlacesModule, PlacesService } from './places.module';
+import { PlaceModule, PlacesService } from './place.module';
 import { omit } from 'lodash';
-import { PlayersService } from '../players/player.module';
+import { PlayersModule, PlayersService } from '../players/player.module';
 
 @Injectable()
 export class PlaceInstanceRepository extends RepositoryAccessor<PlaceInstance> {
@@ -18,7 +18,7 @@ export class PlaceInstanceRepository extends RepositoryAccessor<PlaceInstance> {
 }
 
 @Injectable()
-export class PlaceInstanceService extends AbstractService<PlaceInstance> {
+export class PlaceInstancesService extends AbstractService<PlaceInstance> {
   constructor(repo: PlaceInstanceRepository) {
     super(repo);
   }
@@ -75,15 +75,15 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
 @Controller('place-instances')
 @UseFilters(AllExceptionsFilter)
 export class PlaceInstanceController extends AbstractServiceController<PlaceInstance, PlaceInstanceDto> {
-  constructor(service: PlaceInstanceService, mapper: PlaceInstanceMapper) {
+  constructor(service: PlaceInstancesService, mapper: PlaceInstanceMapper) {
     super(service, mapper);
   }
 }
 
 @Module({
-  imports: [PlacesModule, TypeOrmModule.forFeature([PlaceInstance])],
+  imports: [PlaceModule, PlayersModule, TypeOrmModule.forFeature([PlaceInstance])],
   controllers: [PlaceInstanceController],
-  providers: [PlaceInstanceService, PlaceInstanceMapper, PlaceInstanceRepository],
-  exports: [PlaceInstanceService, PlaceInstanceMapper]
+  providers: [PlaceInstancesService, PlaceInstanceMapper, PlaceInstanceRepository],
+  exports: [PlaceInstancesService, PlaceInstanceMapper]
 })
 export class PlaceInstancesModule {}

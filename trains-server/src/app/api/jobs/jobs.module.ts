@@ -7,7 +7,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlacesModule, PlacesService } from '../places/places.module';
+import { PlaceModule, PlacesService } from '../places/place.module';
 import { Job, JobDto } from './job.entity';
 
 @Injectable()
@@ -96,7 +96,7 @@ export class JobsController extends AbstractServiceController<Job, JobDto> {
 }
 
 @Module({
-  imports: [PlacesModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
+  imports: [PlaceModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
   controllers: [JobsController],
   providers: [JobsService, JobMapper, JobRepository],
   exports: [JobsService, JobMapper],

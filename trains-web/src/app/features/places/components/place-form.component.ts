@@ -43,7 +43,7 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
 
   public externalPlaceUpdate(place: PlaceDto) {
     this.placeForm.controls['lat'].setValue(place.lat);
-    this.placeForm.controls['long'].setValue(place.long);
+    this.placeForm.controls['long'].setValue(place.lng);
   }
 
   toForm(place: PlaceDto): UntypedFormGroup {
@@ -57,7 +57,7 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
         Validators.pattern('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)$'),
         Validators.max(90),
         Validators.min(-90)]),
-      long: new UntypedFormControl(place.long, [
+      lng: new UntypedFormControl(place.lng, [
         Validators.required,
         Validators.pattern('^[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'),
         Validators.max(180),

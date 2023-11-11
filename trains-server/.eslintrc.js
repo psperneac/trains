@@ -26,10 +26,10 @@ module.exports = {
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'max-len': ['error', {'code': 140}],
+      'max-len': ['error', {'code': 100}],
       'prettier/prettier': ['error', {
           'endOfLine': 'auto',
-          'printWidth': 140,
+          'printWidth': 100,
           'singleQuote': true,
           'trailingComma': 'none',
           'bracketSpacing': true,

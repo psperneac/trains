@@ -1,6 +1,6 @@
 import { TestConfig } from '../../../utils/test/test-config';
 import { Place, PlaceDto } from './place.entity';
-import { PlaceMapper, PlacesController, PlacesRepository, PlacesService } from './places.module';
+import { PlaceMapper, PlacesController, PlacesRepository, PlacesService } from './place.module';
 
 const createPlace = (id: number): Place => {
   return {
@@ -13,7 +13,7 @@ const createPlace = (id: number): Place => {
     description: 'PlaceDescription' + id,
     type: 'RAIL',
     lat: 47.38 + id / 10,
-    long: 120.77 + id / 7
+    lng: 120.77 + id / 7
   };
 };
 

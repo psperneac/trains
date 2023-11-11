@@ -15,7 +15,7 @@ export class VehicleRepository extends RepositoryAccessor<Vehicle> {
 }
 
 @Injectable()
-export class VehicleService extends AbstractService<Vehicle> {
+export class VehiclesService extends AbstractService<Vehicle> {
   constructor(private readonly repo: VehicleRepository) {
     super(repo);
   }
@@ -44,7 +44,7 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
 @Controller('vehicles')
 @UseFilters(AllExceptionsFilter)
 export class VehicleController extends AbstractServiceController<Vehicle, VehicleDto> {
-  constructor(service: VehicleService, mapper: VehicleMapper) {
+  constructor(service: VehiclesService, mapper: VehicleMapper) {
     super(service, mapper);
   }
 }
@@ -52,7 +52,7 @@ export class VehicleController extends AbstractServiceController<Vehicle, Vehicl
 @Module({
   imports: [TypeOrmModule.forFeature([Vehicle])],
   controllers: [VehicleController],
-  providers: [VehicleMapper, VehicleService, VehicleRepository],
-  exports: [VehicleMapper, VehicleService],
+  providers: [VehicleMapper, VehiclesService, VehicleRepository],
+  exports: [VehicleMapper, VehiclesService],
 })
-export class VehiclesModule {}
+export class VehicleModule {}

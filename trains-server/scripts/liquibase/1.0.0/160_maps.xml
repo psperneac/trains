@@ -47,13 +47,6 @@
             </column>
             <column name="deleted" type="datetime" />
 
-            <column name="name" type="varchar(100)">
-                <constraints nullable="false" />
-            </column>
-            <column name="description" type="varchar(250)">
-                <constraints nullable="false" />
-            </column>
-
             <column name="place_id" type="${uuid_type}">
                 <constraints nullable="false" />
             </column>
@@ -95,13 +88,6 @@
                 <constraints nullable="false" />
             </column>
             <column name="deleted" type="datetime" />
-
-            <column name="name" type="varchar(100)">
-                <constraints nullable="false" />
-            </column>
-            <column name="description" type="varchar(250)">
-                <constraints nullable="false" />
-            </column>
 
             <column name="place_connection_id" type="${uuid_type}">
                 <constraints nullable="false" />

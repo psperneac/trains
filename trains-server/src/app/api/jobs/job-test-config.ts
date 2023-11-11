@@ -21,7 +21,7 @@ const createPlace = (id: number): Place => {
     description: 'PlaceDescription' + id,
     type: 'RAIL',
     lat: 47.38 + id / 10,
-    long: 120.77 + id / 7
+    lng: 120.77 + id / 7
   };
 };
 

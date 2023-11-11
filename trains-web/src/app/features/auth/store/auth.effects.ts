@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { PlaceTypeActions } from '../../place-types/store/place-type.actions';
+import { VehicleTypeActions } from '../../vehicle-types/store/vehicle-type.actions';
 import { AuthService } from '../services/auth.service';
 import {
   login,
@@ -42,12 +44,15 @@ export class AuthEffects {
         this.store.pipe(select(selectLoggedIn)),
         this.store.pipe(select(selectUser)),
         this.store.pipe(select(routerSelectReturnUrl))),
-      map(([_action, loggedIn, _user, returnUrl]) => {
+      switchMap(([_action, loggedIn, _user, returnUrl]) => {
         if (loggedIn) {
           console.log('LoggedIn - Navigating to Home');
           this.router.navigate([returnUrl || '/home']);
         }
-        return {type: 'NO-OP'};
+        return [
+          PlaceTypeActions.getAll({request: { unpaged: true }}),
+          VehicleTypeActions.getAll({request: { unpaged: true }})
+        ];
       })
     )
   );

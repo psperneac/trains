@@ -18,7 +18,7 @@ export class MapTemplate extends AbstractEntity {
   places: MapPlace[];
 
   @OneToMany(_type => MapPlaceConnection, mapPlaceConnection => mapPlaceConnection.map)
-  placeConnections: MapPlace[];
+  placeConnections: MapPlaceConnection[];
 }
 
 export interface MapTemplateDto {

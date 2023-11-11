@@ -8,14 +8,6 @@ import { Vehicle, VehicleDto } from './vehicle.entity';
 
 @Entity({ name: 'vehicle_instances' })
 export class VehicleInstance extends AbstractEntity {
-  @Column('varchar', { length: 250 })
-  @Expose()
-  name: string;
-
-  @Column('varchar', { length: 250 })
-  @Expose()
-  description: string;
-
   @ManyToOne(type => Vehicle, { eager: true })
   @JoinColumn({ name: 'vehicle_id' })
   @Expose()
@@ -55,8 +47,6 @@ export class VehicleInstance extends AbstractEntity {
 
 export interface VehicleInstanceDto {
   id: string;
-  name: string;
-  description: string;
   vehicleId: string;
   startId: string;
   endId: string;

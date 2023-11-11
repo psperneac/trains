@@ -6,19 +6,19 @@ import { MapTemplate } from './map-template.entity';
 
 @Entity({ name: 'map_place_connections' })
 export class MapPlaceConnection extends AbstractEntity {
-  @Column('varchar', { length: 250 })
-  @Expose()
-  name: string;
-
-  @Column('varchar', { length: 250 })
-  @Expose()
-  description: string;
-
   @OneToOne((_type) => PlaceConnection, { eager: true })
   @JoinColumn({ name: 'place_connection_id' })
+  @Expose()
   placeConnection: PlaceConnection;
 
   @ManyToOne(type => MapTemplate, { eager: true })
   @JoinColumn({ name: 'map_id' })
+  @Expose()
   map: MapTemplate;
+}
+
+export interface MapPlaceConnectionDto {
+  id: string;
+  placeConnectionId: string;
+  mapId: string;
 }

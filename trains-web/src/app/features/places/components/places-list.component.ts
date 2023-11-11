@@ -26,7 +26,7 @@ export class PlacesListComponent extends AbstractListComponent<PlacesState, Plac
     'description',
     'type',
     'lat',
-    'long'
+    'lng'
   ];
   public filterColumns = [];
 

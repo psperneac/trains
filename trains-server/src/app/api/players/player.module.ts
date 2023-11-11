@@ -1,11 +1,12 @@
-import { Controller, Injectable, UseFilters } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractService } from '../../../utils/abstract.service';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { UsersModule } from '../users/users.module';
 import { Player, PlayerDto } from './player.entity';
 import { UsersService } from '../users/users.service';
-import { MapTemplateService } from '../maps/map-template.module';
+import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 
@@ -78,3 +79,11 @@ export class PlayerController extends AbstractServiceController<Player, PlayerDt
     super(service, mapper);
   }
 }
+
+@Module({
+  imports: [UsersModule, MapTemplateModule, TypeOrmModule.forFeature([Player])],
+  controllers: [PlayerController],
+  providers: [PlayersService, PlayerMapper, PlayerRepository],
+  exports: [PlayersService]
+})
+export class PlayersModule {}
