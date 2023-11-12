@@ -9,6 +9,7 @@ Transportation game where players send jobs by vehicles from one place to anothe
 Short term plan on what to add to the app:
 
 - admin defined places and connections
+- player wallet / player xp / leveling?
 - player can buy places and connections
 - player can buy vehicles from predefined list
 - jobs appear when player clicks on places at predefined times
@@ -50,12 +51,13 @@ Bugs, misc:
 
 ## .long-term-plan
 
+- player site in react once angular one is working - admin site remains in angular?
 - special types of jobs that give materials or vehicle parts
 - manufacturing facilities where vehicles are built when all components or materials are present
 - multiplayer - sharing jobs between players
 - companies - players can create companies and share jobs between them
 - ability to add places and connections on map depending on neighbourhood a player is in - for pay?
-- premium features
+- premium features - pay for premium features, extract existing features to premium, add more QOL features for premium
 - ability to control sections of maps for player/corporation
 
 ## Terms
