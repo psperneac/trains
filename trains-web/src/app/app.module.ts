@@ -39,6 +39,7 @@ import { MomentModule } from 'ngx-moment';
 import { PLACES_FEATURE } from './features/places/places.feature';
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
+import { PLAYERS_FEATURE } from './features/players/players.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -52,6 +53,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...VEHICLE_TYPES_FEATURE.declarations,
     ...VEHICLES_FEATURE.declarations,
     ...PLACE_CONNECTIONS_FEATURE.declarations,
+    ...PLAYERS_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -99,6 +101,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...VEHICLE_TYPES_FEATURE.imports,
     ...VEHICLES_FEATURE.imports,
     ...PLACE_CONNECTIONS_FEATURE.imports,
+    ...PLAYERS_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -109,7 +112,8 @@ export function createTranslationLoader(http: HttpClient) {
     ...PLACE_TYPES_FEATURE.providers,
     ...VEHICLE_TYPES_FEATURE.providers,
     ...VEHICLES_FEATURE.providers,
-    ...PLACE_CONNECTIONS_FEATURE.providers
+    ...PLACE_CONNECTIONS_FEATURE.providers,
+    ...PLAYERS_FEATURE.providers,
   ],
   bootstrap: [AppComponent],
 })

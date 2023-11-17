@@ -5,9 +5,11 @@ import { history } from '../helpers';
 import { client } from "../helpers/client";
 
 function createInitialState() {
+  // TODO: can re-enable the localStorage saving if I can figure out a way to verify expiry
+
   return {
     // initialize state from local storage to enable user to stay logged in
-    value: JSON.parse(localStorage.getItem('auth'))
+    // value: JSON.parse(localStorage.getItem('auth'))
   }
 }
 
@@ -42,7 +44,7 @@ function createExtraActions() {
           dispatch(authActions.setAuth(user));
 
           // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem('auth', JSON.stringify(user));
+          // localStorage.setItem('auth', JSON.stringify(user));
 
           // get return url from location state or default to home page
           const { from } = history.location.state || { from: { pathname: '/' } };
@@ -59,7 +61,7 @@ function createExtraActions() {
       `${name}/logout`,
       function (arg, { dispatch }) {
         dispatch(authActions.setAuth(null));
-        localStorage.removeItem('auth');
+        // localStorage.removeItem('auth');
         history.navigate('/account/login');
       }
     );

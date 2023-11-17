@@ -186,7 +186,10 @@ describe('Abstract Controller', () => {
 
       it('should return 401 if no token is present', async () => {
         // unauthorized
-        await request(app.getHttpServer()).put(`${config.url}/ID${config.existingEntityId}`).send(updateEntity).expect(401);
+        await request(app.getHttpServer())
+          .put(`${config.url}/ID${config.existingEntityId}`)
+          .send(updateEntity)
+          .expect(401);
       });
 
       it('should return 404 if token is for non-existent user', async () => {

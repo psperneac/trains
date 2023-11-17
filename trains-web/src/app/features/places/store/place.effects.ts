@@ -12,8 +12,6 @@ import { PlaceDto } from '../../../models/place.model';
 
 @Injectable()
 export class PlaceEffects extends AbstractEffects<PlacesState, PlaceDto> {
-
-
   constructor(
     readonly actions$: Actions,
     readonly service: PlaceService,

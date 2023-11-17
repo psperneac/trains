@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { addAuthorizationHeader } from '../helpers/http';
+import {HEADER_AUTH} from '../constants';
 
 const TAG = {
   PLACE_TYPE: 'PlaceType',
@@ -9,6 +9,10 @@ const TAG = {
 const PLACE_TYPE_QUERIES = (build) => ({
   getPlaceTypes: build.query({
       query: () => 'place-types',
+      // queryFn: async (args, api, extraOptions, baseQuery) => {
+      //   const state = api.getState();
+
+      // },
       providesTags: (results = [], _error, _arg) => {
         console.log(results, _error, _arg);
 
@@ -74,9 +78,11 @@ const VEHICLE_TYPE_QUERIES = (build) => ({
 
 export const DataApi = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.REACT_APP_API_URL}`,
-    prepareHeaders: addAuthorizationHeader
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_API_URL}`, prepareHeaders: (headers, {getState}) => {
+      const state = getState();
+      console.log('BaseQuery - SetHeaders', state, state?.auth?.value?.authorization);
+      headers.set(HEADER_AUTH, state?.auth?.value?.authorization);
+    }
   }),
   tagTypes: [TAG.PLACE_TYPE, TAG.VEHICLE_TYPE],
   endpoints: (build) => ({

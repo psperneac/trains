@@ -26,10 +26,10 @@ module.exports = {
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'max-len': ['error', {'code': 100}],
+      'max-len': ['error', {'code': 120}],
       'prettier/prettier': ['error', {
           'endOfLine': 'auto',
-          'printWidth': 100,
+          'printWidth': 120,
           'singleQuote': true,
           'trailingComma': 'none',
           'bracketSpacing': true,
@@ -40,4 +40,12 @@ module.exports = {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["warn", {"args": "all", "argsIgnorePattern": "^_"}],
   },
+  overrides: [
+    {
+      files: ["*.spec.ts", "*.test.ts"],
+      rules: {
+        'max-len': 'off' // disables line length check
+      }
+    }
+  ]
 };
