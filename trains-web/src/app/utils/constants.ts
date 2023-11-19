@@ -8,6 +8,8 @@ export const DEFAULT_KEEPALIVE = 30;
 
 export const PAGE_SIZE = 5;
 
+export const HOME = '/home';
+
 export const PLACES = '/places';
 export const PLACES_CREATE = '/places/create';
 
@@ -22,3 +24,6 @@ export const VEHICLE_TYPES_CREATE = 'vehicle-types/create';
 
 export const VEHICLES = '/vehicles';
 export const VEHICLES_CREATE = 'vehicles/create';
+
+export const PLAYERS = '/players';
+export const PLAYERS_CREATE = '/players/create';

@@ -1,12 +1,12 @@
 import DataTable, { TableColumn } from 'react-data-table-component';
 
 import {useGetPlaceTypesQuery} from '../../store/data.api';
-import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { PlaceType } from '../../data/place-type.model';
 import { useNavigate } from 'react-router-dom';
 import './PlaceTypesList.scss';
 import { useState } from 'react';
+import Button from '@mui/material/Button';
 
 export const PlaceTypesList = () => {
   const { data, isFetching, isLoading } = useGetPlaceTypesQuery();
@@ -62,7 +62,7 @@ export const PlaceTypesList = () => {
     {
       name: 'Edit',
       button: true,
-      cell: (row) => <Button variant='outline-primary' size='sm' onClick={handleEdit} id={row.id}>Edit</Button>,
+      cell: (row) => <Button onClick={handleEdit} id={row.id}>Edit</Button>,
     }
   ];
 
@@ -76,11 +76,9 @@ export const PlaceTypesList = () => {
         onSelectedRowsChange={handleSelectedRowcChange}
       />
       <div className='buttons-container'>
-        <Button variant='outline-danger' 
-                size='sm' 
-                className='delete-button' 
+        <Button className='delete-button' 
                 disabled={!selected || selected.length === 0}>{t('main.delete')}</Button>
-        <Button variant='outline-primary' size='sm' className='add-button' onClick={handleAdd}>{t('main.add')}</Button>
+        <Button className='add-button' onClick={handleAdd}>{t('main.add')}</Button>
       </div>
     </>
   );

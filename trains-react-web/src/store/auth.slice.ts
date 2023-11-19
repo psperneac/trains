@@ -34,7 +34,8 @@ function createExtraActions() {
   function login() {
     return createAsyncThunk(
       `${name}/login`,
-      async function ({ username, password }, { dispatch }) {
+      async function (payload, { dispatch }) {
+        const { username, password } = payload as any;
         dispatch(alertActions.clear());
         try {
           const userResponse = await client.post(`${baseUrl}/login`, { email: username, password });
@@ -60,7 +61,7 @@ function createExtraActions() {
     return createAsyncThunk(
       `${name}/logout`,
       function (arg, { dispatch }) {
-        dispatch(authActions.setAuth(null));
+        dispatch(authActions.setAuth(null as any));
         // localStorage.removeItem('auth');
         history.navigate('/account/login');
       }

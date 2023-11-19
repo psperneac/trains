@@ -13,7 +13,7 @@ import { VehicleActions } from '../store/vehicle.actions';
 import { VehicleSelectors } from '../store/vehicle.selectors';
 
 @Component({
-  selector: 'trains-vehicle-create-page',
+  selector: 'trains-vehicle-edit-page',
   templateUrl: './vehicle-edit.page.html',
   styleUrls: ['./vehicle-edit.page.scss']
 })

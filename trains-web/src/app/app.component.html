@@ -31,6 +31,10 @@
     <mat-icon>supervisor_account</mat-icon>
     <span>{{'menu.users' | translate}}</span>
   </button>
+  <button (click)="menuClicked('players')" mat-menu-item>
+    <mat-icon>diversity_3</mat-icon>
+    <span>{{'menu.players' | translate}}</span>
+  </button>
   <button (click)="menuClicked('map')" mat-menu-item>
     <mat-icon>map</mat-icon>
     <span>{{'menu.map' | translate}}</span>

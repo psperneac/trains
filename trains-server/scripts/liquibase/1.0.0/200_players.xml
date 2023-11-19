@@ -36,6 +36,8 @@
             <column name="map_id" type="${uuid_type}">
                 <constraints nullable="false" />
             </column>
+
+            <column name="content" type="json"> </column>
         </createTable>
     </changeSet>
 

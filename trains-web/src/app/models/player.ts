@@ -1,11 +1,11 @@
 export interface PlayerDto {
-  id: string;
+  id?: string;
   name: string;
   description: string;
-  userId: string;
-  mapId: string;
-  vehicles: string[];
-  places: string[];
-  placeConnections: string[];
   content: any;
+  userId?: string;
+  mapId?: string;
+  vehicles?: string[];
+  places?: string[];
+  placeConnections?: string[];
 }

@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import { history } from './helpers';
-import { Nav, Alert, PrivateRoute } from './components';
+import { AppNav, Alert, PrivateRoute } from './components';
 import { Home } from './features/home/Home';
 import { AccountLayout } from './features/account/AccountLayout';
 import { UsersLayout } from './features/users/UsersLayout';
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div className="app-container bg-light">
-      <Nav />
+      <AppNav />
       <Alert />
       <div className="container pt-4 pb-4">
         <Routes>

@@ -1,4 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { ThunkMiddlewareFor } from '@reduxjs/toolkit/src/getDefaultMiddleware';
 
 import { alertReducer } from './alert.slice';
 import { authReducer } from './auth.slice';
@@ -14,15 +15,25 @@ export * from './counter.slice';
 export * from './users.slice';
 export * from './notifications.slice';
 
-export const store = configureStore({
-  reducer: {
+export interface AppState {
+  alert: any;
+  auth: any;
+  counter: any;
+  notifications: any;
+  users: any;
+  posts: any;
+  api: any;
+}
+
+export const store = configureStore<AppState>({
+  reducer: combineReducers({
     alert: alertReducer,
     auth: authReducer,
     counter: counterReducer,
     notifications: notificationsReducer,
     users: usersReducer,
     posts: postsReducer,
-    [apiSlice.reducerPath]: apiSlice.reducer
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware)
+    api: apiSlice.reducer
+  }),
+  middleware: (getDefaultMiddleware): any => getDefaultMiddleware().concat(apiSlice.middleware),
 });

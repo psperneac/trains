@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractListComponent } from '../../../helpers/abstract-list.component';
-import { PlayerSelectors, PlayersState } from '../store';
+import { PlayerActions, PlayerSelectors, PlayersState } from '../store';
 import { PlayerDto } from '../../../models/player';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -30,6 +30,23 @@ export class PlayersListComponent extends AbstractListComponent<PlayersState, Pl
   public filterColumns = [];
 
   constructor(readonly store: Store<AppState>, private readonly router: Router) {
-    super(PlayerActions, PlayersState);
+    super(PlayerActions, PlayerSelectors, store);
+  }
+
+  ngOnInit(): void {
+    this.store.dispatch(PlayerActions.getAll({request: {
+        unpaged: true,
+        sortColumn: this.sortColumn,
+        sortDescending: this.sortDirection === 'desc',
+        filter: ''
+      }}));
+  }
+
+  getPaginator(): MatPaginator {
+    return this.paginator;
+  }
+
+  addPlayer() {
+    this.router.navigateByUrl('/players/create');
   }
 }

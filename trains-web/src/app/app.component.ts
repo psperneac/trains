@@ -6,7 +6,7 @@ import { selectLoggedIn, logout } from './features/auth/store';
 import { Route, Router } from '@angular/router';
 import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 import { Keepalive } from '@ng-idle/keepalive';
-import { DEFAULT_IDLE, DEFAULT_KEEPALIVE, DEFAULT_TIMEOUT } from './utils/constants';
+import { DEFAULT_IDLE, DEFAULT_KEEPALIVE, DEFAULT_TIMEOUT, HOME, PLACES, PLACE_CONNECTIONS, PLACE_TYPES, PLAYERS, VEHICLES, VEHICLE_TYPES } from './utils/constants';
 import { UiService } from './services/ui.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -95,24 +95,27 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
   async menuClicked(tag: string) {
     switch (tag) {
       case 'home':
-        await this.router.navigate(['/home']);
+        await this.router.navigate([HOME]);
         break;
       case 'places':
-        await this.router.navigate(['/places']);
+        await this.router.navigate([PLACES]);
         break;
       case 'placeConnections':
-        await this.router.navigate(['/place-connections']);
+        await this.router.navigate([PLACE_CONNECTIONS]);
         break;
       case 'placeTypes':
-        await this.router.navigate(['/place-types']);
+        await this.router.navigate([PLACE_TYPES]);
         break;
       case 'vehicleTypes':
-        await this.router.navigate(['/vehicle-types']);
+        await this.router.navigate([VEHICLE_TYPES]);
         break;
       case 'vehicles':
-        await this.router.navigate(['/vehicles']);
+        await this.router.navigate([VEHICLES]);
         break;
-      }
+      case 'players':
+        await this.router.navigate([PLAYERS]);
+        break;
+    }
   }
 
   ngOnInit(): void {

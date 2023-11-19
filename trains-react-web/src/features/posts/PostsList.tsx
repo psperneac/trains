@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from 'react-redux'
 import { TimeAgo } from '../../helpers/TimeAgo';
 import {ReactionButtons} from "./ReactionButtons";
 import {PostAuthor} from "./PostsAuthor";
-import {Spinner} from "react-bootstrap";
 import {AddPostForm} from "./AddPostForm";
 
 import {
@@ -13,6 +12,7 @@ import {
   selectPostIds,
   selectPostById
 } from '../../store/posts.slice';
+import CircularProgress from '@mui/material/CircularProgress';
 
 let PostExcerpt = ({ postId }) => {
   const post = useSelector(state => selectPostById(state, postId))
@@ -33,7 +33,7 @@ let PostExcerpt = ({ postId }) => {
   )
 }
 
-PostExcerpt = React.memo(PostExcerpt)
+const PostExcerptMemo = React.memo(PostExcerpt);
 
 export const PostsList = () => {
 
@@ -46,18 +46,18 @@ export const PostsList = () => {
   useEffect(() => {
     if (postStatus === 'idle') {
       console.log('Loading posts')
-      dispatch(fetchPosts())
+      dispatch(fetchPosts() as any)
     }
   }, [postStatus, dispatch])
 
   let content
 
   if (postStatus === 'loading') {
-    content = <Spinner text="Loading..." />
+    content = <CircularProgress />
   } else if (postStatus === 'succeeded') {
     // Sort posts in reverse chronological order by datetime string
     content = orderedPostIds.map(postId => (
-      <PostExcerpt key={postId} postId={postId} />
+      <PostExcerptMemo key={postId} postId={postId} />
     ))
   } else if (postStatus === 'error') {
     content = <div>{error}</div>

@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import {HEADER_AUTH} from '../constants';
+import { AppState } from './index';
 
 const TAG = {
   PLACE_TYPE: 'PlaceType',
@@ -13,7 +14,7 @@ const PLACE_TYPE_QUERIES = (build) => ({
       //   const state = api.getState();
 
       // },
-      providesTags: (results = [], _error, _arg) => {
+      providesTags: (results = { data: [] }, _error, _arg) => {
         console.log(results, _error, _arg);
 
         return [
@@ -47,7 +48,7 @@ const PLACE_TYPE_QUERIES = (build) => ({
 const VEHICLE_TYPE_QUERIES = (build) => ({
   getVehicleTypes: build.query({
     query: () => 'vehicle-types',
-    providesTags: (results = [], _error, _arg) => {
+    providesTags: (results = { data: [] }, _error, _arg) => {
       console.log(results, _error, _arg);
 
       return [...results.data.map(({id}) => ({ type: TAG.VEHICLE_TYPE, id}))];
@@ -79,7 +80,7 @@ const VEHICLE_TYPE_QUERIES = (build) => ({
 export const DataApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: `${process.env.REACT_APP_API_URL}`, prepareHeaders: (headers, {getState}) => {
-      const state = getState();
+      const state = getState() as AppState;
       console.log('BaseQuery - SetHeaders', state, state?.auth?.value?.authorization);
       headers.set(HEADER_AUTH, state?.auth?.value?.authorization);
     }
@@ -96,7 +97,7 @@ export const {
   // place type
   useGetPlaceTypesQuery,
   useGetPlaceTypeQuery,
-  useAddPlaceTypesMutation,
+  useAddPlaceTypeMutation,
   useUpdatePlaceTypeMutation,
 
   // vehicle type

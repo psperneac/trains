@@ -19,6 +19,7 @@
     "places": "Places",
     "placeConnections": "Place Connections",
     "placeTypes": "Place Types",
+    "players": "Players",
     "register": "Register",
     "routes": "Routes",
     "users": "Users",
@@ -106,6 +107,15 @@
         "load": "Load per auxiliary",
         "fuel": "Fuel per auxiliary"
       }
+    },
+    "player": {
+      "listTitle": "Players",
+      "createTitle": "Create Player",
+      "editTitle": "Edit Player",
+      "name": "Name",
+      "defaultName": "Default Name",
+      "description": "Description",
+      "content": "Content"
     }
   }
 }

@@ -1,16 +1,13 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
-import Button from 'react-bootstrap/Button';
 
 import { authActions } from '../../store';
+import Button from '@mui/material/Button';
 
-export { Login };
-
-function Login() {
+export const Login = () => {
   const dispatch = useDispatch();
 
   // form validation rules 
@@ -44,11 +41,11 @@ function Login() {
             <input name="password" type="password" {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
             <div className="invalid-feedback">{errors.password?.message}</div>
           </div>
-          <Button type="submit" disabled={isSubmitting} variant="primary">
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
             Login
           </Button>
-          <Button variant="link" onClick={() => navigate('../register')}>Register</Button>
+          <Button onClick={() => navigate('../register')}>Register</Button>
         </form>
       </div>
     </div>

@@ -109,6 +109,8 @@ db.createUser(
 - https://wanago.io/2020/07/13/api-nestjs-testing-services-controllers-integration-tests/ - testing services and
   controllers with integration tests
 - [TypeOrm](https://github.com/typeorm/typeorm)
+- [Helm](https://helm.sh/docs/)
+- [Scoop](https://scoop.sh/#/)
 
 ### [Postgres earth distance module](https://www.postgresql.org/docs/9.2/earthdistance.html)
 
