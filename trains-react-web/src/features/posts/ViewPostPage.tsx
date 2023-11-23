@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom';
+import { AppState } from '../../store';
 import {selectPostById} from "../../store/posts.slice";
 
 export const ViewPostPage = () => {
   const { postId } = useParams();
 
-  const post = useSelector(state => selectPostById(state, postId));
+  const post = useSelector((state: AppState) => selectPostById(state, postId));
 
   if (!post) {
     return (

@@ -40,7 +40,8 @@ export class MapTemplateMapper extends AbstractDtoMapper<MapTemplate, MapTemplat
       name: domain.name,
       description: domain.description,
       places: domain.places?.map(p => p.id),
-      placeConnections: domain.placeConnections?.map(p => p.id)
+      placeConnections: domain.placeConnections?.map(p => p.id),
+      content: domain.content
     };
 
     return dto;

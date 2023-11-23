@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { Place } from '../places/place.entity';
 
@@ -16,12 +16,12 @@ export abstract class Job extends AbstractEntity {
   @Expose()
   description: string;
 
-  @ManyToOne(type => Place, { eager: true })
+  @ManyToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'start' })
   @Expose()
   start: Place;
 
-  @ManyToOne(type => Place, { eager: true })
+  @ManyToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'end' })
   @Expose()
   end: Place;

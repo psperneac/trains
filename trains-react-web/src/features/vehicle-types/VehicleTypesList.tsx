@@ -1,6 +1,6 @@
 import DataTable, { TableColumn } from 'react-data-table-component';
 
-import {useGetVehicleTypesQuery} from '../../store/data.api';
+import {useGetVehicleTypesQuery} from '../../store';
 import { useTranslation } from 'react-i18next';
 import { VehicleType } from '../../data/vehicle-type.model';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { useState } from 'react';
 import Button from '@mui/material/Button';
 
 export const VehicleTypesList = () => {
-  const { data, isFetching, isLoading } = useGetVehicleTypesQuery( );
+  const { data, isFetching, isLoading } = useGetVehicleTypesQuery(); //
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
@@ -38,8 +38,8 @@ export const VehicleTypesList = () => {
     navigate('add');
   }
 
-  function handleSelectedRowcChange({ selectedRows }) {
-    console.log('handleSelectedRowcChange', selectedRows);
+  function handleSelectedRowChange({ selectedRows }) {
+    console.log('handleSelectedRowChange', selectedRows);
     setSelected(selectedRows.map(row => row.id));
   }
 
@@ -73,7 +73,7 @@ export const VehicleTypesList = () => {
         columns={columns}
         data={data.data}
         selectableRows
-        onSelectedRowsChange={handleSelectedRowcChange}
+        onSelectedRowsChange={handleSelectedRowChange}
       />
       <div className='buttons-container'>
         <Button className='delete-button' 

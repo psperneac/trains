@@ -8,6 +8,7 @@ import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature'
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
 import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
 import { PLAYERS_FEATURE } from './features/players/players.feature';
+import { MAP_TEMPLATES_FEATURE } from './features/map-templates/map-template.feature';
 
 // - auth guard should go here as they will be evaluated before the guards in the modules
 //   which load data and implement app logic
@@ -62,6 +63,12 @@ const ROUTES: Routes = [
   {
     path: 'players',
     children: [...(PLAYERS_FEATURE.routes ?? [])],
+    canActivate: [isAdminFn],
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'maps',
+    children: [...(MAP_TEMPLATES_FEATURE.routes ?? [])],
     canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'
   },

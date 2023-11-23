@@ -34,7 +34,7 @@ function createExtraActions() {
   function login() {
     return createAsyncThunk(
       `${name}/login`,
-      async function (payload, { dispatch }) {
+      async function (payload: { username: string, password: string}, { dispatch }) {
         const { username, password } = payload as any;
         dispatch(alertActions.clear());
         try {

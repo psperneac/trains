@@ -1,8 +1,7 @@
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { FeaturePart } from '../../utils/feature-part';
-import { resolvePlaceTypesFn } from '../place-types/services/place-type-data.service';
-import { loadOnePlaceGuardFn, placesResolverFn } from '../places/services/place-data.service';
+import { placesResolverFn } from '../places/services/place-data.service';
 import { PlaceConnectionFormComponent } from './components/place-connection-form/place-connection-form.component';
 import { PlaceConnectionEditPage } from './pages/place-connection-edit.page';
 import { PlaceConnectionsPage } from './pages/place-connections.page';

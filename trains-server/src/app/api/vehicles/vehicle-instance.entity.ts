@@ -8,17 +8,17 @@ import { Vehicle, VehicleDto } from './vehicle.entity';
 
 @Entity({ name: 'vehicle_instances' })
 export class VehicleInstance extends AbstractEntity {
-  @ManyToOne(type => Vehicle, { eager: true })
+  @ManyToOne(_type => Vehicle, { eager: true })
   @JoinColumn({ name: 'vehicle_id' })
   @Expose()
   vehicle: Vehicle;
 
-  @ManyToOne(type => Place, { eager: true })
+  @ManyToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'start_id' })
   @Expose()
   start: Place;
 
-  @ManyToOne(type => Place, { eager: true })
+  @ManyToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'end_id' })
   @Expose()
   end: Place;
@@ -31,12 +31,12 @@ export class VehicleInstance extends AbstractEntity {
   @Expose()
   endTime: Date;
 
-  @ManyToOne(type => Player, { eager: true })
+  @ManyToOne(_type => Player, { eager: true })
   @JoinColumn({ name: 'player_id' })
   @Expose()
   player: Player;
 
-  @OneToMany(type => VehicleInstanceJob, job => job.vehicleInstance)
+  @OneToMany(_type => VehicleInstanceJob, job => job.vehicleInstance)
   @Expose()
   jobs: VehicleInstanceJob[];
 

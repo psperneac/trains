@@ -40,10 +40,32 @@ import { PLACES_FEATURE } from './features/places/places.feature';
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
 import { PLAYERS_FEATURE } from './features/players/players.feature';
+import { MAP_TEMPLATES_FEATURE } from './features/map-templates/map-template.feature';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
 }
+
+/*
+
+map_place_connections
+map_places
+maps
+place_connection_instances
+place_connections
+place_instance_job_offers
+place_instance_jobs
+place_instances
+places
+players
+posts
+translations
+users
+vehicle_instance_jobs
+vehicle_instances
+vehicles
+
+*/
 
 @NgModule({
   declarations: [
@@ -54,6 +76,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...VEHICLES_FEATURE.declarations,
     ...PLACE_CONNECTIONS_FEATURE.declarations,
     ...PLAYERS_FEATURE.declarations,
+    ...MAP_TEMPLATES_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -102,6 +125,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...VEHICLES_FEATURE.imports,
     ...PLACE_CONNECTIONS_FEATURE.imports,
     ...PLAYERS_FEATURE.imports,
+    ...MAP_TEMPLATES_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -114,6 +138,7 @@ export function createTranslationLoader(http: HttpClient) {
     ...VEHICLES_FEATURE.providers,
     ...PLACE_CONNECTIONS_FEATURE.providers,
     ...PLAYERS_FEATURE.providers,
+    ...MAP_TEMPLATES_FEATURE.providers,
   ],
   bootstrap: [AppComponent],
 })

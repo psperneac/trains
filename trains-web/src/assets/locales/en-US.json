@@ -108,6 +108,15 @@
         "fuel": "Fuel per auxiliary"
       }
     },
+    "mapTemplate": {
+      "listTitle": "Map Templates",
+      "createTitle": "Create Map Template",
+      "editTitle": "Edit Map Template",
+      "name": "Name",
+      "defaultName": "Default Name",
+      "description": "Description",
+      "content": "Content"
+    },
     "player": {
       "listTitle": "Players",
       "createTitle": "Create Player",

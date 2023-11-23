@@ -1,19 +1,20 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewPost, postAdded } from '../../store/posts.slice';
-import {selectAllUsers} from "../../store";
+import { AppDispatch, AppState, selectAllUsers } from "../../store";
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
-  const currentUserId = useSelector((state) => state.auth.value.username);
+  const currentUserId = useSelector((state: AppState) => state.auth.value.username);
   const [userId, setUserId] = useState('')
 
   const users = useSelector((state) => selectAllUsers(state));
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const canSave =
     [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
@@ -25,7 +26,7 @@ export const AddPostForm = () => {
     if (canSave) {
       try {
         setAddRequestStatus('pending')
-        await dispatch(addNewPost({ title, content, user: userId })).unwrap()
+        await dispatch(addNewPost({ title, content, user: userId }) as any as AnyAction).unwrap()
         setTitle('')
         setContent('')
         setUserId(currentUserId)

@@ -19,6 +19,10 @@ export class MapTemplate extends AbstractEntity {
 
   @OneToMany(_type => MapPlaceConnection, mapPlaceConnection => mapPlaceConnection.map)
   placeConnections: MapPlaceConnection[];
+
+  @Column({ type: 'json' })
+  @Expose()
+  content: any;
 }
 
 export interface MapTemplateDto {
@@ -27,4 +31,5 @@ export interface MapTemplateDto {
   description: string;
   places?: string[];
   placeConnections?: string[];
+  content: any;
 }

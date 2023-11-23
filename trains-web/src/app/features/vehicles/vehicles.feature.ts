@@ -20,7 +20,6 @@ export const VEHICLES_FEATURE: FeaturePart = {
     VehiclesListComponent,
     VehicleFormComponent,
     VehicleEditPage,
-    VehicleFormComponent,
   ],
   providers: [
     VehicleService,

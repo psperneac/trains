@@ -1,6 +1,6 @@
 import DataTable, { TableColumn } from 'react-data-table-component';
 
-import {useGetPlaceTypesQuery} from '../../store/data.api';
+import { useGetPlaceTypesQuery } from '../../store';
 import { useTranslation } from 'react-i18next';
 import { PlaceType } from '../../data/place-type.model';
 import { useNavigate } from 'react-router-dom';
@@ -13,8 +13,6 @@ export const PlaceTypesList = () => {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
-
-  console.log('GetPlaces data', data, isFetching, isLoading);
 
   if (isFetching) {
     return (<div>

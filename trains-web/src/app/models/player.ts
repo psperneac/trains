@@ -5,7 +5,7 @@ export interface PlayerDto {
   content: any;
   userId?: string;
   mapId?: string;
-  vehicles?: string[];
-  places?: string[];
-  placeConnections?: string[];
+  vehicles?: string[];          // vehicleInstances
+  places?: string[];            // placeInstances
+  placeConnections?: string[];  // placeConnectionInstances
 }

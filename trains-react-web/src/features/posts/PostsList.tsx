@@ -2,9 +2,10 @@ import React, {useEffect} from 'react'
 import { Link } from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux'
 import { TimeAgo } from '../../helpers/TimeAgo';
-import {ReactionButtons} from "./ReactionButtons";
-import {PostAuthor} from "./PostsAuthor";
-import {AddPostForm} from "./AddPostForm";
+import { ReactionButtons } from './ReactionButtons';
+import { PostAuthor } from './PostsAuthor';
+import { AddPostForm } from './AddPostForm';
+import { AppState }  from '../../store';
 
 import {
   selectAllPosts,
@@ -15,7 +16,7 @@ import {
 import CircularProgress from '@mui/material/CircularProgress';
 
 let PostExcerpt = ({ postId }) => {
-  const post = useSelector(state => selectPostById(state, postId))
+  const post = useSelector(state => selectPostById(state as any, postId))
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
@@ -40,8 +41,8 @@ export const PostsList = () => {
   const dispatch = useDispatch()
   const orderedPostIds = useSelector(selectPostIds)
 
-  const postStatus = useSelector(state => state.posts.status)
-  const error = useSelector(state => state.posts.error)
+  const postStatus = useSelector((state: AppState) => state.posts.status)
+  const error = useSelector((state: AppState) => state.posts.error)
 
   useEffect(() => {
     if (postStatus === 'idle') {

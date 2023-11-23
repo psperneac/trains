@@ -15,6 +15,10 @@ export * from './counter.slice';
 export * from './users.slice';
 export * from './notifications.slice';
 
+export * from './data.api';
+export * from './vehicle-types.api';
+export * from './place-types.api';
+
 export interface AppState {
   alert: any;
   auth: any;
@@ -37,3 +41,5 @@ export const store = configureStore<AppState>({
   }),
   middleware: (getDefaultMiddleware): any => getDefaultMiddleware().concat(apiSlice.middleware),
 });
+
+export type AppDispatch = typeof store.dispatch;
