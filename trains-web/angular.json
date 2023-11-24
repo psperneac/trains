@@ -88,10 +88,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "trains-web:build:production"
+              "buildTarget": "trains-web:build:production"
             },
             "development": {
-              "browserTarget": "trains-web:build:development"
+              "buildTarget": "trains-web:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -99,7 +99,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "trains-web:build"
+            "buildTarget": "trains-web:build"
           }
         },
         "test": {
