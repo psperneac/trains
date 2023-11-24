@@ -104,7 +104,7 @@ vehicles
     StoreDevtoolsModule.instrument({
       maxAge: 50,
       logOnly: environment.production,
-    }),
+    connectInZone: true}),
 
     // app modules
     SharedModule,
