@@ -3,7 +3,7 @@ import { UiService } from '../../../services/ui.service';
 
 @Component({
     selector: 'trains-map-templates',
-    template: '<trains-map-templates-list></trains-map-templates-list>',
+    template: '<trains-map-template-list></trains-map-template-list>',
     styleUrls: []
 })
 export class MapTemplatesPage implements OnInit {

@@ -1,5 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { NgxLeafletFullscreenModule } from '@runette/ngx-leaflet-fullscreen';
+import { NgxLoadingControlModule } from '@runette/ngx-leaflet-loading';
+import { NgxLeafletLocateModule } from '@runette/ngx-leaflet-locate';
 
 import { AppComponent } from './app.component';
 
@@ -8,6 +11,10 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
+import { AlertComponent } from './components/alert/alert.component';
+import { ConfirmDialog } from './components/confirm-dialog/confirm.dialog';
+import { CustomMapComponent } from './components/custom-map/custom-map.component';
+import { HomePageComponent } from './features/home/pages/home-page/home-page.component';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
 import { reducers, metaReducers } from './store';
@@ -20,7 +27,6 @@ import {
 } from '@angular/common/http';
 
 import { ReactiveFormsModule } from '@angular/forms';
-import { ComponentsModule } from './components/components.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
@@ -70,6 +76,11 @@ vehicles
 @NgModule({
   declarations: [
     AppComponent,
+    AlertComponent,
+    CustomMapComponent,
+    ConfirmDialog,
+    HomePageComponent,
+
     ...PLACES_FEATURE.declarations,
     ...PLACE_TYPES_FEATURE.declarations,
     ...VEHICLE_TYPES_FEATURE.declarations,
@@ -109,13 +120,16 @@ vehicles
     // app modules
     SharedModule,
 
-    ComponentsModule,
-
     HelpersModule,
     ServicesModule,
     LeafletModule,
     NgIdleKeepaliveModule.forRoot(),
     MomentModule,
+
+    LeafletModule,
+    NgxLoadingControlModule,
+    NgxLeafletLocateModule,
+    NgxLeafletFullscreenModule,
 
     AuthModule,
 

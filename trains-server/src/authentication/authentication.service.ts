@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { UserPreference } from '../app/api/users/user-preference.entity';
+import { UserPreferencesService } from '../app/api/users/user-preference.module';
 import { RegisterDto, TokenPayload } from './authentication.model';
 import { JwtService } from '@nestjs/jwt';
 import { SCOPE_USER } from '../utils/constants';
@@ -10,7 +12,10 @@ import { User } from '../app/api/users/users.entity';
 export class AuthenticationService {
   logger = new Logger(AuthenticationService.name);
 
-  constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userPreferencesService: UserPreferencesService,
+    private readonly jwtService: JwtService) {}
 
   public async register(registrationData: RegisterDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
@@ -18,6 +23,11 @@ export class AuthenticationService {
       ...registrationData,
       password: hashedPassword,
       scope: SCOPE_USER
+    });
+
+    const preferences = await this.userPreferencesService.create({
+      user: createdUser,
+      content: {}
     });
 
     createdUser.password = undefined;

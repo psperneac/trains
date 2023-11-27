@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractSelectors } from './abstract.selectors';
 import { AppState } from '../store';
 import { select, Store } from '@ngrx/store';
@@ -9,7 +9,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { PAGE_SIZE } from '../utils/constants';
 import { AbstractEntityState } from './abstract.reducer';
 import { AbstractEntity } from './abstract.entity';
-import { Sort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { SortDirection } from '@angular/material/sort';
 
 @Component({
@@ -105,7 +105,7 @@ export abstract class AbstractListComponent<S extends AbstractEntityState<T>, T 
     )
   }
 
-  isUnpaged() { 
+  isUnpaged() {
     return !this.getPaginator();
   }
 

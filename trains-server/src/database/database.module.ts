@@ -10,6 +10,7 @@ import { PlaceInstanceJobOffer } from '../app/api/places/place-instance-job-offe
 import { PlaceInstanceJob } from '../app/api/places/place-instance-job.entity';
 import { PlaceInstance } from '../app/api/places/place-instance.entity';
 import { Player } from '../app/api/players/player.entity';
+import { UserPreference } from '../app/api/users/user-preference.entity';
 import { User } from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
 import { Translation } from '../app/api/translations/translation.entity';
@@ -28,12 +29,25 @@ export const TABLES = {
   POSTS: 'posts',
   TRANSLATIONS: 'translations',
   VEHICLE_TYPES: 'vehicle_types',
-  VEHICLES: 'vehicles'
+  VEHICLES: 'vehicles',
+  PLACE_TYPES: 'place_types',
+  PLACE_CONNECTION_INSTANCES: 'place_connection_instances',
+  PLACE_INSTANCES: 'place_instances',
+  PLACE_INSTANCE_JOBS: 'place_instance_jobs',
+  PLACE_INSTANCE_JOB_OFFERS: 'place_instance_job_offers',
+  VEHICLE_INSTANCES: 'vehicle_instances',
+  VEHICLE_INSTANCE_JOBS: 'vehicle_instance_jobs',
+  MAP_TEMPLATES: 'map_templates',
+  MAP_PLACES: 'map_places',
+  MAP_PLACE_CONNECTIONS: 'map_place_connections',
+  PLAYERS: 'players',
+  USER_PREFERENCES: 'user_preferences',
 }
 
 export const ENTITIES = [
   Place,
   User,
+  UserPreference,
   Translation,
   PlaceType,
   VehicleType,

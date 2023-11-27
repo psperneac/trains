@@ -12,6 +12,16 @@
     </mat-form-field>
   </div>
   <div class="input-row">
+    <mat-form-field class="input-map">
+      <mat-label>{{'page.player.map' | translate}}</mat-label>
+      <mat-select formControlName="mapId">
+        <mat-option *ngFor="let map of (maps$ | async)" [value]="map.id">
+          {{map.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
     <mat-form-field class="input-player-content fill-container" appearance="fill">
       <mat-label>{{'page.player.content' | translate}}</mat-label>
       <textarea matInput formControlName="content" rows="10"></textarea>

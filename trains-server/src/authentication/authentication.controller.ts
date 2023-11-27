@@ -68,11 +68,11 @@ export class AuthenticationController {
   // @UseGuards(JwtAuthenticationGuard)
   @Post('logout')
   @HttpCode(200)
-  @UseGuards(LoggedIn)
+  // @UseGuards(LoggedIn) -- logout should be allowed even if not logged in
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     // we have no way to currently un-authenticate tokens already sent out
     // app is stateless / session less, so this doesn't do anything
-    // TODO: find way to un-authenticate tokens
+    // TODO: find way to un-authenticate tokens already sent out and remove them from server
     return response.send(JSON.stringify({ ok: true }));
   }
 }

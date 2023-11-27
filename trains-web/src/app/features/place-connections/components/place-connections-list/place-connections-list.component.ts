@@ -68,7 +68,7 @@ export class PlaceConnectionsListComponent extends AbstractListComponent<PlaceCo
   }
 
   getPaginator(): MatPaginator {
-    return null;
+    return undefined;
   }
 
   addPlaceConnection() {

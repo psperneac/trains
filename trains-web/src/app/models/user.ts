@@ -7,3 +7,16 @@ export class User {
   scope: string;
   authorization: string;
 }
+
+export interface UserDto {
+  id: string;
+  username: string;
+  email: string;
+  scope: string;
+}
+
+export interface UserPreferenceDto {
+  id: string;
+  userId: string;
+  content: any;
+}

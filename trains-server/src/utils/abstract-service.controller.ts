@@ -12,7 +12,7 @@ import { Admin, LoggedIn } from '../authentication/authentication.guard';
  * R - entity dto type
  */
 export class AbstractServiceController<T extends AbstractEntity, R> {
-  constructor(private readonly service: AbstractService<T>, private readonly mapper: AbstractDtoMapper<T, R>) {}
+  constructor(readonly service: AbstractService<T>, readonly mapper: AbstractDtoMapper<T, R>) {}
 
   @Get(':id')
   @UseGuards(LoggedIn)
@@ -140,6 +140,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
       if (e instanceof HttpException) {
         throw e;
       } else {
+        console.error(e);
         throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     });

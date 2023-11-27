@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, withLatestFrom, filter, map, tap } from 'rxjs';
 import { MapTemplateDto } from '../../../models/map-template.model';
+import { AppState } from '../../../store';
 import { MapTemplateActions, MapTemplateSelectors } from '../store';
 import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn } from '@angular/router';
 
@@ -12,14 +13,18 @@ export class MapTemplateDataService {
   resolveMapTemplates(): Observable<MapTemplateDto[]> {
     return this.store.pipe(
       select(MapTemplateSelectors.All),
-      withLatestFrom(this.store.pipe(select(MapTemplateSelectors.Loading))),
-      tap(([data, loading]) => {
-        if ((!data || data.length === 0) && !loading) {
+      withLatestFrom(
+        this.store.pipe(select(MapTemplateSelectors.Loading)),
+        this.store.pipe(select(MapTemplateSelectors.Loaded)),
+      ),
+      tap(([data, loading, loaded]) => {
+        console.log('Maps: ', data, loading, loaded);
+        if ((!data && !loading) || (!loading && !loaded)) {
           this.store.dispatch(MapTemplateActions.getAll({ request: { unpaged: true } }));
         }
       }),
-      map(([data, _loading]) => data),
-      filter(data => !!data && data.length > 0),
+      map(([data, _loading, _loaded]) => data),
+      filter(data => !!data),
     );
   }
 
@@ -39,7 +44,7 @@ export class MapTemplateDataService {
   }
 }
 
-export const mapTemplatesResolversFn: ResolveFn<MapTemplateDto[]> =
+export const mapTemplatesResolveFn: ResolveFn<MapTemplateDto[]> =
   (_route, _state) =>
     inject(MapTemplateDataService).resolveMapTemplates();
 
@@ -48,5 +53,5 @@ export const createMapTemplateGuardFn: CanActivateFn =
     inject(MapTemplateDataService).createMapTemplate(route);
 
 export const loadOneMapTemplateGuardFn: CanActivateFn =
-  (route, _state) =>
+  (route, state) =>
     inject(MapTemplateDataService).loadOneMapTemplate(route);

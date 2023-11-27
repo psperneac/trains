@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
-import { isAdminFn } from './features/auth/services/auth-data.service';
+import { isAdminFn, isLoggedInFn } from './features/auth/services/auth-data.service';
+import { HomePageComponent } from './features/home/pages/home-page/home-page.component';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import {PLACES_FEATURE} from "./features/places/places.feature";
 import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature';
@@ -16,20 +17,11 @@ import { MAP_TEMPLATES_FEATURE } from './features/map-templates/map-template.fea
 
 const ROUTES: Routes = [
   {
-    path: 'pages',
-    loadChildren: () => import('./components/components.module').then(m => m.ComponentsModule),
-    runGuardsAndResolvers: 'always'
-  },
-  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
     runGuardsAndResolvers: 'always'
   },
-  {
-    path: 'home',
-    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
-    runGuardsAndResolvers: 'always'
-  },
+  { path: 'home', component: HomePageComponent, canActivate: [isLoggedInFn], canDeactivate: [] },
   {
     path: 'places',
     children: [...(PLACES_FEATURE.routes ?? [])],
@@ -67,7 +59,7 @@ const ROUTES: Routes = [
     runGuardsAndResolvers: 'always'
   },
   {
-    path: 'maps',
+    path: 'map-templates',
     children: [...(MAP_TEMPLATES_FEATURE.routes ?? [])],
     canActivate: [isAdminFn],
     runGuardsAndResolvers: 'always'

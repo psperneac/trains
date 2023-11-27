@@ -38,5 +38,6 @@
   <include file="240_place_instance_jobs.xml" relativeToChangelogFile="true" />
   <include file="250_place_instance_job_offers.xml" relativeToChangelogFile="true" />
   <include file="260_place_connection_instances.xml" relativeToChangelogFile="true" />
+  <include file="270_user_preferences.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

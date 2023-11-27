@@ -16,12 +16,12 @@ export class PlaceConnectionDataService {
       select(PlaceConnectionSelectors.All),
       withLatestFrom(this.store.pipe(select(PlaceConnectionSelectors.Loading))),
       tap(([data, loading]) => {
-        if ((!data || data.length === 0) && !loading) {
+        if (!data && !loading) {
           this.store.dispatch(PlaceConnectionActions.getAll({ request: { unpaged: true } }));
         }
       }),
       map(([data, _loading]) => data),
-      filter(data => !!data && data.length > 0),
+      filter(data => !!data),
     );
   }
 

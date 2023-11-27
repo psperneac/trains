@@ -1,15 +1,29 @@
 import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
+import { MatSelectChange } from '@angular/material/select';
 import { TranslateService } from '@ngx-translate/core';
+import { PlayerSelectors } from './features/players/store';
 import { AppState } from './store';
 import { select, Store } from '@ngrx/store';
 import { selectLoggedIn, logout } from './features/auth/store';
 import { Route, Router } from '@angular/router';
 import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 import { Keepalive } from '@ng-idle/keepalive';
-import { DEFAULT_IDLE, DEFAULT_KEEPALIVE, DEFAULT_TIMEOUT, HOME, PLACES, PLACE_CONNECTIONS, PLACE_TYPES, PLAYERS, VEHICLES, VEHICLE_TYPES } from './utils/constants';
+import {
+  DEFAULT_IDLE,
+  DEFAULT_KEEPALIVE,
+  DEFAULT_TIMEOUT,
+  HOME,
+  PLACES,
+  PLACE_CONNECTIONS,
+  PLACE_TYPES,
+  PLAYERS,
+  VEHICLES,
+  VEHICLE_TYPES,
+  MAP_TEMPLATES
+} from './utils/constants';
 import { UiService } from './services/ui.service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
 import { AuthFacade } from './features/auth/store/auth.facade';
 
 @Component({
@@ -32,6 +46,13 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
   loggedIn$ = this.store.pipe(select(selectLoggedIn));
 
   isAdmin$ = this.authFacade.isAdmin$;
+  isUser$ = this.authFacade.isUserOrAdmin$;
+
+  players$ = this.store.pipe(select(PlayerSelectors.All));
+
+  hasPlayers$ = combineLatest([this.players$, this.loggedIn$])
+    .pipe(
+      map(([players, loggedIn]) => players && players.length > 0 && loggedIn));
 
   constructor(
     private readonly translate: TranslateService,
@@ -115,6 +136,9 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
       case 'players':
         await this.router.navigate([PLAYERS]);
         break;
+      case 'map-templates':
+        await this.router.navigate([MAP_TEMPLATES]);
+        break;
     }
   }
 
@@ -148,5 +172,9 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
         this.printpath(currentPath, route.children);
       }
     }
+  }
+
+  playerSelected($event: MatSelectChange) {
+    console.log('Player selected: ', $event);
   }
 }

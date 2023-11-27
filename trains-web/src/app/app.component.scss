@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@import "styles";
+
 .toolbar-spacer {
   flex: 1 1 auto;
 }
@@ -14,6 +17,7 @@
 
 .box .row.header {
   flex: 0 1 auto;
+  height: 4rem;
 }
 
 .box .row.content {
@@ -22,4 +26,12 @@
 
 .box .row.footer {
   flex: 0 1 40px;
+}
+
+.player-select-field {
+  margin-top: 1.8rem;
+
+  .player-select {
+    width: 15rem;
+  }
 }

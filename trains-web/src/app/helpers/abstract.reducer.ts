@@ -13,8 +13,8 @@ export interface AbstractEntityState<T extends AbstractEntity> extends EntitySta
   sortDescending: boolean;
   selected: T;
 
-  loading: boolean;
-  loaded: boolean;
+  loading: boolean;   // a load is in progress
+  loaded: boolean;    // a load has been completed
 
   selectedLoading: boolean,
   selectedLoaded: boolean,
@@ -105,6 +105,22 @@ export function defaultCreateReducer<T extends AbstractEntity>(
         ...state,
         selected: action.payload
       }
+    }),
+    on(actions.createSuccess, (state, action) => {
+      console.log('createSuccess', action.result);
+      return {
+        ...adapter.addOne(action.result, state),
+        limit: state.limit + 1,
+      };
+    }),
+    on(actions.updateSuccess, (state, action) => {
+      return adapter.updateOne({ id: action.result.id, changes: action.result }, state);
+    }),
+    on(actions.deleteSuccess, (state, action) => {
+      return {
+        ...adapter.removeOne(action.result, state),
+        limit: state.limit - 1,
+      };
     }),
     on(actions.createFailure, actions.updateFailure, actions.deleteFailure, (state, action) => ({
       ...state,

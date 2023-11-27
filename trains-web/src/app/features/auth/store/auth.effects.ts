@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { MapTemplateActions } from '../../map-templates/store';
 import { PlaceTypeActions } from '../../place-types/store/place-type.actions';
+import { PlayerActions } from '../../players/store';
 import { VehicleTypeActions } from '../../vehicle-types/store/vehicle-type.actions';
 import { AuthService } from '../services/auth.service';
 import {
@@ -51,7 +53,9 @@ export class AuthEffects {
         }
         return [
           PlaceTypeActions.getAll({request: { unpaged: true }}),
-          VehicleTypeActions.getAll({request: { unpaged: true }})
+          VehicleTypeActions.getAll({request: { unpaged: true }}),
+          MapTemplateActions.getAll({request: { unpaged: true }}),
+          PlayerActions.getAll({request: { unpaged: true }}),
         ];
       })
     )

@@ -27,3 +27,6 @@ export const VEHICLES_CREATE = 'vehicles/create';
 
 export const PLAYERS = '/players';
 export const PLAYERS_CREATE = '/players/create';
+
+export const MAP_TEMPLATES = '/map-templates';
+export const MAP_TEMPLATES_CREATE = '/map-templates/create';

@@ -1,0 +1,20 @@
+<form [formGroup]="form">
+  <div class="input-row">
+    <mat-form-field class="name fill-container" appearance="fill">
+      <mat-label>{{'page.mapTemplate.name' | translate}}</mat-label>
+      <input matInput formControlName="name" width="40" />
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="description fill-container" appearance="fill">
+      <mat-label>{{'page.mapTemplate.description' | translate}}</mat-label>
+      <textarea matInput formControlName="description" rows="5"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="input-row">
+    <mat-form-field class="content fill-container" appearance="fill">
+      <mat-label>{{'page.mapTemplate.content' | translate}}</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
+    </mat-form-field>
+  </div>
+</form>

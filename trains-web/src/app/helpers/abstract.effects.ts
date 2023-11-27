@@ -66,7 +66,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
       ofType(this.actions.update),
       switchMap(action =>
         this.service.update(action.payload.id, action.payload).pipe(
-          map(result => this.actions.createSuccess({result})),
+          map(result => this.actions.updateSuccess({result})),
           catchError(error => of(this.actions.updateFailure({error})))
         )
       )
@@ -78,7 +78,8 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
       ofType(this.actions.delete),
       switchMap(action =>
         this.service.delete(action.uuid).pipe(
-          map(result => this.actions.deleteSuccess({result}))
+          map(result => this.actions.deleteSuccess({result: action.uuid})),
+          catchError(error => of(this.actions.deleteFailure({error})))
         )
       )
     )

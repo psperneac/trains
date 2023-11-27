@@ -8,6 +8,7 @@ import { MapTemplateService } from '../services/map-template.service';
 import { MapTemplateActions } from './map-template.actions';
 import { Injectable } from '@angular/core';
 import { MapTemplateState } from './map-template.reducer';
+import { MapTemplateSelectors } from './map-template.selectors';
 
 @Injectable()
 export class MapTemplateEffects extends AbstractEffects<MapTemplateState, MapTemplateDto> {

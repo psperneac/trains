@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, withLatestFrom, tap, map, filter } from 'rxjs';
 import { PlayerDto } from '../../../models/player';
+import { selectUser } from '../../auth/store';
 import { PlayerSelectors, PlayerActions } from '../store';
 import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn } from '@angular/router';
 
@@ -14,23 +15,34 @@ export class PlayerDataService {
       select(PlayerSelectors.All),
       withLatestFrom(this.store.pipe(select(PlayerSelectors.Loading))),
       tap(([data, loading]) => {
-        if ((!data || data.length === 0) && !loading) {
+        if (!data && !loading) {
           this.store.dispatch(PlayerActions.getAll({ request: { unpaged: true } }));
         }
       }),
       map(([data, _loading]) => data),
-      filter(data => !!data && data.length > 0),
+      filter(data => !!data),
     );
   }
 
-  createPlayer(): boolean {
-    this.store.dispatch(PlayerActions.selectOne({ payload: {
-        name: '',
-        description: '',
-        content: {},
-      }}));
+  createPlayer(): Observable<boolean> {
+    return this.store.pipe(select(selectUser),
+      map(user => {
+        if (!user) {
+          return false;
+        }
 
-    return true;
+        this.store.dispatch(PlayerActions.selectOne({
+          payload: {
+            userId: user.id,
+            mapId: 'f7423c20-4cdc-4099-9081-ec1d67181ada',
+            name: '',
+            description: '',
+            content: {},
+          }
+        }));
+
+        return true;
+      }));
   }
 
   loadOnePlayer(route: ActivatedRouteSnapshot): boolean {

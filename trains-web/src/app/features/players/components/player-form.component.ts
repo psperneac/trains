@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { select, Store } from '@ngrx/store';
 import { PlayerDto } from '../../../models/player';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { MapTemplateSelectors } from '../../map-templates/store';
 
 @Component({
   selector: 'trains-player-form',
@@ -19,7 +21,12 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
 
   playerForm: UntypedFormGroup;
 
-  constructor(private readonly formBuilder: UntypedFormBuilder) {}
+  maps$ = this.store.pipe(select(MapTemplateSelectors.All));
+
+  constructor(
+    private readonly store: Store<{}>,
+    private readonly formBuilder: UntypedFormBuilder
+  ) {}
 
   ngOnInit() {
     this.playerForm = this.toForm(this.player);
@@ -48,6 +55,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       id: player.id,
       name: [player.name, [Validators.required]],
       description: [player.description, [Validators.required]],
+      mapId: [player.mapId, [Validators.required]],
       content: new UntypedFormControl(JSON.stringify(player.content || {})),
     })
   }

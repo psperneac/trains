@@ -11,6 +11,7 @@ import { PlaceInstancesModule } from './places/place-instance.module';
 import { PlayersModule } from './players/player.module';
 import { PostsModule } from './posts/posts.module';
 import { PlaceModule } from './places/place.module';
+import { UserPreferenceModule } from './users/user-preference.module';
 import { UsersModule } from './users/users.module';
 import { Module } from '@nestjs/common';
 import { TranslationsModule } from './translations/translations.module';
@@ -40,6 +41,7 @@ import { VehicleModule } from './vehicles/vehicle.module';
     PlayersModule,
     VehicleInstancesModule,
     VehicleInstanceJobsModule,
+    UserPreferenceModule,
   ],
 })
 export class ApiModule {

@@ -1,5 +1,5 @@
 export interface User {
-  is: string;
+  id: string;
   created: Date;
   modified: Date;
   username: string;
