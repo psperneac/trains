@@ -1,6 +1,8 @@
 @import 'styles';
 
 :host {
+  display: flex;
+
   .container-bottom {
     display: flex;
     flex-wrap: wrap;
@@ -20,11 +22,51 @@
     flex: 0 1 28rem;
   }
 
+  .container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .container-table {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .column-name {
     @include ik_table_size(20rem);
   }
 
+  .header-name {
+    @include ik_table_size(20rem);
+    justify-content: left;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .column-description {
     @include ik_table_size_fill(30rem);
+  }
+
+  .header-description {
+    @include ik_table_size_fill(30rem);
+    justify-content: left;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .column-actions {
+    @include ik_table_size(10rem);
+    justify-content: right;
+    padding-right: 1rem;
+    min-width: 4rem;
+  }
+
+  .header-actions {
+    @include ik_table_size(10rem);
+    justify-content: right;
+    padding-left: 0;
+    padding-right: 1rem;
+    min-width: 4rem;
   }
 }

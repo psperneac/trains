@@ -134,7 +134,7 @@ body { margin: 0; height: 100%; }
 @mixin ik_table_size($width) {
   word-wrap: break-word !important;
   white-space: unset !important;
-  flex: 0 0 $width !important;
+  flex: 0 1 $width !important;
   width: $width !important;
   overflow-wrap: break-word;
   word-wrap: break-word;

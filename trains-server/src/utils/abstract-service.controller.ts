@@ -37,6 +37,8 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
           throw new HttpException('Entity cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -46,11 +48,22 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
-    return this.service.findAll(pagination).then(async page => {
-      return Promise.all(page?.data?.map(item => this.mapper.toDto(item))).then(mappedData => ({
-        ...page,
-        data: mappedData
-      }));
+    return this.service
+      .findAll(pagination)
+      .then(async page => {
+        return Promise.all(page?.data?.map(item => this.mapper.toDto(item))).then(mappedData => ({
+          ...page,
+          data: mappedData
+        }))
+      .catch(e => {
+        if (e instanceof HttpException) {
+          throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+          throw new HttpException('Entities cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      });
     });
   }
 
@@ -64,6 +77,8 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
           throw new HttpException('Entity cannot be created', HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -92,8 +107,10 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
-          throw new HttpException('Entity cannot be created', HttpStatus.INTERNAL_SERVER_ERROR);
+          throw new HttpException('Entity cannot be updated', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
   }
@@ -127,6 +144,8 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
           throw new HttpException('Entity cannot be updated', HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -139,8 +158,9 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
     return this.service.delete(id).catch(e => {
       if (e instanceof HttpException) {
         throw e;
+      } else if (e instanceof Error) {
+        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        console.error(e);
         throw new HttpException('Entity cannot be deleted', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     });

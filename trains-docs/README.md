@@ -3,6 +3,11 @@
 - [TrainsServer - backend](#TrainsServer)
 - [NEST](#Nest)
 
+# Log
+
+- ! figure out a way how to navigate away from an edit after Save is clicked and is successful and print error on screen
+  if not successful
+
 # TrainsWeb
 
 ```bash
