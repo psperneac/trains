@@ -2,11 +2,13 @@
 - [TrainsWeb - ui](#TrainsWeb)
 - [TrainsServer - backend](#TrainsServer)
 - [NEST](#Nest)
+- [Resources](#Resources)
+- [Misc](Misc.md)
+- [Development Guidelines](Development.md)
 
 # Log
 
-- ! figure out a way how to navigate away from an edit after Save is clicked and is successful and print error on screen
-  if not successful
+- ! figure out a way how to navigate away from an edit after Save is clicked and is successful and print error on screen if not successful
 
 # TrainsWeb
 
@@ -104,9 +106,7 @@ db.createUser(
 )
 ```
 
-# Misc
-
-## Resources
+# Resources
 
 - [Nest tutorial](https://wanago.io/courses/api-with-nestjs/)
 - [Nest tutorial code](https://github.com/mwanago/nestjs-typescript)
@@ -114,32 +114,8 @@ db.createUser(
 - https://wanago.io/2020/07/13/api-nestjs-testing-services-controllers-integration-tests/ - testing services and
   controllers with integration tests
 - [TypeOrm](https://github.com/typeorm/typeorm)
-- [Helm](https://helm.sh/docs/)
-- [Scoop](https://scoop.sh/#/)
+- [Helm](https://helm.sh/docs/) - for deployments
+    - [Helm how to delete deployment](https://phoenixnap.com/kb/helm-delete-deployment-namespace)
+- [Scoop](https://scoop.sh/#/) - command line installer for windows - a-la Brew - `scoop install nodejs`
 
-### [Postgres earth distance module](https://www.postgresql.org/docs/9.2/earthdistance.html)
 
-```sql
--- toronto
-select ll_to_earth(43.651070, -79.347015);
--- montreal east
-select ll_to_earth(45.630001, -73.519997);
-
--- toronto to montreal east
-select earth_distance(ll_to_earth(43.651070, -79.347015), ll_to_earth(45.630001, -73.519997));
--- 511251.4492717375 (metres)
-
--- toronto to timisoara
-select earth_distance(ll_to_earth(43.651070, -79.347015), ll_to_earth(45.75372, 21.22571));
---- 7381294.681172046 (metres)
-```
-
-- [Class-validator - validating annotations](https://github.com/typestack/class-validator)
-- [Nest Readme.md](Docs/Nest.md)
-- [NX Readme.md](Docs/NX.md)
-
-## Unit tests
-
-- Unit test the highest component that can be tested and would provide coverage for underlying components. Eg for
-  controllers,
-  make a test at controller level that tests the controller and the service and mocks the repoistory
