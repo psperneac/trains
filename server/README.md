@@ -1,1 +1,1 @@
-- [Docs](../trains-docs/README.md)
+- [Docs](../docs/README.md)
