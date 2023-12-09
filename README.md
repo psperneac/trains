@@ -2,6 +2,8 @@
 
 Transportation game where players send jobs by vehicles from one place to another to earn cash
 
+- [Docs](./trains-docs/README.md)
+
 ## short-term-plan
 
 ## .plan
