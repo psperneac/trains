@@ -6,7 +6,7 @@ import { Store, select } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { UiService } from "../../../services/ui.service";
 import { VehicleTypeSelectors } from "../store/vehicle-type.selectors";
-import { cloneDeep, isNil } from "lodash";
+import { cloneDeep, isNil } from "lodash-es";
 import { VEHICLE_TYPES } from "../../../utils/constants";
 import { VehicleTypeActions } from "../store/vehicle-type.actions";
 import { VehicleTypeFormComponent } from "../components/vehicle-type-form/vehicle-type-form.component";

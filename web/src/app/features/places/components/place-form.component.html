@@ -6,7 +6,6 @@
     </mat-form-field>
     <mat-form-field class="input-place-type">
       <mat-label>{{'page.place.type' | translate}}</mat-label>
-      <!-- <input matInput formControlName="type" width="20"> -->
       <mat-select formControlName="type">
         <mat-option *ngFor="let placeType of (placeTypes$ | async)" [value]="placeType.type">
           {{placeType.name}}

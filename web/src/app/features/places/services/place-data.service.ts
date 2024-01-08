@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { keyBy } from 'lodash';
+import { keyBy } from 'lodash-es';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { PlaceDto } from '../../../models/place.model';
@@ -25,6 +25,17 @@ export class PlaceDataService {
       switchMap(() => this.places$));
   }
 
+  createPlace(_route: ActivatedRouteSnapshot) {
+    this.store.dispatch(PlaceActions.selectOne({ payload: {
+        name: '',
+        description: '',
+        type: '',
+        lat: 0,
+        lng: 0,
+      }}));
+    return true;
+  }
+
   loadOneGuard(route: ActivatedRouteSnapshot) {
     const id = route.paramMap.get('id');
     this.store.dispatch(PlaceActions.getOne({ uuid: id }));
@@ -42,6 +53,10 @@ export class PlaceDataService {
 export const placesResolverFn: ResolveFn<PlaceDto[]> =
   (_route, _state) =>
     inject(PlaceDataService).resolvePlaces();
+
+export const createPlaceGuardFn: CanActivateFn =
+  (route, _state) =>
+    inject(PlaceDataService).createPlace(route);
 
 export const loadOnePlaceGuardFn: CanActivateFn =
   (route, _state) =>

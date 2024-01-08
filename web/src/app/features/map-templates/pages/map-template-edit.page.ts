@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { cloneDeep, isNil } from 'lodash';
+import { cloneDeep, isNil } from 'lodash-es';
 import { Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { MapTemplateDto } from '../../../models/map-template.model';
@@ -10,6 +10,7 @@ import { AppState } from '../../../store';
 import { MAP_TEMPLATES } from '../../../utils/constants';
 import { MapTemplateFormComponent } from '../components/map-template-form.component';
 import { MapTemplateActions, MapTemplateSelectors } from '../store';
+import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
   selector: 'trains-map-template-create-page',
@@ -40,7 +41,8 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private readonly router: Router,
-    private readonly uiService: UiService
+    private readonly uiService: UiService,
+    readonly actions$: Actions,
   ) {}
 
   ngOnInit(): void {
@@ -62,8 +64,8 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
     this.destroy$.next(true);
   }
 
-  onCancel() {
-    this.router.navigateByUrl(MAP_TEMPLATES);
+  async onCancel() {
+    await this.router.navigateByUrl(MAP_TEMPLATES);
   }
 
   onSave() {
@@ -72,6 +74,18 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
     } else {
       this.store.dispatch(MapTemplateActions.create({payload: this.map}));
     }
+
+    this.actions$.pipe(ofType(
+      MapTemplateActions.createSuccess,
+      MapTemplateActions.createFailure,
+      MapTemplateActions.updateSuccess,
+      MapTemplateActions.updateFailure), take(1)).subscribe((action) => {
+        console.log('MapTemplate - save response', action);
+
+        if(MapTemplateActions.isCreateSuccess(action) || MapTemplateActions.isUpdateSuccess(action)) {
+          this.router.navigateByUrl(MAP_TEMPLATES);
+        }
+      });
   }
 
   mapChanged(map: MapTemplateDto) {

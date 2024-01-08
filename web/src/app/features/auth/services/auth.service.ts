@@ -3,7 +3,7 @@ import {User} from "../store";
 import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment";
-import * as urljoin from 'url-join';
+import urljoin from 'url-join';
 
 @Injectable()
 export class AuthService {

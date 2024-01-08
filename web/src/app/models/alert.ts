@@ -1,4 +1,4 @@
-import {assign} from 'lodash';
+import {assign} from 'lodash-es';
 
 // @ts-ignore
 export class Alert {

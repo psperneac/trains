@@ -4,7 +4,7 @@ import {Observable} from "rxjs";
 import {PageDto} from "../models/page.model";
 import {environment} from "../../environments/environment";
 import {toParams} from "./http.helpers";
-import * as urljoin from 'url-join';
+import urljoin from 'url-join';
 
 export class AbstractService<T> {
   constructor(public httpClient: HttpClient, public path: string) {}

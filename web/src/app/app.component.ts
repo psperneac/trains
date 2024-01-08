@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
   loggedIn$ = this.store.pipe(select(selectLoggedIn));
 
   isAdmin$ = this.authFacade.isAdmin$;
-  isUser$ = this.authFacade.isUserOrAdmin$;
+  isUser$ = this.authFacade.isUser$;
 
   players$ = this.store.pipe(select(PlayerSelectors.All));
 

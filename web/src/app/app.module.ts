@@ -47,6 +47,7 @@ import { PLACE_TYPES_FEATURE } from './features/place-types/place-types.feature'
 import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.feature';
 import { PLAYERS_FEATURE } from './features/players/players.feature';
 import { MAP_TEMPLATES_FEATURE } from './features/map-templates/map-template.feature';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -115,7 +116,8 @@ vehicles
     StoreDevtoolsModule.instrument({
       maxAge: 50,
       logOnly: environment.production,
-    connectInZone: true}),
+      connectInZone: true,
+    }),
 
     // app modules
     SharedModule,
@@ -153,6 +155,11 @@ vehicles
     ...PLACE_CONNECTIONS_FEATURE.providers,
     ...PLAYERS_FEATURE.providers,
     ...MAP_TEMPLATES_FEATURE.providers,
+
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {
+      subscriptSizing: 'dynamic',
+      appearance: 'outline',
+    }},
   ],
   bootstrap: [AppComponent],
 })

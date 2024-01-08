@@ -94,3 +94,13 @@ db.createUser(
     }
 )
 ```
+
+#### Remote machine
+
+- https://www.cherryservers.com/blog/install-mongodb-ubuntu-22-04
+
+Change to this to give admin permissions:
+```
+use admin
+db.createUser({ user: "mongoadmin" , pwd: "mongoadmin", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})
+```

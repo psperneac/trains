@@ -43,7 +43,7 @@ export class PlaceFormComponent implements OnInit, OnDestroy {
 
   public externalPlaceUpdate(place: PlaceDto) {
     this.placeForm.controls['lat'].setValue(place.lat);
-    this.placeForm.controls['long'].setValue(place.lng);
+    this.placeForm.controls['lng'].setValue(place.lng);
   }
 
   toForm(place: PlaceDto): UntypedFormGroup {

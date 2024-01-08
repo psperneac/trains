@@ -1,12 +1,12 @@
 <form [formGroup]="playerForm">
   <div class="input-row">
-    <mat-form-field class="input-player-name fill-container" appearance="fill">
+    <mat-form-field class="input-player-name fill-container">
       <mat-label>{{'page.player.name' | translate}}</mat-label>
       <input matInput formControlName="name" width="40" />
     </mat-form-field>
   </div>
   <div class="input-row">
-    <mat-form-field class="input-player-description fill-container" appearance="fill">
+    <mat-form-field class="input-player-description fill-container">
       <mat-label>{{'page.player.description' | translate}}</mat-label>
       <textarea matInput formControlName="description" rows="5"></textarea>
     </mat-form-field>
@@ -22,7 +22,7 @@
     </mat-form-field>
   </div>
   <div class="input-row">
-    <mat-form-field class="input-player-content fill-container" appearance="fill">
+    <mat-form-field class="input-player-content fill-container">
       <mat-label>{{'page.player.content' | translate}}</mat-label>
       <textarea matInput formControlName="content" rows="10"></textarea>
     </mat-form-field>

@@ -3,6 +3,17 @@
 :host {
   display: flex;
 
+  .container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .container-table {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .container-bottom {
     display: flex;
     flex-wrap: wrap;
@@ -22,16 +33,6 @@
     flex: 0 1 28rem;
   }
 
-  .container {
-    width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .container-table {
-    padding-left: 0;
-    padding-right: 0;
-  }
 
   .column-name {
     @include ik_table_size(20rem);

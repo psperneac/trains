@@ -109,6 +109,11 @@ cd server/scripts/liquibase
 ./liquibase.bat update
 ```
 
+#### External machine
+
+- https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-22-04-quickstart
+- https://blog.devart.com/configure-postgresql-to-allow-remote-connection.html
+
 ## TrainsWeb
 
 UI for the app - Angular

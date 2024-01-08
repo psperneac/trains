@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { keyBy } from 'lodash';
 import { Observable, tap } from 'rxjs';
 import { filter, map, withLatestFrom } from 'rxjs/operators';
 import { PlaceConnectionDto } from '../../../models/place-connection.model';
@@ -14,18 +13,23 @@ export class PlaceConnectionDataService {
   resolvePlaceConnections(): Observable<PlaceConnectionDto[]> {
     return this.store.pipe(
       select(PlaceConnectionSelectors.All),
-      withLatestFrom(this.store.pipe(select(PlaceConnectionSelectors.Loading))),
-      tap(([data, loading]) => {
-        if (!data && !loading) {
+      withLatestFrom(
+        this.store.pipe(select(PlaceConnectionSelectors.Loading)),
+        this.store.pipe(select(PlaceConnectionSelectors.Loaded)),
+      ),
+      tap(([data, loading, loaded]) => {
+        console.log('PlaceConnectionDataService.resolvePlaceConnections', data, loading);
+
+        if ((!data && !loading) || (!loading && !loaded)) {
           this.store.dispatch(PlaceConnectionActions.getAll({ request: { unpaged: true } }));
         }
       }),
-      map(([data, _loading]) => data),
+      map(([data, _loading, _loaded]) => data),
       filter(data => !!data),
     );
   }
 
-  createPlaceConnection(route: ActivatedRouteSnapshot) {
+  createPlaceConnection(_route: ActivatedRouteSnapshot) {
     this.store.dispatch(PlaceConnectionActions.selectOne({ payload: {
         type: '',
         name: '',

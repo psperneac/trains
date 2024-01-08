@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { keys } from 'lodash';
+import { keys } from 'lodash-es';
 
 export const toParams = (obj: any): HttpParams => {
   let params = new HttpParams();

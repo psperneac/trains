@@ -3,8 +3,7 @@ import { UiService } from '../../../services/ui.service';
 
 @Component({
   selector: 'trains-place-connections',
-  templateUrl: './place-connections.page.html',
-  styleUrls: ['./place-connections.page.scss']
+  template: `<trains-place-connections-list></trains-place-connections-list>`,
 })
 export class PlaceConnectionsPage implements OnInit {
   constructor(private readonly uiService: UiService) {}

@@ -9,7 +9,7 @@ import {
   mapTemplatesResolveFn
 } from './services/map-template-data.service';
 import { MapTemplateService } from './services/map-template.service';
-import { reducer as mapTemplatesReducer } from './store/map-template.reducer';
+import { reducer as mapTemplatesReducer } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { MapTemplateEffects } from './store';
 import { MapTemplatesPage } from './pages/map-templates.page';

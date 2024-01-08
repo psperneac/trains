@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as urljoin from 'url-join';
+import urljoin from 'url-join';
 
 import {select, Store} from '@ngrx/store';
 import {selectLoggedIn, selectUser} from '../features/auth/store';
@@ -10,7 +10,7 @@ import {AppState} from '../store';
 import {environment} from '../../environments/environment';
 
 
-  @Injectable()
+@Injectable()
 export class JwtInterceptor implements HttpInterceptor {
   constructor(private readonly store: Store<AppState>) { }
 

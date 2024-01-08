@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { cloneDeep, isNil } from 'lodash';
+import { cloneDeep, isNil } from 'lodash-es';
 import { Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { VehicleDto } from '../../../models/vehicle.model';
@@ -9,8 +9,8 @@ import { UiService } from '../../../services/ui.service';
 import { AppState } from '../../../store';
 import { VEHICLES } from '../../../utils/constants';
 import { VehicleFormComponent } from '../components/vehicle-form/vehicle-form.component';
-import { VehicleActions } from '../store/vehicle.actions';
-import { VehicleSelectors } from '../store/vehicle.selectors';
+import { VehicleActions } from '../store';
+import { VehicleSelectors } from '../store';
 
 @Component({
   selector: 'trains-vehicle-edit-page',

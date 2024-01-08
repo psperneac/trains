@@ -1,0 +1,9 @@
+{
+  "name": "trains",
+  "version": "0.0.0",
+  "scripts": {
+    "web-start": "npm --prefix ./web start",
+    "server-start": "npm --prefix ./server start",
+    "web-react-start": "npm --prefix ./web-react start"
+  }
+}

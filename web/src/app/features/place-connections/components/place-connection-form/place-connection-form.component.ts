@@ -1,23 +1,23 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { PlaceConnectionDto } from '../../../../models/place-connection.model';
 import { PlaceDto } from '../../../../models/place.model';
 import { PlaceDataService } from '../../../places/services/place-data.service';
-import { keys, values } from 'lodash';
+import { keys, values } from 'lodash-es';
+import { Store, select } from '@ngrx/store';
+import { PlaceTypeSelectors } from '../../../place-types/store/place-type.selectors';
 
 @Component({
   selector: 'trains-place-connection-form',
   templateUrl: './place-connection-form.component.html',
-  styleUrls: ['./place-connection-form.component.scss']
+  styleUrls: ['./place-connection-form.component.scss'],
 })
 export class PlaceConnectionFormComponent implements OnInit, OnDestroy {
-
   destroy$ = new Subject();
 
-  placesById$: Observable<PlaceDto[]> = this.placesDataService.placesById$().pipe(map(m => values(m)));
+  placesById$: Observable<PlaceDto[]> = this.placesDataService.placesById$().pipe(map((m) => values(m)));
 
   @Input()
   placeConnection: PlaceConnectionDto;
@@ -27,28 +27,29 @@ export class PlaceConnectionFormComponent implements OnInit, OnDestroy {
 
   form: FormGroup;
   private placesMap: { [p: string]: PlaceDto };
+  placeTypes$ = this.store.pipe(select(PlaceTypeSelectors.All));
 
   constructor(
+    private readonly store: Store<{}>,
     private readonly placesDataService: PlaceDataService,
-    private readonly formBuilder: UntypedFormBuilder
+    private readonly formBuilder: UntypedFormBuilder,
   ) {}
 
   ngOnInit(): void {
-    this.placesDataService.placesById$().pipe(takeUntil(this.destroy$))
-      .subscribe(map => this.placesMap = map);
+    this.placesDataService
+      .placesById$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((map) => (this.placesMap = map));
 
     this.form = this.toForm(this.placeConnection);
-    this.form.valueChanges.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(1000)
-    ).subscribe(updatedValues => {
+    this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(1000)).subscribe((updatedValues) => {
       if (updatedValues.content) {
         updatedValues.content = JSON.parse(updatedValues.content);
       } else {
         updatedValues.content = {};
       }
 
-      this.placeConnection = { ...this.placeConnection, ...updatedValues};
+      this.placeConnection = { ...this.placeConnection, ...updatedValues };
       this.valueChange.emit(this.placeConnection);
     });
   }
@@ -78,6 +79,6 @@ export class PlaceConnectionFormComponent implements OnInit, OnDestroy {
       content: new FormControl(JSON.stringify(connection.content || {})),
       startId: new FormControl(connection.startId, [Validators.required]),
       endId: new FormControl(connection.endId, [Validators.required]),
-    })
+    });
   }
 }
