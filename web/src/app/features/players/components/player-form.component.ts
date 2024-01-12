@@ -3,7 +3,7 @@ import { select, Store } from '@ngrx/store';
 import { PlayerDto } from '../../../models/player';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MapTemplateSelectors } from '../../map-templates/store';
+import { MapTemplateSelectors } from '../../map-templates/store/map-template.store';
 
 @Component({
   selector: 'trains-player-form',

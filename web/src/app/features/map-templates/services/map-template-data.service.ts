@@ -2,8 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, withLatestFrom, filter, map, tap } from 'rxjs';
 import { MapTemplateDto } from '../../../models/map-template.model';
-import { AppState } from '../../../store';
-import { MapTemplateActions, MapTemplateSelectors } from '../store';
+import { MapTemplateActions, MapTemplateSelectors } from '../store/map-template.store';
 import { ActivatedRouteSnapshot, CanActivateFn, ResolveFn } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })

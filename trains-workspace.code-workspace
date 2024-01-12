@@ -1,16 +1,16 @@
 {
 	"folders": [
 		{
-			"path": "trains-server"
+			"name": "docs",
+			"path": "docs"
 		},
 		{
-			"path": "trains-web"
+			"name": "web",
+			"path": "web"
 		},
 		{
-			"path": "trains-docs"
-		},
-		{
-			"path": "trains-react-web"
+			"name": "server",
+			"path": "server"
 		}
 	],
 	"settings": {
