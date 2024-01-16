@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { MapTemplateActions } from '../../map-templates/store';
+import { MapTemplateActions } from '../../map-templates/store/map-template.store';
 import { PlaceTypeActions } from '../../place-types/store/place-type.actions';
 import { PlayerActions } from '../../players/store';
 import { VehicleTypeActions } from '../../vehicle-types/store/vehicle-type.actions';

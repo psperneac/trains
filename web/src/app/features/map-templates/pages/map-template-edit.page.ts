@@ -9,8 +9,8 @@ import { UiService } from '../../../services/ui.service';
 import { AppState } from '../../../store';
 import { MAP_TEMPLATES } from '../../../utils/constants';
 import { MapTemplateFormComponent } from '../components/map-template-form.component';
-import { MapTemplateActions, MapTemplateSelectors } from '../store';
 import { Actions, ofType } from '@ngrx/effects';
+import { MapTemplateActions, MapTemplateSelectors } from '../store/map-template.store';
 
 @Component({
   selector: 'trains-map-template-create-page',

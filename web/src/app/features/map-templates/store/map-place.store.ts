@@ -17,7 +17,7 @@ import { of } from 'rxjs';
 
 export class MapPlaceActionsType extends AbstractActions<MapPlaceDto> {
   getAllByMap: ActionCreator<string, (props: ({ request: PageRequestDto, mapId: string } & NotAllowedCheck<{ request: PageRequestDto, mapId: string }>)) => ({ request: PageRequestDto, mapId: string } & TypedAction<string>)>;
-  isGetallByMap: IsActionChecker;
+  isGetAllByMap: IsActionChecker;
   getAllByMapSuccess: ActionCreator<string, (props: { result: PageDto<MapPlaceDto>; mapId: string; }) => { result: PageDto<MapPlaceDto>; mapId: string; } & TypedAction<string>>;
   isGetAllByMapSuccess: IsActionChecker;
   getAllByMapFailure: ActionCreator<string, (props: { error: any; }) => { error: any; } & TypedAction<string>>;
@@ -27,11 +27,11 @@ export class MapPlaceActionsType extends AbstractActions<MapPlaceDto> {
     super('MapPlace');
 
     this.getAllByMap = createAction(`[MapPlace] Get All By Map`, props<{ request: PageRequestDto, mapId: string }>());
-    this.isGetallByMap = (action: TypedAction<string>) => action.type === `[MapPlace] Get All By Map`;
+    this.isGetAllByMap = (action: TypedAction<string>) => action.type === `[MapPlace] Get All By Map`;
 
-    this.getAllByMapSuccess = createAction(`[MapPlace] Get All By Map Success`, props<{ result: PageDto<MapPlaceDto>, mapId: string }>()); 
+    this.getAllByMapSuccess = createAction(`[MapPlace] Get All By Map Success`, props<{ result: PageDto<MapPlaceDto>, mapId: string }>());
     this.isGetAllByMapSuccess = (action: TypedAction<string>) => action.type === `[MapPlace] Get All By Map Success`;
-    this.getAllByMapFailure = createAction(`[MapPlace] Get All By Map Failure`, props<{ error: any }>()); 
+    this.getAllByMapFailure = createAction(`[MapPlace] Get All By Map Failure`, props<{ error: any }>());
     this.isGetAllByMapFailure = (action: TypedAction<string>) => action.type === `[MapPlace] Get All By Map Failure`;
   }
 }
@@ -49,7 +49,7 @@ export class MapPlaceEffects extends AbstractEffects<MapPlaceState, MapPlaceDto>
     super(actions$, service, store, router, MapPlaceActions, MapPlaceSelectors);
   }
 
-  getAllByMap$ = createEffect(() => 
+  getAllByMap$ = createEffect(() =>
     this.actions$.pipe(
       ofType(MapPlaceActions.getAllByMap),
       switchMap(action => {

@@ -8,7 +8,7 @@ import { ConfirmDialog } from '../../../components/confirm-dialog/confirm.dialog
 import { AbstractListComponent } from '../../../helpers/abstract-list.component';
 import { MapTemplateDto } from '../../../models/map-template.model';
 import { AppState } from '../../../store';
-import { MapTemplateActions, MapTemplateSelectors, MapTemplateState } from '../store';
+import { MapTemplateActions, MapTemplateSelectors, MapTemplateState } from '../store/map-template.store';
 
 @Component({
   selector: 'trains-map-template-list',
