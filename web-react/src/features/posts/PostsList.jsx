@@ -5,18 +5,16 @@ import { TimeAgo } from '../../helpers/TimeAgo';
 import { ReactionButtons } from './ReactionButtons';
 import { PostAuthor } from './PostsAuthor';
 import { AddPostForm } from './AddPostForm';
-import { AppState }  from '../../store';
 
 import {
-  selectAllPosts,
   fetchPosts,
   selectPostIds,
   selectPostById
-} from '../../store/posts.slice';
+} from '../../store';
 import CircularProgress from '@mui/material/CircularProgress';
 
 let PostExcerpt = ({ postId }) => {
-  const post = useSelector(state => selectPostById(state as any, postId))
+  const post = useSelector(state => selectPostById(state, postId))
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
@@ -41,13 +39,13 @@ export const PostsList = () => {
   const dispatch = useDispatch()
   const orderedPostIds = useSelector(selectPostIds)
 
-  const postStatus = useSelector((state: AppState) => state.posts.status)
-  const error = useSelector((state: AppState) => state.posts.error)
+  const postStatus = useSelector((state) => state.posts.status)
+  const error = useSelector((state) => state.posts.error)
 
   useEffect(() => {
     if (postStatus === 'idle') {
       console.log('Loading posts')
-      dispatch(fetchPosts() as any)
+      dispatch(fetchPosts())
     }
   }, [postStatus, dispatch])
 

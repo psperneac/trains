@@ -4,11 +4,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 
-import { AppDispatch, authActions } from '../../store';
+import { authActions } from '../../store';
 import Button from '@mui/material/Button';
 
 export const Login = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
   // form validation rules 
   const validationSchema = Yup.object().shape({

@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { authActions } from './auth.slice';
+import { authActions } from './auth.slice.js';
 import {client} from "../helpers/client";
-import { AppState } from '.';
 
 // create slice
 
@@ -10,7 +9,7 @@ const name = 'users';
 const initialState = createInitialState();
 const extraActions = createExtraActions();
 const extraReducers = createExtraReducers();
-const slice = createSlice({ name, initialState, extraReducers } as any);
+const slice = createSlice({ name, initialState, extraReducers });
 
 // exports
 
@@ -67,12 +66,12 @@ function createExtraActions() {
     return createAsyncThunk(
       `${name}/update`,
       async (payload , { getState, dispatch }) => {
-        const { id, data } = payload as any;
+        const { id, data } = payload;
 
         await client.put(`${baseUrl}/${id}`, data);
 
         // update stored user if the logged in user updated their own record
-        const state = getState() as AppState;
+        const state = getState();
         const auth = state.auth.value;
         if (id === auth?.id.toString()) {
           // update local storage
@@ -94,7 +93,7 @@ function createExtraActions() {
         await client.delete(`${baseUrl}/${id}`);
 
         // auto logout if the logged in user deleted their own record
-        const state = getState() as AppState;
+        const state = getState();
         if (id === state.auth.value?.id) {
           dispatch(authActions.logout());
         }

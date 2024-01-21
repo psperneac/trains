@@ -1,8 +1,7 @@
 import { useSelector } from 'react-redux'
-import { AppState } from '../../store';
 
 export const PostAuthor = ({ userId }) => {
-  const author = useSelector((state: AppState) =>
+  const author = useSelector((state) =>
     state.users?.list?.value?.find((user) => user.id === userId)
   )
 

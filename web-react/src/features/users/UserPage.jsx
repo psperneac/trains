@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import {Link, useParams} from 'react-router-dom'
 
 import { selectUserById } from '../../store'
-import {selectAllPosts, selectPostsByUser} from '../../store/posts.slice'
+import { selectPostsByUser} from '../../store'
 
 export const UserPage = () => {
   const { userId } = useParams();

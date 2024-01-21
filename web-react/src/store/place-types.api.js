@@ -1,9 +1,8 @@
-import { PagedResult, PlaceType } from '../data';
-import { DataApi, TAG } from './data.api';
+import { DataApi, TAG } from './data.api.js';
 
 const api = DataApi.injectEndpoints({
   endpoints: (build) => ({
-    getPlaceTypes: build.query<PagedResult<PlaceType>, void>({
+    getPlaceTypes: build.query({
       query: () => 'place-types',
       // queryFn: async (args, api, extraOptions, baseQuery) => {
       //   const state = api.getState();

@@ -1,11 +1,19 @@
-import {createAsyncThunk, createEntityAdapter, createSelector, createSlice, nanoid} from '@reduxjs/toolkit';
-import {client} from "../helpers/client";
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  nanoid,
+} from '@reduxjs/toolkit';
+import {client} from '../helpers/client';
 
 const postsAdapter = createEntityAdapter({
+  selectId: (post) => post.id,
   sortComparer: (a, b) => b?.date?.localeCompare(a?.date)
 })
 
 const initialState = postsAdapter.getInitialState({
+  ...postsAdapter.getInitialState(),
   status: 'idle',
   error: null
 });
@@ -17,8 +25,8 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
 
 export const addNewPost = createAsyncThunk(
   'posts/addNewPost',
-  async (initialPost) => {
-    const response = await client.post('/fakeApi/posts', initialPost)
+  async (post) => {
+    const response = await client.post('/fakeApi/posts', post)
     return response.data
   }
 )
@@ -28,18 +36,16 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     postAdded: {
-      reducer(state, action)
-      {
-        state.push(action.payload)
-      },
-      prepare(title, content, userId) {
+      reducer: (state, action) => postsAdapter.addOne(state, action.payload),
+      prepare: (title, content, userId) => {
         return {
           payload: {
             id: nanoid(),
+            date: new Date().toISOString(),
             title,
             content,
             user: userId,
-            date: new Date().toISOString(),
+            reactions: {},
           }
         }
       }
@@ -87,7 +93,7 @@ export const {
   selectAll: selectAllPosts,
   selectById: selectPostById,
   selectIds: selectPostIds
-} = postsAdapter.getSelectors(state => state.posts);
+} = postsAdapter.getSelectors((state) => state.posts);
 
 export const selectPostsByUser = createSelector(
   [selectAllPosts, (state, userId) => userId],

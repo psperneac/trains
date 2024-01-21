@@ -1,9 +1,8 @@
-import { DataApi, TAG } from './data.api';
-import { PagedResult, VehicleType } from '../data/';
+import { DataApi, TAG } from './data.api.js';
 
 const api = DataApi.injectEndpoints({
   endpoints: (build) => ({
-    getVehicleTypes: build.query<PagedResult<VehicleType>, void>({
+    getVehicleTypes: build.query({
       query: () => 'vehicle-types',
       providesTags: (results = { data: [], total: 0, page: 0, pageSize: 10 }, _error, _arg) => {
         console.log(results, _error, _arg);

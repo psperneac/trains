@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { alertActions } from './alert.slice';
+import { alertActions } from './alert.slice.js';
 import { history } from '../helpers';
 import { client } from "../helpers/client";
 
@@ -34,8 +34,8 @@ function createExtraActions() {
   function login() {
     return createAsyncThunk(
       `${name}/login`,
-      async function (payload: { username: string, password: string}, { dispatch }) {
-        const { username, password } = payload as any;
+      async function (payload, { dispatch }) {
+        const { username, password } = payload;
         dispatch(alertActions.clear());
         try {
           const userResponse = await client.post(`${baseUrl}/login`, { email: username, password });
@@ -61,7 +61,7 @@ function createExtraActions() {
     return createAsyncThunk(
       `${name}/logout`,
       function (arg, { dispatch }) {
-        dispatch(authActions.setAuth(null as any));
+        dispatch(authActions.setAuth(null));
         // localStorage.removeItem('auth');
         history.navigate('/account/login');
       }

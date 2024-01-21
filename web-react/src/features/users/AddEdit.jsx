@@ -9,7 +9,7 @@ export { AddEdit };
 
 function AddEdit() {
   const { id } = useParams();
-  const [title, setTitle] = useState();
+  const [title] = useState(); // , setTitle
   const dispatch = useDispatch();
   const user = useSelector(x => x.users?.item);
 

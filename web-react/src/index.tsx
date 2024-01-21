@@ -7,14 +7,14 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import {userActions, store} from './store';
+import {userActions, store} from './store/index.js';
 import { App } from './App';
 import common_en from './translations/en/common.json';
 import './index.css';
 
 // setup fake backend
 import {worker} from './helpers/server';
-import {fetchPosts} from './store/posts.slice';
+import {fetchPosts} from './store/posts.slice.js';
 
 import i18next from "i18next";
 import { I18nextProvider } from 'react-i18next';

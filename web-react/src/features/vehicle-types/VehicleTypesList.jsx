@@ -1,29 +1,30 @@
-import DataTable, { TableColumn } from 'react-data-table-component';
+import DataTable from 'react-data-table-component';
 
-import { useGetPlaceTypesQuery } from '../../store';
+import {useGetVehicleTypesQuery} from '../../store';
 import { useTranslation } from 'react-i18next';
-import { PlaceType } from '../../data/place-type.model';
 import { useNavigate } from 'react-router-dom';
-import './PlaceTypesList.scss';
+import './VehicleTypesList.scss';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 
-export const PlaceTypesList = () => {
-  const { data, isFetching, isLoading } = useGetPlaceTypesQuery();
+export const VehicleTypesList = () => {
+  const { data, isFetching, isLoading } = useGetVehicleTypesQuery(); //
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
 
+  console.log('GetVehicles data', data, isFetching, isLoading);
+
   if (isFetching) {
     return (<div>
-      <h1>PlaceTypesList</h1>
+      <h1>VehicleTypesList</h1>
       <p>Is Fetching</p>
     </div>);
   }
 
   if (isLoading) {
     return  (<div>
-      <h1>PlaceTypesList</h1>
+      <h1>VehicleTypesList</h1>
       <p>Is Loading</p>
     </div>);
   }
@@ -36,12 +37,12 @@ export const PlaceTypesList = () => {
     navigate('add');
   }
 
-  function handleSelectedRowcChange({ selectedRows }) {
-    console.log('handleSelectedRowcChange', selectedRows);
+  function handleSelectedRowChange({ selectedRows }) {
+    console.log('handleSelectedRowChange', selectedRows);
     setSelected(selectedRows.map(row => row.id));
   }
 
-  const columns: TableColumn<PlaceType>[] = [
+  const columns = [
     {
       name: 'Type',
       selector: row => row.type,
@@ -66,12 +67,12 @@ export const PlaceTypesList = () => {
 
   return (
     <>
-      <h1>{t('place-types.title')}</h1>
+      <h1>{t('vehicle-types.title')}</h1>
       <DataTable
         columns={columns}
         data={data.data}
         selectableRows
-        onSelectedRowsChange={handleSelectedRowcChange}
+        onSelectedRowsChange={handleSelectedRowChange}
       />
       <div className='buttons-container'>
         <Button className='delete-button' 

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom';
-import { AppState } from '../../store';
+import { AppState } from '../../store/index.js';
 
-import { postUpdated } from '../../store/posts.slice';
+import { postUpdated } from '../../store/posts.slice.js';
 import { history } from '../../helpers';
 
 export const EditPostForm = () => {
