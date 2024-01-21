@@ -2,15 +2,16 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { cloneDeep, isNil } from 'lodash-es';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { MapTemplateDto } from '../../../models/map-template.model';
 import { UiService } from '../../../services/ui.service';
 import { AppState } from '../../../store';
-import { MAP_TEMPLATES } from '../../../utils/constants';
+import { MAP_TEMPLATES, MAP_TEMPLATE_MAP_DEFAULT_ZOOM } from '../../../utils/constants';
 import { MapTemplateFormComponent } from '../components/map-template-form.component';
 import { Actions, ofType } from '@ngrx/effects';
 import { MapTemplateActions, MapTemplateSelectors } from '../store/map-template.store';
+import { Layer, latLng, tileLayer } from 'leaflet';
 
 @Component({
   selector: 'trains-map-template-create-page',
@@ -23,12 +24,20 @@ import { MapTemplateActions, MapTemplateSelectors } from '../store/map-template.
             <button mat-button (click)="onCancel()">{{'button.cancel' | translate}}</button>
           </div>
           <trains-map-template-form #mapTemplateForm *ngIf="map" [map]="map"
-                             class="place-form"
+                             class="map-templates-form"
                              (valueChange)="mapChanged($event)"></trains-map-template-form>
         </div>
+        <trains-custom-map
+          class="map-templates-map"
+          [options]="options"
+          [layers]="markers$ | async"
+          (mapChanged)="onMap($event)"
+        >
+        </trains-custom-map>
       </div>
     </div>
   `,
+  styleUrl: './map-template-edit.page.scss',
 })
 export class MapTemplateEditPage implements OnInit, OnDestroy {
   destroy$ = new Subject();
@@ -37,6 +46,18 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
 
   @ViewChild('mapTemplateForm')
   form: MapTemplateFormComponent;
+
+  theTileLayer = tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '...' });
+
+  options = {
+    layers: [this.theTileLayer],
+    zoom: MAP_TEMPLATE_MAP_DEFAULT_ZOOM,
+    center: latLng(46.879966, -121.726909),
+  };
+
+  lMap: L.Map;
+  map$ = new BehaviorSubject<L.Map>(null);
+  markers$: Subject<Layer[]> = new BehaviorSubject([]);
 
   constructor(
     private store: Store<AppState>,
@@ -62,6 +83,12 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
+  }
+
+
+  onMap(map: L.Map) {
+    this.lMap = map;
+    this.map$.next(map);
   }
 
   async onCancel() {

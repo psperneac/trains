@@ -1,0 +1,41 @@
+@import 'styles';
+
+.map {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.map-templates-form-page-actions {
+  width: 100%;
+}
+
+.map-templates-form-page {
+  display: flex;
+  flex-flow: row;
+  height: 100%;
+}
+
+@media (max-width: 599px) {
+  .map-templates-form-page {
+    flex-direction: column;
+  }
+}
+
+.map-templates-form-container {
+  flex: 1 1 40rem;
+  display: block;
+  flex-flow: column;
+}
+
+.map-templates-map {
+  flex: 1 1 100%;
+}
+
+.map-templates-actions {
+  flex: 0 0 2rem;
+}
+
+.map-templates-form {
+  flex: 1 1 40rem;
+}
