@@ -2,7 +2,7 @@ import { AbstractActions, IsActionChecker } from '../../../helpers/abstract.acti
 import { MapPlaceDto } from '../../../models/map-place.model';
 import { AbstractEntityState, createAdapter, defaultCreateReducer } from '../../../helpers/abstract.reducer';
 import { Router } from '@angular/router';
-import { ActionCreator, Store, createAction, props } from '@ngrx/store';
+import { ActionCreator, Store, createAction, props, createSelector } from '@ngrx/store';
 import { AppState } from '../../../store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AbstractEffects } from '../../../helpers/abstract.effects';
@@ -83,6 +83,11 @@ export class MapPlaceSelectorsType extends AbstractSelectors<MapPlaceState, MapP
   constructor() {
     super(featureState, selectors);
   }
+
+  ByMapId = (mapId: string) => createSelector(featureState, state => {
+    const ret = Object.values(state.entities).filter(mp => mp.mapId === mapId);
+    return ret;
+  });
 }
 
 export const MapPlaceSelectors = new MapPlaceSelectorsType();

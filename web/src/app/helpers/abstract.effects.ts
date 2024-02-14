@@ -2,7 +2,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../store';
 import { Router } from '@angular/router';
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AbstractActions } from './abstract.actions';
 import { AbstractEntityState } from "./abstract.reducer";
@@ -28,7 +28,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   getAll$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.getAll),
-      switchMap(action => {
+      mergeMap(action => {
         return this.service.getAll(action.request).pipe(
           map(result => this.actions.getAllSuccess({ result })),
           catchError(error => of(this.actions.getAllFailure({error})))
@@ -40,7 +40,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   getOne$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.getOne),
-      switchMap(action =>
+      mergeMap(action =>
         this.service.get(action.uuid).pipe(
           map(result => this.actions.getOneSuccess({result})),
           catchError(error => of(this.actions.getOneFailure({error})))
@@ -52,7 +52,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   create$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.create),
-      switchMap(action =>
+      mergeMap(action =>
         this.service.create(action.payload).pipe(
           map(result => this.actions.createSuccess({result})),
           catchError(error => of(this.actions.createFailure({error})))
@@ -64,7 +64,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   update$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.update),
-      switchMap(action =>
+      mergeMap(action =>
         this.service.update(action.payload.id, action.payload).pipe(
           map(result => this.actions.updateSuccess({result})),
           catchError(error => of(this.actions.updateFailure({error})))
@@ -76,7 +76,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   delete$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.delete),
-      switchMap(action =>
+      mergeMap(action =>
         this.service.delete(action.uuid).pipe(
           map(result => this.actions.deleteSuccess({result: action.uuid})),
           catchError(error => of(this.actions.deleteFailure({error})))
@@ -100,7 +100,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
     this.actions$.pipe(
       ofType(this.actions.createSuccess),
       withLatestFrom(this.store.pipe(select(this.selectors.CurrentPageRequest))),
-      switchMap(([_action, currentPageRequest]) => of(this.actions.getAll({ request: currentPageRequest })))
+      map(([_action, currentPageRequest]) => this.actions.getAll({ request: currentPageRequest }))
     )
   );
 }

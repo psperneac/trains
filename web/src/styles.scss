@@ -11,7 +11,7 @@ $my-theme: mat.define-light-theme((
     accent: $my-accent,
   ),
   typography: mat.define-typography-config(),
-  density: -3,
+  // density: -3,
 ));
 
 @include mat.all-component-themes($my-theme);

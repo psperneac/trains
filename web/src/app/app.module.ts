@@ -48,6 +48,7 @@ import { VEHICLE_TYPES_FEATURE } from './features/vehicle-types/vehicle-types.fe
 import { PLAYERS_FEATURE } from './features/players/players.feature';
 import { MAP_TEMPLATES_FEATURE } from './features/map-templates/map-template.feature';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { SelectPlaceComponent } from './components/select-place/select-place.component';
 
 export function createTranslationLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
@@ -81,6 +82,7 @@ vehicles
     CustomMapComponent,
     ConfirmDialog,
     HomePageComponent,
+    SelectPlaceComponent,
 
     ...PLACES_FEATURE.declarations,
     ...PLACE_TYPES_FEATURE.declarations,

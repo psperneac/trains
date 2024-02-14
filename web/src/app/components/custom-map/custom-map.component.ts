@@ -2,7 +2,7 @@
 /// <reference types='leaflet.locatecontrol' />
 /// <reference types='@runette/leaflet-fullscreen' />
 import 'leaflet';
-import { Component, Input, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Output, EventEmitter, ElementRef } from '@angular/core';
 import {
   Control,
   DomUtil,
@@ -30,15 +30,27 @@ declare module 'leaflet' {
   }
 }
 
+export interface CustomButton {
+  id: string;
+  value: string;
+  eventName: string;
+}
+
 @Component({
   selector: 'trains-custom-map',
   templateUrl: './custom-map.component.html',
   styleUrls: ['./custom-map.component.scss']
 })
 export class CustomMapComponent implements OnInit, OnDestroy {
+  @Input() addEnabled: boolean = false;
+  @Input() removeEnabled: boolean = false;
+
+  @Input() customButtons: CustomButton[] = [];
+
   @Output() mapChanged: EventEmitter<L.Map> = new EventEmitter();
   @Output() zoomEnd: EventEmitter<number> = new EventEmitter();
   @Output() addClicked = new EventEmitter<any>();
+  @Output() removeClicked = new EventEmitter<any>();
 
   @Input() options: MapOptions= {
     layers:[tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -73,13 +85,10 @@ export class CustomMapComponent implements OnInit, OnDestroy {
     }
   };
 
-  @Input()
-  addEnabled = false;
-
   public map: L.Map;
   public zoom: number;
 
-  constructor() {
+  constructor(private elementRef: ElementRef) {
   }
 
   ngOnInit() {
@@ -161,7 +170,24 @@ export class CustomMapComponent implements OnInit, OnDestroy {
   clickAdd($event) {
     $event.preventDefault();
     $event.stopPropagation();
-    console.log('Clicked');
+    console.log('Add Clicked');
     this.addClicked.emit($event);
+  }
+
+  clickRemove($event: MouseEvent) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    console.log('Remove Clicked');
+    this.removeClicked.emit($event);
+  }
+
+  clickCustomButton($event, customButton) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    console.log('Custom Button Clicked: %O', customButton);
+
+    const event = new CustomEvent(customButton.eventName, {bubbles: true, detail: customButton});
+    this.elementRef.nativeElement.dispatchEvent(event);
   }
 }

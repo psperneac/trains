@@ -5,7 +5,9 @@
      (leafletMapZoomEnd)="onMapZoomEnd($event)"
 >
   <div class="leaflet-bottom leaflet-left" style="pointer-events: auto; cursor: pointer;">
-    <input type="button" id="button-add" value="Add" (click)="clickAdd($event)" />
+    <input *ngIf="addEnabled" type="button" id="button-add" value="Add" (click)="clickAdd($event)" />
+    <input *ngIf="removeEnabled" type="button" id="button-remove" value="Remove" (click)="clickRemove($event)" />
+    <input *ngFor="let customButton of customButtons" type="button" id="{{customButton.id}}" value="{{customButton.value}}" (click)="clickCustomButton($event, customButton)" />
   </div>
 </div>
 <leaflet-loading-control [options]="loadingOptions" [map]='map'></leaflet-loading-control>

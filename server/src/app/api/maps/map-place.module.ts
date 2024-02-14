@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { omit } from 'lodash';
 import { FindOptionsUtils } from 'typeorm';
 
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
@@ -108,8 +109,11 @@ export class MapPlaceMapper extends AbstractDtoMapper<MapPlace, MapPlaceDto> {
     const placeId = dto.placeId ?? domain.place?.id;
     const mapId = dto.mapId ?? domain.map?.id;
 
+    const fixedDto = omit(dto, ['placeId', 'mapId']);
+
     return {
       ...domain,
+      ...fixedDto,
       place: await this.placeService.findOne(placeId),
       map: await this.mapTemplateService.findOne(mapId)
     } as MapPlace;

@@ -1,0 +1,29 @@
+<div class="app-full-height-page"
+     (addConnectionClicked)="addConnectionClicked($event)"
+     (addPlaceClicked)="addPlaceClicked($event)"
+>
+  <div class="map-templates-form-page">
+    <div class="map-templates-form-container">
+      <div class="map-templates-actions">
+        <button mat-button (click)="onSave()" [disabled]="!form?.valid()">{{'button.save' | translate}}</button>
+        <button mat-button (click)="onCancel()">{{'button.cancel' | translate}}</button>
+      </div>
+      <trains-map-template-form #mapTemplateForm *ngIf="map" [map]="map"
+                                class="map-templates-form"
+                                (valueChange)="mapChanged($event)"></trains-map-template-form>
+      <div>
+        <mat-list>
+          <mat-list-item *ngFor="let place of (toAddPlaces$ | async)">{{place.name}}</mat-list-item>
+        </mat-list>
+      </div>
+    </div>
+    <trains-custom-map
+      class="map-templates-map"
+      [options]="options"
+      [layers]="markers$ | async"
+      (mapChanged)="onMap($event)"
+      [customButtons]="[{id: 'addConnection', value: 'Add Connection', eventName: 'addConnectionClicked'}, {id: 'addPlace', value: 'Add Place', eventName: 'addPlaceClicked'}]"
+    >
+    </trains-custom-map>
+  </div>
+</div>

@@ -58,8 +58,7 @@ export class MapTemplateMapper extends AbstractDtoMapper<MapTemplate, MapTemplat
 
     return {
       ...domain,
-      name: dto.name,
-      description: dto.description
+      ...dto
     } as MapTemplate;
   }
 }
