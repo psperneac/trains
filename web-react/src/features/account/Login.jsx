@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 
 import { authActions } from '../../store';
-import Button from '@mui/material/Button';
+import { Button } from 'react-bootstrap';
 
 export const Login = () => {
   const dispatch = useDispatch();

@@ -1,20 +1,18 @@
-
 import React from 'react';
-
 import reportWebVitals from './reportWebVitals';
 
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import {userActions, store} from './store/index.js';
+import {userActions, store} from './store';
 import { App } from './App';
 import common_en from './translations/en/common.json';
-import './index.css';
+import './index.scss';
 
 // setup fake backend
 import {worker} from './helpers/server';
-import {fetchPosts} from './store/posts.slice.js';
+import {fetchPosts} from './store';
 
 import i18next from "i18next";
 import { I18nextProvider } from 'react-i18next';

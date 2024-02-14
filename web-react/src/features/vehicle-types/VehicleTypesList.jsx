@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './VehicleTypesList.scss';
 import { useState } from 'react';
-import Button from '@mui/material/Button';
+import { Button } from 'react-bootstrap';
 
 export const VehicleTypesList = () => {
   const { data, isFetching, isLoading } = useGetVehicleTypesQuery(); //

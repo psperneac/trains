@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom';
-import { AppState } from '../../store/index.js';
 
-import { postUpdated } from '../../store/posts.slice.js';
+import { postUpdated } from '../../store';
 import { history } from '../../helpers';
 
 export const EditPostForm = () => {
   const { postId } = useParams();
 
-  const post = useSelector((state: AppState) =>
+  const post = useSelector((state) =>
     state.posts.find(post => post.id === postId)
   )
 

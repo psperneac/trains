@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './PlaceTypesList.scss';
 import { useState } from 'react';
-import Button from '@mui/material/Button';
+import { Button } from 'react-bootstrap';
 
 export const PlaceTypesList = () => {
   const { data, isFetching, isLoading } = useGetPlaceTypesQuery();

@@ -9,6 +9,7 @@ import { PostsLayout } from './features/posts/PostsLayout';
 import { NotificationsList } from "./features/notifications/NotificationsList";
 import { PlaceTypesLayout } from "./features/place-types/PlaceTypesLayout";
 import { VehicleTypesLayout } from './features/vehicle-types/VehicleTypesLayout';
+import './App.scss';
 
 export { App };
 

@@ -11,7 +11,6 @@ import {
   selectPostIds,
   selectPostById
 } from '../../store';
-import CircularProgress from '@mui/material/CircularProgress';
 
 let PostExcerpt = ({ postId }) => {
   const post = useSelector(state => selectPostById(state, postId))
@@ -52,7 +51,7 @@ export const PostsList = () => {
   let content
 
   if (postStatus === 'loading') {
-    content = <CircularProgress />
+    content = <p>Loading...</p>
   } else if (postStatus === 'succeeded') {
     // Sort posts in reverse chronological order by datetime string
     content = orderedPostIds.map(postId => (
