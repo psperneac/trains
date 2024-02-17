@@ -25,11 +25,6 @@ function createInitialState() {
   }
 }
 
-// export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-//   const response = await client.get('/fakeApi/users')
-//   return response.data
-// })
-
 function createExtraActions() {
   const baseUrl = `${process.env.REACT_APP_API_URL}/users`;
 
@@ -162,28 +157,3 @@ export const selectAllUsers = state => state.users.list.value
 
 export const selectUserById = (state, userId) =>
   state.users.list.value.find(user => user.id === userId)
-
-/*
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import {client} from "../helpers/client";
-
-const initialState = []
-
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await client.get('/fakeApi/users')
-  return response.data
-})
-
-const usersSlice = createSlice({
-  name: 'users',
-  initialState,
-  reducers: {},
-  extraReducers(builder) {
-    builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      return action.payload
-    })
-  },
-})
-
-export const usersReducer = usersSlice.reducer
- */
