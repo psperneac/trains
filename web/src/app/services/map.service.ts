@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { icon } from 'leaflet';
+import { FeatureGroup, icon, LatLng, Marker } from 'leaflet';
+import { TrainsLine, TrainsMarker } from '../models/trains-leaflet';
+import * as uuid from 'uuid';
+
+export interface MakeMarkerOptions {
+  name?: string;
+  dragEndListener?: (marker: Marker, latLng: LatLng) => void;
+}
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
@@ -50,5 +57,55 @@ export class MapService {
 
   get iconBlue() {
     return this.icBlue;
+  }
+
+  makeMarker(aLatLong, options?: MakeMarkerOptions): TrainsMarker {
+    const name = options.name ?? uuid.v4();
+    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.iconGreen, draggable: true });
+
+    if (options?.dragEndListener) {
+      aMarker.on('dragend', (event) => {
+        const latlng = event.target.getLatLng();
+        options.dragEndListener(aMarker, latlng);
+      });
+    }
+
+    return aMarker;
+  }
+
+  makeStartEndMarker(aLatLong, options?: MakeMarkerOptions): TrainsMarker {
+    const name = options?.name ?? uuid.v4();
+    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.iconBlue, draggable: false });
+
+    if (options?.dragEndListener) {
+      aMarker.on('dragend', (event) => {
+        const latlng = event.target.getLatLng();
+        options.dragEndListener(aMarker, latlng);
+      });
+    }
+
+    return aMarker;
+  }
+
+  getAllMarkerNames(featureGroup: FeatureGroup) {
+    const ret = [];
+    featureGroup.eachLayer((layer) => {
+        if (layer instanceof TrainsMarker) {
+          ret.push(layer.name);
+        }
+      }
+    );
+    return ret;
+  }
+
+  getAllLineNames(featureGroup: FeatureGroup) {
+    const ret = [];
+    featureGroup.eachLayer((layer) => {
+        if (layer instanceof TrainsLine) {
+          ret.push(layer.name);
+        }
+      }
+    );
+    return ret;
   }
 }

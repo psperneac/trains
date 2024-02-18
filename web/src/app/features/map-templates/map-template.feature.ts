@@ -1,5 +1,6 @@
 import { StoreModule } from '@ngrx/store';
 import { FeaturePart } from '../../utils/feature-part';
+import { placeConnectionsResolversFn } from '../place-connections/services/place-connection-data.service';
 import { MapTemplateFormComponent } from './components/map-template-form.component';
 import { MapTemplateListComponent } from './components/map-template-list.component';
 import { MapTemplateEditPage } from './pages/map-template-edit.page';
@@ -18,7 +19,10 @@ import { MapTemplatesPage } from './pages/map-templates.page';
 import { MapPlaceService } from './services/map-place.service';
 import { MapPlaceDataService, mapPlacesResolveFn } from './services/map-place-data.service';
 import { MapPlaceConnectionService } from './services/map-place-connection.service';
-import { MapPlaceConnectionDataService } from './services/map-place-connection-data.service';
+import {
+  MapPlaceConnectionDataService,
+  mapPlaceConnectionsResolveFn
+} from './services/map-place-connection-data.service';
 import { placesResolverFn } from '../places/services/place-data.service';
 
 export const MAP_TEMPLATES_FEATURE: FeaturePart = {
@@ -62,6 +66,8 @@ export const MAP_TEMPLATES_FEATURE: FeaturePart = {
       resolve: {
         places: placesResolverFn,
         mapPlaces: mapPlacesResolveFn,
+        placeConnections: placeConnectionsResolversFn,
+        mapPlaceConnections: mapPlaceConnectionsResolveFn,
       }
     },
     {
@@ -72,6 +78,8 @@ export const MAP_TEMPLATES_FEATURE: FeaturePart = {
       resolve: {
         places: placesResolverFn,
         mapPlaces: mapPlacesResolveFn,
+        placeConnections: placeConnectionsResolversFn,
+        mapPlaceConnections: mapPlaceConnectionsResolveFn,
       }
     }
   ],

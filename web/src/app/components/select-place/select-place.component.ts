@@ -14,11 +14,11 @@ export interface SelectPlaceComponentData {
   templateUrl: './select-place.component.html',
   styleUrl: './select-place.component.scss'
 })
-export class SelectPlaceComponent implements OnInit {
+export class SelectPlaceComponent {
 
-  selectedPlace: any;
+  selectedPlace: PlaceDto;
 
-  places$;
+  places$: Observable<PlaceDto[]>;
   title = 'component.select-place.title';
 
   constructor(
@@ -27,9 +27,6 @@ export class SelectPlaceComponent implements OnInit {
     if (data.title) {
       this.title = data.title;
     }
-  }
-
-  ngOnInit() {
   }
 
   selectionChange($event: MatSelectChange) {

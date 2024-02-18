@@ -146,10 +146,16 @@
   },
   "component": {
     "select-place": {
+      "places": "Places",
       "title": "Select a place to add",
       "cancel": "Cancel",
-      "add": "Add",
-      "add-with-connections": "Add with connections"
+      "add": "Add"
+    },
+    "select-place-connection": {
+      "place-connections": "Place Connections",
+      "title": "Select a place connection to add",
+      "cancel": "Cancel",
+      "add": "Add"
     }
   }
 }

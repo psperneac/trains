@@ -1,5 +1,5 @@
 export interface MapPlaceConnectionDto {
-  id: string;
+  id?: string;
   placeConnectionId: string;
   mapId: string;
 }

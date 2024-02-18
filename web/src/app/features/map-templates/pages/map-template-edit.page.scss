@@ -1,41 +1,55 @@
 @import 'styles';
 
-.map {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-}
-
-.map-templates-form-page-actions {
-  width: 100%;
-}
-
-.map-templates-form-page {
-  display: flex;
-  flex-flow: row;
-  height: 100%;
-}
-
-@media (max-width: 599px) {
-  .map-templates-form-page {
-    flex-direction: column;
+:host {
+  .map {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
   }
-}
 
-.map-templates-form-container {
-  flex: 1 1 40rem;
-  display: block;
-  flex-flow: column;
-}
+  .map-templates-form-page-actions {
+    width: 100%;
+  }
 
-.map-templates-map {
-  flex: 1 1 100%;
-}
+  .map-templates-form-page {
+    display: flex;
+    flex-flow: row;
+    height: 100%;
+  }
 
-.map-templates-actions {
-  flex: 0 0 2rem;
-}
+  @media (max-width: 599px) {
+    .map-templates-form-page {
+      flex-direction: column;
+    }
+  }
 
-.map-templates-form {
-  flex: 1 1 40rem;
+  .map-templates-form-container {
+    flex: 1 1 40rem;
+    display: block;
+    flex-flow: column;
+  }
+
+  .map-templates-map {
+    flex: 1 1 100%;
+  }
+
+  .map-templates-actions {
+    flex: 0 0 2rem;
+  }
+
+  .map-templates-form {
+    flex: 1 1 40rem;
+  }
+
+  .list {
+    --mdc-list-list-item-one-line-container-height: 1.5rem;
+
+    ::ng-deep .mdc-list-item__primary-text {
+      display: flex;
+
+      .list-text {
+        vertical-align: middle;
+      }
+    }
+  }
 }

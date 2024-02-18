@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{ title | translate }}</h2>
+<mat-dialog-content class="content">
+  <mat-form-field class="select-place-form-field">
+    <mat-label>{{'component.select-place-connection.place-connections' | translate}}</mat-label>
+    <mat-select (selectionChange)="selectionChange($event)">
+      <mat-option *ngFor="let p of (placeConnections$ | async)" [value]="p.placeConnection">
+        {{ p.startPlace.name + '-' + p.endPlace.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{'component.select-place-connection.cancel' | translate}}</button>
+  <button mat-button [mat-dialog-close]="{ type: 'add', value: selectedPlaceConnection }" [disabled]="!selectedPlaceConnection">{{'component.select-place-connection.add' | translate}}</button>
+</mat-dialog-actions>

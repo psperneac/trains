@@ -14,6 +14,7 @@ import { environment } from '../environments/environment';
 import { AlertComponent } from './components/alert/alert.component';
 import { ConfirmDialog } from './components/confirm-dialog/confirm.dialog';
 import { CustomMapComponent } from './components/custom-map/custom-map.component';
+import { SelectPlaceConnectionComponent } from './components/select-place-connection/select-place-connection.component';
 import { HomePageComponent } from './features/home/pages/home-page/home-page.component';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
@@ -83,6 +84,7 @@ vehicles
     ConfirmDialog,
     HomePageComponent,
     SelectPlaceComponent,
+    SelectPlaceConnectionComponent,
 
     ...PLACES_FEATURE.declarations,
     ...PLACE_TYPES_FEATURE.declarations,

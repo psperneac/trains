@@ -1,6 +1,8 @@
 <div class="app-full-height-page"
      (addConnectionClicked)="addConnectionClicked($event)"
      (addPlaceClicked)="addPlaceClicked($event)"
+     (printClicked)="printClicked($event)"
+     (fitClicked)="fitClicked($event)"
 >
   <div class="map-templates-form-page">
     <div class="map-templates-form-container">
@@ -11,18 +13,33 @@
       <trains-map-template-form #mapTemplateForm *ngIf="map" [map]="map"
                                 class="map-templates-form"
                                 (valueChange)="mapChanged($event)"></trains-map-template-form>
+      <hr />
       <div>
-        <mat-list>
-          <mat-list-item *ngFor="let place of (toAddPlaces$ | async)">{{place.name}}</mat-list-item>
+        <mat-label style="padding-left: 1rem">Places in the map</mat-label>
+        <mat-list class="list">
+          <mat-list-item *ngFor="let displayPlace of (currentMapPlaces$ | async)">
+            <span class="list-text">{{displayPlace.place.name}}</span>
+            <span *ngIf="displayPlace.added" class="material-symbols-outlined" style="color: green">add</span>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <hr />
+      <div>
+        <mat-label style="padding-left: 1rem">Place connections in the map</mat-label>
+        <mat-list class="list">
+          <mat-list-item *ngFor="let dpc of (currentMapPlaceConnections$ | async)">
+            <span class="list-text">{{dpc.startPlace.name}} - {{dpc.endPlace.name}}</span>
+            <span *ngIf="dpc.added" class="material-symbols-outlined" style="color: green">add</span>
+          </mat-list-item>
         </mat-list>
       </div>
     </div>
     <trains-custom-map
       class="map-templates-map"
       [options]="options"
-      [layers]="markers$ | async"
+      [layers]="[featureGroup]"
       (mapChanged)="onMap($event)"
-      [customButtons]="[{id: 'addConnection', value: 'Add Connection', eventName: 'addConnectionClicked'}, {id: 'addPlace', value: 'Add Place', eventName: 'addPlaceClicked'}]"
+      [customButtons]="customButtons$ | async"
     >
     </trains-custom-map>
   </div>

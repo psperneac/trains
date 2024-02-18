@@ -15,7 +15,6 @@ import {
 import 'leaflet';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import * as uuid from 'uuid';
 import { AnimatedMarker } from '../../../helpers/plugins/AnimatedMarker';
 import { PlaceConnectionDto } from '../../../models/place-connection.model';
 import { TrainsMarker } from '../../../models/trains-leaflet';
@@ -138,9 +137,12 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
     }
 
     // make them again from coords
-    this.startMarker = this.makeStartEndMarker(this.startCoords).addTo(this.map);
-    this.endMarker = this.makeStartEndMarker(this.endCoords).addTo(this.map);
-    this.routeMarkers = this.routeCoords.map((c) => this.makeMarker(c).addTo(this.map));
+    this.startMarker = this.mapService.makeStartEndMarker(this.startCoords,
+      { dragEndListener: this.markerDragEnd }).addTo(this.map);
+    this.endMarker = this.mapService.makeStartEndMarker(this.endCoords,
+      { dragEndListener: this.markerDragEnd}).addTo(this.map);
+    this.routeMarkers = this.routeCoords.map((c) => this.mapService.makeMarker(c,
+      { dragEndListener: this.markerDragEnd}).addTo(this.map));
 
     const markers = [this.startMarker, ...this.routeMarkers, this.endMarker];
 
@@ -162,34 +164,6 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
     }
     const line = this.makePolyline();
     this.routeLayer = line.addTo(this.map);
-  }
-
-  makeMarker(aLatLong, name?: string): TrainsMarker {
-    if (!name) {
-      name = uuid.v4();
-    }
-
-    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.mapService.iconGreen, draggable: true });
-    aMarker.on('dragend', (event) => {
-      const latlng = event.target.getLatLng();
-      this.markerDragEnd(aMarker, latlng);
-    });
-
-    return aMarker;
-  }
-
-  makeStartEndMarker(aLatLong, name?: string): TrainsMarker {
-    if (!name) {
-      name = uuid.v4();
-    }
-
-    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.mapService.iconBlue, draggable: false });
-    aMarker.on('dragend', (event) => {
-      const latlng = event.target.getLatLng();
-      this.markerDragEnd(aMarker, latlng);
-    });
-
-    return aMarker;
   }
 
   makePolyline() {
@@ -222,7 +196,8 @@ export class PlaceConnectionEditPage implements OnInit, OnDestroy {
       }
 
       if (min || min === 0) {
-        const newMarker = this.makeMarker(e.latlng).addTo(this.map);
+        const newMarker = this.mapService.makeMarker(e.latlng,
+          { dragEndListener: this.markerDragEnd}).addTo(this.map);
 
         if (minIndex === 0) {
           // insert between start and first point

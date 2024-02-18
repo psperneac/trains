@@ -33,7 +33,7 @@ export class MapPlaceDataService {
     );
   }
 
-  createMapPlace(_route: ActivatedRouteSnapshot) {
+  createMapPlace() {
     this.store.dispatch(MapPlaceActions.selectOne({ payload: {
         mapId: '',
         placeId: '',
@@ -49,12 +49,10 @@ export class MapPlaceDataService {
 }
 
 export const mapPlacesResolveFn =
-  (_route: ActivatedRouteSnapshot) =>
-    inject(MapPlaceDataService).resolveMapPlaces();
+  () => inject(MapPlaceDataService).resolveMapPlaces();
 
 export const createMapPlaceGuardFn =
-  (route: ActivatedRouteSnapshot) =>
-    inject(MapPlaceDataService).createMapPlace(route);
+  () => inject(MapPlaceDataService).createMapPlace();
 
 export const loadOneMapPlaceGuardFn =
   (route: ActivatedRouteSnapshot) =>

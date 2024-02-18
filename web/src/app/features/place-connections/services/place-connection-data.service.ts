@@ -8,6 +8,10 @@ import { PlaceConnectionActions, PlaceConnectionSelectors } from '../store';
 
 @Injectable({ providedIn: 'root' })
 export class PlaceConnectionDataService {
+
+  placeConnectionsLoaded$ = this.store.pipe(select(PlaceConnectionSelectors.Loaded));
+  placeConnections$ = this.store.pipe(select(PlaceConnectionSelectors.All));
+
   constructor(private readonly store: Store<{}>) {}
 
   resolvePlaceConnections(): Observable<PlaceConnectionDto[]> {
