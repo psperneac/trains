@@ -212,7 +212,7 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
         const allMarkerName = this.mapService.getAllMarkerNames(this.featureGroup);
         currentMapPlaces.forEach(place => {
           if (!allMarkerName.includes(place.place.name)) {
-            const marker = new TrainsMarker(place.place.name, new LatLng(place.place.lat, place.place.lng));
+            const marker = this.mapService.makeMarker(new LatLng(place.place.lat, place.place.lng), { name: place.place.name });
             marker.addTo(this.featureGroup);
             added = true;
           }
@@ -314,9 +314,11 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
       data: { placesConnections$: this.availablePlaceConnectionsToAdd$ }
     });
     dialogRef.afterClosed().subscribe(result => {
-      const placeConnectionToAdd = result.value;
-      if (placeConnectionToAdd) {
-        this.toAddPlaceConnections$.next(uniqBy([...this.toAddPlaceConnections$.getValue(), placeConnectionToAdd], 'id'));
+      console.log('addConnectionClicked', result);
+      if (result?.value) {
+        const value = uniqBy([...this.toAddPlaceConnections$.getValue(), ...result.value.map(dpc => dpc.placeConnection)], 'id');
+        console.log('addConnectionClicked - next', value);
+        this.toAddPlaceConnections$.next(value);
       }
     });
   }
@@ -326,9 +328,10 @@ export class MapTemplateEditPage implements OnInit, OnDestroy {
       data: { places$: this.availablePlacesToAdd$ }
     });
     dialogRef.afterClosed().subscribe(result => {
-      const placeToAdd = result.value;
-      if (placeToAdd) {
-        this.toAddPlaces$.next(uniqBy([...this.toAddPlaces$.getValue(), placeToAdd], 'id'));
+      if (result?.value) {
+        const value = uniqBy([...this.toAddPlaces$.getValue(), ...result?.value], 'id');
+        console.log('addConnectionClicked - next', value);
+        this.toAddPlaces$.next(value);
       }
     });
   }

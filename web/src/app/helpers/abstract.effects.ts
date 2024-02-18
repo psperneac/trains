@@ -2,7 +2,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../store';
 import { Router } from '@angular/router';
-import { catchError, map, mergeMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, mergeMap, switchMap, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AbstractActions } from './abstract.actions';
 import { AbstractEntityState } from "./abstract.reducer";
@@ -28,7 +28,7 @@ export class AbstractEffects<S extends AbstractEntityState<T>, T extends Abstrac
   getAll$ = createEffect(() =>
     this.actions$.pipe(
       ofType(this.actions.getAll),
-      mergeMap(action => {
+      switchMap(action => {
         return this.service.getAll(action.request).pipe(
           map(result => this.actions.getAllSuccess({ result })),
           catchError(error => of(this.actions.getAllFailure({error})))

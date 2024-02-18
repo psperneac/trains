@@ -86,7 +86,7 @@ export function defaultCreateReducer<T extends AbstractEntity>(
     }),
     on(actions.getOneSuccess, (state, action) => {
       return {
-        ...state,
+        ...adapter.setOne(action.result, state),
         error: true,
         selectedLoading: false,
         selectedLoaded: true,

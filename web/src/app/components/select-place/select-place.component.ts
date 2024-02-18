@@ -16,7 +16,7 @@ export interface SelectPlaceComponentData {
 })
 export class SelectPlaceComponent {
 
-  selectedPlace: PlaceDto;
+  selectedPlace: PlaceDto[];
 
   places$: Observable<PlaceDto[]>;
   title = 'component.select-place.title';

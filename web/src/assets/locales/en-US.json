@@ -149,13 +149,15 @@
       "places": "Places",
       "title": "Select a place to add",
       "cancel": "Cancel",
-      "add": "Add"
+      "add": "Add",
+      "add-all": "Add All"
     },
     "select-place-connection": {
       "place-connections": "Place Connections",
       "title": "Select a place connection to add",
       "cancel": "Cancel",
-      "add": "Add"
+      "add": "Add",
+      "add-all": "Add All"
     }
   }
 }

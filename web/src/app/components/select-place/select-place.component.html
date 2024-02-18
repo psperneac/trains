@@ -2,7 +2,7 @@
 <mat-dialog-content class="content">
   <mat-form-field class="select-place-form-field">
     <mat-label>{{'component.select-place.places' | translate}}</mat-label>
-    <mat-select (selectionChange)="selectionChange($event)">
+    <mat-select (selectionChange)="selectionChange($event)" multiple>
       <mat-option *ngFor="let place of (places$ | async)" [value]="place">
         {{ place.name }}
       </mat-option>
@@ -12,4 +12,5 @@
 <mat-dialog-actions>
   <button mat-button mat-dialog-close>{{'component.select-place.cancel' | translate}}</button>
   <button mat-button [mat-dialog-close]="{ type: 'add', value: selectedPlace }" [disabled]="!selectedPlace">{{'component.select-place.add' | translate}}</button>
+  <button mat-button [mat-dialog-close]="{ type: 'addAll', value: (places$ | async) }" [disabled]="!places$ || (places$ | async).length === 0">{{'component.select-place.add-all' | translate}}</button>
 </mat-dialog-actions>

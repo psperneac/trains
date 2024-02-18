@@ -61,7 +61,12 @@ export class MapService {
 
   makeMarker(aLatLong, options?: MakeMarkerOptions): TrainsMarker {
     const name = options.name ?? uuid.v4();
-    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.iconGreen, draggable: true });
+    const aMarker = new TrainsMarker(name, aLatLong, { icon: this.iconGreen, draggable: true })
+      .bindTooltip(name,
+        {
+          permanent: true,
+          direction: 'top'
+        });
 
     if (options?.dragEndListener) {
       aMarker.on('dragend', (event) => {

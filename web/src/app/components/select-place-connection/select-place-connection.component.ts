@@ -16,7 +16,7 @@ export interface SelectPlaceConnectionComponentData {
   styleUrl: './select-place-connection.component.scss'
 })
 export class SelectPlaceConnectionComponent {
-  selectedPlaceConnection: PlaceConnectionDto;
+  selectedPlaceConnection: PlaceConnectionDto[];
 
   placeConnections$: Observable<DisplayPlaceConnection[]>;
   title = 'component.select-place-connection.title';
