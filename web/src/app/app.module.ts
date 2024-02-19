@@ -15,6 +15,7 @@ import { AlertComponent } from './components/alert/alert.component';
 import { ConfirmDialog } from './components/confirm-dialog/confirm.dialog';
 import { CustomMapComponent } from './components/custom-map/custom-map.component';
 import { SelectPlaceConnectionComponent } from './components/select-place-connection/select-place-connection.component';
+import { GAME_FEATURE } from './features/game/game.feature';
 import { HomePageComponent } from './features/home/pages/home-page/home-page.component';
 import { PLACE_CONNECTIONS_FEATURE } from './features/place-connections/place-connections.feature';
 import { VEHICLES_FEATURE } from './features/vehicles/vehicles.feature';
@@ -93,6 +94,7 @@ vehicles
     ...PLACE_CONNECTIONS_FEATURE.declarations,
     ...PLAYERS_FEATURE.declarations,
     ...MAP_TEMPLATES_FEATURE.declarations,
+    ...GAME_FEATURE.declarations,
   ],
   imports: [
     AppRoutingModule,
@@ -146,6 +148,7 @@ vehicles
     ...PLACE_CONNECTIONS_FEATURE.imports,
     ...PLAYERS_FEATURE.imports,
     ...MAP_TEMPLATES_FEATURE.imports,
+    ...GAME_FEATURE.imports,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -159,6 +162,7 @@ vehicles
     ...PLACE_CONNECTIONS_FEATURE.providers,
     ...PLAYERS_FEATURE.providers,
     ...MAP_TEMPLATES_FEATURE.providers,
+    ...GAME_FEATURE.providers,
 
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {
       subscriptSizing: 'dynamic',

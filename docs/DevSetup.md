@@ -1,4 +1,13 @@
+# Development Setup
+
+
 # Misc
+
+## Unit tests
+
+- Unit test the highest component that can be tested and would provide coverage for underlying components. Eg for
+  controllers,
+  make a test at controller level that tests the controller and the service and mocks the repoistory
 
 ## Code snippets
 
@@ -67,7 +76,7 @@ cd scripts/liquibase
 
 ### Mongo
 
-Aux DB. 
+Aux DB.
 
 ```bash
 docker pull mongo
@@ -104,3 +113,9 @@ Change to this to give admin permissions:
 use admin
 db.createUser({ user: "mongoadmin" , pwd: "mongoadmin", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})
 ```
+
+## Fonts
+
+To view font contents, go here
+
+https://fontdrop.info/

@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
+import { ConfirmDialog } from '../../../../components/confirm-dialog/confirm.dialog';
 import { AbstractListComponent } from '../../../../helpers/abstract-list.component';
 import { VehicleDto } from '../../../../models/vehicle.model';
 import { AppState } from '../../../../store';
@@ -30,14 +32,16 @@ export class VehiclesListComponent extends AbstractListComponent<VehicleState, V
     'name',
     'type',
     'description',
-    'details'
+    'details',
+    'actions'
   ]
 
   public filterColumns = [];
 
   constructor(
     private readonly store: Store<AppState>,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly dialog: MatDialog
   ) {
     super(VehicleActions, VehicleSelectors, store);
   }
@@ -61,5 +65,20 @@ export class VehiclesListComponent extends AbstractListComponent<VehicleState, V
 
   getDetails(item: VehicleDto) {
     return `Max: ${item.engineMax}/${item.auxMax}, Load: ${item.engineLoad}/${item.auxLoad}, Fuel: ${item.engineFuel}/${item.auxFuel}, Speed: ${item.speed}`;
+  }
+
+  deleteVehicle(id) {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'page.vehicle.deleteTitle',
+        message: 'page.vehicle.deleteMessage',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.store.dispatch(VehicleActions.delete({ uuid: id }));
+      }
+    });
   }
 }

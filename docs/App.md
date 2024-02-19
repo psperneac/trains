@@ -25,13 +25,11 @@ TRUCK
 - Double 1, 2, 1000, 75mph
 - Long 2, 2, 1500, 65mph
 
-### Domain
-
-#### User
+### User
 
 General user properties, username, email, password hash
 
-#### Player
+### Player
 
 1-1 with user (??? multiple players per user could be useful) but contains info pertaining to game assets
 - id
@@ -45,14 +43,14 @@ General user properties, username, email, password hash
 - vehicleInstance* - all the vehicles the player has bought and might have inventory in
 - connections - all the connections the player has bought
 
-#### Map
+### Map
 
 general map 
 
 - place* - all the possible places on the map
 - connection* - all the possible connections on the map
  
-#### Place
+### Place
 
 A place on the map with a type of access; ie TRAIN, AIR, AUTO, SHIP, MIXED
 
@@ -63,7 +61,7 @@ A place on the map with a type of access; ie TRAIN, AIR, AUTO, SHIP, MIXED
 - type: TRAIN, AIR, AUTO, SHIP, MIXED
 - other/content - eg what kind of jobs it can spawn
 
-#### PlaceInstance
+### PlaceInstance
 
 a place with jobs attached to it
 
@@ -74,7 +72,7 @@ a place with jobs attached to it
 - jobOfferExpire - when the job offers expire and are regenerated
 - content - extra settings in json
 
-#### PlaceConnection
+### PlaceConnection
 
 - id
 - name
@@ -83,7 +81,7 @@ a place with jobs attached to it
 - start, end
 - content: points along the way and other
 
-#### Vehicle
+### Vehicle
 
 Vehicle templates.
 
@@ -94,7 +92,7 @@ Vehicle templates.
 - characteristics; speed, fuel, load
 - content - json for extra settings
 
-#### VehicleInstance
+### VehicleInstance
 
 A vehicle a player owns that carries jobs. Depending on the values of startTime/endTime and startPlace/endPlace a 
 vehicle can be in movement or parked at a place.
@@ -107,7 +105,7 @@ vehicle can be in movement or parked at a place.
 - startPlace - the place a vehicle left from
 - endPlace - the place a vehicle will arrive at
 
-#### Job
+### Job
 
 A job that can be carried by a vehicle or parked at a place. A job has a start and end place and a payment that is 
 received when the job is delivered.
@@ -128,85 +126,10 @@ are associated with a place instance or offered to a player in a place instance.
 - startTime - when the job was created - can influence the pay or decrease the pay
 - content - for extra settings
 
-### Misc
-
-#### Translation
+### Translation
 
 Table of translation strings. B/E will cache this so it doesn't have to keep loading it from DB.
 
-## .plan
-
-### General
-
-- research more transportation game names
-- research features for the rest of transportation games found
-- make list of features desired in this game
-- filter list of features and decide on features for V0
-- filter list of features and decide on features for V1 and future
-- on each feature, try to figure out how to implement to make data model flexible enough to allow said feature
-
-### Sprints
-
-#### MVE
-
-- USER
-  - can create a player
-- PLAYER
-  - user can select a player to play with
-  - sees map with currently owned places, connections and potential places and connections
-  - can buy places and connections
-  - can see jobs in a place
-  - can see vehicle instances in a place and their inventory
-  - can send a vehicle from one place to another on the map
-  - can load jobs to a vehicle and unload jobs from a vehicle
-  - when a vehicle arrives at a place (even in passing) jobs ending at that place are removed and payment is received
-  - when offered jobs in a place expire, new jobs are generated
-  - can create a player
-
-### Client
-
-- _ ? move layout to App component
-- X add multiple pages to menu, make Content component switch to pages on menu clicks
-- _ figure out how to have menu be served by Server
-- X add places list screen and create/edit place using map for location (ADMIN)
-- _ add ADMIN editor for main map template - use map for selecting places to connect.
-- _ add USERS editor for map routes bought - use map to select already created connections from main map
-
-### Server
-
-- X finish Places controller
-- _ add resource for vehicles types and figure out attributes to be held for vehicles
-- _ add resource for owned vehicles by a user
-- _ add resource for currency and other general attributes of a user
-- _ add Maps table with jsonb field for connections array
-    - _ add resource for route between 2 points
-    - _ add special map entry for the main map template
-    - _ user map = map entry is for 'bought' connections which are applied on top of map
-    - _ figure out data model for map, based on main map and user map
-    - _ figure out queries to be done for a map (additionally figure out a library for graph functions)
-        - what connections are from place x
-        - what free/bought connection are from place x
-        - is x to y connected (graph traversal)
-- _ figure out table for connection attributes (price, fuel etc)
-    - should this be a separate table, or should these be attributes on the main map?
-
-### TechDebt
-
-- X add unit tests on controller
-- _ make a stress test tool to hit endpoints
-- _ add layer to count API hits and gather statistics on API hits (there is probably a standard library to do this;
-  figure
-  out how to collect data and where to put it)
-- _ make plan and test replacing DB with Mongo and Cassandra (advantages/disadvantages) which one would allow the
-  codebase/data model to be similar with one used on postgres and allow switching in production
-- _ research using 2 databases in nestjs
-- _ add audit feature for all api changes
-- _ research implementing audit in another db than main db
-- _ figure out jobs service - does it need to be in main server or can it be a different service (initial implementation
-  in main server, moving out is main server is overwhelmed?)
-- _ research deployment options (heroku?)
-    - price of deployment for testing
-    - automatic deployment from github
 
 ## Features
 

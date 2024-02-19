@@ -29,7 +29,8 @@
 }
 
 .player-select-field {
-  margin-top: 1.8rem;
+  margin-top: 0.8rem;
+  @include mat.form-field-density(-3);
 
   .player-select {
     width: 15rem;

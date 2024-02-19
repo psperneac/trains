@@ -13,26 +13,32 @@
       <trains-map-template-form #mapTemplateForm *ngIf="map" [map]="map"
                                 class="map-templates-form"
                                 (valueChange)="mapChanged($event)"></trains-map-template-form>
-      <hr />
-      <div>
-        <mat-label style="padding-left: 1rem">Places in the map</mat-label>
+      <mat-expansion-panel class="mat-templates-xp-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Places in the map
+          </mat-panel-title>
+        </mat-expansion-panel-header>
         <mat-list class="list">
           <mat-list-item *ngFor="let displayPlace of (currentMapPlaces$ | async)">
             <span class="list-text">{{displayPlace.place.name}}</span>
             <span *ngIf="displayPlace.added" class="material-symbols-outlined" style="color: green">add</span>
           </mat-list-item>
         </mat-list>
-      </div>
-      <hr />
-      <div>
-        <mat-label style="padding-left: 1rem">Place connections in the map</mat-label>
+      </mat-expansion-panel>
+      <mat-expansion-panel class="mat-templates-xp-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Place connections in the map
+          </mat-panel-title>
+        </mat-expansion-panel-header>
         <mat-list class="list">
           <mat-list-item *ngFor="let dpc of (currentMapPlaceConnections$ | async)">
             <span class="list-text">{{dpc.startPlace.name}} - {{dpc.endPlace.name}}</span>
             <span *ngIf="dpc.added" class="material-symbols-outlined" style="color: green">add</span>
           </mat-list-item>
         </mat-list>
-      </div>
+      </mat-expansion-panel>
     </div>
     <trains-custom-map
       class="map-templates-map"

@@ -141,7 +141,9 @@
       "editTitle": "Edit Player",
       "listTitle": "Players",
       "map": "Map",
-      "name": "Name"
+      "name": "Name",
+      "deleteTitle": "Delete Player",
+      "deleteMessage": "Are you sure you want to delete this player?"
     }
   },
   "component": {

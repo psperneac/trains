@@ -1,0 +1,51 @@
+@import "styles";
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  .container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .container-table {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .container-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    padding-right: 1rem;
+    //  padding-left: 1rem;
+  }
+
+  .container-bottom-action {
+    flex: 0 1 20rem;
+  }
+
+  .container-bottom-space {
+    flex: 1 1;
+  }
+
+  .container-bottom-paginator {
+    flex: 0 1 28rem;
+  }
+
+  .header-actions {
+    @include ik_table_size(6rem);
+    text-align: right;
+    padding-left: 0;
+    padding-right: 1rem;
+    min-width: 4rem;
+  }
+
+  .column-actions {
+    @include ik_table_size(6rem);
+    text-align: right;
+    padding-right: 1rem;
+    min-width: 4rem;
+  }
+}

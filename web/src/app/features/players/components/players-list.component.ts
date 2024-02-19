@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from '../../../components/confirm-dialog/confirm.dialog';
 import { AbstractListComponent } from '../../../helpers/abstract-list.component';
 import { PlayerActions, PlayerSelectors, PlayersState } from '../store';
 import { PlayerDto } from '../../../models/player';
@@ -25,11 +27,16 @@ export class PlayersListComponent extends AbstractListComponent<PlayersState, Pl
   public displayColumns = [
     'name',
     'description',
+    'actions'
   ];
 
   public filterColumns = [];
 
-  constructor(readonly store: Store<AppState>, private readonly router: Router) {
+  constructor(
+    readonly store: Store<AppState>,
+    private readonly router: Router,
+    private readonly dialog: MatDialog
+  ) {
     super(PlayerActions, PlayerSelectors, store);
   }
 
@@ -48,5 +55,21 @@ export class PlayersListComponent extends AbstractListComponent<PlayersState, Pl
 
   addPlayer() {
     this.router.navigateByUrl('/players/create');
+  }
+
+
+  deletePlayer(id: string) {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'page.player.deleteTitle',
+        message: 'page.player.deleteMessage',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.store.dispatch(PlayerActions.delete({ uuid: id }));
+      }
+    });
   }
 }

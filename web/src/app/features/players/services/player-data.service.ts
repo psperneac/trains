@@ -50,6 +50,13 @@ export class PlayerDataService {
     this.store.dispatch(PlayerActions.getOne({ uuid: id }));
     return true;
   }
+
+  getPlayerById$(id: string): Observable<PlayerDto> {
+    return this.store.pipe(
+      select(PlayerSelectors.ById(id)),
+      filter(data => !!data),
+    );
+  }
 }
 
 export const playersResolveFn: ResolveFn<any> =

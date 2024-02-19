@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { TranslateService } from '@ngx-translate/core';
+import { GameDataService } from './features/game/services/game-data.service';
 import { PlayerSelectors } from './features/players/store';
 import { AppState } from './store';
 import { select, Store } from '@ngrx/store';
@@ -62,7 +63,8 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
     private readonly keepalive: Keepalive,
     private readonly uiService: UiService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly authFacade: AuthFacade) {
+    private readonly authFacade: AuthFacade,
+    private readonly gameDataService: GameDataService) {
     this.translate.setDefaultLang(this.language);
     this.translate.use(this.language);
 
@@ -176,5 +178,6 @@ export class AppComponent implements OnInit, OnDestroy, DoCheck {
 
   playerSelected($event: MatSelectChange) {
     console.log('Player selected: ', $event);
+    this.gameDataService.setSelectedPlayer($event.value);
   }
 }
