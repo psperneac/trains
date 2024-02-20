@@ -9,3 +9,13 @@ export interface PlaceDto extends AbstractEntity {
 }
 
 export type PlaceDtoMap = { [id: string]: PlaceDto };
+
+export interface PlaceInstanceDto extends AbstractEntity {
+  placeId: string;
+  playerId: string;
+  jobs: string[];
+  jobOffers: string[];
+  content: any;
+}
+
+export type PlaceInstanceDtoMap = { [id: string]: PlaceInstanceDto };

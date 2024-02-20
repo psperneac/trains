@@ -41,6 +41,12 @@ export class MapTemplateDataService {
     this.store.dispatch(MapTemplateActions.getOne({ uuid: id }));
     return true;
   }
+
+  getMapTemplateById$(id: string): Observable<MapTemplateDto> {
+    return this.store.pipe(
+      select(MapTemplateSelectors.ById(id)),
+    );
+  }
 }
 
 export const mapTemplatesResolveFn: ResolveFn<MapTemplateDto[]> =

@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {latLng, Layer, tileLayer} from 'leaflet';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import {UiService} from '../../../../services/ui.service';
 import { GameDataService } from '../../../game/services/game-data.service';
+import { MapTemplateDataService } from '../../../map-templates/services/map-template-data.service';
 
 @Component({
   selector: 'trains-home-page',
@@ -23,17 +24,17 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   markers: Layer[] = [];
 
+  player$ = this.gameDataService.getSelectedPlayer$();
+  map$ = this.player$.pipe(map(player => this.mapTemplateDataService.getMapTemplateById$(player.mapId)));
+
   constructor(
     private readonly uiService: UiService,
-    private readonly gameDataService: GameDataService
+    private readonly gameDataService: GameDataService,
+    private readonly mapTemplateDataService: MapTemplateDataService
   ) { }
 
   ngOnInit(): void {
     this.uiService.setPageTitle('page.home.title');
-
-    this.gameDataService.getSelectedPlayer$().pipe(takeUntil(this.destroy$)).subscribe(player => {
-      console.log('Player', player);
-    });
   }
 
   ngOnDestroy(): void {

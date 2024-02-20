@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { AbstractEffects } from '../../../helpers/abstract.effects';
 import { Actions } from '@ngrx/effects';
 import { MapTemplateService } from '../services/map-template.service';
-import { Action, Store } from '@ngrx/store';
+import { Action, createSelector, Store } from '@ngrx/store';
 import { AppState } from '../../../store';
 import { Router } from '@angular/router';
 import {
@@ -56,6 +56,10 @@ export class MapTemplateSelectorsType extends AbstractSelectors<MapTemplateState
   constructor() {
     super(featureState, selectors);
   }
+
+  ById = (mapTemplateId: string) => createSelector(featureState, (state: MapTemplateState) => {
+    return state.entities[mapTemplateId];
+  })
 }
 
 export const MapTemplateSelectors = new MapTemplateSelectorsType();
