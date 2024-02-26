@@ -3,6 +3,8 @@ import { Repository } from 'typeorm';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { TestConfig } from '../../../utils/test/test-config';
+import { MapPlace } from '../maps/map-place.entity';
+import { MapTemplate } from '../maps/map-template.entity';
 import { PlaceConnection } from '../places/place-connection.entity';
 import { Place } from '../places/place.entity';
 import { PlaceTestConfig } from '../places/places-test-config';
@@ -10,8 +12,8 @@ import { VehicleInstanceJob } from '../vehicles/vehicle-instance-job.entity';
 import { Job, JobDto } from './job.entity';
 import { JobMapper, JobRepository, JobsController, JobsService } from './jobs.module';
 
-const createPlace = (id: number): Place => {
-  return {
+const createPlace = (id: number): MapPlace => {
+  const place = {
     id: 'ID' + id,
     version: 0,
     created: new Date(),
@@ -22,7 +24,27 @@ const createPlace = (id: number): Place => {
     type: 'RAIL',
     lat: 47.38 + id / 10,
     lng: 120.77 + id / 7
-  };
+  } as Place;
+
+  const map = {
+    id: 'MapID' + id,
+    version: 0,
+    created: new Date(),
+    updated: new Date(),
+    deleted: null,
+    name: 'Map' + id,
+    description: 'MapDescription' + id
+  } as MapTemplate;
+
+  return {
+    id: 'ID' + id,
+    version: 0,
+    created: new Date(),
+    updated: new Date(),
+    deleted: null,
+    place,
+    map,
+  } as MapPlace;
 };
 
 const createJob = (id: number): Job => {

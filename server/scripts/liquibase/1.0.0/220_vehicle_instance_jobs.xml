@@ -55,6 +55,10 @@
                 <constraints nullable="false" />
             </column>
 
+            <column name="map_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
             <column name="content" type="json"> </column>
         </createTable>
     </changeSet>
@@ -114,6 +118,15 @@
                 baseTableName="vehicle_instance_jobs"
                 baseColumnNames="player_id"
                 referencedTableName="players"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="80" author="paul">
+        <addForeignKeyConstraint
+                constraintName="vehicle_instance_jobs_maps"
+                baseTableName="vehicle_instance_jobs"
+                baseColumnNames="map_id"
+                referencedTableName="maps"
                 referencedColumnNames="id" />
     </changeSet>
 

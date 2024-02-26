@@ -3,14 +3,15 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Job, JobDto } from '../jobs/job.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { Player } from '../players/player.entity';
-import { VehicleInstance } from './vehicle-instance.entity';
+import { MapPlaceInstance } from './map-place-instance.entity';
 
-@Entity({name: 'vehicle_instance_jobs'})
-export class VehicleInstanceJob extends Job {
-  @ManyToOne(type => VehicleInstance, {eager: true})
-  @JoinColumn({name: 'vehicle_instance_id'})
+@Entity({ name: 'map_place_instance_jobs' })
+export class MapPlaceInstanceJob extends Job {
+
+  @ManyToOne(type => MapPlaceInstance, { eager: true })
+  @JoinColumn({ name: 'map_place_instance_id' })
   @Expose()
-  vehicleInstance: VehicleInstance;
+  mapPlaceInstance: MapPlaceInstance;
 
   @ManyToOne(type => Player, {eager: true})
   @JoinColumn({name: 'player_id'})
@@ -27,8 +28,8 @@ export class VehicleInstanceJob extends Job {
   content: any;
 }
 
-export interface VehicleInstanceJobDto extends JobDto {
-  vehicleInstanceId: string;
+export interface MapPlaceInstanceJobDto extends JobDto {
+  mapPlaceInstanceId: string;
   playerId: string;
   mapId: string;
   content: any;

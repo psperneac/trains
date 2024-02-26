@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { Column, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { Place } from '../places/place.entity';
+import { MapPlace } from '../maps/map-place.entity';
 
 export abstract class Job extends AbstractEntity {
   @Column('varchar', { length: 20 })
@@ -16,15 +16,15 @@ export abstract class Job extends AbstractEntity {
   @Expose()
   description: string;
 
-  @ManyToOne(_type => Place, { eager: true })
+  @ManyToOne(_type => MapPlace, { eager: true })
   @JoinColumn({ name: 'start' })
   @Expose()
-  start: Place;
+  start: MapPlace;
 
-  @ManyToOne(_type => Place, { eager: true })
+  @ManyToOne(_type => MapPlace, { eager: true })
   @JoinColumn({ name: 'end' })
   @Expose()
-  end: Place;
+  end: MapPlace;
 
   @Column()
   @Expose()

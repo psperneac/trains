@@ -1,14 +1,15 @@
 import { JobsModule } from './jobs/jobs.module';
-import { MapPlaceConnectionModule } from './maps/map-place-connection.module';
-import { MapPlaceModule } from './maps/map-place.module';
+import { MapPlaceConnectionsModule } from './maps/map-place-connections.module';
+import { MapPlacesModule } from './maps/map-places.module';
 import { MapTemplateModule } from './maps/map-template.module';
-import { PlaceConnectionInstancesModule } from './places/place-connection-instance.module';
+import { PlaceConnectionInstancesModule } from './places/map-place-connection-instance.module';
 import { PlaceConnectionsModule } from './places/place-connection.module';
-import { PlaceInstanceJobOffersModule } from './places/place-instance-job-offer.module';
-import { PlaceInstanceJobsModule } from './places/place-instance-job.module';
-import { PlaceInstance } from './places/place-instance.entity';
-import { PlaceInstancesModule } from './places/place-instance.module';
+import { MapPlaceInstanceJobOffersModule } from './places/map-place-instance-job-offer.module';
+import { MapPlaceInstanceJobsModule } from './places/map-place-instance-job.module';
+import { MapPlaceInstance } from './places/map-place-instance.entity';
+import { MapPlaceInstancesModule } from './places/map-place-instance.module';
 import { PlayersModule } from './players/player.module';
+import { WalletModule } from './players/wallet.module';
 import { PostsModule } from './posts/posts.module';
 import { PlaceModule } from './places/place.module';
 import { UserPreferenceModule } from './users/user-preference.module';
@@ -31,14 +32,15 @@ import { VehicleModule } from './vehicles/vehicle.module';
     PlaceTypeModule,
     VehicleModule,
     PlaceConnectionsModule,
-    MapPlaceModule,
-    MapPlaceConnectionModule,
+    MapPlacesModule,
+    MapPlaceConnectionsModule,
     MapTemplateModule,
     PlaceConnectionInstancesModule,
-    PlaceInstancesModule,
-    PlaceInstanceJobsModule,
-    PlaceInstanceJobOffersModule,
+    MapPlaceInstancesModule,
+    MapPlaceInstanceJobsModule,
+    MapPlaceInstanceJobOffersModule,
     PlayersModule,
+    WalletModule,
     VehicleInstancesModule,
     VehicleInstanceJobsModule,
     UserPreferenceModule,

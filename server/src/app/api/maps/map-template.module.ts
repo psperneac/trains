@@ -4,8 +4,8 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { PlaceConnection } from '../places/place-connection.entity';
-import { MapPlaceConnectionModule } from './map-place-connection.module';
-import { MapPlaceModule } from './map-place.module';
+import { MapPlaceConnectionsModule } from './map-place-connections.module';
+import { MapPlacesModule } from './map-places.module';
 import { MapTemplate, MapTemplateDto } from './map-template.entity';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';

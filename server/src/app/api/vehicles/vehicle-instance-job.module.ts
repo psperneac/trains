@@ -6,6 +6,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { PlaceModule, PlacesService } from '../places/place.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
 import { VehicleInstanceJob, VehicleInstanceJobDto } from './vehicle-instance-job.entity';
@@ -30,7 +31,9 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
   constructor(
     private readonly placesService: PlacesService,
     private readonly vehicleInstancesService: VehicleInstancesService,
-    private readonly playersService: PlayersService) {
+    private readonly playersService: PlayersService,
+    private readonly mapService: MapTemplateService,
+  ) {
     super();
   }
 
@@ -49,6 +52,7 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
       pay: domain.pay,
       vehicleInstanceId: domain.vehicleInstance?.id,
       playerId: domain.player?.id,
+      mapId: domain.map?.id,
       startId: domain.start?.id,
       endId: domain.end?.id,
       startTime: domain.startTime?.toISOString(),
@@ -69,17 +73,19 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
 
     const vehicleInstanceId = dto.vehicleInstanceId ?? domain.vehicleInstance?.id;
     const playerId = dto.playerId ?? domain.player?.id;
+    const mapId = dto.mapId ?? domain.map?.id;
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
-    const fixedDto = omit(dto, ['vehicleInstanceId', 'playerId', 'startId', 'endId', 'startTime']);
+    const fixedDto = omit(dto, ['vehicleInstanceId', 'playerId', 'mapId', 'startId', 'endId', 'startTime']);
 
     return {
       ...domain,
       ...fixedDto,
       vehicleInstance: await this.vehicleInstancesService.findOne(vehicleInstanceId),
       player: await this.playersService.findOne(playerId),
+      map: await this.mapService.findOne(mapId),
       start: await this.placesService.findOne(startId),
       end: await this.placesService.findOne(endId),
       startTime,
@@ -98,7 +104,7 @@ export class VehicleInstanceJobsController extends AbstractServiceController<Veh
 }
 
 @Module({
-  imports: [PlaceModule, VehicleInstancesModule, PlayersModule, TypeOrmModule.forFeature([VehicleInstanceJob])],
+  imports: [PlaceModule, VehicleInstancesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([VehicleInstanceJob])],
   controllers: [VehicleInstanceJobsController],
   providers: [VehicleInstanceJobService, VehicleInstanceJobMapper, VehicleInstanceJobRepository],
   exports: [VehicleInstanceJobService, VehicleInstanceJobMapper]

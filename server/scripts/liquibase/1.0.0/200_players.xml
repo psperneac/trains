@@ -59,4 +59,27 @@
                 referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="99" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/players.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="players"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="name" name="name" type="varchar(250)" />
+            <column header="description" name="description" type="varchar(250)" />
+            <column header="user_id" name="user_id" type="${uuid_type}" />
+            <column header="map_id" name="map_id" type="${uuid_type}" />
+            <column header="content" name="content" type="json" />
+        </loadUpdateData>
+    </changeSet>
+
 </databaseChangeLog>

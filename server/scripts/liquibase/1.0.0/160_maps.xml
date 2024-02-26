@@ -119,4 +119,65 @@
                 referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="99" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/maps.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="maps"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="name" name="name" type="varchar(250)" />
+            <column header="description" name="description" type="varchar(250)" />
+            <column header="content" name="content" type="json" />
+        </loadUpdateData>
+    </changeSet>
+
+    <changeSet id="101" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/map_places.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="map_places"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="place_id" name="place_id" type="${uuid_type}" />
+            <column header="map_id" name="map_id" type="${uuid_type}" />
+        </loadUpdateData>
+    </changeSet>
+
+    <changeSet id="103" author="paul">
+        <loadUpdateData
+                primaryKey="id"
+                encoding="utf-8"
+                file="../data/map_place_connections.csv"
+                quotchar="&quot;"
+                relativeToChangelogFile="true"
+                separator=","
+                tableName="map_place_connections"
+        >
+            <column header="id" name="id" type="varchar(36)" />
+            <column header="version" name="version" type="integer" />
+            <column header="created" name="created" type="datetime" />
+            <column header="updated" name="updated" type="datetime" />
+            <column header="deleted" name="deleted" type="datetime" />
+            <column header="place_connection_id" name="place_connection_id" type="${uuid_type}" />
+            <column header="map_id" name="map_id" type="${uuid_type}" />
+        </loadUpdateData>
+    </changeSet>
+
 </databaseChangeLog>

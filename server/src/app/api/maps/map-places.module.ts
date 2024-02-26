@@ -1,7 +1,6 @@
 import {
   Controller,
-  Get,
-  HttpException, HttpStatus,
+  Get, HttpException, HttpStatus,
   Injectable,
   Module,
   Param,
@@ -10,40 +9,41 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { omit } from 'lodash';
+import { FindOptionsUtils } from 'typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceConnectionService, PlaceConnectionsModule } from '../places/place-connection.module';
-import { MapPlaceConnection, MapPlaceConnectionDto } from './map-place-connection.entity';
+import { PlaceModule, PlacesService } from '../places/place.module';
+import { MapPlace, MapPlaceDto } from './map-place.entity';
 import { MapTemplateModule, MapTemplateService } from './map-template.module';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { PageDto } from '../../../models/page.model';
-import { FindOptionsUtils } from 'typeorm';
 import { LoggedIn } from '../../../authentication/authentication.guard';
-import { MapPlaceService } from './map-place.module';
 
 @Injectable()
-export class MapPlaceConnectionRepository extends RepositoryAccessor<MapPlaceConnection>{
-  constructor(@InjectRepository(MapPlaceConnection) injectedRepo) {
-    super(injectedRepo, ['placeConnection', 'map']);
+export class MapPlaceRepository extends RepositoryAccessor<MapPlace> {
+  constructor(@InjectRepository(MapPlace) injectedRepo) {
+    super(injectedRepo, ['place', 'map']);
   }
 }
 
 @Injectable()
-export class MapPlaceConnectionService extends AbstractService<MapPlaceConnection> {
-  constructor(private readonly repo: MapPlaceConnectionRepository) {
+export class MapPlacesService extends AbstractService<MapPlace> {
+  constructor(repo: MapPlaceRepository) {
     super(repo);
   }
 
-  findAllByMap(pagination: PageRequestDto, mapId: string): Promise<PageDto<MapPlaceConnection>> {
+  findAllByMap(pagination: PageRequestDto, mapId: string): Promise<PageDto<MapPlace>> {
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
 
-    let query = this.repository.createQueryBuilder('map_place_connection')
-    // .innerJoin('map_place.map', 'map').innerJoin('map_place.map', 'map');
+    let query = this.repository.createQueryBuilder('map_place')
+      // .innerJoin('map_place.map', 'map').innerJoin('map_place.map', 'map');
     if (this.relationships) {
       // clone relationships because the method empties it
       FindOptionsUtils.applyRelationsRecursively(
@@ -60,7 +60,7 @@ export class MapPlaceConnectionService extends AbstractService<MapPlaceConnectio
     if (pagination.sortColumn) {
       query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
     }
-    query = query.where('map_place_connection.map.id = :mapId', { mapId });
+    query = query.where('map_place.map.id = :mapId', { mapId });
 
     return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
       return {
@@ -74,56 +74,61 @@ export class MapPlaceConnectionService extends AbstractService<MapPlaceConnectio
 }
 
 @Injectable()
-export class MapPlaceConnectionMapper extends AbstractDtoMapper<MapPlaceConnection, MapPlaceConnectionDto> {
-  constructor(private readonly placeConnectionService: PlaceConnectionService, private readonly mapService: MapTemplateService) {
+export class MapPlaceMapper extends AbstractDtoMapper<MapPlace, MapPlaceDto> {
+  constructor(
+    private readonly mapTemplateService: MapTemplateService,
+    private readonly placeService: PlacesService) {
     super();
   }
 
-  async toDto(domain: MapPlaceConnection): Promise<any> {
+  async toDto(domain: MapPlace): Promise<MapPlaceDto> {
     if (!domain) {
       return null;
     }
 
     const dto: any = {
       id: domain.id,
-      placeConnectionId: domain.placeConnection?.id,
+      placeId: domain.place?.id,
       mapId: domain.map?.id
     };
 
     return dto;
   }
 
-  async toDomain(dto: any, domain?: Partial<MapPlaceConnection> | MapPlaceConnection): Promise<MapPlaceConnection> {
+  async toDomain(dto: any, domain?: Partial<MapPlace> | MapPlace): Promise<MapPlace> {
     if (!dto) {
-      return domain as any as MapPlaceConnection;
+      return domain as any as MapPlace;
     }
 
     if (!domain) {
       domain = {};
     }
 
-    const placeConnectionId = dto.placeConnectionId ?? domain.placeConnection?.id;
+    const placeId = dto.placeId ?? domain.place?.id;
     const mapId = dto.mapId ?? domain.map?.id;
+
+    const fixedDto = omit(dto, ['placeId', 'mapId']);
 
     return {
       ...domain,
-      placeConnection: await this.placeConnectionService.findOne(placeConnectionId),
-      map: await this.mapService.findOne(mapId),
-    } as MapPlaceConnection;
+      ...fixedDto,
+      place: await this.placeService.findOne(placeId),
+      map: await this.mapTemplateService.findOne(mapId)
+    } as MapPlace;
   }
 }
 
-@Controller('map-place-connections')
+@Controller('map-places')
 @UseFilters(AllExceptionsFilter)
-export class MapPlaceConnectionController extends AbstractServiceController<MapPlaceConnection, MapPlaceConnectionDto> {
-  constructor(service: MapPlaceConnectionService, mapper: MapPlaceConnectionMapper) {
-    super(service, mapper)
+export class MapPlaceController extends AbstractServiceController<MapPlace, MapPlaceDto> {
+  constructor(service: MapPlacesService, mapper: MapPlaceMapper) {
+    super(service, mapper);
   }
 
   @Get('by-map/:mapId')
   @UseGuards(LoggedIn)
-  async findAllByMap(@Query() pagination: PageRequestDto, @Param('mapId') mapId: string): Promise<PageDto<MapPlaceConnectionDto>> {
-    return (this.service as MapPlaceConnectionService).findAllByMap(pagination, mapId).then(async page => {
+  async findAllByMap(@Query() pagination: PageRequestDto, @Param('mapId') mapId: string): Promise<PageDto<MapPlaceDto>> {
+    return (this.service as MapPlacesService).findAllByMap(pagination, mapId).then(async page => {
       return Promise.all(page?.data?.map(item => this.mapper.toDto(item)))
         .then(mappedData => ({
           ...page,
@@ -143,9 +148,9 @@ export class MapPlaceConnectionController extends AbstractServiceController<MapP
 }
 
 @Module({
-  imports: [PlaceConnectionsModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlaceConnection])],
-  controllers: [MapPlaceConnectionController],
-  providers: [MapPlaceConnectionService, MapPlaceConnectionMapper, MapPlaceConnectionRepository],
-  exports: [MapPlaceConnectionService, MapPlaceConnectionMapper]
+  imports: [PlaceModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlace])],
+  controllers: [MapPlaceController],
+  providers: [MapPlacesService, MapPlaceMapper, MapPlaceRepository],
+  exports: [MapPlacesService, MapPlaceMapper]
 })
-export class MapPlaceConnectionModule { }
+export class MapPlacesModule { }

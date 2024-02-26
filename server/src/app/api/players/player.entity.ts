@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
-import { PlaceInstance } from '../places/place-instance.entity';
+import { MapPlaceInstance } from '../places/map-place-instance.entity';
 import { User } from '../users/users.entity';
 import { VehicleInstance } from '../vehicles/vehicle-instance.entity';
 
@@ -29,13 +29,13 @@ export class Player extends AbstractEntity {
   @Expose()
   vehicles: VehicleInstance[];
 
-  @OneToMany(_type => PlaceInstance, placeInstance => placeInstance.player)
+  @OneToMany(_type => MapPlaceInstance, placeInstance => placeInstance.player)
   @Expose()
-  places: PlaceInstance[];
+  places: MapPlaceInstance[];
 
-  @OneToMany(_type => PlaceInstance, placeConnectionInstance => placeConnectionInstance.player)
+  @OneToMany(_type => MapPlaceInstance, placeConnectionInstance => placeConnectionInstance.player)
   @Expose()
-  placeConnections: PlaceInstance[];
+  placeConnections: MapPlaceInstance[];
 
   @Column({ type: 'json' })
   @Expose()

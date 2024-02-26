@@ -6,19 +6,6 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
                       http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-  <!--    <changeSet id="1" author="paul">-->
-  <!--      <sql>-->
-  <!--        create extension if not exists "uuid-ossp";-->
-  <!--        create extension if not exists "pgcrypto";-->
-  <!--        create extension if not exists "autoinc";-->
-  <!--        create extension if not exists "cube";-->
-  <!--        create extension if not exists "earthdistance";-->
-  <!--        alter user trains with nosuperuser;-->
-  <!--      </sql>-->
-  <!--      &lt;!&ndash; impossible to rollback this one, but if it got this far with the rollback, just
-  rerun create.sql &ndash;&gt;-->
-  <!--    </changeSet>-->
-
   <changeSet id="99" author="paul">
     <tagDatabase tag="initial" />
   </changeSet>
@@ -34,10 +21,11 @@
   <include file="200_players.xml" relativeToChangelogFile="true" />
   <include file="210_vehicle_instance.xml" relativeToChangelogFile="true" />
   <include file="220_vehicle_instance_jobs.xml" relativeToChangelogFile="true" />
-  <include file="230_place_instance.xml" relativeToChangelogFile="true" />
-  <include file="240_place_instance_jobs.xml" relativeToChangelogFile="true" />
-  <include file="250_place_instance_job_offers.xml" relativeToChangelogFile="true" />
-  <include file="260_place_connection_instances.xml" relativeToChangelogFile="true" />
+  <include file="230_map_place_instance.xml" relativeToChangelogFile="true" />
+  <include file="240_map_place_instance_jobs.xml" relativeToChangelogFile="true" />
+  <include file="250_map_place_instance_job_offers.xml" relativeToChangelogFile="true" />
+  <include file="260_map_place_connection_instances.xml" relativeToChangelogFile="true" />
   <include file="270_user_preferences.xml" relativeToChangelogFile="true" />
+  <include file="280_wallet.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

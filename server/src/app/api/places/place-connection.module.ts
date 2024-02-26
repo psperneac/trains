@@ -61,18 +61,12 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
 
     const fixedDto = omit(dto, ['startId', 'endId']);
 
-    return Promise.all([this.getPlace(startId), this.getPlace(endId)]).then(([start, end]) => {
-      return {
-        ...domain,
-        ...fixedDto,
-        start,
-        end
-      } as any as PlaceConnection;
-    });
-  }
-
-  getPlace(id: string) {
-    return id ? this.service.findOne(id) : null;
+    return {
+      ...domain,
+      ...fixedDto,
+      start: this.service.findOne(startId),
+      end: this.service.findOne(endId),
+    } as any as PlaceConnection;
   }
 }
 

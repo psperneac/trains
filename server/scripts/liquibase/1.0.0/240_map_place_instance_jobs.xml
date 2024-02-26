@@ -8,7 +8,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="10" author="paul">
-        <createTable tableName="place_instance_job_offers">
+        <createTable tableName="map_place_instance_jobs">
             <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false" />
             </column>
@@ -47,13 +47,15 @@
                 <constraints nullable="false" />
             </column>
 
-            <column name="place_instance_id" type="${uuid_type}">
+            <column name="map_place_instance_id" type="${uuid_type}">
                 <constraints nullable="true" />
             </column>
 
-            <column name="job_offer_expiry" type="datetime"></column>
-
             <column name="player_id" type="${uuid_type}">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="map_id" type="${uuid_type}">
                 <constraints nullable="false" />
             </column>
 
@@ -63,59 +65,68 @@
 
     <changeSet id="20" author="paul">
         <addForeignKeyConstraint
-                constraintName="place_instance_job_offers_start_places"
-                baseTableName="place_instance_job_offers"
+                constraintName="map_place_instance_jobs_start_places"
+                baseTableName="map_place_instance_jobs"
                 baseColumnNames="start_id"
-                referencedTableName="places"
+                referencedTableName="map_places"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="30" author="paul">
         <addForeignKeyConstraint
-                constraintName="place_instance_job_offers_end_places"
-                baseTableName="place_instance_job_offers"
+                constraintName="map_place_instance_jobs_end_places"
+                baseTableName="map_place_instance_jobs"
                 baseColumnNames="end_id"
-                referencedTableName="places"
+                referencedTableName="map_places"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="40" author="paul">
         <addForeignKeyConstraint
-                constraintName="place_instance_job_offers_place_instance"
-                baseTableName="place_instance_job_offers"
-                baseColumnNames="place_instance_id"
-                referencedTableName="place_instances"
+                constraintName="map_place_instance_jobs_map_place_instance"
+                baseTableName="map_place_instance_jobs"
+                baseColumnNames="map_place_instance_id"
+                referencedTableName="map_place_instances"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="50" author="paul">
         <sql>
-            alter table place_instance_job_offers add constraint ck_jobs_type check (type in ('delivery', 'passenger', 'repair', 'rescue', 'tow'));
+            alter table map_place_instance_jobs add constraint ck_jobs_type check (type in ('delivery', 'passenger', 'repair', 'rescue', 'tow'));
         </sql>
         <rollback>
             <sql>
-                alter table place_instance_job_offers drop constraint ck_jobs_type;
+                alter table map_place_instance_jobs drop constraint ck_jobs_type;
             </sql>
         </rollback>
     </changeSet>
 
     <changeSet id="60" author="paul">
         <sql>
-            alter table place_instance_job_offers add constraint ck_jobs_pay_type check (pay_type in ('gold', 'token', 'crate', 'material'));
+            alter table map_place_instance_jobs add constraint ck_jobs_pay_type check (pay_type in ('gold', 'token', 'crate', 'material'));
         </sql>
         <rollback>
             <sql>
-                alter table place_instance_job_offers drop constraint ck_jobs_pay_type;
+                alter table map_place_instance_jobs drop constraint ck_jobs_pay_type;
             </sql>
         </rollback>
     </changeSet>
 
     <changeSet id="70" author="paul">
         <addForeignKeyConstraint
-                constraintName="place_instance_job_offers_players"
-                baseTableName="place_instance_job_offers"
+                constraintName="map_place_instance_jobs_players"
+                baseTableName="map_place_instance_jobs"
                 baseColumnNames="player_id"
                 referencedTableName="players"
+                referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="80" author="paul">
+        <addForeignKeyConstraint
+                constraintName="map_place_instance_jobs_maps"
+                baseTableName="map_place_instance_jobs"
+                baseColumnNames="map_id"
+                referencedTableName="maps"
                 referencedColumnNames="id" />
     </changeSet>
 

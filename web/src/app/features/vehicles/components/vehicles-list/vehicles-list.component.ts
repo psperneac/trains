@@ -8,9 +8,7 @@ import { ConfirmDialog } from '../../../../components/confirm-dialog/confirm.dia
 import { AbstractListComponent } from '../../../../helpers/abstract-list.component';
 import { VehicleDto } from '../../../../models/vehicle.model';
 import { AppState } from '../../../../store';
-import { VehicleActions } from '../../store/vehicle.actions';
-import { VehicleState } from '../../store/vehicle.reducer';
-import { VehicleSelectors } from '../../store/vehicle.selectors';
+import { VehicleActions, VehicleState, VehicleSelectors } from '../../store/vehicle.store';
 
 @Component({
   selector: 'trains-vehicles-list',

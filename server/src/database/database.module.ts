@@ -4,12 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MapPlaceConnection } from '../app/api/maps/map-place-connection.entity';
 import { MapPlace } from '../app/api/maps/map-place.entity';
 import { MapTemplate } from '../app/api/maps/map-template.entity';
-import { PlaceConnectionInstance } from '../app/api/places/place-connection-instance.entity';
+import { MapPlaceConnectionInstance } from '../app/api/places/map-place-connection-instance.entity';
 import { PlaceConnection } from '../app/api/places/place-connection.entity';
-import { PlaceInstanceJobOffer } from '../app/api/places/place-instance-job-offer.entity';
-import { PlaceInstanceJob } from '../app/api/places/place-instance-job.entity';
-import { PlaceInstance } from '../app/api/places/place-instance.entity';
+import { MapPlaceInstanceJobOffer } from '../app/api/places/map-place-instance-job-offer.entity';
+import { MapPlaceInstanceJob } from '../app/api/places/map-place-instance-job.entity';
+import { MapPlaceInstance } from '../app/api/places/map-place-instance.entity';
 import { Player } from '../app/api/players/player.entity';
+import { Wallet } from '../app/api/players/wallet.entity';
 import { UserPreference } from '../app/api/users/user-preference.entity';
 import { User } from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
@@ -42,6 +43,7 @@ export const TABLES = {
   MAP_PLACE_CONNECTIONS: 'map_place_connections',
   PLAYERS: 'players',
   USER_PREFERENCES: 'user_preferences',
+  WALLETS: 'wallets',
 }
 
 export const ENTITIES = [
@@ -53,17 +55,18 @@ export const ENTITIES = [
   VehicleType,
   Vehicle,
   PlaceConnection,
-  PlaceConnectionInstance,
-  PlaceInstance,
-  PlaceInstanceJob,
-  PlaceInstanceJobOffer,
+  MapPlaceConnectionInstance,
+  MapPlaceInstance,
+  MapPlaceInstanceJob,
+  MapPlaceInstanceJobOffer,
   VehicleInstance,
   VehicleInstanceJob,
   MapTemplate,
   MapPlace,
   MapPlaceConnection,
 
-  Player
+  Player,
+  Wallet,
 ];
 
 @Module({

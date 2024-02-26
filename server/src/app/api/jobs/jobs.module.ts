@@ -7,7 +7,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceModule, PlacesService } from '../places/place.module';
+import { MapPlacesModule, MapPlacesService } from '../maps/map-places.module';
 import { Job, JobDto } from './job.entity';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class JobsService extends AbstractService<Job> {
 
 @Injectable()
 export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
-  constructor(private readonly service: PlacesService) {
+  constructor(private readonly service: MapPlacesService) {
     super();
   }
 
@@ -69,21 +69,13 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       { ...dto },
       ['startId', 'endId', 'startTime']);
 
-    return Promise.all([this.getPlace(startId), this.getPlace(endId)]).then(([start, end]) => {
-      const ret = {
-        ...domain,
-        ...fixedDto,
-        start,
-        end,
-        startTime,
-      } as Job;
-
-      return ret;
-    });
-  }
-
-  getPlace(id: string) {
-    return id ? this.service.findOne(id) : null;
+    return {
+      ...domain,
+      ...fixedDto,
+      start: this.service.findOne(startId),
+      end: this.service.findOne(endId),
+      startTime,
+    } as any as Job;
   }
 }
 
@@ -96,7 +88,7 @@ export class JobsController extends AbstractServiceController<Job, JobDto> {
 }
 
 @Module({
-  imports: [PlaceModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
+  imports: [MapPlacesModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
   controllers: [JobsController],
   providers: [JobsService, JobMapper, JobRepository],
   exports: [JobsService, JobMapper],

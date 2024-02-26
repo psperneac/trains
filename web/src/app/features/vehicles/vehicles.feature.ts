@@ -7,8 +7,7 @@ import { VehicleEditPage } from './pages/vehicle-edit.page';
 import { VehiclesPage } from './pages/vehicles-page.component';
 import { createVehicleGuardFn, loadOneVehicleGuardFn, VehicleDataService } from './services/vehicle-data.service';
 import { VehicleService } from './services/vehicle.service';
-import { VehicleEffects } from './store/vehicle.effects';
-import { reducer as vehiclesReducer } from './store/vehicle.reducer';
+import { reducer as vehiclesReducer, VehicleEffects } from './store/vehicle.store';
 
 export const VEHICLES_FEATURE: FeaturePart = {
   imports: [

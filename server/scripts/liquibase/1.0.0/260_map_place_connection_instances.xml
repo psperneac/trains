@@ -8,7 +8,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="10" author="paul">
-        <createTable tableName="vehicle_instances">
+        <createTable tableName="map_place_connection_instances">
             <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false" />
             </column>
@@ -21,22 +21,8 @@
             </column>
             <column name="deleted" type="datetime" />
 
-            <column name="vehicle_id" type="${uuid_type}">
+            <column name="map_place_connection_id" type="${uuid_type}">
                 <constraints nullable="false" />
-            </column>
-
-            <column name="start_id" type="${uuid_type}">
-                <constraints nullable="false" />
-            </column>
-
-            <column name="end_id" type="${uuid_type}">
-                <constraints nullable="false" />
-            </column>
-
-            <column name="start_time" type="datetime">
-            </column>
-
-            <column name="end_time" type="datetime">
             </column>
 
             <column name="player_id" type="${uuid_type}">
@@ -53,44 +39,26 @@
 
     <changeSet id="20" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instances_start_places"
-                baseTableName="vehicle_instances"
-                baseColumnNames="start_id"
-                referencedTableName="map_places"
+                constraintName="map_place_connection_instances_map_place_connections"
+                baseTableName="map_place_connection_instances"
+                baseColumnNames="map_place_connection_id"
+                referencedTableName="map_place_connections"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="30" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instances_end_places"
-                baseTableName="vehicle_instances"
-                baseColumnNames="end_id"
-                referencedTableName="map_places"
-                referencedColumnNames="id" />
-    </changeSet>
-
-    <changeSet id="40" author="paul">
-        <addForeignKeyConstraint
-                constraintName="vehicle_instances_vehicles"
-                baseTableName="vehicle_instances"
-                baseColumnNames="vehicle_id"
-                referencedTableName="vehicles"
-                referencedColumnNames="id" />
-    </changeSet>
-
-    <changeSet id="50" author="paul">
-        <addForeignKeyConstraint
-                constraintName="vehicle_instances_players"
-                baseTableName="vehicle_instances"
+                constraintName="map_place_connection_instances_players"
+                baseTableName="map_place_connection_instances"
                 baseColumnNames="player_id"
                 referencedTableName="players"
                 referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet id="60" author="paul">
+    <changeSet id="40" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instances_maps"
-                baseTableName="vehicle_instances"
+                constraintName="map_place_connection_instances_maps"
+                baseTableName="map_place_connection_instances"
                 baseColumnNames="map_id"
                 referencedTableName="maps"
                 referencedColumnNames="id" />

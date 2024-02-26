@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,26 +6,27 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="10" author="paul">
-        <createTable tableName="place_connection_instances">
+        <createTable tableName="wallets">
             <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
-                <constraints primaryKey="true" nullable="false" />
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="version" type="integer" defaultValue="0" />
+            <column name="version" type="integer" defaultValue="0"/>
             <column name="created" type="datetime" defaultValueComputed="now()">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="updated" type="datetime" defaultValueComputed="now()">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="deleted" type="datetime" />
+            <column name="deleted" type="datetime"/>
 
-            <column name="place_connection_id" type="${uuid_type}">
-                <constraints nullable="false" />
-            </column>
 
             <column name="player_id" type="${uuid_type}">
-                <constraints nullable="false" />
+                <constraints unique="true" nullable="false" uniqueConstraintName="WALLET_PLAYER_ix1" />
             </column>
+
+            <column name="gold" type="integer" defaultValue="0"/>
+            <column name="gems" type="integer" defaultValue="0"/>
+            <column name="parts" type="integer" defaultValue="0"/>
 
             <column name="content" type="json"> </column>
         </createTable>
@@ -35,20 +34,10 @@
 
     <changeSet id="20" author="paul">
         <addForeignKeyConstraint
-                constraintName="place_connection_instances_place_connections"
-                baseTableName="place_connection_instances"
-                baseColumnNames="place_connection_id"
-                referencedTableName="place_connections"
-                referencedColumnNames="id" />
-    </changeSet>
-
-    <changeSet id="30" author="paul">
-        <addForeignKeyConstraint
-                constraintName="place_connection_instances_players"
-                baseTableName="place_connection_instances"
+                constraintName="wallet_players"
+                baseTableName="wallet"
                 baseColumnNames="player_id"
                 referencedTableName="players"
                 referencedColumnNames="id" />
     </changeSet>
-
 </databaseChangeLog>
