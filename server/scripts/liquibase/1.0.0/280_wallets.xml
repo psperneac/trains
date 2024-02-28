@@ -34,8 +34,8 @@
 
     <changeSet id="20" author="paul">
         <addForeignKeyConstraint
-                constraintName="wallet_players"
-                baseTableName="wallet"
+                constraintName="wallets_players"
+                baseTableName="wallets"
                 baseColumnNames="player_id"
                 referencedTableName="players"
                 referencedColumnNames="id" />

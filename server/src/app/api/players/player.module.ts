@@ -9,11 +9,12 @@ import { UsersService } from '../users/users.service';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { WalletService, WalletModule } from './wallet.module';
 
 @Injectable()
 export class PlayerRepository extends RepositoryAccessor<Player> {
   constructor(@InjectRepository(Player) injectedRepo) {
-    super(injectedRepo, ['user', 'map', 'vehicles', 'places', 'placeConnections']);
+    super(injectedRepo, ['user', 'map', 'vehicles', 'places', 'placeConnections', 'wallet']);
   }
 }
 
@@ -22,11 +23,16 @@ export class PlayersService extends AbstractService<Player> {
   constructor(repo: PlayerRepository) {
     super(repo);
   }
+
+
 }
 
 @Injectable()
 export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
-  constructor(private readonly userService: UsersService, private readonly mapService: MapTemplateService) {
+  constructor(
+    private readonly userService: UsersService, 
+    private readonly mapService: MapTemplateService,
+  ) {
     super();
   }
 
@@ -34,6 +40,7 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
     if (!domain) {
       return null;
     }
+    console.log('Player - domain', domain);
 
     const dto: PlayerDto = {
       id: domain.id,
@@ -41,6 +48,7 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       description: domain.description,
       userId: domain.user?.id,
       mapId: domain.map?.id,
+      walletId: domain.wallet?.id,
       vehicles: domain.vehicles?.map(v => v.id),
       places: domain.places?.map(p => p.id),
       placeConnections: domain.placeConnections?.map(p => p.id),
@@ -67,7 +75,7 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       name: dto.name,
       description: dto.description,
       user: userId ? await this.userService.getById(userId) : null,
-      map: mapId ? await this.mapService.findOne(mapId) : null
+      map: mapId ? await this.mapService.findOne(mapId) : null,
     } as Player;
   }
 }

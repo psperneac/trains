@@ -5,6 +5,7 @@ import { MapTemplate } from '../maps/map-template.entity';
 import { MapPlaceInstance } from '../places/map-place-instance.entity';
 import { User } from '../users/users.entity';
 import { VehicleInstance } from '../vehicles/vehicle-instance.entity';
+import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'players' })
 export class Player extends AbstractEntity {
@@ -37,6 +38,11 @@ export class Player extends AbstractEntity {
   @Expose()
   placeConnections: MapPlaceInstance[];
 
+
+  @OneToOne(() => Wallet, (wallet) => wallet.player, { eager: true }) // specify inverse side as a second parameter
+  @Expose()
+  wallet: Wallet;
+
   @Column({ type: 'json' })
   @Expose()
   content: any;
@@ -46,6 +52,7 @@ export interface PlayerDto {
   id: string;
   name: string;
   description: string;
+  walletId: string;
   userId: string;
   mapId: string;
   vehicles: string[];

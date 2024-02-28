@@ -46,7 +46,18 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   async findOne(uuid: string): Promise<T> {
-    return uuid ? this.repository.findOne(uuid) : null;
+    if (!uuid) {
+      return null;
+    }
+
+    let query = this.repository.createQueryBuilder();
+    if (this.relationships) {
+      // clone relationships because the method empties it
+      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships], query.alias, this.repository.metadata, '');
+    }
+    query = query.where({ id: uuid });
+
+    return query.getOne();
   }
 
   create(entity: DeepPartial<T>): Promise<T> {

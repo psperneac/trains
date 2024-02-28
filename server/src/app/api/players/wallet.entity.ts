@@ -5,28 +5,20 @@ import { Player } from './player.entity';
 
 @Entity({ name: 'wallets' })
 export class Wallet extends AbstractEntity {
-  @Column('varchar', { length: 250 })
-  @Expose()
-  name: string;
-
-  @Column('varchar', { length: 250 })
-  @Expose()
-  description: string;
-
-  @OneToOne(_type => Player, { eager: true })
+  @OneToOne(_type => Player, (player) => player.wallet)
   @JoinColumn({ name: 'player_id' })
   @Expose()
   player: Player;
 
-  @Column()
+  @Column('integer')
   @Expose()
   gold = 0;
 
-  @Column()
+  @Column('integer')
   @Expose()
   gems = 0;
 
-  @Column()
+  @Column('integer')
   @Expose()
   parts = 0;
 
@@ -37,8 +29,6 @@ export class Wallet extends AbstractEntity {
 
 export interface WalletDto {
   id: string;
-  name: string;
-  description: string;
   playerId: string;
   gold: number;
   gems: number;

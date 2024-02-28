@@ -26,6 +26,6 @@
   <include file="250_map_place_instance_job_offers.xml" relativeToChangelogFile="true" />
   <include file="260_map_place_connection_instances.xml" relativeToChangelogFile="true" />
   <include file="270_user_preferences.xml" relativeToChangelogFile="true" />
-  <include file="280_wallet.xml" relativeToChangelogFile="true" />
+  <include file="280_wallets.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

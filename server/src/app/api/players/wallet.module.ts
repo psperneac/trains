@@ -35,8 +35,6 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
 
     const dto: WalletDto = {
       id: domain.id,
-      name: domain.name,
-      description: domain.description,
       playerId: domain.player?.id,
       gold: domain.gold,
       gems: domain.gems,
@@ -57,16 +55,15 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
     }
 
     const playerId = dto.playerId ?? domain.player?.id;
+    console.log('playerId', playerId);
 
     return {
       ...domain,
       id: dto.id,
-      name: dto.name,
-      description: dto.description,
       gold: dto.gold,
       gems: dto.gems,
       parts: dto.parts,
-      player: this.playersService.findOne(playerId),
+      player: await this.playersService.findOne(playerId),
       content: dto.content
     } as any as Wallet;
   }
