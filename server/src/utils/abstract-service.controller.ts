@@ -48,13 +48,26 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
+    console.log('findAll', pagination, this.service, this.mapper);
+
     return this.service
       .findAll(pagination)
-      .then(async page => {
-        return Promise.all(page?.data?.map(item => this.mapper.toDto(item))).then(mappedData => ({
-          ...page,
-          data: mappedData
-        }))
+      .then(this.makeHandler());
+  }
+
+  /**
+   * This is a helper function to create a closured handler for findAll containing the mapper instance
+   */
+  public makeHandler() {
+    return (page) => this.handlePagedResults(page, this.mapper);
+  }
+
+  public async handlePagedResults(page, mapper) {
+    return Promise.all(page?.data?.map(item => mapper.toDto(item)))
+      .then(mappedData => ({
+      ...page,
+        data: mappedData
+      }))
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;
@@ -64,8 +77,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
           throw new HttpException('Entities cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
-    });
-  }
+}
 
   @Post()
   @UseGuards(LoggedIn, Admin)

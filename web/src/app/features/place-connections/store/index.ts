@@ -1,4 +1,2 @@
-export * from './place-connection.actions';
-export * from './place-connection.reducer';
-export * from './place-connection.selectors';
-export * from './place-connection.effects';
+export * from './place-connection.store';
+export * from './map-place-connection.store';

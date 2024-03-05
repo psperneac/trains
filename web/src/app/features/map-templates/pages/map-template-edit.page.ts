@@ -19,10 +19,10 @@ import { PlaceConnectionDataService } from '../../place-connections/services/pla
 import { PlaceDataService } from '../../places/services/place-data.service';
 import { MapTemplateFormComponent } from '../components/map-template-form.component';
 import { Actions, ofType } from '@ngrx/effects';
-import { MapPlaceConnectionDataService } from '../services/map-place-connection-data.service';
-import { MapPlaceDataService } from '../services/map-place-data.service';
-import { MapPlaceConnectionActions } from '../store/map-place-connection.store';
-import { MapPlaceActions } from '../store/map-place.store';
+import { MapPlaceConnectionDataService } from '../../place-connections/services/map-place-connection-data.service';
+import { MapPlaceDataService } from '../../places/services/map-place-data.service';
+import { MapPlaceConnectionActions } from '../../place-connections/store/map-place-connection.store';
+import { MapPlaceActions } from '../../places/store/map-place.store';
 import { MapTemplateActions, MapTemplateSelectors } from '../store/map-template.store';
 import { Layer, latLng, tileLayer, LayerGroup, LatLng, point, FeatureGroup, polyline } from 'leaflet';
 import { MatDialog } from '@angular/material/dialog';

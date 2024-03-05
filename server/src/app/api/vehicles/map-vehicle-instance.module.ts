@@ -7,44 +7,45 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { PlaceModule, PlacesService } from '../places/place.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
-import { VehicleInstance, VehicleInstanceDto } from './vehicle-instance.entity';
+import { MapVehicleInstance, MapVehicleInstanceDto } from './map-vehicle-instance.entity';
+import { MapVehiclesModule, MapVehiclesService } from './map-vehicles.module';
 import { VehicleModule, VehiclesService } from './vehicle.module';
 
 @Injectable()
-export class VehicleInstanceRepository extends RepositoryAccessor<VehicleInstance> {
-  constructor(@InjectRepository(VehicleInstance) injectRepo) {
-    super(injectRepo, ['vehicle', 'player']);
+export class MapVehicleInstanceRepository extends RepositoryAccessor<MapVehicleInstance> {
+  constructor(@InjectRepository(MapVehicleInstance) injectRepo) {
+    super(injectRepo, ['mapVehicle', 'player']);
   }
 }
 
 @Injectable()
-export class VehicleInstancesService extends AbstractService<VehicleInstance> {
-  constructor(repo: VehicleInstanceRepository) {
+export class MapVehicleInstancesService extends AbstractService<MapVehicleInstance> {
+  constructor(repo: MapVehicleInstanceRepository) {
     super(repo);
   }
 }
 
 @Injectable()
-export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, VehicleInstanceDto> {
+export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstance, MapVehicleInstanceDto> {
   constructor(
-    private readonly placesService: PlacesService,
-    private readonly vehiclesService: VehiclesService,
+    private readonly mapPlacesService: MapPlacesService,
+    private readonly mapVehiclesService: MapVehiclesService,
     private readonly playersService: PlayersService,
     private readonly mapService: MapTemplateService,
   ) {
     super();
   }
 
-  async toDto(domain: VehicleInstance): Promise<VehicleInstanceDto> {
+  async toDto(domain: MapVehicleInstance): Promise<MapVehicleInstanceDto> {
     if (!domain) {
       return null;
     }
 
-    const dto: VehicleInstanceDto = {
+    const dto: MapVehicleInstanceDto = {
       id: domain.id,
-      vehicleId: domain.vehicle?.id,
+      mapVehicleId: domain.mapVehicle?.id,
       playerId: domain.player?.id,
       mapId: domain.map?.id,
       jobs: domain.jobs?.map(j => j.id),
@@ -58,16 +59,16 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
     return dto;
   }
 
-  async toDomain(dto: VehicleInstanceDto, domain?: Partial<VehicleInstance> | VehicleInstance): Promise<VehicleInstance> {
+  async toDomain(dto: MapVehicleInstanceDto, domain?: Partial<MapVehicleInstance> | MapVehicleInstance): Promise<MapVehicleInstance> {
     if (!dto) {
-      return domain as any as VehicleInstance;
+      return domain as any as MapVehicleInstance;
     }
 
     if (!domain) {
       domain = {};
     }
 
-    const vehicleId = dto.vehicleId ?? domain.vehicle?.id;
+    const mapVehicleId = dto.mapVehicleId ?? domain.mapVehicle?.id;
     const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
     const startId = dto.startId ?? domain.start?.id;
@@ -80,31 +81,31 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
     return {
       ...domain,
       ...fixedDto,
-      vehicle: await this.vehiclesService.findOne(vehicleId),
+      mapVehicle: await this.mapVehiclesService.findOne(mapVehicleId),
       player: await this.playersService.findOne(playerId),
       map: await this.mapService.findOne(mapId),
-      start: await this.placesService.findOne(startId),
-      end: await this.placesService.findOne(endId),
+      start: await this.mapPlacesService.findOne(startId),
+      end: await this.mapPlacesService.findOne(endId),
       startTime,
       endTime,
-    } as any as VehicleInstance;
+    } as any as MapVehicleInstance;
   }
 }
 
-@Controller('vehicle-instances')
+@Controller('map-vehicle-instances')
 @UseFilters(AllExceptionsFilter)
-export class VehicleInstancesController extends AbstractServiceController<VehicleInstance, VehicleInstanceDto> {
+export class MapVehicleInstancesController extends AbstractServiceController<MapVehicleInstance, MapVehicleInstanceDto> {
   constructor(
-    private readonly vehicleInstancesService: VehicleInstancesService,
-    private readonly vehicleInstanceMapper: VehicleInstanceMapper) {
+    private readonly vehicleInstancesService: MapVehicleInstancesService,
+    private readonly vehicleInstanceMapper: MapVehicleInstanceMapper) {
     super(vehicleInstancesService, vehicleInstanceMapper);
   }
 }
 
 @Module({
-  imports: [PlaceModule, VehicleModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([VehicleInstance])],
-  controllers: [VehicleInstancesController],
-  providers: [VehicleInstancesService, VehicleInstanceMapper, VehicleInstanceRepository],
-  exports: [VehicleInstancesService, VehicleInstanceMapper]
+  imports: [MapPlacesModule, MapVehiclesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([MapVehicleInstance])],
+  controllers: [MapVehicleInstancesController],
+  providers: [MapVehicleInstancesService, MapVehicleInstanceMapper, MapVehicleInstanceRepository],
+  exports: [MapVehicleInstancesService, MapVehicleInstanceMapper]
 })
-export class VehicleInstancesModule { }
+export class MapVehicleInstancesModule { }

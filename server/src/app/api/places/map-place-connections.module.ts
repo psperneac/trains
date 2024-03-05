@@ -15,9 +15,9 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceConnectionService, PlaceConnectionsModule } from '../places/place-connection.module';
+import { PlaceConnectionService, PlaceConnectionsModule } from './place-connection.module';
 import { MapPlaceConnection, MapPlaceConnectionDto } from './map-place-connection.entity';
-import { MapTemplateModule, MapTemplateService } from './map-template.module';
+import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { PageDto } from '../../../models/page.model';
 import { FindOptionsUtils } from 'typeorm';

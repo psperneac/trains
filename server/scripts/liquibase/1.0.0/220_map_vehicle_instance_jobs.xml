@@ -8,7 +8,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="10" author="paul">
-        <createTable tableName="vehicle_instance_jobs">
+        <createTable tableName="map_vehicle_instance_jobs">
             <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false" />
             </column>
@@ -47,7 +47,7 @@
                 <constraints nullable="false" />
             </column>
 
-            <column name="vehicle_instance_id" type="${uuid_type}">
+            <column name="map_vehicle_instance_id" type="${uuid_type}">
                 <constraints nullable="true" />
             </column>
 
@@ -65,57 +65,57 @@
 
     <changeSet id="20" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instance_jobs_start_places"
-                baseTableName="vehicle_instance_jobs"
+                constraintName="map_vehicle_instance_jobs_start_places"
+                baseTableName="map_vehicle_instance_jobs"
                 baseColumnNames="start_id"
-                referencedTableName="places"
+                referencedTableName="map_places"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="30" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instance_jobs_end_places"
-                baseTableName="vehicle_instance_jobs"
+                constraintName="map_vehicle_instance_jobs_end_places"
+                baseTableName="map_vehicle_instance_jobs"
                 baseColumnNames="end_id"
-                referencedTableName="places"
+                referencedTableName="map_places"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="40" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instance_jobs_vehicle_instance"
-                baseTableName="vehicle_instance_jobs"
-                baseColumnNames="vehicle_instance_id"
-                referencedTableName="vehicle_instances"
+                constraintName="map_vehicle_instance_jobs_map_vehicle_instance"
+                baseTableName="map_vehicle_instance_jobs"
+                baseColumnNames="map_vehicle_instance_id"
+                referencedTableName="map_vehicle_instances"
                 referencedColumnNames="id" />
     </changeSet>
 
     <changeSet id="50" author="paul">
         <sql>
-            alter table vehicle_instance_jobs add constraint ck_jobs_type check (type in ('delivery', 'passenger', 'repair', 'rescue', 'tow'));
+            alter table map_vehicle_instance_jobs add constraint ck_jobs_type check (type in ('delivery', 'passenger', 'repair', 'rescue', 'tow'));
         </sql>
         <rollback>
             <sql>
-                alter table vehicle_instance_jobs drop constraint ck_jobs_type;
+                alter table map_vehicle_instance_jobs drop constraint ck_jobs_type;
             </sql>
         </rollback>
     </changeSet>
 
     <changeSet id="60" author="paul">
         <sql>
-            alter table vehicle_instance_jobs add constraint ck_jobs_pay_type check (pay_type in ('gold', 'token', 'crate', 'material'));
+            alter table map_vehicle_instance_jobs add constraint ck_jobs_pay_type check (pay_type in ('gold', 'token', 'crate', 'material'));
         </sql>
         <rollback>
             <sql>
-                alter table vehicle_instance_jobs drop constraint ck_jobs_pay_type;
+                alter table map_vehicle_instance_jobs drop constraint ck_jobs_pay_type;
             </sql>
         </rollback>
     </changeSet>
 
     <changeSet id="70" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instance_jobs_players"
-                baseTableName="vehicle_instance_jobs"
+                constraintName="map_vehicle_instance_jobs_players"
+                baseTableName="map_vehicle_instance_jobs"
                 baseColumnNames="player_id"
                 referencedTableName="players"
                 referencedColumnNames="id" />
@@ -123,8 +123,8 @@
 
     <changeSet id="80" author="paul">
         <addForeignKeyConstraint
-                constraintName="vehicle_instance_jobs_maps"
-                baseTableName="vehicle_instance_jobs"
+                constraintName="map_vehicle_instance_jobs_maps"
+                baseTableName="map_vehicle_instance_jobs"
                 baseColumnNames="map_id"
                 referencedTableName="maps"
                 referencedColumnNames="id" />

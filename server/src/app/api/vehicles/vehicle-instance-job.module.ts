@@ -10,7 +10,7 @@ import { MapTemplateModule, MapTemplateService } from '../maps/map-template.modu
 import { PlaceModule, PlacesService } from '../places/place.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
 import { VehicleInstanceJob, VehicleInstanceJobDto } from './vehicle-instance-job.entity';
-import { VehicleInstanceMapper, VehicleInstancesModule, VehicleInstancesService } from './vehicle-instance.module';
+import { MapVehicleInstanceMapper, MapVehicleInstancesModule, MapVehicleInstancesService } from './map-vehicle-instance.module';
 
 @Injectable()
 export class VehicleInstanceJobRepository extends RepositoryAccessor<VehicleInstanceJob> {
@@ -30,7 +30,7 @@ export class VehicleInstanceJobService extends AbstractService<VehicleInstanceJo
 export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJob, VehicleInstanceJobDto> {
   constructor(
     private readonly placesService: PlacesService,
-    private readonly vehicleInstancesService: VehicleInstancesService,
+    private readonly vehicleInstancesService: MapVehicleInstancesService,
     private readonly playersService: PlayersService,
     private readonly mapService: MapTemplateService,
   ) {
@@ -104,7 +104,7 @@ export class VehicleInstanceJobsController extends AbstractServiceController<Veh
 }
 
 @Module({
-  imports: [PlaceModule, VehicleInstancesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([VehicleInstanceJob])],
+  imports: [PlaceModule, MapVehicleInstancesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([VehicleInstanceJob])],
   controllers: [VehicleInstanceJobsController],
   providers: [VehicleInstanceJobService, VehicleInstanceJobMapper, VehicleInstanceJobRepository],
   exports: [VehicleInstanceJobService, VehicleInstanceJobMapper]

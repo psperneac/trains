@@ -9,16 +9,20 @@ import {
   playersResolveFn,
   createPlayerGuardFn
 } from './services/player-data.service';
-import { PlayerEffects, reducer as playerReducer } from './store';
+import { PlayerEffects, playerReducer } from './store';
+import { WalletEffects, walletReducer } from './store';
 import { PlayersPage } from './pages/players.page';
 import { PlayersListComponent } from './components/players-list.component';
 import { PlayerFormComponent } from './components/player-form.component';
 import { PlayerEditPage } from './pages/player-edit.page';
+import { WalletDataService } from './services/wallet-data.service';
+import { WalletService } from './services/wallet.service';
 
 export const PLAYERS_FEATURE: FeaturePart = {
   imports: [
     StoreModule.forFeature('players', playerReducer),
-    EffectsModule.forFeature([PlayerEffects]),
+    StoreModule.forFeature('wallets', walletReducer),
+    EffectsModule.forFeature([PlayerEffects, WalletEffects]),
   ],
   declarations: [
     PlayersPage,
@@ -29,6 +33,8 @@ export const PLAYERS_FEATURE: FeaturePart = {
   providers: [
     PlayerService,
     PlayerDataService,
+    WalletService,
+    WalletDataService
   ],
   routes: [
     { path: '', component: PlayersPage, canActivate: [], canDeactivate: [], resolve: {

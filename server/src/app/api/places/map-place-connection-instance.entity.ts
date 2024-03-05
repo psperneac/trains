@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { MapPlaceConnection } from '../maps/map-place-connection.entity';
+import { MapPlaceConnection } from './map-place-connection.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { Player } from '../players/player.entity';
 

@@ -1,8 +1,8 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { PlaceConnection } from '../places/place-connection.entity';
-import { MapTemplate } from './map-template.entity';
+import { PlaceConnection } from './place-connection.entity';
+import { MapTemplate } from '../maps/map-template.entity';
 
 @Entity({ name: 'map_place_connections' })
 export class MapPlaceConnection extends AbstractEntity {

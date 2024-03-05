@@ -48,12 +48,7 @@ export class MapPlaceDataService {
   }
 }
 
-export const mapPlacesResolveFn =
-  () => inject(MapPlaceDataService).resolveMapPlaces();
-
-export const createMapPlaceGuardFn =
-  () => inject(MapPlaceDataService).createMapPlace();
-
-export const loadOneMapPlaceGuardFn =
-  (route: ActivatedRouteSnapshot) =>
+export const mapPlacesResolveFn = () => inject(MapPlaceDataService).resolveMapPlaces();
+export const createMapPlaceGuardFn = () => inject(MapPlaceDataService).createMapPlace();
+export const loadOneMapPlaceGuardFn = (route: ActivatedRouteSnapshot) =>
     inject(MapPlaceDataService).loadOneMapPlace(route);

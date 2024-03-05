@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MapPlaceConnection } from '../app/api/maps/map-place-connection.entity';
-import { MapPlace } from '../app/api/maps/map-place.entity';
+import { Job } from '../app/api/jobs/job.entity';
+import { MapPlaceConnection } from '../app/api/places/map-place-connection.entity';
+import { MapPlace } from '../app/api/places/map-place.entity';
 import { MapTemplate } from '../app/api/maps/map-template.entity';
+import { MapVehicle } from '../app/api/vehicles/map-vehicle.entity';
 import { MapPlaceConnectionInstance } from '../app/api/places/map-place-connection-instance.entity';
 import { PlaceConnection } from '../app/api/places/place-connection.entity';
 import { MapPlaceInstanceJobOffer } from '../app/api/places/map-place-instance-job-offer.entity';
@@ -18,7 +20,7 @@ import { Translation } from '../app/api/translations/translation.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PlaceType } from '../app/api/places/place-type.entity';
 import { VehicleInstanceJob } from '../app/api/vehicles/vehicle-instance-job.entity';
-import { VehicleInstance } from '../app/api/vehicles/vehicle-instance.entity';
+import { MapVehicleInstance } from '../app/api/vehicles/map-vehicle-instance.entity';
 import { VehicleType } from '../app/api/vehicles/vehicle-type.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
 
@@ -59,11 +61,12 @@ export const ENTITIES = [
   MapPlaceInstance,
   MapPlaceInstanceJob,
   MapPlaceInstanceJobOffer,
-  VehicleInstance,
+  MapVehicleInstance,
   VehicleInstanceJob,
   MapTemplate,
   MapPlace,
   MapPlaceConnection,
+  MapVehicle,
 
   Player,
   Wallet,

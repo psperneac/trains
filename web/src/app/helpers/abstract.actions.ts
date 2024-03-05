@@ -4,6 +4,7 @@ import {PageRequestDto} from "../models/pagination.model";
 import {PageDto} from "../models/page.model";
 
 export type IsActionChecker = (action: TypedAction<string>) => boolean;
+export type ActionCreatorFn<T extends object> = (props: T & NotAllowedCheck<T>) => (T & TypedAction<string>);
 
 export class AbstractActions<T> {
   public getAll: ActionCreator<string, (props: ({ request: PageRequestDto } & NotAllowedCheck<{ request: PageRequestDto }>)) => ({ request: PageRequestDto } & TypedAction<string>)>;

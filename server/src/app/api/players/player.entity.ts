@@ -4,7 +4,7 @@ import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { MapPlaceInstance } from '../places/map-place-instance.entity';
 import { User } from '../users/users.entity';
-import { VehicleInstance } from '../vehicles/vehicle-instance.entity';
+import { MapVehicleInstance } from '../vehicles/map-vehicle-instance.entity';
 import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'players' })
@@ -26,9 +26,9 @@ export class Player extends AbstractEntity {
   @Expose()
   map: MapTemplate;
 
-  @OneToMany(_type => VehicleInstance, vehicleInstance => vehicleInstance.player)
+  @OneToMany(_type => MapVehicleInstance, vehicleInstance => vehicleInstance.player)
   @Expose()
-  vehicles: VehicleInstance[];
+  vehicles: MapVehicleInstance[];
 
   @OneToMany(_type => MapPlaceInstance, placeInstance => placeInstance.player)
   @Expose()

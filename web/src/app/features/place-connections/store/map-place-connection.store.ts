@@ -69,13 +69,13 @@ export interface MapPlaceConnectionState extends AbstractEntityState<MapPlaceCon
 
 export const mapPlaceConnectionAdapter = createAdapter<MapPlaceConnectionDto>();
 const mapPlaceConnectionInitialState = mapPlaceConnectionAdapter.getInitialState();
-const mapPlaceConnectionReducer = defaultCreateReducer(
+const reducer = defaultCreateReducer(
   MapPlaceConnectionActions,
   mapPlaceConnectionAdapter,
   mapPlaceConnectionInitialState);
 
-export function reducer(state: MapPlaceConnectionState | undefined, action: any) {
-  return mapPlaceConnectionReducer(state, action);
+export function mapPlaceConnectionReducer(state: MapPlaceConnectionState | undefined, action: any) {
+  return reducer(state, action);
 }
 
 const selectors = mapPlaceConnectionAdapter.getSelectors();

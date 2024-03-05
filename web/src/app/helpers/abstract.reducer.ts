@@ -1,4 +1,6 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { ActionCreator } from '@ngrx/store/src/models';
+import { ReducerTypes } from '@ngrx/store/src/reducer_creator';
 import { AbstractEntity } from './abstract.entity';
 import { AbstractActions } from './abstract.actions';
 import { createReducer, on } from '@ngrx/store';
@@ -56,7 +58,12 @@ export const createInitialState = (adapter: EntityAdapter<AbstractEntity>, defau
 export function defaultCreateReducer<T extends AbstractEntity>(
   actions: AbstractActions<T>,
   adapter: EntityAdapter<T>,
-  entityInitialState) {
+  entityInitialState,
+  ...extraReducers: ReducerTypes<AbstractEntityState<T>, readonly ActionCreator[]>[]) {
+  if (!extraReducers) {
+    extraReducers = [];
+  }
+
   return createReducer(
     entityInitialState,
     on(actions.getAll, (state, _action) => {
@@ -125,6 +132,7 @@ export function defaultCreateReducer<T extends AbstractEntity>(
     on(actions.createFailure, actions.updateFailure, actions.deleteFailure, (state, action) => ({
       ...state,
       error: action.error
-    }))
+    })),
+    ...extraReducers
   );
 }

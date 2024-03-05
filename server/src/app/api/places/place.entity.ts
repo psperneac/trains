@@ -27,20 +27,3 @@ export interface PlaceDto {
   lat: number;
   lng: number;
 }
-
-export interface CreatePlaceDto {
-  name: string;
-  description: string;
-  type: string;
-  lat: number;
-  lng: number;
-}
-
-export interface UpdatePlaceDto {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  lat: number;
-  lng: number;
-}

@@ -59,7 +59,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="30" author="paul">
+    <changeSet id="22" author="paul">
         <addForeignKeyConstraint
                 constraintName="map_places_places"
                 baseTableName="map_places"
@@ -68,7 +68,7 @@
                 referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet id="40" author="paul">
+    <changeSet id="24" author="paul">
         <addForeignKeyConstraint
                 constraintName="map_places_maps"
                 baseTableName="map_places"
@@ -77,7 +77,7 @@
                 referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet id="50" author="paul">
+    <changeSet id="30" author="paul">
         <createTable tableName="map_place_connections">
             <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
                 <constraints primaryKey="true" nullable="false" />
@@ -101,7 +101,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="60" author="paul">
+    <changeSet id="32" author="paul">
         <addForeignKeyConstraint
                 constraintName="map_place_connections_places"
                 baseTableName="map_place_connections"
@@ -110,7 +110,7 @@
                 referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet id="70" author="paul">
+    <changeSet id="34" author="paul">
         <addForeignKeyConstraint
                 constraintName="map_place_connections_maps"
                 baseTableName="map_place_connections"
@@ -118,6 +118,48 @@
                 referencedTableName="maps"
                 referencedColumnNames="id" />
     </changeSet>
+
+    <changeSet id="40" author="paul">
+      <createTable tableName="map_vehicles">
+          <column name="id" type="${uuid_type}" defaultValueComputed="${uuid_function}">
+              <constraints primaryKey="true" nullable="false" />
+          </column>
+          <column name="version" type="integer" defaultValue="0" />
+          <column name="created" type="datetime" defaultValueComputed="now()">
+              <constraints nullable="false" />
+          </column>
+          <column name="updated" type="datetime" defaultValueComputed="now()">
+              <constraints nullable="false" />
+          </column>
+          <column name="deleted" type="datetime" />
+
+          <column name="vehicle_id" type="${uuid_type}">
+              <constraints nullable="false" />
+          </column>
+
+          <column name="map_id" type="${uuid_type}">
+              <constraints nullable="false" />
+          </column>
+      </createTable>
+  </changeSet>
+
+  <changeSet id="42" author="paul">
+      <addForeignKeyConstraint
+              constraintName="map_vehicles_vehicles"
+              baseTableName="map_vehicles"
+              baseColumnNames="vehicle_id"
+              referencedTableName="vehicles"
+              referencedColumnNames="id" />
+  </changeSet>
+
+  <changeSet id="44" author="paul">
+      <addForeignKeyConstraint
+              constraintName="map_vehicles_maps"
+              baseTableName="map_vehicles"
+              baseColumnNames="map_id"
+              referencedTableName="maps"
+              referencedColumnNames="id" />
+  </changeSet>
 
     <changeSet id="99" author="paul">
         <loadUpdateData
@@ -179,5 +221,25 @@
             <column header="map_id" name="map_id" type="${uuid_type}" />
         </loadUpdateData>
     </changeSet>
+
+    <changeSet id="105" author="paul">
+      <loadUpdateData
+              primaryKey="id"
+              encoding="utf-8"
+              file="../data/map_vehicles.csv"
+              quotchar="&quot;"
+              relativeToChangelogFile="true"
+              separator=","
+              tableName="map_vehicles"
+      >
+          <column header="id" name="id" type="varchar(36)" />
+          <column header="version" name="version" type="integer" />
+          <column header="created" name="created" type="datetime" />
+          <column header="updated" name="updated" type="datetime" />
+          <column header="deleted" name="deleted" type="datetime" />
+          <column header="vehicle_id" name="vehicle_id" type="${uuid_type}" />
+          <column header="map_id" name="map_id" type="${uuid_type}" />
+      </loadUpdateData>
+  </changeSet>
 
 </databaseChangeLog>

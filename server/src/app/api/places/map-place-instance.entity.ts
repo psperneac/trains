@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { MapPlace } from '../maps/map-place.entity';
+import { MapPlace } from './map-place.entity';
 import { Player } from '../players/player.entity';
 import { MapPlaceInstanceJobOffer } from './map-place-instance-job-offer.entity';
 import { MapPlaceInstanceJob } from './map-place-instance-job.entity';

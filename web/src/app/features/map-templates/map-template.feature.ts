@@ -11,26 +11,19 @@ import {
 } from './services/map-template-data.service';
 import { MapTemplateService } from './services/map-template.service';
 import { reducer as mapTemplatesReducer } from './store/map-template.store';
-import { MapPlaceEffects, reducer as mapPlacesReducer } from './store/map-place.store';
-import { MapPlaceConnectionEffects, reducer as mapPlaceConnectionsReducer } from './store/map-place-connection.store';
 import { EffectsModule } from '@ngrx/effects';
 import { MapTemplateEffects } from './store/map-template.store';
 import { MapTemplatesPage } from './pages/map-templates.page';
-import { MapPlaceService } from './services/map-place.service';
-import { MapPlaceDataService, mapPlacesResolveFn } from './services/map-place-data.service';
-import { MapPlaceConnectionService } from './services/map-place-connection.service';
+import { mapPlacesResolveFn } from '../places/services/map-place-data.service';
 import {
-  MapPlaceConnectionDataService,
   mapPlaceConnectionsResolveFn
-} from './services/map-place-connection-data.service';
+} from '../place-connections/services/map-place-connection-data.service';
 import { placesResolverFn } from '../places/services/place-data.service';
 
 export const MAP_TEMPLATES_FEATURE: FeaturePart = {
   imports: [
     StoreModule.forFeature('map-templates', mapTemplatesReducer),
-    StoreModule.forFeature('map-places', mapPlacesReducer),
-    StoreModule.forFeature('map-place-connections', mapPlaceConnectionsReducer),
-    EffectsModule.forFeature([MapTemplateEffects, MapPlaceEffects, MapPlaceConnectionEffects]),
+    EffectsModule.forFeature([MapTemplateEffects]),
   ],
   declarations: [
     MapTemplatesPage,
@@ -41,10 +34,6 @@ export const MAP_TEMPLATES_FEATURE: FeaturePart = {
   providers: [
     MapTemplateService,
     MapTemplateDataService,
-    MapPlaceService,
-    MapPlaceDataService,
-    MapPlaceConnectionService,
-    MapPlaceConnectionDataService,
   ],
   routes: [
     {

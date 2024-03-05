@@ -5,7 +5,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { MapPlaceConnectionsModule, MapPlaceConnectionService } from '../maps/map-place-connections.module';
+import { MapPlaceConnectionsModule, MapPlaceConnectionService } from './map-place-connections.module';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
 import { MapPlaceConnectionInstance, MapPlaceConnectionInstanceDto } from './map-place-connection-instance.entity';

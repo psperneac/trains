@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { TestConfig } from '../../../utils/test/test-config';
-import { MapPlace } from '../maps/map-place.entity';
+import { MapPlace } from '../places/map-place.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { PlaceConnection } from '../places/place-connection.entity';
 import { Place } from '../places/place.entity';

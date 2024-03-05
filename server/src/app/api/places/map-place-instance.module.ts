@@ -1,11 +1,15 @@
-import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
+import { PageRequestDto } from '../../../models/pagination.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapPlaceInstance, MapPlaceInstanceDto } from './map-place-instance.entity';
+import { MapPlacesModule, MapPlacesService } from './map-places.module';
 import { PlaceModule, PlacesService } from './place.module';
 import { omit } from 'lodash';
 import { PlayersModule, PlayersService } from '../players/player.module';
@@ -22,11 +26,15 @@ export class MapPlaceInstancesService extends AbstractService<MapPlaceInstance> 
   constructor(repo: MapPlaceInstanceRepository) {
     super(repo);
   }
+
+  findAllByPlayerAndMap(pagination: PageRequestDto, playerId: string, mapId: string): Promise<PageDto<MapPlaceInstance>> {
+    return this.findAllWithQuery(pagination, 'map_place_instances.map.id = :mapId and map_place_instances.player.id = :playerId', { mapId, playerId }) as Promise<PageDto<MapPlaceInstance>>;
+  }
 }
 
 @Injectable()
 export class MapPlaceInstanceMapper extends AbstractDtoMapper<MapPlaceInstance, MapPlaceInstanceDto> {
-  constructor(private readonly mapPlacesService: PlacesService, private readonly playersService: PlayersService) {
+  constructor(private readonly mapPlacesService: MapPlacesService, private readonly playersService: PlayersService) {
     super();
   }
 
@@ -76,10 +84,16 @@ export class MapPlaceInstanceController extends AbstractServiceController<MapPla
   constructor(service: MapPlaceInstancesService, mapper: MapPlaceInstanceMapper) {
     super(service, mapper);
   }
+
+  @Get('by-player-and-map/:playerId/:mapId')
+  @UseGuards(LoggedIn)
+  async findAllByPlayerAndMap(pagination: PageRequestDto, playerId: string, mapId: string): Promise<PageDto<MapPlaceInstanceDto>> {
+    return (this.service as MapPlaceInstancesService).findAllByPlayerAndMap(pagination, playerId, mapId).then(this.makeHandler());
+  }
 }
 
 @Module({
-  imports: [PlaceModule, PlayersModule, TypeOrmModule.forFeature([MapPlaceInstance])],
+  imports: [MapPlacesModule, PlayersModule, TypeOrmModule.forFeature([MapPlaceInstance])],
   controllers: [MapPlaceInstanceController],
   providers: [MapPlaceInstancesService, MapPlaceInstanceMapper, MapPlaceInstanceRepository],
   exports: [MapPlaceInstancesService, MapPlaceInstanceMapper]

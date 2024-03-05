@@ -4,15 +4,15 @@ import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { Place } from '../places/place.entity';
 import { Player } from '../players/player.entity';
+import { MapVehicle } from './map-vehicle.entity';
 import { VehicleInstanceJob } from './vehicle-instance-job.entity';
-import { Vehicle, VehicleDto } from './vehicle.entity';
 
-@Entity({ name: 'vehicle_instances' })
-export class VehicleInstance extends AbstractEntity {
-  @ManyToOne(_type => Vehicle, { eager: true })
-  @JoinColumn({ name: 'vehicle_id' })
+@Entity({ name: 'map_vehicle_instances' })
+export class MapVehicleInstance extends AbstractEntity {
+  @ManyToOne(_type => MapVehicle, { eager: true })
+  @JoinColumn({ name: 'map_vehicle_id' })
   @Expose()
-  vehicle: Vehicle;
+  mapVehicle: MapVehicle;
 
   @ManyToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'start_id' })
@@ -51,9 +51,9 @@ export class VehicleInstance extends AbstractEntity {
   content: any;
 }
 
-export interface VehicleInstanceDto {
+export interface MapVehicleInstanceDto {
   id: string;
-  vehicleId: string;
+  mapVehicleId: string;
   startId: string;
   endId: string;
   startTime: string;

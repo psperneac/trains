@@ -7,7 +7,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { MapPlacesModule, MapPlacesService } from '../maps/map-places.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
 import { Job, JobDto } from './job.entity';
 
 @Injectable()

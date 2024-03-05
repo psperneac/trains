@@ -1,3 +1,4 @@
+import { MapPlaceInstance } from '../app/api/places/map-place-instance.entity';
 import { PageRequestDto } from '../models/pagination.model';
 import { PageDto } from '../models/page.model';
 import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
@@ -19,6 +20,15 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
+    if (!pagination) {
+      pagination = new PageRequestDto();
+      pagination.unpaged = true;
+    }
+
+    if (!pagination.page || !pagination.limit) {
+      pagination.unpaged = true;
+    }
+
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
@@ -84,6 +94,40 @@ export class AbstractService<T extends AbstractEntity> {
       }
 
       return true;
+    });
+  }
+
+  findAllWithQuery(pagination: PageRequestDto, queryString: string, queryParams: any): Promise<PageDto<AbstractEntity>> {
+    const page = pagination.page || 1;
+    const limit = pagination.limit || 10;
+    const skippedItems = (page - 1) * limit;
+
+    let query = this.repository.createQueryBuilder('map_place_instances');
+    if (this.relationships) {
+      // clone relationships because the method empties it
+      FindOptionsUtils.applyRelationsRecursively(
+        query,
+        [...this.relationships],
+        query.alias,
+        this.repository.metadata,
+        ''
+      );
+    }
+    if (!pagination.unpaged) {
+      query = query.offset(skippedItems).limit(limit);
+    }
+    if (pagination.sortColumn) {
+      query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
+    }
+    query = query.where(queryString, queryParams);
+
+    return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
+      return {
+        data,
+        page: pagination.unpaged ? page : 1,
+        limit: pagination.unpaged ? count : limit,
+        totalCount: count
+      };
     });
   }
 }
