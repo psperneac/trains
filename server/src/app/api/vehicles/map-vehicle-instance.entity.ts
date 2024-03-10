@@ -5,7 +5,7 @@ import { MapTemplate } from '../maps/map-template.entity';
 import { Place } from '../places/place.entity';
 import { Player } from '../players/player.entity';
 import { MapVehicle } from './map-vehicle.entity';
-import { VehicleInstanceJob } from './vehicle-instance-job.entity';
+import { MapVehicleInstanceJob } from './map-vehicle-instance-job.entity';
 
 @Entity({ name: 'map_vehicle_instances' })
 export class MapVehicleInstance extends AbstractEntity {
@@ -42,9 +42,9 @@ export class MapVehicleInstance extends AbstractEntity {
   @Expose()
   map: MapTemplate;
 
-  @OneToMany(_type => VehicleInstanceJob, job => job.vehicleInstance)
+  @OneToMany(_type => MapVehicleInstanceJob, job => job.mapVehicleInstance)
   @Expose()
-  jobs: VehicleInstanceJob[];
+  jobs: MapVehicleInstanceJob[];
 
   @Column({ type: 'json' })
   @Expose()

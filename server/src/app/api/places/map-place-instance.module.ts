@@ -10,7 +10,6 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapPlaceInstance, MapPlaceInstanceDto } from './map-place-instance.entity';
 import { MapPlacesModule, MapPlacesService } from './map-places.module';
-import { PlaceModule, PlacesService } from './place.module';
 import { omit } from 'lodash';
 import { PlayersModule, PlayersService } from '../players/player.module';
 

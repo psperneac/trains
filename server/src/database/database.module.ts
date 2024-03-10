@@ -19,7 +19,7 @@ import { Place } from '../app/api/places/place.entity';
 import { Translation } from '../app/api/translations/translation.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PlaceType } from '../app/api/places/place-type.entity';
-import { VehicleInstanceJob } from '../app/api/vehicles/vehicle-instance-job.entity';
+import { MapVehicleInstanceJob } from '../app/api/vehicles/map-vehicle-instance-job.entity';
 import { MapVehicleInstance } from '../app/api/vehicles/map-vehicle-instance.entity';
 import { VehicleType } from '../app/api/vehicles/vehicle-type.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
@@ -62,7 +62,7 @@ export const ENTITIES = [
   MapPlaceInstanceJob,
   MapPlaceInstanceJobOffer,
   MapVehicleInstance,
-  VehicleInstanceJob,
+  MapVehicleInstanceJob,
   MapTemplate,
   MapPlace,
   MapPlaceConnection,

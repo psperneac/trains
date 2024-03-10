@@ -17,8 +17,8 @@
   <include file="140_vehicles.xml" relativeToChangelogFile="true" />
   <include file="150_place_connections.xml" relativeToChangelogFile="true" />
   <include file="160_maps.xml" relativeToChangelogFile="true" />
+  <include file="170_players.xml" relativeToChangelogFile="true" />
 
-  <include file="200_players.xml" relativeToChangelogFile="true" />
   <include file="210_map_vehicle_instance.xml" relativeToChangelogFile="true" />
   <include file="220_map_vehicle_instance_jobs.xml" relativeToChangelogFile="true" />
   <include file="230_map_place_instance.xml" relativeToChangelogFile="true" />

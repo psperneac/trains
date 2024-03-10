@@ -5,7 +5,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceModule, PlacesService } from './place.module';
+import { PlacesModule, PlacesService } from './place.module';
 import { PlaceConnection, PlaceConnectionDto } from './place-connection.entity';
 import { omit } from 'lodash';
 
@@ -79,7 +79,7 @@ export class PlaceConnectionController extends AbstractServiceController<PlaceCo
 }
 
 @Module({
-  imports: [PlaceModule, TypeOrmModule.forFeature([PlaceConnection])],
+  imports: [PlacesModule, TypeOrmModule.forFeature([PlaceConnection])],
   controllers: [PlaceConnectionController],
   providers: [PlaceConnectionService, PlaceConnectionMapper, PlaceConnectionRepository],
   exports: [PlaceConnectionService, PlaceConnectionMapper]

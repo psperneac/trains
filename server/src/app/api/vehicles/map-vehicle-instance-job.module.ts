@@ -7,29 +7,29 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { PlaceModule, PlacesService } from '../places/place.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
-import { VehicleInstanceJob, VehicleInstanceJobDto } from './vehicle-instance-job.entity';
+import { MapVehicleInstanceJob, MapVehicleInstanceJobDto } from './map-vehicle-instance-job.entity';
 import { MapVehicleInstanceMapper, MapVehicleInstancesModule, MapVehicleInstancesService } from './map-vehicle-instance.module';
 
 @Injectable()
-export class VehicleInstanceJobRepository extends RepositoryAccessor<VehicleInstanceJob> {
-  constructor(@InjectRepository(VehicleInstanceJob) injectedRepo) {
-    super(injectedRepo, ['vehicleInstance', 'player']);
+export class MapVehicleInstanceJobRepository extends RepositoryAccessor<MapVehicleInstanceJob> {
+  constructor(@InjectRepository(MapVehicleInstanceJob) injectedRepo) {
+    super(injectedRepo, ['mapVehicleInstance', 'player', 'map']);
   }
 }
 
 @Injectable()
-export class VehicleInstanceJobService extends AbstractService<VehicleInstanceJob> {
-  constructor(private readonly repo: VehicleInstanceJobRepository) {
+export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInstanceJob> {
+  constructor(private readonly repo: MapVehicleInstanceJobRepository) {
     super(repo)
   }
 }
 
 @Injectable()
-export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJob, VehicleInstanceJobDto> {
+export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleInstanceJob, MapVehicleInstanceJobDto> {
   constructor(
-    private readonly placesService: PlacesService,
+    private readonly mapPlacesService: MapPlacesService,
     private readonly vehicleInstancesService: MapVehicleInstancesService,
     private readonly playersService: PlayersService,
     private readonly mapService: MapTemplateService,
@@ -37,12 +37,12 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
     super();
   }
 
-  async toDto(domain: VehicleInstanceJob): Promise<VehicleInstanceJobDto> {
+  async toDto(domain: MapVehicleInstanceJob): Promise<MapVehicleInstanceJobDto> {
     if (!domain) {
       return null;
     }
 
-    const dto: VehicleInstanceJobDto = {
+    const dto: MapVehicleInstanceJobDto = {
       id: domain.id,
       type: domain.type,
       name: domain.name,
@@ -50,7 +50,7 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
       load: domain.load,
       payType: domain.payType,
       pay: domain.pay,
-      vehicleInstanceId: domain.vehicleInstance?.id,
+      mapVehicleInstanceId: domain.mapVehicleInstance?.id,
       playerId: domain.player?.id,
       mapId: domain.map?.id,
       startId: domain.start?.id,
@@ -62,16 +62,16 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
     return dto;
   }
 
-  async toDomain(dto: VehicleInstanceJobDto, domain?: Partial<VehicleInstanceJob> | VehicleInstanceJob): Promise<VehicleInstanceJob> {
+  async toDomain(dto: MapVehicleInstanceJobDto, domain?: Partial<MapVehicleInstanceJob> | MapVehicleInstanceJob): Promise<MapVehicleInstanceJob> {
     if (!dto) {
-      return domain as any as VehicleInstanceJob;
+      return domain as any as MapVehicleInstanceJob;
     }
 
     if (!domain) {
       domain = {};
     }
 
-    const vehicleInstanceId = dto.vehicleInstanceId ?? domain.vehicleInstance?.id;
+    const vehicleInstanceId = dto.mapVehicleInstanceId ?? domain.mapVehicleInstance?.id;
     const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
     const startId = dto.startId ?? domain.start?.id;
@@ -86,27 +86,27 @@ export class VehicleInstanceJobMapper extends AbstractDtoMapper<VehicleInstanceJ
       vehicleInstance: await this.vehicleInstancesService.findOne(vehicleInstanceId),
       player: await this.playersService.findOne(playerId),
       map: await this.mapService.findOne(mapId),
-      start: await this.placesService.findOne(startId),
-      end: await this.placesService.findOne(endId),
+      start: await this.mapPlacesService.findOne(startId),
+      end: await this.mapPlacesService.findOne(endId),
       startTime,
-    } as any as VehicleInstanceJob;
+    } as any as MapVehicleInstanceJob;
   }
 }
 
-@Controller('vehicle-instance-jobs')
+@Controller('map-vehicle-instance-jobs')
 @UseFilters(AllExceptionsFilter)
-export class VehicleInstanceJobsController extends AbstractServiceController<VehicleInstanceJob, VehicleInstanceJobDto> {
+export class MapVehicleInstanceJobsController extends AbstractServiceController<MapVehicleInstanceJob, MapVehicleInstanceJobDto> {
   constructor(
-    private readonly vehicleInstanceJobsService: VehicleInstanceJobService,
-    private readonly vehicleInstanceJobsMapper: VehicleInstanceJobMapper) {
-    super(vehicleInstanceJobsService, vehicleInstanceJobsMapper)
+    private readonly mapVehicleInstanceJobsService: MapVehicleInstanceJobService,
+    private readonly mapVehicleInstanceJobsMapper: MapVehicleInstanceJobMapper) {
+    super(mapVehicleInstanceJobsService, mapVehicleInstanceJobsMapper)
   }
 }
 
 @Module({
-  imports: [PlaceModule, MapVehicleInstancesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([VehicleInstanceJob])],
-  controllers: [VehicleInstanceJobsController],
-  providers: [VehicleInstanceJobService, VehicleInstanceJobMapper, VehicleInstanceJobRepository],
-  exports: [VehicleInstanceJobService, VehicleInstanceJobMapper]
+  imports: [MapPlacesModule, MapVehicleInstancesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([MapVehicleInstanceJob])],
+  controllers: [MapVehicleInstanceJobsController],
+  providers: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper, MapVehicleInstanceJobRepository],
+  exports: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper]
 })
 export class VehicleInstanceJobsModule { }

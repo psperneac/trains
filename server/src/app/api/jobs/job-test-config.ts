@@ -8,7 +8,7 @@ import { MapTemplate } from '../maps/map-template.entity';
 import { PlaceConnection } from '../places/place-connection.entity';
 import { Place } from '../places/place.entity';
 import { PlaceTestConfig } from '../places/places-test-config';
-import { VehicleInstanceJob } from '../vehicles/vehicle-instance-job.entity';
+import { MapVehicleInstanceJob } from '../vehicles/map-vehicle-instance-job.entity';
 import { Job, JobDto } from './job.entity';
 import { JobMapper, JobRepository, JobsController, JobsService } from './jobs.module';
 
@@ -48,7 +48,7 @@ const createPlace = (id: number): MapPlace => {
 };
 
 const createJob = (id: number): Job => {
-  const job = new VehicleInstanceJob();
+  const job = new MapVehicleInstanceJob();
   job.id = 'ID' + id;
   job.name = 'Job' + id;
   job.description = 'JobDescription' + id;

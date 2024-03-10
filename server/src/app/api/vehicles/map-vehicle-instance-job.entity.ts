@@ -5,12 +5,12 @@ import { MapTemplate } from '../maps/map-template.entity';
 import { Player } from '../players/player.entity';
 import { MapVehicleInstance } from './map-vehicle-instance.entity';
 
-@Entity({name: 'vehicle_instance_jobs'})
-export class VehicleInstanceJob extends Job {
+@Entity({name: 'map_vehicle_instance_jobs'})
+export class MapVehicleInstanceJob extends Job {
   @ManyToOne(type => MapVehicleInstance, {eager: true})
-  @JoinColumn({name: 'vehicle_instance_id'})
+  @JoinColumn({name: 'map_vehicle_instance_id'})
   @Expose()
-  vehicleInstance: MapVehicleInstance;
+  mapVehicleInstance: MapVehicleInstance;
 
   @ManyToOne(type => Player, {eager: true})
   @JoinColumn({name: 'player_id'})
@@ -27,8 +27,8 @@ export class VehicleInstanceJob extends Job {
   content: any;
 }
 
-export interface VehicleInstanceJobDto extends JobDto {
-  vehicleInstanceId: string;
+export interface MapVehicleInstanceJobDto extends JobDto {
+  mapVehicleInstanceId: string;
   playerId: string;
   mapId: string;
   content: any;

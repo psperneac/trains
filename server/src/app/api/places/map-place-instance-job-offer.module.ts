@@ -96,7 +96,7 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
   }
 }
 
-@Controller('map-place-instance-jobs')
+@Controller('map-place-instance-job-offers')
 @UseFilters(AllExceptionsFilter)
 export class MapPlaceInstanceJobOffersController extends AbstractServiceController<MapPlaceInstanceJobOffer, MapPlaceInstanceJobOfferDto> {
   constructor(service: MapPlaceInstanceJobOffersService, mapper: MapPlaceInstanceJobOfferMapper) {

@@ -43,4 +43,4 @@ export class PlacesController extends AbstractServiceController<Place, PlaceDto>
   providers: [PlacesService, PlaceMapper, PlacesRepository],
   exports: [PlacesService, PlaceMapper],
 })
-export class PlaceModule {}
+export class PlacesModule {}

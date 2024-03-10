@@ -17,7 +17,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceModule, PlacesService } from './place.module';
+import { PlacesModule, PlacesService } from './place.module';
 import { MapPlace, MapPlaceDto } from './map-place.entity';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { PageRequestDto } from '../../../models/pagination.model';
@@ -148,7 +148,7 @@ export class MapPlaceController extends AbstractServiceController<MapPlace, MapP
 }
 
 @Module({
-  imports: [PlaceModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlace])],
+  imports: [PlacesModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlace])],
   controllers: [MapPlaceController],
   providers: [MapPlacesService, MapPlaceMapper, MapPlaceRepository],
   exports: [MapPlacesService, MapPlaceMapper]
