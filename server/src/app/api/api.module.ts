@@ -16,7 +16,7 @@ import { UserPreferenceModule } from './users/user-preference.module';
 import { UsersModule } from './users/users.module';
 import { Module } from '@nestjs/common';
 import { TranslationsModule } from './translations/translations.module';
-import { VehicleInstanceJobsModule } from './vehicles/map-vehicle-instance-job.module';
+import { MapVehicleInstanceJobsModule } from './vehicles/map-vehicle-instance-job.module';
 import { MapVehicleInstancesModule } from './vehicles/map-vehicle-instance.module';
 import { VehicleTypesModule } from './vehicles/vehicle-types.module';
 import { PlaceTypeModule } from "./places/place-type.module";
@@ -42,7 +42,7 @@ import { VehicleModule } from './vehicles/vehicle.module';
     PlayersModule,
     WalletModule,
     MapVehicleInstancesModule,
-    VehicleInstanceJobsModule,
+    MapVehicleInstanceJobsModule,
     UserPreferenceModule,
     MapVehiclesModule,
   ],

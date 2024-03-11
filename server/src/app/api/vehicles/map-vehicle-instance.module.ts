@@ -1,6 +1,8 @@
-import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
@@ -24,6 +26,14 @@ export class MapVehicleInstanceRepository extends RepositoryAccessor<MapVehicleI
 export class MapVehicleInstancesService extends AbstractService<MapVehicleInstance> {
   constructor(repo: MapVehicleInstanceRepository) {
     super(repo);
+  }
+
+  findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string): Promise<PageDto<MapVehicleInstance>> {
+    return this.findAllWithQuery(pagination, 'map_vehicle_instances.map.id = :mapId and map_vehicle_instances.player.id = :playerId', { mapId, playerId }) as Promise<PageDto<MapVehicleInstance>>;
+  }
+
+  findAllByVehicle(pagination: any, mapVehicleId: string): Promise<PageDto<MapVehicleInstance>> {
+    return this.findAllWithQuery(pagination, 'map_vehicle_instances.mapVehicle.id = :mapVehicleId', { mapVehicleId }) as Promise<PageDto<MapVehicleInstance>>;
   }
 }
 
@@ -99,6 +109,18 @@ export class MapVehicleInstancesController extends AbstractServiceController<Map
     private readonly vehicleInstancesService: MapVehicleInstancesService,
     private readonly vehicleInstanceMapper: MapVehicleInstanceMapper) {
     super(vehicleInstancesService, vehicleInstanceMapper);
+  }
+
+  @Get('by-player-and-map/:playerId/:mapId')
+  @UseGuards(LoggedIn)
+  async findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string): Promise<PageDto<MapVehicleInstanceDto>> {
+    return this.vehicleInstancesService.findAllByPlayerAndMap(pagination, playerId, mapId).then(this.makeHandler());
+  }
+
+  @Get('by-vehicle/:mapVehicleId')
+  @UseGuards(LoggedIn)
+  async findAllByVehicle(pagination: any, mapVehicleId: string): Promise<PageDto<MapVehicleInstanceDto>> {
+    return this.vehicleInstancesService.findAllByVehicle(pagination, mapVehicleId).then(this.makeHandler());
   }
 }
 

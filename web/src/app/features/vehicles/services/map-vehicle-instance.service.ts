@@ -18,4 +18,10 @@ export class MapVehicleInstanceService extends AbstractService<MapVehicleInstanc
       params: toParams(pagination)
     });
   }
+
+  getAllByVehicle(pagination: any, vehicleId: string) {
+    return this.httpClient.get<PageDto<MapVehicleInstanceDto>>(urljoin(environment.api, this.path, 'by-vehicle', vehicleId), {
+      params: toParams(pagination)
+    });
+  }
 }

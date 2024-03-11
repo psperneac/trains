@@ -23,3 +23,17 @@ export interface ByPlayerAndMapResponseType<T extends AbstractEntity> {
   playerId: string;
   mapId: string;
 }
+
+export interface ByVehicleRequestType {
+  request: PageRequestDto;
+  vehicleId: string;
+}
+
+export interface ByVehicleResponseType<T extends AbstractEntity> {
+  result: PageDto<T>;
+  vehicleId: string;
+}
+
+export interface ErrorType {
+  error: any;
+}

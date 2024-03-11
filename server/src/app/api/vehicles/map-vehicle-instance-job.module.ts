@@ -1,6 +1,8 @@
-import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
@@ -10,6 +12,7 @@ import { MapTemplateModule, MapTemplateService } from '../maps/map-template.modu
 import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
 import { PlayersModule, PlayersService } from '../players/player.module';
 import { MapVehicleInstanceJob, MapVehicleInstanceJobDto } from './map-vehicle-instance-job.entity';
+import { MapVehicleInstanceDto } from './map-vehicle-instance.entity';
 import { MapVehicleInstanceMapper, MapVehicleInstancesModule, MapVehicleInstancesService } from './map-vehicle-instance.module';
 
 @Injectable()
@@ -23,6 +26,16 @@ export class MapVehicleInstanceJobRepository extends RepositoryAccessor<MapVehic
 export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInstanceJob> {
   constructor(private readonly repo: MapVehicleInstanceJobRepository) {
     super(repo)
+  }
+
+  findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string) {
+    return this.findAllWithQuery(pagination,
+      'map_vehicle_instance_jobs.map.id = :mapId and map_vehicle_instance_jobs.player.id = :playerId',
+      { mapId, playerId });
+  }
+
+  findAllByVehicle(pagination: any, vehicleId: string) {
+    return this.findAllWithQuery(pagination, 'map_vehicle_instance_jobs.mapVehicleInstance.id = :vehicleId', { vehicleId })
   }
 }
 
@@ -101,6 +114,18 @@ export class MapVehicleInstanceJobsController extends AbstractServiceController<
     private readonly mapVehicleInstanceJobsMapper: MapVehicleInstanceJobMapper) {
     super(mapVehicleInstanceJobsService, mapVehicleInstanceJobsMapper)
   }
+
+  @Get('by-player-and-map/:playerId/:mapId')
+  @UseGuards(LoggedIn)
+  async findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string): Promise<PageDto<MapVehicleInstanceDto>> {
+    return this.mapVehicleInstanceJobsService.findAllByPlayerAndMap(pagination, playerId, mapId).then(this.makeHandler());
+  }
+
+  @Get('by-vehicle/:mapVehicleId')
+  @UseGuards(LoggedIn)
+  async findAllByVehicle(pagination: any, mapVehicleId: string): Promise<PageDto<MapVehicleInstanceDto>> {
+    return this.mapVehicleInstanceJobsService.findAllByVehicle(pagination, mapVehicleId).then(this.makeHandler());
+  }
 }
 
 @Module({
@@ -109,4 +134,4 @@ export class MapVehicleInstanceJobsController extends AbstractServiceController<
   providers: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper, MapVehicleInstanceJobRepository],
   exports: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper]
 })
-export class VehicleInstanceJobsModule { }
+export class MapVehicleInstanceJobsModule { }
