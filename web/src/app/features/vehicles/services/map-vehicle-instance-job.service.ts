@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { AbstractService } from '../../../helpers/abstract.service';
 import { toParams } from '../../../helpers/http.helpers';
 import { MapVehicleInstanceJobDto } from '../../../models/map-vehicle-instance-job.model';
+import { PageDto } from '../../../models/page.model';
 
 @Injectable({ providedIn: 'root' })
 export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInstanceJobDto> {
@@ -20,7 +21,7 @@ export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInst
    * @param mapId
    */
   getAllByPlayerAndMap(pagination: any, playerId: string, mapId: string) {
-    return this.httpClient.get(urljoin(environment.api, this.path, 'by-player-and-map', playerId, mapId), {
+    return this.httpClient.get<PageDto<MapVehicleInstanceJobDto>>(urljoin(environment.api, this.path, 'by-player-and-map', playerId, mapId), {
       params: toParams(pagination)
     });
   }
@@ -32,7 +33,7 @@ export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInst
    * @param vehicleId
    */
   getAllByVehicle(pagination: any, vehicleId: string) {
-    return this.httpClient.get(urljoin(environment.api, this.path, 'by-vehicle', vehicleId), {
+    return this.httpClient.get<PageDto<MapVehicleInstanceJobDto>>(urljoin(environment.api, this.path, 'by-vehicle', vehicleId), {
       params: toParams(pagination)
     });
   }

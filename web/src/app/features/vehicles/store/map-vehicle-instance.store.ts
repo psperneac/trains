@@ -90,6 +90,11 @@ class MapVehicleInstanceSelectorsType extends AbstractSelectors<MapVehicleInstan
     featureSelector,
     (state) => state.entities ? Object.values(state.entities).filter((instance) => instance.playerId === playerId && instance.mapId === mapId) : []
   );
+
+  ByVehicle = (vehicleId: string) => createSelector(
+    featureSelector,
+    (state) => state.entities ? Object.values(state.entities).filter((instance) => instance.mapVehicleId === vehicleId) : []
+  );
 }
 
 export const MapVehicleInstanceSelectors = new MapVehicleInstanceSelectorsType();

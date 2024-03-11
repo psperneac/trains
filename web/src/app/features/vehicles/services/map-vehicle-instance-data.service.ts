@@ -11,6 +11,7 @@ export class MapVehicleInstanceDataService {
   mapVehicleInstancesLoaded$ = this.store.pipe(select(MapVehicleInstanceSelectors.Loaded));
   mapVehicleInstances$ = this.store.pipe(select(MapVehicleInstanceSelectors.All));
   mapVehicleInstancesByPlayerAndMapId$ = (playerId: string, mapId: string) => this.store.pipe(select(MapVehicleInstanceSelectors.ByPlayerAndMap(playerId, mapId)));
+  mapVehicleInstancesByVehicleId$ = (vehicleId: string) => this.store.pipe(select(MapVehicleInstanceSelectors.ByVehicle(vehicleId)));
 
   constructor(private readonly store: Store<{}>) {
   }
