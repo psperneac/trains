@@ -51,7 +51,7 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
       startTime: domain.startTime?.toISOString(),
       startId: domain.start?.id,
       endId: domain.end?.id,
-      placeInstanceId: domain.placeInstance?.id,
+      mapPlaceInstanceId: domain.mapPlaceInstance?.id,
       playerId: domain.player?.id,
       mapId: domain.map?.id,
       jobOfferExpiry: domain.jobOfferExpiry?.toISOString(),
@@ -72,7 +72,7 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
 
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
-    const placeInstanceId = dto.placeInstanceId ?? domain.placeInstance?.id;
+    const mapPlaceInstanceId = dto.mapPlaceInstanceId ?? domain.mapPlaceInstance?.id;
     const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
@@ -89,7 +89,7 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
       end: await this.placesService.findOne(endId),
       startTime,
       jobOfferExpiry,
-      placeInstance: await this.placeInstancesService.findOne(placeInstanceId),
+      mapPlaceInstance: await this.placeInstancesService.findOne(mapPlaceInstanceId),
       player: await this.playersService.findOne(playerId),
       map: await this.mapService.findOne(mapId),
     } as MapPlaceInstanceJobOffer;

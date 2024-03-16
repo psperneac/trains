@@ -34,6 +34,16 @@ export interface ByVehicleResponseType<T extends AbstractEntity> {
   vehicleId: string;
 }
 
+export interface ByPlaceRequestType {
+  request: PageRequestDto;
+  placeId: string;
+}
+
+export interface ByPlaceResponseType<T extends AbstractEntity> {
+  result: PageDto<T>;
+  placeId: string;
+}
+
 export interface ErrorType {
   error: any;
 }

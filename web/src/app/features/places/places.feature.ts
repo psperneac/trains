@@ -3,11 +3,13 @@ import { EffectsModule } from '@ngrx/effects';
 import { resolvePlaceTypesFn } from '../place-types/services/place-type-data.service';
 import { MapPlaceDataService } from './services/map-place-data.service';
 import { MapPlaceInstanceDataService } from './services/map-place-instance-data.service';
+import { MapPlaceInstanceJobDataService } from './services/map-place-instance-job-data.service';
+import { MapPlaceInstanceJobService } from './services/map-place-instance-job.service';
 import { MapPlaceInstanceService } from './services/map-place-instance.service';
 import { MapPlaceService } from './services/map-place.service';
 import { createPlaceGuardFn, loadOnePlaceGuardFn, PlaceDataService, placesResolverFn } from './services/place-data.service';
 import { PlaceService } from './services/place.service';
-import { PlaceEffects, reducer as placeReducer } from './store';
+import { MapPlaceInstanceJobEffects, mapPlaceInstanceJobReducer, PlaceEffects, reducer as placeReducer } from './store';
 import { PlacesPage } from './pages/places.page';
 import { PlacesListComponent } from './components/places-list.component';
 import { PlaceFormComponent } from './components/place-form.component';
@@ -22,8 +24,19 @@ export const PLACES_FEATURE: FeaturePart = {
     StoreModule.forFeature('places', placeReducer),
     StoreModule.forFeature('map-places', mapPlacesReducer),
     StoreModule.forFeature('map-place-instances', mapPlaceInstanceReducer),
-    EffectsModule.forFeature([PlaceEffects, MapPlaceEffects, MapPlaceInstanceEffects])],
-  declarations: [PlacesPage, PlacesListComponent, PlaceFormComponent, PlaceEditPage, PlaceCreatePage],
+    StoreModule.forFeature('map-place-instance-jobs', mapPlaceInstanceJobReducer),
+    EffectsModule.forFeature([
+      PlaceEffects,
+      MapPlaceEffects,
+      MapPlaceInstanceEffects,
+      MapPlaceInstanceJobEffects
+    ])],
+  declarations: [
+    PlacesPage,
+    PlacesListComponent,
+    PlaceFormComponent,
+    PlaceEditPage,
+    PlaceCreatePage],
   providers: [
     PlaceService,
     PlaceDataService,
@@ -31,6 +44,8 @@ export const PLACES_FEATURE: FeaturePart = {
     MapPlaceDataService,
     MapPlaceInstanceService,
     MapPlaceInstanceDataService,
+    MapPlaceInstanceJobService,
+    MapPlaceInstanceJobDataService,
   ],
   routes: [
     {

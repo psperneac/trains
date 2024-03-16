@@ -10,7 +10,7 @@ export class MapPlaceInstanceJobOffer extends Job {
   @ManyToOne(type => MapPlaceInstance, { eager: true })
   @JoinColumn({ name: 'map_place_instance_id' })
   @Expose()
-  placeInstance: MapPlaceInstance;
+  mapPlaceInstance: MapPlaceInstance;
 
   @ManyToOne(type => Player, {eager: true})
   @JoinColumn({name: 'player_id'})
@@ -32,7 +32,7 @@ export class MapPlaceInstanceJobOffer extends Job {
 }
 
 export interface MapPlaceInstanceJobOfferDto extends JobDto {
-  placeInstanceId: string;
+  mapPlaceInstanceId: string;
   playerId: string;
   mapId: string;
   jobOfferExpiry: string;
