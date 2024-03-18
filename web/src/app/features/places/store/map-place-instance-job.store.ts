@@ -112,7 +112,7 @@ class MapPlaceInstanceJobSelectorsType extends AbstractSelectors<
     super(featureSelector, selectors);
   }
 
-  ByPlayerAndMap = (playerId: string, mapId: string) =>
+  public ByPlayerAndMap = (playerId: string, mapId: string) =>
     createSelector(
       featureSelector,
       state => state.entities,
@@ -120,7 +120,7 @@ class MapPlaceInstanceJobSelectorsType extends AbstractSelectors<
         Object.values(entities).filter(job => job.playerId === playerId && job.mapId === mapId)
     );
 
-  ByPlace = (placeId: string) =>
+  public ByPlace = (placeId: string) =>
     createSelector(
       featureSelector,
       state => state.entities,

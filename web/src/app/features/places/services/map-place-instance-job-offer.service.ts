@@ -4,12 +4,12 @@ import urljoin from 'url-join';
 import { environment } from '../../../../environments/environment';
 import { AbstractService } from '../../../helpers/abstract.service';
 import { toParams } from '../../../helpers/http.helpers';
-import { MapPlaceInstanceJobDto, PageDto } from '../../../models';
+import { MapPlaceInstanceJobOfferDto, PageDto } from '../../../models';
 
 @Injectable({ providedIn: 'root' })
-export class MapPlaceInstanceJobService extends AbstractService<MapPlaceInstanceJobDto> {
+export class MapPlaceInstanceJobOfferService extends AbstractService<MapPlaceInstanceJobOfferDto> {
   constructor(public httpClient: HttpClient) {
-    super(httpClient, '/api/map-place-instance-jobs');
+    super(httpClient, '/api/map-place-instance-job-offers');
   }
 
   /**
@@ -20,7 +20,7 @@ export class MapPlaceInstanceJobService extends AbstractService<MapPlaceInstance
    * @param mapId
    */
   getAllByPlayerAndMap(pagination: any, playerId: string, mapId: string) {
-    return this.httpClient.get<PageDto<MapPlaceInstanceJobDto>>(
+    return this.httpClient.get<PageDto<MapPlaceInstanceJobOfferDto>>(
       urljoin(environment.api, this.path, 'by-player-and-map', playerId, mapId),
       {
         params: toParams(pagination)
@@ -35,7 +35,7 @@ export class MapPlaceInstanceJobService extends AbstractService<MapPlaceInstance
    * @param placeId
    */
   getAllByPlace(pagination: any, placeId: string) {
-    return this.httpClient.get<PageDto<MapPlaceInstanceJobDto>>(
+    return this.httpClient.get<PageDto<MapPlaceInstanceJobOfferDto>>(
       urljoin(environment.api, this.path, 'by-place', placeId),
       {
         params: toParams(pagination)

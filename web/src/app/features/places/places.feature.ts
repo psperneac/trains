@@ -4,18 +4,30 @@ import { resolvePlaceTypesFn } from '../place-types/services/place-type-data.ser
 import { MapPlaceDataService } from './services/map-place-data.service';
 import { MapPlaceInstanceDataService } from './services/map-place-instance-data.service';
 import { MapPlaceInstanceJobDataService } from './services/map-place-instance-job-data.service';
+import { MapPlaceInstanceJobOfferDataService } from './services/map-place-instance-job-offer-data.service';
 import { MapPlaceInstanceJobService } from './services/map-place-instance-job.service';
 import { MapPlaceInstanceService } from './services/map-place-instance.service';
 import { MapPlaceService } from './services/map-place.service';
-import { createPlaceGuardFn, loadOnePlaceGuardFn, PlaceDataService, placesResolverFn } from './services/place-data.service';
+import {
+  createPlaceGuardFn,
+  loadOnePlaceGuardFn,
+  PlaceDataService,
+  placesResolverFn
+} from './services/place-data.service';
 import { PlaceService } from './services/place.service';
-import { MapPlaceInstanceJobEffects, mapPlaceInstanceJobReducer, PlaceEffects, reducer as placeReducer } from './store';
+import {
+  MapPlaceInstanceJobEffects,
+  mapPlaceInstanceJobReducer,
+  PlaceEffects,
+  reducer as placeReducer
+} from './store';
 import { PlacesPage } from './pages/places.page';
 import { PlacesListComponent } from './components/places-list.component';
 import { PlaceFormComponent } from './components/place-form.component';
 import { PlaceEditPage } from './pages/place-edit.page';
 import { PlaceCreatePage } from './pages/place-create.page';
-import {FeaturePart} from "../../utils/feature-part";
+import { FeaturePart } from '../../utils/feature-part';
+import { MapPlaceInstanceJobOfferEffects } from './store/map-place-instance-job-offer.store';
 import { MapPlaceInstanceEffects, mapPlaceInstanceReducer } from './store/map-place-instance.store';
 import { MapPlaceEffects, reducer as mapPlacesReducer } from './store/map-place.store';
 
@@ -29,14 +41,17 @@ export const PLACES_FEATURE: FeaturePart = {
       PlaceEffects,
       MapPlaceEffects,
       MapPlaceInstanceEffects,
-      MapPlaceInstanceJobEffects
-    ])],
+      MapPlaceInstanceJobEffects,
+      MapPlaceInstanceJobOfferEffects
+    ])
+  ],
   declarations: [
     PlacesPage,
     PlacesListComponent,
     PlaceFormComponent,
     PlaceEditPage,
-    PlaceCreatePage],
+    PlaceCreatePage
+  ],
   providers: [
     PlaceService,
     PlaceDataService,
@@ -46,6 +61,8 @@ export const PLACES_FEATURE: FeaturePart = {
     MapPlaceInstanceDataService,
     MapPlaceInstanceJobService,
     MapPlaceInstanceJobDataService,
+    MapPlaceInstanceJobService,
+    MapPlaceInstanceJobOfferDataService
   ],
   routes: [
     {
@@ -53,7 +70,7 @@ export const PLACES_FEATURE: FeaturePart = {
       component: PlacesPage,
       canActivate: [],
       canDeactivate: [],
-      resolve: { places: placesResolverFn },
+      resolve: { places: placesResolverFn }
     },
     {
       path: 'create',
@@ -61,8 +78,8 @@ export const PLACES_FEATURE: FeaturePart = {
       canActivate: [createPlaceGuardFn],
       canDeactivate: [],
       resolve: {
-        placeTypes: resolvePlaceTypesFn,
-      },
+        placeTypes: resolvePlaceTypesFn
+      }
     },
     {
       path: ':id',
@@ -70,8 +87,8 @@ export const PLACES_FEATURE: FeaturePart = {
       canActivate: [loadOnePlaceGuardFn],
       canDeactivate: [],
       resolve: {
-        placeTypes: resolvePlaceTypesFn,
-      },
-    },
-  ],
+        placeTypes: resolvePlaceTypesFn
+      }
+    }
+  ]
 };
