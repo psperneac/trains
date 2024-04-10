@@ -224,5 +224,6 @@ npm run start
 - [Helm](https://helm.sh/docs/) - for deployments
     - [Helm how to delete deployment](https://phoenixnap.com/kb/helm-delete-deployment-namespace)
 - [Scoop](https://scoop.sh/#/) - command line installer for windows - a-la Brew - `scoop install nodejs`
+- [MongoDb](https://docs.nestjs.com/techniques/mongodb) - implementing MongoDb in Nest.js
 
 
