@@ -23,7 +23,7 @@ export class MapPlaceInstance extends AbstractEntity {
   @Expose()
   jobs: MapPlaceInstanceJob[];
 
-  @OneToMany(type => MapPlaceInstanceJobOffer, job => job.placeInstance)
+  @OneToMany(type => MapPlaceInstanceJobOffer, job => job.mapPlaceInstance)
   @Expose()
   jobOffers: MapPlaceInstanceJobOffer[];
 

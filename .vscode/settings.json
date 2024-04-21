@@ -14,5 +14,10 @@
       "username": "trains",
       "password": "trains1!"
     }
+  ],
+  "eslint.workingDirectories": [
+    "./server",
+    "./web",
+    "./web-react"
   ]
 }

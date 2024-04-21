@@ -5,7 +5,7 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlayersModule, PlayersService } from './player.module';
+import { Players2Module, Players2Service } from './player2.module';
 import { Wallet, WalletDto } from './wallet.entity';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class WalletService extends AbstractService<Wallet> {
 
 @Injectable()
 export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
-  constructor(private readonly playersService: PlayersService) {
+  constructor(private readonly playersService: Players2Service) {
     super();
   }
 
@@ -78,7 +78,7 @@ export class WalletController extends AbstractServiceController<Wallet, WalletDt
 }
 
 @Module({
-  imports: [PlayersModule, TypeOrmModule.forFeature([Wallet])],
+  imports: [Players2Module, TypeOrmModule.forFeature([Wallet])],
   controllers: [WalletController],
   providers: [WalletService, WalletMapper, WalletRepository],
   exports: [WalletService]

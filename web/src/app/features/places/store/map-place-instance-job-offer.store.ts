@@ -1,8 +1,7 @@
-import { state } from '@angular/animations';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { createAction, createFeatureSelector, createSelector, on, props, Store } from '@ngrx/store';
+import { createAction, createSelector, on, props, Store } from '@ngrx/store';
 import { ActionCreator } from '@ngrx/store/src/models';
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -23,9 +22,7 @@ import {
   ByPlayerAndMapResponseType,
   ErrorType
 } from '../../../store';
-import { featureSelector } from '../../game/store/game.selectors';
 import { MapPlaceInstanceJobOfferService } from '../services/map-place-instance-job-offer.service';
-import { MapPlaceInstanceJobsState } from './map-place-instance-job.store';
 
 class MapPlaceInstanceJobOfferActionsType extends AbstractActions<MapPlaceInstanceJobOfferDto> {
   getAllByPlayerAndMap: ActionCreator<string, ActionCreatorFn<ByPlayerAndMapRequestType>>;

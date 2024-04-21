@@ -21,9 +21,7 @@ export class PostsService {
   }
 
   async update(uuid: string, post: UpdatePostDto) {
-    const updatedPost = await this.postModel
-      .findByIdAndUpdate(uuid, post)
-      .setOptions({ overwrite: true, new: true });
+    const updatedPost = await this.postModel.findByIdAndUpdate(uuid, post).setOptions({ overwrite: true, new: true });
 
     if (updatedPost) {
       return updatedPost;

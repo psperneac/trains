@@ -3,14 +3,17 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { tap } from 'rxjs';
 import { filter, map, withLatestFrom } from 'rxjs/operators';
-import { MapPlaceInstanceActions, MapPlaceInstanceSelectors } from '../store/map-place-instance.store';
+import {
+  MapPlaceInstanceActions,
+  MapPlaceInstanceSelectors
+} from '../store/map-place-instance.store';
 
 @Injectable({ providedIn: 'root' })
 export class MapPlaceInstanceDataService {
-
   mapPlaceInstancesLoaded$ = this.store.pipe(select(MapPlaceInstanceSelectors.Loaded));
   mapPlaceInstances$ = this.store.pipe(select(MapPlaceInstanceSelectors.All));
-  mapPlaceInstancesByPlayerAndMapId$ = (playerId: string, mapId: string) => this.store.pipe(select(MapPlaceInstanceSelectors.ByPlayerAndMapId(playerId, mapId)));
+  mapPlaceInstancesByPlayerAndMapId$ = (playerId: string, mapId: string) =>
+    this.store.pipe(select(MapPlaceInstanceSelectors.ByPlayerAndMapId(playerId, mapId)));
 
   constructor(private readonly store: Store<{}>) {}
 
@@ -19,7 +22,7 @@ export class MapPlaceInstanceDataService {
       select(MapPlaceInstanceSelectors.All),
       withLatestFrom(
         this.store.pipe(select(MapPlaceInstanceSelectors.Loading)),
-        this.store.pipe(select(MapPlaceInstanceSelectors.Loaded)),
+        this.store.pipe(select(MapPlaceInstanceSelectors.Loaded))
       ),
       tap(([data, loading, loaded]) => {
         console.log('MapPlaceInstances: ', data, loading, loaded);
@@ -28,19 +31,23 @@ export class MapPlaceInstanceDataService {
         }
       }),
       map(([data, _loading, _loaded]) => data),
-      filter(data => !!data),
+      filter(data => !!data)
     );
   }
 
   createMapPlaceInstance() {
-    this.store.dispatch(MapPlaceInstanceActions.selectOne({ payload: {
-        mapId: '',
-        playerId: '',
-        mapPlaceId: '',
-        jobs: [],
-        jobOffers: [],
-        content: {},
-      }}));
+    this.store.dispatch(
+      MapPlaceInstanceActions.selectOne({
+        payload: {
+          mapId: '',
+          playerId: '',
+          mapPlaceId: '',
+          jobs: [],
+          jobOffers: [],
+          content: {}
+        }
+      })
+    );
     return true;
   }
 
@@ -51,8 +58,9 @@ export class MapPlaceInstanceDataService {
   }
 }
 
-export const mapPlaceInstancesResolveFn = () => inject(MapPlaceInstanceDataService).resolveMapPlaceInstances();
-export const createMapPlaceInstanceGuardFn = () => inject(MapPlaceInstanceDataService).createMapPlaceInstance();
+export const mapPlaceInstancesResolveFn = () =>
+  inject(MapPlaceInstanceDataService).resolveMapPlaceInstances();
+export const createMapPlaceInstanceGuardFn = () =>
+  inject(MapPlaceInstanceDataService).createMapPlaceInstance();
 export const loadOneMapPlaceInstanceGuardFn = (route: ActivatedRouteSnapshot) =>
-    inject(MapPlaceInstanceDataService).loadOneMapPlaceInstance(route);
-
+  inject(MapPlaceInstanceDataService).loadOneMapPlaceInstance(route);

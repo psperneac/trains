@@ -9,8 +9,7 @@ import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
 @UseGuards(LoggedIn)
 @UseFilters(AllExceptionsFilter)
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {
-  }
+  constructor(private readonly postsService: PostsService) {}
 
   @Get()
   getAllPosts() {

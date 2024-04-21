@@ -8,7 +8,7 @@ import { MapVehicleInstance } from '../vehicles/map-vehicle-instance.entity';
 import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'players' })
-export class Player extends AbstractEntity {
+export class Player2 extends AbstractEntity {
   @Column('varchar', { length: 250 })
   @Expose()
   name: string;
@@ -38,8 +38,7 @@ export class Player extends AbstractEntity {
   @Expose()
   placeConnections: MapPlaceInstance[];
 
-
-  @OneToOne(() => Wallet, (wallet) => wallet.player, { eager: true }) // specify inverse side as a second parameter
+  @OneToOne(() => Wallet, wallet => wallet.player, { eager: true }) // specify inverse side as a second parameter
   @Expose()
   wallet: Wallet;
 
@@ -48,7 +47,7 @@ export class Player extends AbstractEntity {
   content: any;
 }
 
-export interface PlayerDto {
+export interface Player2Dto {
   id: string;
   name: string;
   description: string;

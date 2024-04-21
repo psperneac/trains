@@ -218,6 +218,8 @@ npm run start
 - https://wanago.io/2020/07/13/api-nestjs-testing-services-controllers-integration-tests/ - testing services and
   controllers with integration tests
 - [TypeOrm](https://github.com/typeorm/typeorm)
+- [Typegoose](https://typegoose.github.io/typegoose/docs/guides/quick-start-guide)
+- [@nestjs/mongoose](https://docs.nestjs.com/techniques/mongodb)
 
 # Resources
 

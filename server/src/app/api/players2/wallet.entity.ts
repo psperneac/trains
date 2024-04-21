@@ -1,14 +1,14 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { Player } from './player.entity';
+import { Player2 } from './player2.entity';
 
 @Entity({ name: 'wallets' })
 export class Wallet extends AbstractEntity {
-  @OneToOne(_type => Player, (player) => player.wallet)
+  @OneToOne(_type => Player2, player => player.wallet)
   @JoinColumn({ name: 'player_id' })
   @Expose()
-  player: Player;
+  player: Player2;
 
   @Column('integer')
   @Expose()

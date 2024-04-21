@@ -33,7 +33,8 @@ module.exports = {
           'singleQuote': true,
           'trailingComma': 'none',
           'bracketSpacing': true,
-          'arrowParens': 'avoid'
+          'arrowParens': 'avoid',
+          'trailingComma': 'all',
         
       }],
       // disable standard no-unused-vars, enable typescript-eslint one

@@ -4,7 +4,7 @@ import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractService } from '../../../utils/abstract.service';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { UsersModule } from '../users/users.module';
-import { Player, PlayerDto } from './player.entity';
+import { Player2, Player2Dto } from './player2.entity';
 import { UsersService } from '../users/users.service';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
@@ -12,37 +12,32 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { WalletService, WalletModule } from './wallet.module';
 
 @Injectable()
-export class PlayerRepository extends RepositoryAccessor<Player> {
-  constructor(@InjectRepository(Player) injectedRepo) {
+export class Player2Repository extends RepositoryAccessor<Player2> {
+  constructor(@InjectRepository(Player2) injectedRepo) {
     super(injectedRepo, ['user', 'map', 'vehicles', 'places', 'placeConnections', 'wallet']);
   }
 }
 
 @Injectable()
-export class PlayersService extends AbstractService<Player> {
-  constructor(repo: PlayerRepository) {
+export class Players2Service extends AbstractService<Player2> {
+  constructor(repo: Player2Repository) {
     super(repo);
   }
-
-
 }
 
 @Injectable()
-export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
-  constructor(
-    private readonly userService: UsersService, 
-    private readonly mapService: MapTemplateService,
-  ) {
+export class Player2Mapper extends AbstractDtoMapper<Player2, Player2Dto> {
+  constructor(private readonly userService: UsersService, private readonly mapService: MapTemplateService) {
     super();
   }
 
-  async toDto(domain: Player): Promise<PlayerDto> {
+  async toDto(domain: Player2): Promise<Player2Dto> {
     if (!domain) {
       return null;
     }
     console.log('Player - domain', domain);
 
-    const dto: PlayerDto = {
+    const dto: Player2Dto = {
       id: domain.id,
       name: domain.name,
       description: domain.description,
@@ -58,9 +53,9 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
     return dto;
   }
 
-  async toDomain(dto: PlayerDto, domain?: Partial<Player> | Player): Promise<Player> {
+  async toDomain(dto: Player2Dto, domain?: Partial<Player2> | Player2): Promise<Player2> {
     if (!dto) {
-      return domain as any as Player;
+      return domain as any as Player2;
     }
 
     if (!domain) {
@@ -75,23 +70,23 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       name: dto.name,
       description: dto.description,
       user: userId ? await this.userService.getById(userId) : null,
-      map: mapId ? await this.mapService.findOne(mapId) : null,
-    } as Player;
+      map: mapId ? await this.mapService.findOne(mapId) : null
+    } as Player2;
   }
 }
 
-@Controller('players')
+@Controller('players2')
 @UseFilters(AllExceptionsFilter)
-export class PlayerController extends AbstractServiceController<Player, PlayerDto> {
-  constructor(service: PlayersService, mapper: PlayerMapper) {
+export class Player2Controller extends AbstractServiceController<Player2, Player2Dto> {
+  constructor(service: Players2Service, mapper: Player2Mapper) {
     super(service, mapper);
   }
 }
 
 @Module({
-  imports: [UsersModule, MapTemplateModule, TypeOrmModule.forFeature([Player])],
-  controllers: [PlayerController],
-  providers: [PlayersService, PlayerMapper, PlayerRepository],
-  exports: [PlayersService]
+  imports: [UsersModule, MapTemplateModule, TypeOrmModule.forFeature([Player2])],
+  controllers: [Player2Controller],
+  providers: [Players2Service, Player2Mapper, Player2Repository],
+  exports: [Players2Service]
 })
-export class PlayersModule {}
+export class Players2Module {}

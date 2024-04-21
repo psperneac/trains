@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-
-export type PostDocument = Post & Document;
+import { HydratedDocument } from 'mongoose';
 
 @Schema()
 export class Post {
@@ -11,5 +9,7 @@ export class Post {
   @Prop()
   public content: string;
 }
+
+export type PostDocument = HydratedDocument<Post>;
 
 export const PostSchema = SchemaFactory.createForClass(Post);

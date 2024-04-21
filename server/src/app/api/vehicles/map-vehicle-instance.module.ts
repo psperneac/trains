@@ -29,11 +29,17 @@ export class MapVehicleInstancesService extends AbstractService<MapVehicleInstan
   }
 
   findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string): Promise<PageDto<MapVehicleInstance>> {
-    return this.findAllWithQuery(pagination, 'map_vehicle_instances.map.id = :mapId and map_vehicle_instances.player.id = :playerId', { mapId, playerId }) as Promise<PageDto<MapVehicleInstance>>;
+    return this.findAllWithQuery(
+      pagination,
+      'map_vehicle_instances.map.id = :mapId and map_vehicle_instances.player.id = :playerId',
+      { mapId, playerId }
+    ) as Promise<PageDto<MapVehicleInstance>>;
   }
 
   findAllByVehicle(pagination: any, mapVehicleId: string): Promise<PageDto<MapVehicleInstance>> {
-    return this.findAllWithQuery(pagination, 'map_vehicle_instances.mapVehicle.id = :mapVehicleId', { mapVehicleId }) as Promise<PageDto<MapVehicleInstance>>;
+    return this.findAllWithQuery(pagination, 'map_vehicle_instances.mapVehicle.id = :mapVehicleId', {
+      mapVehicleId
+    }) as Promise<PageDto<MapVehicleInstance>>;
   }
 }
 
@@ -43,7 +49,7 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
     private readonly mapPlacesService: MapPlacesService,
     private readonly mapVehiclesService: MapVehiclesService,
     private readonly playersService: PlayersService,
-    private readonly mapService: MapTemplateService,
+    private readonly mapService: MapTemplateService
   ) {
     super();
   }
@@ -69,7 +75,10 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
     return dto;
   }
 
-  async toDomain(dto: MapVehicleInstanceDto, domain?: Partial<MapVehicleInstance> | MapVehicleInstance): Promise<MapVehicleInstance> {
+  async toDomain(
+    dto: MapVehicleInstanceDto,
+    domain?: Partial<MapVehicleInstance> | MapVehicleInstance
+  ): Promise<MapVehicleInstance> {
     if (!dto) {
       return domain as any as MapVehicleInstance;
     }
@@ -97,23 +106,31 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
       start: await this.mapPlacesService.findOne(startId),
       end: await this.mapPlacesService.findOne(endId),
       startTime,
-      endTime,
+      endTime
     } as any as MapVehicleInstance;
   }
 }
 
 @Controller('map-vehicle-instances')
 @UseFilters(AllExceptionsFilter)
-export class MapVehicleInstancesController extends AbstractServiceController<MapVehicleInstance, MapVehicleInstanceDto> {
+export class MapVehicleInstancesController extends AbstractServiceController<
+  MapVehicleInstance,
+  MapVehicleInstanceDto
+> {
   constructor(
     private readonly vehicleInstancesService: MapVehicleInstancesService,
-    private readonly vehicleInstanceMapper: MapVehicleInstanceMapper) {
+    private readonly vehicleInstanceMapper: MapVehicleInstanceMapper
+  ) {
     super(vehicleInstancesService, vehicleInstanceMapper);
   }
 
   @Get('by-player-and-map/:playerId/:mapId')
   @UseGuards(LoggedIn)
-  async findAllByPlayerAndMap(pagination: any, playerId: string, mapId: string): Promise<PageDto<MapVehicleInstanceDto>> {
+  async findAllByPlayerAndMap(
+    pagination: any,
+    playerId: string,
+    mapId: string
+  ): Promise<PageDto<MapVehicleInstanceDto>> {
     return this.vehicleInstancesService.findAllByPlayerAndMap(pagination, playerId, mapId).then(this.makeHandler());
   }
 
@@ -125,9 +142,15 @@ export class MapVehicleInstancesController extends AbstractServiceController<Map
 }
 
 @Module({
-  imports: [MapPlacesModule, MapVehiclesModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([MapVehicleInstance])],
+  imports: [
+    MapPlacesModule,
+    MapVehiclesModule,
+    PlayersModule,
+    MapTemplateModule,
+    TypeOrmModule.forFeature([MapVehicleInstance])
+  ],
   controllers: [MapVehicleInstancesController],
   providers: [MapVehicleInstancesService, MapVehicleInstanceMapper, MapVehicleInstanceRepository],
   exports: [MapVehicleInstancesService, MapVehicleInstanceMapper]
 })
-export class MapVehicleInstancesModule { }
+export class MapVehicleInstancesModule {}

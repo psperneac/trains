@@ -6,12 +6,9 @@ import { AuthenticationModule } from '../../../authentication/authentication.mod
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
-    AuthenticationModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]), AuthenticationModule],
   controllers: [PostsController],
   providers: [PostsService],
-  exports: [PostsService],
+  exports: [PostsService]
 })
 export class PostsModule {}

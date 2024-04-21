@@ -45,6 +45,7 @@ import { VehicleModule } from './vehicles/vehicle.module';
     MapVehicleInstanceJobsModule,
     UserPreferenceModule,
     MapVehiclesModule,
+    PlayersModule
   ],
 })
 export class ApiModule {
