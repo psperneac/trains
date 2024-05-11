@@ -26,15 +26,15 @@ export class Player2 extends AbstractEntity {
   @Expose()
   map: MapTemplate;
 
-  @OneToMany(_type => MapVehicleInstance, vehicleInstance => vehicleInstance.player)
+  @OneToMany(_type => MapVehicleInstance, vehicleInstance => vehicleInstance.playerId)
   @Expose()
   vehicles: MapVehicleInstance[];
 
-  @OneToMany(_type => MapPlaceInstance, placeInstance => placeInstance.player)
+  @OneToMany(_type => MapPlaceInstance, placeInstance => placeInstance.playerId)
   @Expose()
   places: MapPlaceInstance[];
 
-  @OneToMany(_type => MapPlaceInstance, placeConnectionInstance => placeConnectionInstance.player)
+  @OneToMany(_type => MapPlaceInstance, placeConnectionInstance => placeConnectionInstance.playerId)
   @Expose()
   placeConnections: MapPlaceInstance[];
 

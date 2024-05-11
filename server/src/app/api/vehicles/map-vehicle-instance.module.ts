@@ -10,10 +10,8 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
 import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
-import { PlayersModule, PlayersService } from '../players/player.module';
 import { MapVehicleInstance, MapVehicleInstanceDto } from './map-vehicle-instance.entity';
 import { MapVehiclesModule, MapVehiclesService } from './map-vehicles.module';
-import { VehicleModule, VehiclesService } from './vehicle.module';
 
 @Injectable()
 export class MapVehicleInstanceRepository extends RepositoryAccessor<MapVehicleInstance> {
@@ -48,8 +46,7 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
   constructor(
     private readonly mapPlacesService: MapPlacesService,
     private readonly mapVehiclesService: MapVehiclesService,
-    private readonly playersService: PlayersService,
-    private readonly mapService: MapTemplateService
+    private readonly mapService: MapTemplateService,
   ) {
     super();
   }
@@ -62,14 +59,14 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
     const dto: MapVehicleInstanceDto = {
       id: domain.id,
       mapVehicleId: domain.mapVehicle?.id,
-      playerId: domain.player?.id,
+      playerId: domain.playerId,
       mapId: domain.map?.id,
       jobs: domain.jobs?.map(j => j.id),
       startId: domain.start?.id,
       endId: domain.end?.id,
       startTime: domain.startTime?.toISOString(),
       endTime: domain.endTime?.toISOString(),
-      content: domain.content
+      content: domain.content,
     };
 
     return dto;
@@ -88,7 +85,6 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
     }
 
     const mapVehicleId = dto.mapVehicleId ?? domain.mapVehicle?.id;
-    const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
@@ -101,7 +97,6 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
       ...domain,
       ...fixedDto,
       mapVehicle: await this.mapVehiclesService.findOne(mapVehicleId),
-      player: await this.playersService.findOne(playerId),
       map: await this.mapService.findOne(mapId),
       start: await this.mapPlacesService.findOne(startId),
       end: await this.mapPlacesService.findOne(endId),
@@ -142,15 +137,9 @@ export class MapVehicleInstancesController extends AbstractServiceController<
 }
 
 @Module({
-  imports: [
-    MapPlacesModule,
-    MapVehiclesModule,
-    PlayersModule,
-    MapTemplateModule,
-    TypeOrmModule.forFeature([MapVehicleInstance])
-  ],
+  imports: [MapPlacesModule, MapVehiclesModule, MapTemplateModule, TypeOrmModule.forFeature([MapVehicleInstance])],
   controllers: [MapVehicleInstancesController],
   providers: [MapVehicleInstancesService, MapVehicleInstanceMapper, MapVehicleInstanceRepository],
-  exports: [MapVehicleInstancesService, MapVehicleInstanceMapper]
+  exports: [MapVehicleInstancesService, MapVehicleInstanceMapper],
 })
 export class MapVehicleInstancesModule {}

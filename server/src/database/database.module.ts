@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Job } from '../app/api/jobs/job.entity';
 import { MapPlaceConnection } from '../app/api/places/map-place-connection.entity';
 import { MapPlace } from '../app/api/places/map-place.entity';
 import { MapTemplate } from '../app/api/maps/map-template.entity';
@@ -11,8 +10,6 @@ import { PlaceConnection } from '../app/api/places/place-connection.entity';
 import { MapPlaceInstanceJobOffer } from '../app/api/places/map-place-instance-job-offer.entity';
 import { MapPlaceInstanceJob } from '../app/api/places/map-place-instance-job.entity';
 import { MapPlaceInstance } from '../app/api/places/map-place-instance.entity';
-import { Player } from '../app/api/players/player.entity';
-import { Wallet } from '../app/api/players/wallet.entity';
 import { UserPreference } from '../app/api/users/user-preference.entity';
 import { User } from '../app/api/users/users.entity';
 import { Place } from '../app/api/places/place.entity';
@@ -46,7 +43,7 @@ export const TABLES = {
   PLAYERS: 'players',
   USER_PREFERENCES: 'user_preferences',
   WALLETS: 'wallets',
-}
+};
 
 export const ENTITIES = [
   Place,
@@ -67,9 +64,6 @@ export const ENTITIES = [
   MapPlace,
   MapPlaceConnection,
   MapVehicle,
-
-  Player,
-  Wallet,
 ];
 
 @Module({

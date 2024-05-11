@@ -3,7 +3,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { Place } from '../places/place.entity';
-import { Player } from '../players/player.entity';
 import { MapVehicle } from './map-vehicle.entity';
 import { MapVehicleInstanceJob } from './map-vehicle-instance-job.entity';
 
@@ -32,10 +31,9 @@ export class MapVehicleInstance extends AbstractEntity {
   @Expose()
   endTime: Date;
 
-  @ManyToOne(_type => Player, { eager: true })
-  @JoinColumn({ name: 'player_id' })
+  @Column({ name: 'player_id' })
   @Expose()
-  player: Player;
+  playerId: string;
 
   @ManyToOne(_type => MapTemplate, { eager: true })
   @JoinColumn({ name: 'map_id' })

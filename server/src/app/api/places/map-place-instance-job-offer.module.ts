@@ -8,7 +8,6 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapPlacesService, MapPlacesModule } from './map-places.module';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { PlayersModule, PlayersService } from '../players/player.module';
 import { MapPlaceInstanceJobOffer, MapPlaceInstanceJobOfferDto } from './map-place-instance-job-offer.entity';
 import { MapPlaceInstancesModule, MapPlaceInstancesService } from './map-place-instance.module';
 
@@ -27,11 +26,15 @@ export class MapPlaceInstanceJobOffersService extends AbstractService<MapPlaceIn
 }
 
 @Injectable()
-export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceInstanceJobOffer, MapPlaceInstanceJobOfferDto> {
-  constructor(private readonly placesService: MapPlacesService,
-              private readonly playersService: PlayersService,
-              private readonly mapService: MapTemplateService,
-              private readonly placeInstancesService: MapPlaceInstancesService) {
+export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<
+  MapPlaceInstanceJobOffer,
+  MapPlaceInstanceJobOfferDto
+> {
+  constructor(
+    private readonly placesService: MapPlacesService,
+    private readonly mapService: MapTemplateService,
+    private readonly placeInstancesService: MapPlaceInstancesService,
+  ) {
     super();
   }
 
@@ -52,16 +55,19 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
       startId: domain.start?.id,
       endId: domain.end?.id,
       mapPlaceInstanceId: domain.mapPlaceInstance?.id,
-      playerId: domain.player?.id,
+      playerId: domain.playerId,
       mapId: domain.map?.id,
       jobOfferExpiry: domain.jobOfferExpiry?.toISOString(),
-      content: domain.content
+      content: domain.content,
     };
 
     return dto;
   }
 
-  async toDomain(dto: MapPlaceInstanceJobOfferDto, domain?: Partial<MapPlaceInstanceJobOffer> | MapPlaceInstanceJobOffer): Promise<MapPlaceInstanceJobOffer> {
+  async toDomain(
+    dto: MapPlaceInstanceJobOfferDto,
+    domain?: Partial<MapPlaceInstanceJobOffer> | MapPlaceInstanceJobOffer,
+  ): Promise<MapPlaceInstanceJobOffer> {
     if (!dto) {
       return domain as any as MapPlaceInstanceJobOffer;
     }
@@ -73,14 +79,11 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
     const startId = dto.startId ?? domain.start?.id;
     const endId = dto.endId ?? domain.end?.id;
     const mapPlaceInstanceId = dto.mapPlaceInstanceId ?? domain.mapPlaceInstance?.id;
-    const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
     const jobOfferExpiry = dto.jobOfferExpiry ? new Date(dto.jobOfferExpiry) : domain.jobOfferExpiry;
 
-    const fixedDto = omit(
-      { ...dto },
-      ['startId', 'endId', 'placeInstanceId', 'playerId', 'mapId', 'startTime']);
+    const fixedDto = omit({ ...dto }, ['startId', 'endId', 'placeInstanceId', 'mapId', 'startTime']);
 
     return {
       ...domain,
@@ -90,7 +93,6 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
       startTime,
       jobOfferExpiry,
       mapPlaceInstance: await this.placeInstancesService.findOne(mapPlaceInstanceId),
-      player: await this.playersService.findOne(playerId),
       map: await this.mapService.findOne(mapId),
     } as MapPlaceInstanceJobOffer;
   }
@@ -98,16 +100,24 @@ export class MapPlaceInstanceJobOfferMapper extends AbstractDtoMapper<MapPlaceIn
 
 @Controller('map-place-instance-job-offers')
 @UseFilters(AllExceptionsFilter)
-export class MapPlaceInstanceJobOffersController extends AbstractServiceController<MapPlaceInstanceJobOffer, MapPlaceInstanceJobOfferDto> {
+export class MapPlaceInstanceJobOffersController extends AbstractServiceController<
+  MapPlaceInstanceJobOffer,
+  MapPlaceInstanceJobOfferDto
+> {
   constructor(service: MapPlaceInstanceJobOffersService, mapper: MapPlaceInstanceJobOfferMapper) {
     super(service, mapper);
   }
 }
 
 @Module({
-  imports: [MapPlacesModule, PlayersModule, MapPlaceInstancesModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlaceInstanceJobOffer])],
+  imports: [
+    MapPlacesModule,
+    MapPlaceInstancesModule,
+    MapTemplateModule,
+    TypeOrmModule.forFeature([MapPlaceInstanceJobOffer]),
+  ],
   controllers: [MapPlaceInstanceJobOffersController],
   providers: [MapPlaceInstanceJobOffersService, MapPlaceInstanceJobOfferMapper, MapPlaceInstanceJobOfferRepository],
-  exports: [MapPlaceInstanceJobOffersService, MapPlaceInstanceJobOfferMapper]
+  exports: [MapPlaceInstanceJobOffersService, MapPlaceInstanceJobOfferMapper],
 })
 export class MapPlaceInstanceJobOffersModule {}

@@ -1,4 +1,3 @@
-import { JobsModule } from './jobs/jobs.module';
 import { MapPlaceConnectionsModule } from './places/map-place-connections.module';
 import { MapPlacesModule } from './places/map-places.module';
 import { MapTemplateModule } from './maps/map-template.module';
@@ -9,8 +8,6 @@ import { PlaceConnectionsModule } from './places/place-connection.module';
 import { MapPlaceInstanceJobOffersModule } from './places/map-place-instance-job-offer.module';
 import { MapPlaceInstanceJobsModule } from './places/map-place-instance-job.module';
 import { MapPlaceInstancesModule } from './places/map-place-instance.module';
-import { PlayersModule } from './players/player.module';
-import { WalletModule } from './players/wallet.module';
 import { PostsModule } from './posts/posts.module';
 import { UserPreferenceModule } from './users/user-preference.module';
 import { UsersModule } from './users/users.module';
@@ -19,8 +16,9 @@ import { TranslationsModule } from './translations/translations.module';
 import { MapVehicleInstanceJobsModule } from './vehicles/map-vehicle-instance-job.module';
 import { MapVehicleInstancesModule } from './vehicles/map-vehicle-instance.module';
 import { VehicleTypesModule } from './vehicles/vehicle-types.module';
-import { PlaceTypeModule } from "./places/place-type.module";
+import { PlaceTypeModule } from './places/place-type.module';
 import { VehicleModule } from './vehicles/vehicle.module';
+import { PlayersModule } from './players/players.module';
 
 @Module({
   imports: [
@@ -39,14 +37,12 @@ import { VehicleModule } from './vehicles/vehicle.module';
     MapPlaceInstancesModule,
     MapPlaceInstanceJobsModule,
     MapPlaceInstanceJobOffersModule,
-    PlayersModule,
-    WalletModule,
     MapVehicleInstancesModule,
     MapVehicleInstanceJobsModule,
     UserPreferenceModule,
     MapVehiclesModule,
-    PlayersModule
+
+    PlayersModule,
   ],
 })
-export class ApiModule {
-}
+export class ApiModule {}

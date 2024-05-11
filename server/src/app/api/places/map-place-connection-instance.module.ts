@@ -7,8 +7,8 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapPlaceConnectionsModule, MapPlaceConnectionService } from './map-place-connections.module';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { PlayersModule, PlayersService } from '../players/player.module';
 import { MapPlaceConnectionInstance, MapPlaceConnectionInstanceDto } from './map-place-connection-instance.entity';
+import { omit } from 'lodash';
 
 @Injectable()
 export class MapPlaceConnectionInstanceRepository extends RepositoryAccessor<MapPlaceConnectionInstance> {
@@ -25,10 +25,13 @@ export class MapPlaceConnectionInstanceService extends AbstractService<MapPlaceC
 }
 
 @Injectable()
-export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<MapPlaceConnectionInstance, MapPlaceConnectionInstanceDto> {
-  constructor(private readonly mapPlaceConnectionService: MapPlaceConnectionService,
-              private readonly playersService: PlayersService,
-              private readonly mapService: MapTemplateService,
+export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
+  MapPlaceConnectionInstance,
+  MapPlaceConnectionInstanceDto
+> {
+  constructor(
+    private readonly mapPlaceConnectionService: MapPlaceConnectionService,
+    private readonly mapService: MapTemplateService,
   ) {
     super();
   }
@@ -41,15 +44,18 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<MapPlace
     const dto: MapPlaceConnectionInstanceDto = {
       id: domain.id,
       mapPlaceConnectionId: domain.mapPlaceConnection?.id,
-      playerId: domain.player?.id,
+      playerId: domain.playerId,
       mapId: domain.map.id,
-      content: domain.content
+      content: domain.content,
     };
 
     return dto;
   }
 
-  async toDomain(dto: MapPlaceConnectionInstanceDto, domain?: Partial<MapPlaceConnectionInstance> | MapPlaceConnectionInstance): Promise<MapPlaceConnectionInstance> {
+  async toDomain(
+    dto: MapPlaceConnectionInstanceDto,
+    domain?: Partial<MapPlaceConnectionInstance> | MapPlaceConnectionInstance,
+  ): Promise<MapPlaceConnectionInstance> {
     if (!dto) {
       return domain as any as MapPlaceConnectionInstance;
     }
@@ -59,32 +65,39 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<MapPlace
     }
 
     const mapPlaceConnectionId = dto.mapPlaceConnectionId ?? domain.mapPlaceConnection?.id;
-    const playerId = dto.playerId ?? domain.player?.id;
     const mapId = dto.mapId ?? domain.map?.id;
+
+    const fixedDto = omit(dto, ['mapPlaceConnectionId', 'mapId']);
 
     return {
       ...domain,
+      ...fixedDto,
       mapPlaceConnection: await this.mapPlaceConnectionService.findOne(mapPlaceConnectionId),
       map: await this.mapService.findOne(mapId),
-      player: await this.playersService.findOne(playerId),
-      content: dto.content
+      content: dto.content,
     } as any as MapPlaceConnectionInstance;
   }
 }
 
 @Controller('map-place-connection-instances')
 @UseFilters(AllExceptionsFilter)
-export class MapPlaceConnectionInstanceController extends AbstractServiceController<MapPlaceConnectionInstance, MapPlaceConnectionInstanceDto> {
-  constructor(service: MapPlaceConnectionInstanceService,
-              mapper: MapPlaceConnectionInstanceMapper) {
+export class MapPlaceConnectionInstanceController extends AbstractServiceController<
+  MapPlaceConnectionInstance,
+  MapPlaceConnectionInstanceDto
+> {
+  constructor(service: MapPlaceConnectionInstanceService, mapper: MapPlaceConnectionInstanceMapper) {
     super(service, mapper);
   }
 }
 
 @Module({
-  imports: [MapPlaceConnectionsModule, PlayersModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlaceConnectionInstance])],
+  imports: [MapPlaceConnectionsModule, MapTemplateModule, TypeOrmModule.forFeature([MapPlaceConnectionInstance])],
   controllers: [MapPlaceConnectionInstanceController],
-  providers: [MapPlaceConnectionInstanceService, MapPlaceConnectionInstanceMapper, MapPlaceConnectionInstanceRepository],
-  exports: [MapPlaceConnectionInstanceService, MapPlaceConnectionInstanceMapper]
+  providers: [
+    MapPlaceConnectionInstanceService,
+    MapPlaceConnectionInstanceMapper,
+    MapPlaceConnectionInstanceRepository,
+  ],
+  exports: [MapPlaceConnectionInstanceService, MapPlaceConnectionInstanceMapper],
 })
 export class PlaceConnectionInstancesModule {}

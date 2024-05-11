@@ -3,7 +3,6 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapPlaceConnection } from './map-place-connection.entity';
 import { MapTemplate } from '../maps/map-template.entity';
-import { Player } from '../players/player.entity';
 
 @Entity({ name: 'map_place_connection_instances' })
 export class MapPlaceConnectionInstance extends AbstractEntity {
@@ -12,10 +11,9 @@ export class MapPlaceConnectionInstance extends AbstractEntity {
   @Expose()
   mapPlaceConnection: MapPlaceConnection;
 
-  @ManyToOne(type => Player, { eager: true })
-  @JoinColumn({ name: 'player_id' })
+  @Column({ name: 'player_id' })
   @Expose()
-  player: Player;
+  playerId: string;
 
   @ManyToOne(type => MapTemplate, { eager: true })
   @JoinColumn({ name: 'map_id' })

@@ -12,7 +12,7 @@ import {
   Post,
   Put,
   UseFilters,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel, MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
@@ -22,6 +22,9 @@ import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
 
 @Schema()
 export class Player {
+  @Prop()
+  public uuid: string;
+
   @Prop()
   public name: string;
 
@@ -46,7 +49,7 @@ export class Player {
   @Prop()
   public placeConnections: string[];
 
-  @Prop()
+  @Prop({ type: Object })
   public content: any;
 }
 
@@ -72,36 +75,41 @@ export class PlayersService {
   constructor(@InjectModel(Player.name) private playerModel: Model<PlayerDocument>) {}
 
   async getAll() {
-    return await this.playerModel.find().exec();
+    const ret = await this.playerModel.find().exec();
+    if (ret && ret.length > 0) {
+      return ret.map(player => player.toObject({ getters: true }));
+    }
+    return [];
   }
 
-  async getOne(uuid: string) {
-    const player = await this.playerModel.findById(uuid).exec();
+  async getOne(id: string) {
+    const player = await this.playerModel.findById(id).exec();
     if (player) {
-      return player;
+      return player.toObject({ getters: true });
     }
     throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
   }
 
-  async update(uuid: string, playerDto: PlayerDto) {
+  async update(id: string, playerDto: PlayerDto) {
     const updatedPlayer = await this.playerModel
-      .findByIdAndUpdate(uuid, playerDto)
+      .findByIdAndUpdate(id, playerDto)
       .setOptions({ overwrite: true, new: true });
 
     if (updatedPlayer) {
-      return updatedPlayer;
+      return updatedPlayer.toObject({ getters: true });
     }
 
     throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
   }
 
-  create(playerDto: PlayerDto) {
+  async create(playerDto: PlayerDto) {
     const newPlayer = new this.playerModel(playerDto);
-    return newPlayer.save();
+    const savedPlayer = await newPlayer.save();
+    return savedPlayer ? savedPlayer.toObject({ getters: true }) : null;
   }
 
-  async delete(uuid: string) {
-    const deleteResponse = await this.playerModel.findByIdAndDelete(uuid);
+  async delete(id: string) {
+    const deleteResponse = await this.playerModel.findByIdAndDelete(id);
     if (!deleteResponse) {
       throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
     }
@@ -122,12 +130,19 @@ export class PlayersController {
   }
 
   @Get(':id')
-  getPlayerById(uuid: string) {
-    return this.service.getOne(uuid);
+  getPlayerById(@Param() { id }: ParamsWithMongoId) {
+    return this.service.getOne(id);
   }
 
   @Post()
   async createPlayer(@Body() player: PlayerDto) {
+    player = {
+      ...player,
+      vehicles: !!player.vehicles && player.vehicles.length === 0 ? undefined : player.vehicles,
+      places: !!player.places && player.places.length === 0 ? undefined : player.places,
+      placeConnections:
+        !!player.placeConnections && player.placeConnections.length === 0 ? undefined : player.placeConnections,
+    };
     return this.service.create(player);
   }
 
@@ -143,9 +158,9 @@ export class PlayersController {
 }
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Player.name, schema: PlayerSchema }]), AuthenticationModule],
+  imports: [Player, MongooseModule.forFeature([{ name: Player.name, schema: PlayerSchema }]), AuthenticationModule],
   controllers: [PlayersController],
   providers: [PlayersService],
-  exports: [PlayersService]
+  exports: [Player],
 })
 export class PlayersModule {}
