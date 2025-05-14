@@ -1,6 +1,6 @@
 import { AbstractEntity } from '../abstract.entity';
 import { cloneDeep } from 'lodash';
-import * as uuid from 'uuid-v4';
+import { v4 as uuidv4 } from 'uuid';
 import { UpdateResult } from 'typeorm';
 
 export class MockRepository<T extends AbstractEntity> {
@@ -59,7 +59,7 @@ export class MockRepository<T extends AbstractEntity> {
 
     return {
       ...entity,
-      id: uuid(),
+      id: uuidv4(),
       created: new Date(),
       modified: new Date()
     };

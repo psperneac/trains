@@ -17,7 +17,7 @@ export class UsersService {
   }
 
   async getByEmail(email: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ email });
+    const user = await this.usersRepository.findOne({ where: { email }});
     if (user) {
       return user;
     }
@@ -25,7 +25,7 @@ export class UsersService {
   }
 
   async getById(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ id: userId });
+    const user = await this.usersRepository.findOne({ where: { id: userId }});
     if (user) {
       return user;
     }
@@ -42,7 +42,7 @@ export class UsersService {
 
   async replace(uuid: string, user: UpdateUserDto): Promise<User> {
     await this.usersRepository.update(uuid, user);
-    const updatedUser = await this.usersRepository.findOne(uuid);
+    const updatedUser = await this.usersRepository.findOne({ where: { id: uuid }});
     if (updatedUser) {
       return updatedUser;
     }

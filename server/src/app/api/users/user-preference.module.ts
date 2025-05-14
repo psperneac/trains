@@ -34,7 +34,7 @@ export class UserPreferencesService extends AbstractService<UserPreference> {
   }
 
   public async findByUserId(userId: string): Promise<UserPreference> {
-    return userId ? this.repository.findOne({ where: { user: userId } }) : null;
+    return userId ? this.repository.findOne({ where: { id: userId } } ) : null;
   }
 }
 

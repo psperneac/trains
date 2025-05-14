@@ -37,7 +37,7 @@ export class VehicleTypeSeederService {
   create(): Array<Promise<VehicleType>> {
     return vehicleTypes.map((vehicleType) => {
       return this.repository
-        .findOne({ type: vehicleType.type })
+        .findOne({ where: {type: vehicleType.type }})
         .then(async foundVehicleType => {
           // We check if a language already exists.
           // If it does don't create a new one.
