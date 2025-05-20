@@ -1,13 +1,58 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Expose } from 'class-transformer';
+import { omit } from 'lodash';
+import { AbstractDto } from 'src/utils/abstract-dto';
+import { AbstractEntity } from 'src/utils/abstract.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlacesModule, PlacesService } from './place.module';
-import { PlaceConnection, PlaceConnectionDto } from './place-connection.entity';
-import { omit } from 'lodash';
+
+import { Place, PlacesModule, PlacesService } from './place.module';
+
+@Entity({ name: 'place_connections' })
+export class PlaceConnection extends AbstractEntity {
+  @Column('varchar', { length: 20 })
+  @Expose()
+  type: string;
+
+  @Column('varchar', { length: 250 })
+  @Expose()
+  name: string;
+
+  @Column('varchar', { length: 250 })
+  @Expose()
+  description: string;
+
+  @Column({ type: 'json' })
+  @Expose()
+  content: any;
+
+  @ManyToOne(_type => Place, { eager: true })
+  @JoinColumn({ name: 'start_id' })
+  @Expose()
+  start: Place;
+
+  @ManyToOne(_type => Place, { eager: true })
+  @JoinColumn({ name: 'end_id' })
+  @Expose()
+  end: Place;
+}
+
+export class PlaceConnectionDto implements AbstractDto {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+  content: any;
+
+  startId: string;
+  endId: string;
+}
 
 @Injectable()
 export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnection> {
@@ -35,19 +80,22 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
     }
 
     const dto: PlaceConnectionDto = {
-      id: domain.id,
+      id: domain._id.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
       content: domain.content,
-      startId: domain.start?.id,
-      endId: domain.end?.id
+      startId: domain.start?._id.toString(),
+      endId: domain.end?._id.toString()
     };
 
     return dto;
   }
 
-  async toDomain(dto: PlaceConnectionDto, domain?: Partial<PlaceConnection> | PlaceConnection): Promise<PlaceConnection> {
+  async toDomain(
+    dto: PlaceConnectionDto,
+    domain?: Partial<PlaceConnection> | PlaceConnection
+  ): Promise<PlaceConnection> {
     if (!dto) {
       return domain as any as PlaceConnection;
     }
@@ -56,8 +104,8 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       domain = {};
     }
 
-    const startId = dto.startId ?? domain.start?.id;
-    const endId = dto.endId ?? domain.end?.id;
+    const startId = dto.startId ?? domain.start?._id.toString();
+    const endId = dto.endId ?? domain.end?._id.toString();
 
     const fixedDto = omit(dto, ['startId', 'endId']);
 
@@ -65,7 +113,7 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       ...domain,
       ...fixedDto,
       start: this.service.findOne(startId),
-      end: this.service.findOne(endId),
+      end: this.service.findOne(endId)
     } as any as PlaceConnection;
   }
 }

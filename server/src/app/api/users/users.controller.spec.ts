@@ -1,17 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import User from './users.entity';
-import * as request from 'supertest';
-import { UsersService } from './users.service';
-import { authMocks } from '../../../utils/mocks/auth.mock';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { getAuthorizationBearer } from '../../../utils/jwt';
-import {
-  createMockUser,
-  MOCK_USERS,
-} from '../../../utils/mocks/users.repository.mock';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import * as request from 'supertest';
+
 import { CreateUserDto, UpdateUserDto } from '../../../models/user.model';
+import { getAuthorizationBearer } from '../../../utils/jwt';
+import { authMocks } from '../../../utils/mocks/auth.mock';
+import { createMockUser, MOCK_USERS } from '../../../utils/mocks/users.repository.mock';
+
+import { UsersController } from './users.controller';
+import User from './users.entity';
+import { UsersService } from './users.service';
 
 describe('Users Controller', () => {
   let module: TestingModule;
@@ -23,7 +22,7 @@ describe('Users Controller', () => {
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [...authMocks, UsersService],
+      providers: [...authMocks, UsersService]
     }).compile();
 
     app = module.createNestApplication();
@@ -117,7 +116,7 @@ describe('Users Controller', () => {
         email: user.email,
         username: user.username,
         password: user.password,
-        scope: user.scope,
+        scope: user.scope
       };
 
       const mockSave = jest.spyOn(repository, 'save');
@@ -128,7 +127,7 @@ describe('Users Controller', () => {
         .send(createUser)
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(201)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body.id).toBeDefined();
           expect(res.body.created).toBeDefined();
           expect(res.body.modified).toBeDefined();
@@ -150,7 +149,7 @@ describe('Users Controller', () => {
         email: 'updated-testUser1@trains.com',
         username: 'testUser1',
         password: 'updated-password',
-        scope: 'USER',
+        scope: 'USER'
       };
 
       const mockUpdate = jest.spyOn(repository, 'update');
@@ -160,7 +159,7 @@ describe('Users Controller', () => {
         .send(updateUser)
         .set({ Authorization: getAuthorizationBearer(module, 'ID10') })
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body.email).toEqual('updated-testUser1@trains.com');
           expect(res.body.password).toEqual('updated-password');
         });
@@ -173,7 +172,7 @@ describe('Users Controller', () => {
         email: 'updated-testUser1@trains.com',
         username: 'testUser1',
         password: 'updated-password',
-        scope: 'USER',
+        scope: 'USER'
       };
 
       await request(app.getHttpServer())

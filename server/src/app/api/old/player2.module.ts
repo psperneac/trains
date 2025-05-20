@@ -1,15 +1,16 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { AbstractService } from '../../../utils/abstract.service';
-import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { UsersModule } from '../users/users.module';
-import { Player2, Player2Dto } from './player2.entity';
-import { UsersService } from '../users/users.service';
-import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
-import { WalletService, WalletModule } from './wallet.module';
+import { AbstractService } from '../../../utils/abstract.service';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
+import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
+import { UsersModule } from '../users/users.module';
+import { UsersService } from '../users/users.service';
+
+import { Player2, Player2Dto } from './player2.entity';
 
 @Injectable()
 export class Player2Repository extends RepositoryAccessor<Player2> {
@@ -27,7 +28,10 @@ export class Players2Service extends AbstractService<Player2> {
 
 @Injectable()
 export class Player2Mapper extends AbstractDtoMapper<Player2, Player2Dto> {
-  constructor(private readonly userService: UsersService, private readonly mapService: MapTemplateService) {
+  constructor(
+    private readonly userService: UsersService,
+    private readonly mapService: MapTemplateService
+  ) {
     super();
   }
 
@@ -38,15 +42,15 @@ export class Player2Mapper extends AbstractDtoMapper<Player2, Player2Dto> {
     console.log('Player - domain', domain);
 
     const dto: Player2Dto = {
-      id: domain.id,
+      id: domain._id.toString(),
       name: domain.name,
       description: domain.description,
-      userId: domain.user?.id,
-      mapId: domain.map?.id,
-      walletId: domain.wallet?.id,
-      vehicles: domain.vehicles?.map(v => v.id),
-      places: domain.places?.map(p => p.id),
-      placeConnections: domain.placeConnections?.map(p => p.id),
+      userId: domain.user?._id.toString(),
+      mapId: domain.map?._id.toString(),
+      walletId: domain.wallet?._id.toString(),
+      vehicles: domain.vehicles?.map(v => v._id.toString()),
+      places: domain.places?.map(p => p._id.toString()),
+      placeConnections: domain.placeConnections?.map(p => p._id.toString()),
       content: domain.content
     };
 
@@ -62,8 +66,8 @@ export class Player2Mapper extends AbstractDtoMapper<Player2, Player2Dto> {
       domain = {};
     }
 
-    const userId = dto.userId ?? domain.user?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
+    const userId = dto.userId ?? domain.user?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
 
     return {
       ...domain,

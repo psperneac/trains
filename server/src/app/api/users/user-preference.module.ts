@@ -10,12 +10,15 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+
+import { Types } from 'mongoose';
 import { UserPreference, UserPreferenceDto } from './user-preference.entity';
 import { UsersModule } from './users.module';
 import { UsersService } from './users.service';
@@ -34,13 +37,12 @@ export class UserPreferencesService extends AbstractService<UserPreference> {
   }
 
   public async findByUserId(userId: string): Promise<UserPreference> {
-    return userId ? this.repository.findOne({ where: { id: userId } } ) : null;
+    return userId ? this.repository.findOne({ where: { _id: new Types.ObjectId(userId) } }) : null;
   }
 }
 
 @Injectable()
 export class UserPreferenceMapper extends AbstractDtoMapper<UserPreference, UserPreferenceDto> {
-
   constructor(private readonly userService: UsersService) {
     super();
   }
@@ -51,8 +53,8 @@ export class UserPreferenceMapper extends AbstractDtoMapper<UserPreference, User
     }
 
     return {
-      id: domain.id,
-      userId: domain.user?.id,
+      id: domain._id.toString(),
+      userId: domain.user?._id.toString(),
       content: domain.content
     };
   }
@@ -66,13 +68,13 @@ export class UserPreferenceMapper extends AbstractDtoMapper<UserPreference, User
       domain = {};
     }
 
-    const userId = dto.userId ?? domain.user?.id;
+    const userId = dto.userId ?? domain.user?._id.toString();
 
     return {
       ...domain,
       user: userId ? await this.userService.getById(userId) : null,
       content: dto.content ?? domain.content
-    } as UserPreference
+    } as UserPreference;
   }
 }
 
@@ -117,7 +119,6 @@ export class UserPreferencesController extends AbstractServiceController<UserPre
   imports: [UsersModule, TypeOrmModule.forFeature([UserPreference])],
   controllers: [UserPreferencesController],
   providers: [UserPreferencesService, UserPreferenceMapper, UserPreferenceRepository],
-  exports: [UserPreferencesService],
+  exports: [UserPreferencesService]
 })
-export class UserPreferenceModule {
-}
+export class UserPreferenceModule {}

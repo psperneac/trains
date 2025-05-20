@@ -1,7 +1,8 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { Player2 } from './player2.entity';
+import { Player2 } from '../old/player2.entity';
 
 @Entity({ name: 'wallets' })
 export class Wallet extends AbstractEntity {

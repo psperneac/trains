@@ -1,25 +1,25 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MapPlaceConnection } from '../app/api/places/map-place-connection.entity';
-import { MapPlace } from '../app/api/places/map-place.entity';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PlaceConnection } from 'src/app/api/places/place-connection.module';
+
 import { MapTemplate } from '../app/api/maps/map-template.entity';
-import { MapVehicle } from '../app/api/vehicles/map-vehicle.entity';
+import { Place2 } from '../app/api/old/place2.entity';
 import { MapPlaceConnectionInstance } from '../app/api/places/map-place-connection-instance.entity';
-import { PlaceConnection } from '../app/api/places/place-connection.entity';
+import { MapPlaceConnection } from '../app/api/places/map-place-connection.entity';
 import { MapPlaceInstanceJobOffer } from '../app/api/places/map-place-instance-job-offer.entity';
 import { MapPlaceInstanceJob } from '../app/api/places/map-place-instance-job.entity';
 import { MapPlaceInstance } from '../app/api/places/map-place-instance.entity';
+import { MapPlace } from '../app/api/places/map-place.entity';
+import { Translation } from '../app/api/translations/translation.entity';
 import { UserPreference } from '../app/api/users/user-preference.entity';
 import { User } from '../app/api/users/users.entity';
-import { Place } from '../app/api/places/place.entity';
-import { Translation } from '../app/api/translations/translation.entity';
-import { MongooseModule } from '@nestjs/mongoose';
-import { PlaceType } from '../app/api/places/place-type.entity';
 import { MapVehicleInstanceJob } from '../app/api/vehicles/map-vehicle-instance-job.entity';
 import { MapVehicleInstance } from '../app/api/vehicles/map-vehicle-instance.entity';
-import { VehicleType } from '../app/api/vehicles/vehicle-type.entity';
+import { MapVehicle } from '../app/api/vehicles/map-vehicle.entity';
 import { Vehicle } from '../app/api/vehicles/vehicle.entity';
+import { Place } from 'src/app/api/places/place.module';
 
 export const TABLES = {
   USERS: 'users',
@@ -42,7 +42,7 @@ export const TABLES = {
   MAP_PLACE_CONNECTIONS: 'map_place_connections',
   PLAYERS: 'players',
   USER_PREFERENCES: 'user_preferences',
-  WALLETS: 'wallets',
+  WALLETS: 'wallets'
 };
 
 export const ENTITIES = [
@@ -50,8 +50,6 @@ export const ENTITIES = [
   User,
   UserPreference,
   Translation,
-  PlaceType,
-  VehicleType,
   Vehicle,
   PlaceConnection,
   MapPlaceConnectionInstance,
@@ -63,7 +61,7 @@ export const ENTITIES = [
   MapTemplate,
   MapPlace,
   MapPlaceConnection,
-  MapVehicle,
+  MapVehicle
 ];
 
 @Module({
@@ -82,17 +80,31 @@ export const ENTITIES = [
         //   entities: ENTITIES,
         //   synchronize: false,
         // };
+        // return {
+        //   type: 'postgres',
+        //   host: configService.get('POSTGRESQL_HOST'),
+        //   port: configService.get('POSTGRESQL_PORT'),
+        //   username: configService.get('POSTGRESQL_USER'),
+        //   password: configService.get('POSTGRESQL_PASSWORD'),
+        //   database: configService.get('POSTGRESQL_DB'),
+        //   entities: ENTITIES,
+        //   synchronize: false,
+        // };
+
+        const username = configService.get('MONGO_USERNAME');
+        const password = configService.get('MONGO_PASSWORD');
+        const database = configService.get('MONGO_DATABASE');
+        const host = configService.get('MONGO_HOST');
+        const url = `mongodb://${username}:${password}@${host}/${database}?ssl=false`;
+
         return {
-          type: 'postgres',
-          host: configService.get('POSTGRESQL_HOST'),
-          port: configService.get('POSTGRESQL_PORT'),
-          username: configService.get('POSTGRESQL_USER'),
-          password: configService.get('POSTGRESQL_PASSWORD'),
-          database: configService.get('POSTGRESQL_DB'),
+          type: 'mongodb',
+          url,
+          database: configService.get('MONGO_DATABASE'),
           entities: ENTITIES,
-          synchronize: false,
+          synchronize: false
         };
-      },
+      }
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -105,13 +117,13 @@ export const ENTITIES = [
         // https://mongoosejs.com/docs/connections.html
         const config = {
           uri: `mongodb://${username}:${password}@${host}/${database}?ssl=false`,
-          dbName: database,
+          dbName: database
         };
 
         return config;
       },
-      inject: [ConfigService],
-    }),
-  ],
+      inject: [ConfigService]
+    })
+  ]
 })
 export class DatabaseModule {}

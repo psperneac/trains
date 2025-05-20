@@ -1,3 +1,3 @@
 export enum PostgresErrorCode {
-  UniqueViolation = 'ER_DUP_ENTRY',
+  UniqueViolation = 'ER_DUP_ENTRY'
 }

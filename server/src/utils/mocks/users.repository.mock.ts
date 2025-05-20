@@ -1,24 +1,23 @@
-import { User } from '../../app/api/users/users.entity';
 import { isString } from 'util';
-import { cloneDeep } from 'lodash';
-import * as bcrypt from 'bcrypt';
 
-export function createMockUser(
-  id: number,
-  prefix: string,
-  scope?: string,
-): User {
+import * as bcrypt from 'bcrypt';
+import { cloneDeep } from 'lodash';
+
+import { Types } from 'mongoose';
+import { User } from '../../app/api/users/users.entity';
+
+export function createMockUser(id: number, prefix: string, scope?: string): User {
   const password = bcrypt.hashSync(prefix + '1!', 10);
   return {
-    id: 'ID' + id,
+    _id: new Types.ObjectId(),
+    version: 0,
     username: prefix + id,
     password,
     email: prefix + id + '@trains.com',
-    version: 0,
     created: new Date(),
     updated: new Date(),
     deleted: null,
-    scope: scope || 'USER',
+    scope: scope || 'USER'
   };
 }
 
@@ -26,7 +25,7 @@ export const MOCK_USERS: User[] = [
   createMockUser(1, 'testUser'),
   createMockUser(2, 'testUser'),
   createMockUser(3, 'testUser'),
-  createMockUser(10, 'testAdmin', 'ADMIN'),
+  createMockUser(10, 'testAdmin', 'ADMIN')
 ];
 
 export class MockUsersRepository {
@@ -42,24 +41,24 @@ export class MockUsersRepository {
 
   findOne(data: string | any) {
     if (isString(data)) {
-      return this.users.find((user) => user.id === data);
+      return this.users.find(user => user._id.toString() === data);
     }
 
     let ret = null;
     if (data.email) {
-      ret = this.users.find((user) => user.email === data.email);
-    } else if (data.id) {
-      ret = this.users.find((user) => user.id === data.id);
+      ret = this.users.find(user => user.email === data.email);
+    } else if (data._id) {
+      ret = this.users.find(user => user._id.toString() === data._id);
     }
 
     return ret;
   }
 
   create(user: User) {
-    if (user.id) {
+    if (user._id) {
       return {
         ...user,
-        modified: new Date(),
+        modified: new Date()
       };
     }
 
@@ -67,32 +66,29 @@ export class MockUsersRepository {
       ...user,
       id: user.username,
       created: new Date(),
-      modified: new Date(),
+      modified: new Date()
     };
   }
 
   update(uuid: string, user: User) {
     user = {
-      ...this.users.find((u) => u.id === uuid),
-      ...user,
+      ...this.users.find(u => u._id.toString() === uuid),
+      ...user
     };
 
-    this.users = [...this.users.filter((u) => u.id !== uuid), user];
+    this.users = [...this.users.filter(u => u._id.toString() !== uuid), user];
 
     return user;
   }
 
   save(user: User) {
-    this.users = [
-      ...this.users.filter((u) => u.username !== user.username),
-      user,
-    ];
+    this.users = [...this.users.filter(u => u.username !== user.username), user];
     return user;
   }
 
   delete(uuid: string) {
-    const entity = this.users.find((user) => user.id === uuid);
-    this.users = this.users.filter((user) => user.id !== uuid);
+    const entity = this.users.find(user => user._id.toString() === uuid);
+    this.users = this.users.filter(user => user._id.toString() !== uuid);
     return { affected: !!entity };
   }
 }

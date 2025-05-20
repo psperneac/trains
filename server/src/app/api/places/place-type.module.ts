@@ -1,20 +1,57 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { AbstractEntity } from 'src/utils/abstract.entity';
 import { Repository } from 'typeorm';
+
+import { Types } from 'mongoose';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { MockRepository } from '../../../utils/mocks/repository.mock';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceType, PlaceTypeDto } from './place-type.entity';
+
+export class PlaceType extends AbstractEntity {
+  type: string;
+  name: string;
+  description: string;
+  content: any;
+}
+
+export class PlaceTypeDto {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+  content: any;
+}
+
+/*
+
+682be65aeffcff2be10510e4
+682be65aeffcff2be10510e5
+682be65aeffcff2be10510e6
+
+*/
 
 export const PLACE_TYPE_DATA: PlaceType[] = [
-  { id: 'RAIL', type: 'RAIL', name: 'Railway station', description: 'Railway station', content: {}} as PlaceType,
-  { id: 'WAREHOUSE', type: 'WAREHOUSE', name: 'Warehouse', description: 'Warehouse', content: {}} as PlaceType,
-  { id: 'PORT', type: 'PORT', name: 'Port', description: 'Port', content: {}} as PlaceType,
-  { id: 'BUSINESS', type: 'BUSINESS', name: 'Business', description: 'A business place', content: {}} as PlaceType,
-  { id: 'TRANSIT', type: 'TRANSIT', name: 'Transit Station', description: 'Mass Transit Station', content: {}} as PlaceType,
-  { id: 'YARD', type: 'YARD', name: 'Yard', description: 'Vehicle, Train, Mass Transit or Shipyard', content: {}} as PlaceType
+  { _id: new Types.ObjectId('682be65aeffcff2be10510de'), type: 'RAIL', name: 'Railway station', description: 'Railway station', content: {} } as any as PlaceType,
+  { _id: new Types.ObjectId('682be65aeffcff2be10510df'), type: 'WAREHOUSE', name: 'Warehouse', description: 'Warehouse', content: {} } as any as PlaceType,
+  { _id: new Types.ObjectId('682be65aeffcff2be10510e0'), type: 'PORT', name: 'Port', description: 'Port', content: {} } as any as PlaceType,
+  { _id: new Types.ObjectId('682be65aeffcff2be10510e1'), type: 'BUSINESS', name: 'Business', description: 'A business place', content: {} } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510e2'),
+    type: 'TRANSIT',
+    name: 'Transit Station',
+    description: 'Mass Transit Station',
+    content: {}
+  } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510e3'),
+    type: 'YARD',
+    name: 'Yard',
+    description: 'Vehicle, Train, Mass Transit or Shipyard',
+    content: {}
+  } as any as PlaceType
 ];
 
 @Injectable()

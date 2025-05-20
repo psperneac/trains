@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
 import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
+
 import { ApiModule } from './api/api.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -30,21 +31,20 @@ import { AppService } from './app.service';
         MONGO_HOST: Joi.string().required(),
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION_TIME: Joi.string().required(),
-      }),
+        JWT_EXPIRATION_TIME: Joi.string().required()
+      })
     }),
     DatabaseModule,
     AuthenticationModule,
-    ApiModule,
+    ApiModule
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-  ],
+      useClass: AllExceptionsFilter
+    }
+  ]
 })
 export class AppModule {}
-

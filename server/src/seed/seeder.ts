@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { VehicleTypeSeederService } from './vehicle-type-seeder.service';
 
 @Injectable()
@@ -6,8 +7,7 @@ export class Seeder {
   constructor(
     private readonly logger: Logger,
     private readonly vehicleTypeSeederService: VehicleTypeSeederService
-  ) {
-  }
+  ) {}
 
   async seed() {
     await this.vehicleTypes();

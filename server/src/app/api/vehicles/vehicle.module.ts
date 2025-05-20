@@ -1,10 +1,12 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+
 import { Vehicle, VehicleDto } from './vehicle.entity';
 
 @Injectable()
@@ -36,7 +38,7 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
       'auxMax',
       'auxLoad',
       'auxFuel',
-      'speed',
+      'speed'
     ];
   }
 }
@@ -53,6 +55,6 @@ export class VehicleController extends AbstractServiceController<Vehicle, Vehicl
   imports: [TypeOrmModule.forFeature([Vehicle])],
   controllers: [VehicleController],
   providers: [VehicleMapper, VehiclesService, VehicleRepository],
-  exports: [VehicleMapper, VehiclesService],
+  exports: [VehicleMapper, VehiclesService]
 })
 export class VehicleModule {}

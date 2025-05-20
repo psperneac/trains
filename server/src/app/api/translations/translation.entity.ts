@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity } from 'typeorm';
+
 import { AbstractDto } from '../../../utils/abstract-dto';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 

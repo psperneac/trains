@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+
 import { User } from '../app/api/users/users.entity';
 
 export class RegisterDto {

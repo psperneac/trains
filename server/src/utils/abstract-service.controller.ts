@@ -1,18 +1,35 @@
+import {
+  Body,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards
+} from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
-import { PageRequestDto } from '../models/pagination.model';
+
+import { Admin, LoggedIn } from '../authentication/authentication.guard';
 import { PageDto } from '../models/page.model';
+import { PageRequestDto } from '../models/pagination.model';
+
 import { AbstractDtoMapper } from './abstract-dto-mapper';
 import { AbstractEntity } from './abstract.entity';
 import { AbstractService } from './abstract.service';
-import { Body, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { Admin, LoggedIn } from '../authentication/authentication.guard';
 
 /**
  * T - entity type
  * R - entity dto type
  */
 export class AbstractServiceController<T extends AbstractEntity, R> {
-  constructor(readonly service: AbstractService<T>, readonly mapper: AbstractDtoMapper<T, R>) {}
+  constructor(
+    readonly service: AbstractService<T>,
+    readonly mapper: AbstractDtoMapper<T, R>
+  ) {}
 
   @Get(':id')
   @UseGuards(LoggedIn)
@@ -50,22 +67,20 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
     console.log('findAll', pagination, this.service, this.mapper);
 
-    return this.service
-      .findAll(pagination)
-      .then(this.makeHandler());
+    return this.service.findAll(pagination).then(this.makeHandler());
   }
 
   /**
    * This is a helper function to create a closured handler for findAll containing the mapper instance
    */
   public makeHandler() {
-    return (page) => this.handlePagedResults(page, this.mapper);
+    return page => this.handlePagedResults(page, this.mapper);
   }
 
   public async handlePagedResults(page, mapper) {
     return Promise.all(page?.data?.map(item => mapper.toDto(item)))
       .then(mappedData => ({
-      ...page,
+        ...page,
         data: mappedData
       }))
       .catch(e => {
@@ -77,7 +92,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
           throw new HttpException('Entities cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
-}
+  }
 
   @Post()
   @UseGuards(LoggedIn, Admin)

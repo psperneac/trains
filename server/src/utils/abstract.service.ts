@@ -1,8 +1,10 @@
-import { MapPlaceInstance } from '../app/api/places/map-place-instance.entity';
-import { PageRequestDto } from '../models/pagination.model';
-import { PageDto } from '../models/page.model';
-import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
+
+import { PageDto } from '../models/page.model';
+import { PageRequestDto } from '../models/pagination.model';
+
+import { Types } from 'mongoose';
 import { AbstractEntity } from './abstract.entity';
 import { RepositoryAccessor } from './repository-accessor';
 import { SqlException } from './sql.exception';
@@ -19,7 +21,7 @@ export class AbstractService<T extends AbstractEntity> {
     this.relationships = repositoryAccessor.getRelationships();
   }
 
-  findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
+  async findAll(pagination: PageRequestDto): Promise<PageDto<T>> {
     if (!pagination) {
       pagination = new PageRequestDto();
       pagination.unpaged = true;
@@ -31,28 +33,26 @@ export class AbstractService<T extends AbstractEntity> {
 
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
-    const skippedItems = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
-    let query = this.repository.createQueryBuilder();
-    if (this.relationships) {
-      // clone relationships because the method empties it
-      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships], query.alias, this.repository.metadata, '');
-    }
-    if (!pagination.unpaged) {
-      query = query.offset(skippedItems).limit(limit);
-    }
-    if (pagination.sortColumn) {
-      query = query.orderBy(pagination.sortColumn, pagination.sortDescending ? 'DESC' : 'ASC');
-    }
+    const [data, totalCount] = await Promise.all([
+      this.repository.find({
+        relations: this.relationships,
+        skip: pagination.unpaged ? undefined : skip,
+        take: pagination.unpaged ? undefined : limit,
+        order: pagination.sortColumn ? {
+          [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC'
+        } as any : undefined
+      }),
+      this.repository.count()
+    ]);
 
-    return Promise.all([query.getMany(), this.repository.count()]).then(([data, count]) => {
-      return {
-        data,
-        page: pagination.unpaged ? page : 1,
-        limit: pagination.unpaged ? count : limit,
-        totalCount: count
-      };
-    });
+    return {
+      data,
+      page: pagination.unpaged ? page : 1,
+      limit: pagination.unpaged ? totalCount : limit,
+      totalCount
+    };
   }
 
   async findOne(uuid: string): Promise<T> {
@@ -60,14 +60,12 @@ export class AbstractService<T extends AbstractEntity> {
       return null;
     }
 
-    let query = this.repository.createQueryBuilder();
-    if (this.relationships) {
-      // clone relationships because the method empties it
-      FindOptionsUtils.applyRelationsRecursively(query, [...this.relationships], query.alias, this.repository.metadata, '');
-    }
-    query = query.where({ id: uuid });
+    const data = await this.repository.findOne({
+      where: { _id: new Types.ObjectId(uuid) } as any,
+      relations: this.relationships
+    });
 
-    return query.getOne();
+    return data;
   }
 
   create(entity: DeepPartial<T>): Promise<T> {
@@ -97,7 +95,11 @@ export class AbstractService<T extends AbstractEntity> {
     });
   }
 
-  findAllWithQuery(pagination: PageRequestDto, queryString: string, queryParams: any): Promise<PageDto<AbstractEntity>> {
+  findAllWithQuery(
+    pagination: PageRequestDto,
+    queryString: string,
+    queryParams: any
+  ): Promise<PageDto<AbstractEntity>> {
     const page = pagination.page || 1;
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;

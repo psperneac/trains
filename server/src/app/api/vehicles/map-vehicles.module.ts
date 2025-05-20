@@ -9,20 +9,22 @@ import {
   Query,
   UseGuards
 } from '@nestjs/common';
-import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import { FindOptionsUtils } from 'typeorm';
-import { MapVehicle, MapVehicleDto } from './map-vehicle.entity';
-import { AbstractService } from '../../../utils/abstract.service';
-import { PageRequestDto } from '../../../models/pagination.model';
-import { PageDto } from '../../../models/page.model';
-import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { VehicleModule, VehiclesService } from './vehicle.module';
 import { omit } from 'lodash';
-import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { FindOptionsUtils } from 'typeorm';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
+import { PageRequestDto } from '../../../models/pagination.model';
+import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractServiceController } from '../../../utils/abstract-service.controller';
+import { AbstractService } from '../../../utils/abstract.service';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
+import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
+
+import { MapVehicle, MapVehicleDto } from './map-vehicle.entity';
+import { VehicleModule, VehiclesService } from './vehicle.module';
 
 @Injectable()
 export class MapVehicleRepository extends RepositoryAccessor<MapVehicle> {
@@ -42,7 +44,7 @@ export class MapVehiclesService extends AbstractService<MapVehicle> {
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
 
-    let query = this.repository.createQueryBuilder('map_vehicle')
+    let query = this.repository.createQueryBuilder('map_vehicle');
     if (this.relationships) {
       // clone relationships because the method empties it
       FindOptionsUtils.applyRelationsRecursively(
@@ -76,26 +78,27 @@ export class MapVehiclesService extends AbstractService<MapVehicle> {
 export class MapVehicleMapper extends AbstractDtoMapper<MapVehicle, MapVehicleDto> {
   constructor(
     private readonly mapTemplateService: MapTemplateService,
-    private readonly vehicleService: VehiclesService) {
+    private readonly vehicleService: VehiclesService
+  ) {
     super();
   }
 
   async toDto(domain: MapVehicle): Promise<MapVehicleDto> {
-    if(!domain) {
+    if (!domain) {
       return null;
     }
 
     const dto: any = {
-      id: domain.id,
-      vehicleId: domain.vehicle.id,
-      mapId: domain.map.id
+      id: domain._id.toString(),
+      vehicleId: domain.vehicle?._id.toString(),
+      mapId: domain.map?._id.toString()
     };
 
     return dto;
   }
 
   async toDomain(dto: MapVehicleDto, domain?: MapVehicle): Promise<MapVehicle> {
-    if(!dto) {
+    if (!dto) {
       return domain as any as MapVehicle;
     }
 
@@ -103,16 +106,16 @@ export class MapVehicleMapper extends AbstractDtoMapper<MapVehicle, MapVehicleDt
       domain = new MapVehicle();
     }
 
-    const vehicleId = dto.vehicleId ?? domain.vehicle?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
+    const vehicleId = dto.vehicleId ?? domain.vehicle?._id;
+    const mapId = dto.mapId ?? domain.map?._id;
 
     const fixedDto = omit(dto, ['vehicleId', 'mapId']);
 
     return {
       ...domain,
       ...fixedDto,
-      vehicle: vehicleId ? await this.vehicleService.findOne(vehicleId) : null,
-      map: mapId ? await this.mapTemplateService.findOne(mapId) : null
+      vehicle: vehicleId ? await this.vehicleService.findOne(vehicleId.toString()) : null,
+      map: mapId ? await this.mapTemplateService.findOne(mapId.toString()) : null
     } as MapVehicle;
   }
 }
@@ -126,7 +129,10 @@ export class MapVehiclesController extends AbstractServiceController<MapVehicle,
 
   @Get('by-map/:mapId')
   @UseGuards(LoggedIn)
-  async findAllByMap(@Query() pagination: PageRequestDto, @Param('mapId') mapId: string): Promise<PageDto<MapVehicleDto>> {
+  async findAllByMap(
+    @Query() pagination: PageRequestDto,
+    @Param('mapId') mapId: string
+  ): Promise<PageDto<MapVehicleDto>> {
     return (this.service as MapVehiclesService).findAllByMap(pagination, mapId).then(async page => {
       return Promise.all(page?.data?.map(item => this.mapper.toDto(item)))
         .then(mappedData => ({
@@ -152,4 +158,4 @@ export class MapVehiclesController extends AbstractServiceController<MapVehicle,
   providers: [MapVehicleRepository, MapVehiclesService, MapVehicleMapper],
   exports: [MapVehiclesService, MapVehicleMapper]
 })
-export class MapVehiclesModule { }
+export class MapVehiclesModule {}

@@ -1,10 +1,12 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
-import { Place } from '../places/place.entity';
-import { MapVehicle } from './map-vehicle.entity';
+
+import { Place } from '../places/place.module';
 import { MapVehicleInstanceJob } from './map-vehicle-instance-job.entity';
+import { MapVehicle } from './map-vehicle.entity';
 
 @Entity({ name: 'map_vehicle_instances' })
 export class MapVehicleInstance extends AbstractEntity {

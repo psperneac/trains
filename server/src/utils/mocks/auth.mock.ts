@@ -1,14 +1,16 @@
 import { ConfigService } from '@nestjs/config';
-import { mockedConfigService } from './config.service.mock';
-import { JWT_MODULE_OPTIONS } from '@nestjs/jwt/dist/jwt.constants';
 import { JwtService } from '@nestjs/jwt';
-import { JwtStrategy } from '../../authentication/jwt.strategy';
-import { UsersService } from '../../app/api/users/users.service';
+import { JWT_MODULE_OPTIONS } from '@nestjs/jwt/dist/jwt.constants';
 import { getRepositoryToken } from '@nestjs/typeorm';
+
 import { User } from '../../app/api/users/users.entity';
-import { mockedUsersRepository } from './users.repository.mock';
-import { LocalStrategy } from '../../authentication/local.strategy';
+import { UsersService } from '../../app/api/users/users.service';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { JwtStrategy } from '../../authentication/jwt.strategy';
+import { LocalStrategy } from '../../authentication/local.strategy';
+
+import { mockedConfigService } from './config.service.mock';
+import { mockedUsersRepository } from './users.repository.mock';
 
 export const authMocks = [
   { provide: ConfigService, useValue: mockedConfigService },
@@ -18,5 +20,5 @@ export const authMocks = [
   LocalStrategy,
   UsersService,
   AuthenticationService,
-  { provide: getRepositoryToken(User), useValue: mockedUsersRepository },
+  { provide: getRepositoryToken(User), useValue: mockedUsersRepository }
 ];

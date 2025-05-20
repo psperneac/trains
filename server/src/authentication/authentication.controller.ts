@@ -11,19 +11,21 @@ import {
   SerializeOptions,
   UseFilters,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthenticationService } from './authentication.service';
-import { RegisterDto, RequestWithUser } from './authentication.model';
-import { LoggedIn, LocalAuthenticationGuard } from './authentication.guard';
+
 import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
+
+import { LocalAuthenticationGuard, LoggedIn } from './authentication.guard';
+import { RegisterDto, RequestWithUser } from './authentication.model';
+import { AuthenticationService } from './authentication.service';
 
 @Controller('authentication')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseFilters(AllExceptionsFilter)
 @SerializeOptions({
-  strategy: 'excludeAll',
+  strategy: 'excludeAll'
 })
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
@@ -57,7 +59,7 @@ export class AuthenticationController {
   @Post('login')
   async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
     const { user } = request;
-    const authorization = this.authenticationService.getAuthorizationBearer(user.id);
+    const authorization = this.authenticationService.getAuthorizationBearer(user._id.toString());
     user.password = undefined;
     return response
       .setHeader('Authorization', authorization)
@@ -69,7 +71,7 @@ export class AuthenticationController {
   @Post('logout')
   @HttpCode(200)
   // @UseGuards(LoggedIn) -- logout should be allowed even if not logged in
-  async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
+  async logOut(@Req() _request: RequestWithUser, @Res() response: Response) {
     // we have no way to currently un-authenticate tokens already sent out
     // app is stateless / session less, so this doesn't do anything
     // TODO: find way to un-authenticate tokens already sent out and remove them from server

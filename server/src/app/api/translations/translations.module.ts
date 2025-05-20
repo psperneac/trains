@@ -1,10 +1,12 @@
 import { Controller, Get, Injectable, Module, Param, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+
 import { Translation, TranslationDto } from './translation.entity';
 
 @Injectable()
@@ -21,7 +23,10 @@ export class TranslationsService extends AbstractService<Translation> {
   }
 
   getAllByLanguage(language: string): Promise<Translation[]> {
-    return this.repository.createQueryBuilder('translation').where('translation.language = :language', { language }).getMany();
+    return this.repository
+      .createQueryBuilder('translation')
+      .where('translation.language = :language', { language })
+      .getMany();
   }
 }
 

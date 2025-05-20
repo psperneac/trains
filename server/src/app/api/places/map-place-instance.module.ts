@@ -1,5 +1,7 @@
 import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { omit } from 'lodash';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
@@ -8,9 +10,9 @@ import { AbstractServiceController } from '../../../utils/abstract-service.contr
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
+
 import { MapPlaceInstance, MapPlaceInstanceDto } from './map-place-instance.entity';
-import { MapPlacesModule, MapPlacesService } from './map-places.module';
-import { omit } from 'lodash';
+import { MapPlacesModule, MapPlacesService } from './map-place.module';
 
 @Injectable()
 export class MapPlaceInstanceRepository extends RepositoryAccessor<MapPlaceInstance> {
@@ -28,12 +30,12 @@ export class MapPlaceInstancesService extends AbstractService<MapPlaceInstance> 
   findAllByPlayerAndMap(
     pagination: PageRequestDto,
     playerId: string,
-    mapId: string,
+    mapId: string
   ): Promise<PageDto<MapPlaceInstance>> {
     return this.findAllWithQuery(
       pagination,
       'map_place_instances.map.id = :mapId and map_place_instances.player.id = :playerId',
-      { mapId, playerId },
+      { mapId, playerId }
     ) as Promise<PageDto<MapPlaceInstance>>;
   }
 }
@@ -50,12 +52,12 @@ export class MapPlaceInstanceMapper extends AbstractDtoMapper<MapPlaceInstance, 
     }
 
     const dto: MapPlaceInstanceDto = {
-      id: domain.id,
-      mapPlaceId: domain.mapPlace?.id,
+      id: domain._id.toString(),
+      mapPlaceId: domain.mapPlace?._id.toString(),
       playerId: domain.playerId,
-      jobs: domain.jobs?.map(j => j.id),
-      jobOffers: domain.jobOffers?.map(j => j.id),
-      content: domain.content,
+      jobs: domain.jobs?.map(j => j._id.toString()),
+      jobOffers: domain.jobOffers?.map(j => j._id.toString()),
+      content: domain.content
     };
 
     return dto;
@@ -63,7 +65,7 @@ export class MapPlaceInstanceMapper extends AbstractDtoMapper<MapPlaceInstance, 
 
   async toDomain(
     dto: MapPlaceInstanceDto,
-    domain?: Partial<MapPlaceInstance> | MapPlaceInstance,
+    domain?: Partial<MapPlaceInstance> | MapPlaceInstance
   ): Promise<MapPlaceInstance> {
     if (!dto) {
       return domain as any as MapPlaceInstance;
@@ -73,14 +75,14 @@ export class MapPlaceInstanceMapper extends AbstractDtoMapper<MapPlaceInstance, 
       domain = {};
     }
 
-    const mapPlaceId = dto.mapPlaceId ?? domain.mapPlace?.id;
+    const mapPlaceId = dto.mapPlaceId ?? domain.mapPlace?._id.toString();
 
     const fixedDto = omit(dto, ['mapPlaceId']);
 
     return {
       ...domain,
       ...fixedDto,
-      mapPlace: this.mapPlacesService.findOne(mapPlaceId),
+      mapPlace: await this.mapPlacesService.findOne(mapPlaceId)
     } as any as MapPlaceInstance;
   }
 }
@@ -97,7 +99,7 @@ export class MapPlaceInstanceController extends AbstractServiceController<MapPla
   async findAllByPlayerAndMap(
     pagination: PageRequestDto,
     playerId: string,
-    mapId: string,
+    mapId: string
   ): Promise<PageDto<MapPlaceInstanceDto>> {
     return (this.service as MapPlaceInstancesService)
       .findAllByPlayerAndMap(pagination, playerId, mapId)
@@ -109,6 +111,6 @@ export class MapPlaceInstanceController extends AbstractServiceController<MapPla
   imports: [MapPlacesModule, TypeOrmModule.forFeature([MapPlaceInstance])],
   controllers: [MapPlaceInstanceController],
   providers: [MapPlaceInstancesService, MapPlaceInstanceMapper, MapPlaceInstanceRepository],
-  exports: [MapPlaceInstancesService, MapPlaceInstanceMapper],
+  exports: [MapPlaceInstancesService, MapPlaceInstanceMapper]
 })
 export class MapPlaceInstancesModule {}

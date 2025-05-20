@@ -1,14 +1,16 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { omit } from 'lodash';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { MapPlaceConnectionsModule, MapPlaceConnectionService } from './map-place-connections.module';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
+
 import { MapPlaceConnectionInstance, MapPlaceConnectionInstanceDto } from './map-place-connection-instance.entity';
-import { omit } from 'lodash';
+import { MapPlaceConnectionService, MapPlaceConnectionsModule } from './map-place-connections.module';
 
 @Injectable()
 export class MapPlaceConnectionInstanceRepository extends RepositoryAccessor<MapPlaceConnectionInstance> {
@@ -31,7 +33,7 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
 > {
   constructor(
     private readonly mapPlaceConnectionService: MapPlaceConnectionService,
-    private readonly mapService: MapTemplateService,
+    private readonly mapService: MapTemplateService
   ) {
     super();
   }
@@ -42,11 +44,11 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
     }
 
     const dto: MapPlaceConnectionInstanceDto = {
-      id: domain.id,
-      mapPlaceConnectionId: domain.mapPlaceConnection?.id,
+      id: domain._id.toString(),
+      mapPlaceConnectionId: domain.mapPlaceConnection?._id.toString(),
       playerId: domain.playerId,
-      mapId: domain.map.id,
-      content: domain.content,
+      mapId: domain.map?._id.toString(),
+      content: domain.content
     };
 
     return dto;
@@ -54,7 +56,7 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
 
   async toDomain(
     dto: MapPlaceConnectionInstanceDto,
-    domain?: Partial<MapPlaceConnectionInstance> | MapPlaceConnectionInstance,
+    domain?: Partial<MapPlaceConnectionInstance> | MapPlaceConnectionInstance
   ): Promise<MapPlaceConnectionInstance> {
     if (!dto) {
       return domain as any as MapPlaceConnectionInstance;
@@ -64,8 +66,8 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
       domain = {};
     }
 
-    const mapPlaceConnectionId = dto.mapPlaceConnectionId ?? domain.mapPlaceConnection?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
+    const mapPlaceConnectionId = dto.mapPlaceConnectionId ?? domain.mapPlaceConnection?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
 
     const fixedDto = omit(dto, ['mapPlaceConnectionId', 'mapId']);
 
@@ -74,7 +76,7 @@ export class MapPlaceConnectionInstanceMapper extends AbstractDtoMapper<
       ...fixedDto,
       mapPlaceConnection: await this.mapPlaceConnectionService.findOne(mapPlaceConnectionId),
       map: await this.mapService.findOne(mapId),
-      content: dto.content,
+      content: dto.content
     } as any as MapPlaceConnectionInstance;
   }
 }
@@ -96,8 +98,8 @@ export class MapPlaceConnectionInstanceController extends AbstractServiceControl
   providers: [
     MapPlaceConnectionInstanceService,
     MapPlaceConnectionInstanceMapper,
-    MapPlaceConnectionInstanceRepository,
+    MapPlaceConnectionInstanceRepository
   ],
-  exports: [MapPlaceConnectionInstanceService, MapPlaceConnectionInstanceMapper],
+  exports: [MapPlaceConnectionInstanceService, MapPlaceConnectionInstanceMapper]
 })
 export class PlaceConnectionInstancesModule {}

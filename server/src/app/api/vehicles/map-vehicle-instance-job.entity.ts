@@ -1,7 +1,9 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
 import { Job, JobDto } from '../jobs/job.entity';
 import { MapTemplate } from '../maps/map-template.entity';
+
 import { MapVehicleInstance } from './map-vehicle-instance.entity';
 
 @Entity({ name: 'map_vehicle_instance_jobs' })

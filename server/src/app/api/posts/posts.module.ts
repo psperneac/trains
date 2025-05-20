@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PostsController } from './posts.controller';
-import { PostsService } from './posts.service';
-import { Post, PostSchema } from './posts.schema';
-import { AuthenticationModule } from '../../../authentication/authentication.module';
 import { MongooseModule } from '@nestjs/mongoose';
+
+import { AuthenticationModule } from '../../../authentication/authentication.module';
+
+import { PostsController } from './posts.controller';
+import { Post, PostSchema } from './posts.schema';
+import { PostsService } from './posts.service';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]), AuthenticationModule],

@@ -1,9 +1,11 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
-import { MapPlace } from './map-place.entity';
+
 import { MapPlaceInstanceJobOffer } from './map-place-instance-job-offer.entity';
 import { MapPlaceInstanceJob } from './map-place-instance-job.entity';
+import { MapPlace } from './map-place.entity';
 
 @Entity({ name: 'map_place_instances' })
 export class MapPlaceInstance extends AbstractEntity {

@@ -1,7 +1,8 @@
-import { Expose } from "class-transformer";
-import { Column, Entity } from "typeorm";
-import { AbstractDto } from "../../../utils/abstract-dto";
-import { AbstractEntity } from "../../../utils/abstract.entity";
+import { Expose } from 'class-transformer';
+import { Column, Entity } from 'typeorm';
+
+import { AbstractDto } from '../../../utils/abstract-dto';
+import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'vehicles' })
 export class Vehicle extends AbstractEntity {

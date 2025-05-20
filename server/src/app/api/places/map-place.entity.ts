@@ -1,12 +1,12 @@
-import { Expose } from 'class-transformer';
-import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { AbstractEntity } from '../../../utils/abstract.entity';
-import { Place } from './place.entity';
+import { AbstractEntity } from 'src/utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
+import { Place } from '../places/place.module';
+import { Entity, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { Expose } from 'class-transformer';
 
 @Entity({ name: 'map_places' })
 export class MapPlace extends AbstractEntity {
-  @OneToOne((_type) => Place, { eager: true })
+  @OneToOne(_type => Place, { eager: true })
   @JoinColumn({ name: 'place_id' })
   @Expose()
   place: Place;

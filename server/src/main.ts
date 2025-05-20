@@ -3,11 +3,7 @@
  * This is only a minimal backend to get started.
  */
 
-import {
-  Logger,
-  ValidationPipe,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
+import { Logger, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
@@ -17,7 +13,7 @@ import { AllExceptionsFilter } from './utils/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug'],
+    logger: ['log', 'error', 'warn', 'debug']
   });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

@@ -1,7 +1,8 @@
-import { AbstractEntity } from '../abstract.entity';
 import { cloneDeep } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateResult } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
+import { AbstractEntity } from '../abstract.entity';
 
 export class MockRepository<T extends AbstractEntity> {
   private data: T[];
@@ -17,7 +18,7 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   internalFind(id) {
-    return this.data.find(d => d.id === id);
+    return this.data.find(d => d._id.toString() === id);
   }
 
   reset() {
@@ -26,7 +27,10 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   getMany() {
-    const ret = this.data.slice(this.dataOffset, Math.min(this.dataOffset + (this.dataLimit || this.data.length), this.data.length));
+    const ret = this.data.slice(
+      this.dataOffset,
+      Math.min(this.dataOffset + (this.dataLimit || this.data.length), this.data.length)
+    );
     return Promise.resolve(ret);
   }
 
@@ -36,21 +40,21 @@ export class MockRepository<T extends AbstractEntity> {
 
   findOne(param: string | any) {
     if (typeof param === 'string') {
-      return Promise.resolve(this.data.find(d => d.id === param));
+      return Promise.resolve(this.data.find(d => d._id.toString() === param));
     }
 
     let ret = null;
     if (param['email']) {
       ret = this.data.find(d => d['email'] === param['email']);
     } else if (param.id) {
-      ret = this.data.find(d => d.id === param.id);
+      ret = this.data.find(d => d._id.toString() === param.id);
     }
 
     return Promise.resolve(ret);
   }
 
   create(entity: T) {
-    if (entity.id) {
+    if (entity._id) {
       return {
         ...entity,
         modified: new Date()
@@ -66,7 +70,7 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   update(id: string, entity: T): Promise<UpdateResult> {
-    const existing = this.data.find(u => u.id === id);
+    const existing = this.data.find(u => u._id.toString() === id);
 
     // TODO: return error if it doesn't exist
 
@@ -77,7 +81,7 @@ export class MockRepository<T extends AbstractEntity> {
       updated: new Date()
     };
 
-    this.data = [...this.data.filter(u => u.id !== id), entity];
+    this.data = [...this.data.filter(u => u._id.toString() !== id), entity];
 
     return Promise.resolve({
       raw: 0,
@@ -86,13 +90,13 @@ export class MockRepository<T extends AbstractEntity> {
   }
 
   save(entity: T) {
-    this.data = [...this.data.filter(u => u.id !== entity.id), entity];
+    this.data = [...this.data.filter(u => u._id.toString() !== entity._id.toString()), entity];
     return Promise.resolve(entity);
   }
 
   delete(id: string) {
-    const entity = this.data.find(u => u.id === id);
-    this.data = this.data.filter(u => u.id !== id);
+    const entity = this.data.find(u => u._id.toString() === id);
+    this.data = this.data.filter(u => u._id.toString() !== id);
     return Promise.resolve({ affected: !!entity });
   }
 

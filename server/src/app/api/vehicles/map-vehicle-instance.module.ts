@@ -1,6 +1,7 @@
 import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
@@ -9,7 +10,8 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-place.module';
+
 import { MapVehicleInstance, MapVehicleInstanceDto } from './map-vehicle-instance.entity';
 import { MapVehiclesModule, MapVehiclesService } from './map-vehicles.module';
 
@@ -46,7 +48,7 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
   constructor(
     private readonly mapPlacesService: MapPlacesService,
     private readonly mapVehiclesService: MapVehiclesService,
-    private readonly mapService: MapTemplateService,
+    private readonly mapService: MapTemplateService
   ) {
     super();
   }
@@ -57,16 +59,16 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
     }
 
     const dto: MapVehicleInstanceDto = {
-      id: domain.id,
-      mapVehicleId: domain.mapVehicle?.id,
+      id: domain._id.toString(),
+      mapVehicleId: domain.mapVehicle?._id.toString(),
       playerId: domain.playerId,
-      mapId: domain.map?.id,
-      jobs: domain.jobs?.map(j => j.id),
-      startId: domain.start?.id,
-      endId: domain.end?.id,
+      mapId: domain.map?._id.toString(),
+      jobs: domain.jobs?.map(j => j._id.toString()),
+      startId: domain.start?._id.toString(),
+      endId: domain.end?._id.toString(),
       startTime: domain.startTime?.toISOString(),
       endTime: domain.endTime?.toISOString(),
-      content: domain.content,
+      content: domain.content
     };
 
     return dto;
@@ -84,10 +86,10 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
       domain = {};
     }
 
-    const mapVehicleId = dto.mapVehicleId ?? domain.mapVehicle?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
-    const startId = dto.startId ?? domain.start?.id;
-    const endId = dto.endId ?? domain.end?.id;
+    const mapVehicleId = dto.mapVehicleId ?? domain.mapVehicle?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
+    const startId = dto.startId ?? domain.start?._id.toString();
+    const endId = dto.endId ?? domain.end?._id.toString();
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
     const endTime = dto.endTime ? new Date(dto.endTime) : domain.endTime;
 
@@ -97,9 +99,9 @@ export class MapVehicleInstanceMapper extends AbstractDtoMapper<MapVehicleInstan
       ...domain,
       ...fixedDto,
       mapVehicle: await this.mapVehiclesService.findOne(mapVehicleId),
-      map: await this.mapService.findOne(mapId),
-      start: await this.mapPlacesService.findOne(startId),
-      end: await this.mapPlacesService.findOne(endId),
+      map: await this.mapService.findOne(mapId.toString()),
+      start: await this.mapPlacesService.findOne(startId.toString()),
+      end: await this.mapPlacesService.findOne(endId.toString()),
       startTime,
       endTime
     } as any as MapVehicleInstance;
@@ -140,6 +142,6 @@ export class MapVehicleInstancesController extends AbstractServiceController<
   imports: [MapPlacesModule, MapVehiclesModule, MapTemplateModule, TypeOrmModule.forFeature([MapVehicleInstance])],
   controllers: [MapVehicleInstancesController],
   providers: [MapVehicleInstancesService, MapVehicleInstanceMapper, MapVehicleInstanceRepository],
-  exports: [MapVehicleInstancesService, MapVehicleInstanceMapper],
+  exports: [MapVehicleInstancesService, MapVehicleInstanceMapper]
 })
 export class MapVehicleInstancesModule {}

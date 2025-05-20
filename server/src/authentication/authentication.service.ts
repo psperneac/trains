@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { UserPreference } from '../app/api/users/user-preference.entity';
-import { UserPreferencesService } from '../app/api/users/user-preference.module';
-import { RegisterDto, TokenPayload } from './authentication.model';
 import { JwtService } from '@nestjs/jwt';
-import { SCOPE_USER } from '../utils/constants';
-import { UsersService } from '../app/api/users/users.service';
+import * as bcrypt from 'bcrypt';
+
+import { UserPreferencesService } from '../app/api/users/user-preference.module';
 import { User } from '../app/api/users/users.entity';
+import { UsersService } from '../app/api/users/users.service';
+import { SCOPE_USER } from '../utils/constants';
+
+import { RegisterDto, TokenPayload } from './authentication.model';
 
 @Injectable()
 export class AuthenticationService {
@@ -14,8 +15,9 @@ export class AuthenticationService {
 
   constructor(
     private readonly usersService: UsersService,
-    private readonly userPreferencesService: UserPreferencesService,
-    private readonly jwtService: JwtService) {}
+    private readonly _userPreferencesService: UserPreferencesService,
+    private readonly jwtService: JwtService
+  ) {}
 
   public async register(registrationData: RegisterDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
@@ -25,10 +27,10 @@ export class AuthenticationService {
       scope: SCOPE_USER
     });
 
-    const preferences = await this.userPreferencesService.create({
-      user: createdUser,
-      content: {}
-    });
+    // const preferences = await this.userPreferencesService.create({
+    //   user: createdUser,
+    //   content: {}
+    // });
 
     createdUser.password = undefined;
     return createdUser;
@@ -41,6 +43,7 @@ export class AuthenticationService {
       user.password = undefined;
       return user;
     } catch (error) {
+      this.logger.error(error);
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
     }
   }

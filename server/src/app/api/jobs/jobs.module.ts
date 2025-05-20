@@ -1,13 +1,15 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+
 import { AuthenticationModule } from '../../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-place.module';
+
 import { Job, JobDto } from './job.entity';
 
 @Injectable()
@@ -36,7 +38,7 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
     }
 
     const dto: JobDto = {
-      id: domain.id,
+      id: domain._id.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
@@ -45,8 +47,8 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       payType: domain.payType,
       pay: domain.pay,
       startTime: domain.startTime?.toISOString(),
-      startId: domain.start?.id,
-      endId: domain.end?.id
+      startId: domain.start?._id.toString(),
+      endId: domain.end?._id.toString()
     };
 
     return dto;
@@ -61,20 +63,18 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       domain = {};
     }
 
-    const startId = dto.startId ?? domain.start?.id;
-    const endId = dto.endId ?? domain.end?.id;
+    const startId = dto.startId ?? domain.start?._id.toString();
+    const endId = dto.endId ?? domain.end?._id.toString();
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
-    const fixedDto = omit(
-      { ...dto },
-      ['startId', 'endId', 'startTime']);
+    const fixedDto = omit({ ...dto }, ['startId', 'endId', 'startTime']);
 
     return {
       ...domain,
       ...fixedDto,
       start: this.service.findOne(startId),
       end: this.service.findOne(endId),
-      startTime,
+      startTime
     } as any as Job;
   }
 }
@@ -91,6 +91,6 @@ export class JobsController extends AbstractServiceController<Job, JobDto> {
   imports: [MapPlacesModule, TypeOrmModule.forFeature([Job]), AuthenticationModule],
   controllers: [JobsController],
   providers: [JobsService, JobMapper, JobRepository],
-  exports: [JobsService, JobMapper],
+  exports: [JobsService, JobMapper]
 })
 export class JobsModule {}

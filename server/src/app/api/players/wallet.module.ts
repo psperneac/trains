@@ -1,11 +1,13 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { Players2Module, Players2Service } from './player2.module';
+import { Players2Module, Players2Service } from '../old/player2.module';
+
 import { Wallet, WalletDto } from './wallet.entity';
 
 @Injectable()
@@ -34,8 +36,8 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
     }
 
     const dto: WalletDto = {
-      id: domain.id,
-      playerId: domain.player?.id,
+      id: domain._id.toString(),
+      playerId: domain.player?._id.toString(),
       gold: domain.gold,
       gems: domain.gems,
       parts: domain.parts,
@@ -54,12 +56,12 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
       domain = {};
     }
 
-    const playerId = dto.playerId ?? domain.player?.id;
+    const playerId = dto.playerId ?? domain.player?._id.toString();
     console.log('playerId', playerId);
 
     return {
       ...domain,
-      id: dto.id,
+      _id: dto.id,
       gold: dto.gold,
       gems: dto.gems,
       parts: dto.parts,

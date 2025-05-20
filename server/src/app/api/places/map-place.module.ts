@@ -1,28 +1,31 @@
 import {
   Controller,
-  Get, HttpException, HttpStatus,
+  Get,
+  HttpException,
+  HttpStatus,
   Injectable,
   Module,
   Param,
   Query,
   UseFilters,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
 import { FindOptionsUtils } from 'typeorm';
 
+import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
+import { PageRequestDto } from '../../../models/pagination.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlacesModule, PlacesService } from './place.module';
-import { MapPlace, MapPlaceDto } from './map-place.entity';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { PageRequestDto } from '../../../models/pagination.model';
-import { PageDto } from '../../../models/page.model';
-import { LoggedIn } from '../../../authentication/authentication.guard';
+
+import { MapPlace, MapPlaceDto } from './map-place.entity';
+import { PlacesModule, PlacesService } from './place.module';
 
 @Injectable()
 export class MapPlaceRepository extends RepositoryAccessor<MapPlace> {
@@ -42,8 +45,8 @@ export class MapPlacesService extends AbstractService<MapPlace> {
     const limit = pagination.limit || 10;
     const skippedItems = (page - 1) * limit;
 
-    let query = this.repository.createQueryBuilder('map_place')
-      // .innerJoin('map_place.map', 'map').innerJoin('map_place.map', 'map');
+    let query = this.repository.createQueryBuilder('map_place');
+    // .innerJoin('map_place.map', 'map').innerJoin('map_place.map', 'map');
     if (this.relationships) {
       // clone relationships because the method empties it
       FindOptionsUtils.applyRelationsRecursively(
@@ -77,7 +80,8 @@ export class MapPlacesService extends AbstractService<MapPlace> {
 export class MapPlaceMapper extends AbstractDtoMapper<MapPlace, MapPlaceDto> {
   constructor(
     private readonly mapTemplateService: MapTemplateService,
-    private readonly placeService: PlacesService) {
+    private readonly placeService: PlacesService
+  ) {
     super();
   }
 
@@ -87,9 +91,9 @@ export class MapPlaceMapper extends AbstractDtoMapper<MapPlace, MapPlaceDto> {
     }
 
     const dto: any = {
-      id: domain.id,
-      placeId: domain.place?.id,
-      mapId: domain.map?.id
+      id: domain._id.toString(),
+      placeId: domain.place?._id.toString(),
+      mapId: domain.map?._id.toString()
     };
 
     return dto;
@@ -104,8 +108,8 @@ export class MapPlaceMapper extends AbstractDtoMapper<MapPlace, MapPlaceDto> {
       domain = {};
     }
 
-    const placeId = dto.placeId ?? domain.place?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
+    const placeId = dto.placeId ?? domain.place?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
 
     const fixedDto = omit(dto, ['placeId', 'mapId']);
 
@@ -127,7 +131,10 @@ export class MapPlaceController extends AbstractServiceController<MapPlace, MapP
 
   @Get('by-map/:mapId')
   @UseGuards(LoggedIn)
-  async findAllByMap(@Query() pagination: PageRequestDto, @Param('mapId') mapId: string): Promise<PageDto<MapPlaceDto>> {
+  async findAllByMap(
+    @Query() pagination: PageRequestDto,
+    @Param('mapId') mapId: string
+  ): Promise<PageDto<MapPlaceDto>> {
     return (this.service as MapPlacesService).findAllByMap(pagination, mapId).then(async page => {
       return Promise.all(page?.data?.map(item => this.mapper.toDto(item)))
         .then(mappedData => ({
@@ -153,4 +160,4 @@ export class MapPlaceController extends AbstractServiceController<MapPlace, MapP
   providers: [MapPlacesService, MapPlaceMapper, MapPlaceRepository],
   exports: [MapPlacesService, MapPlaceMapper]
 })
-export class MapPlacesModule { }
+export class MapPlacesModule {}

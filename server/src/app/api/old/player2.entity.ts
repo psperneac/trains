@@ -1,11 +1,12 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapTemplate } from '../maps/map-template.entity';
 import { MapPlaceInstance } from '../places/map-place-instance.entity';
+import { Wallet } from '../players/wallet.entity';
 import { User } from '../users/users.entity';
 import { MapVehicleInstance } from '../vehicles/map-vehicle-instance.entity';
-import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'players' })
 export class Player2 extends AbstractEntity {

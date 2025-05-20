@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, UseFilters } from '@nestjs/common';
-import { PostsService } from './posts.service';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
-import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { CreatePostDto, UpdatePostDto } from '../../../models/posts.model';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
+
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 @UseGuards(LoggedIn)
@@ -18,7 +20,7 @@ export class PostsController {
   }
 
   @Get(':id')
-  getPostById(@Param() {id}: ParamsWithMongoId) {
+  getPostById(@Param() { id }: ParamsWithMongoId) {
     return this.postsService.getOne(id);
   }
 
@@ -33,7 +35,7 @@ export class PostsController {
   }
 
   @Delete(':id')
-  async deletePost(@Param() {id}: ParamsWithMongoId) {
+  async deletePost(@Param() { id }: ParamsWithMongoId) {
     return this.postsService.delete(id);
   }
 }

@@ -1,5 +1,4 @@
 export class ModuleTokens {
-
   public service: symbol;
   public controller: symbol;
   public repository: symbol;

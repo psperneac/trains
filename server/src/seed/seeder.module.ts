@@ -2,10 +2,12 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
+
 import { ApiModule } from '../app/api/api.module';
 import { VehicleType } from '../app/api/vehicles/vehicle-type.entity';
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
+
 import { Seeder } from './seeder';
 import { VehicleTypeSeederService } from './vehicle-type-seeder.service';
 
@@ -30,17 +32,14 @@ import { VehicleTypeSeederService } from './vehicle-type-seeder.service';
         MONGO_HOST: Joi.string().required(),
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION_TIME: Joi.string().required(),
-      }),
+        JWT_EXPIRATION_TIME: Joi.string().required()
+      })
     }),
     DatabaseModule,
     AuthenticationModule,
     ApiModule,
-    TypeOrmModule.forFeature([VehicleType])],
-  providers: [
-    Logger,
-    Seeder,
-    VehicleTypeSeederService],
+    TypeOrmModule.forFeature([VehicleType])
+  ],
+  providers: [Logger, Seeder, VehicleTypeSeederService]
 })
-export class SeederModule {
-}
+export class SeederModule {}

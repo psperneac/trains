@@ -1,6 +1,7 @@
 import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
@@ -9,7 +10,8 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
-import { MapPlacesModule, MapPlacesService } from '../places/map-places.module';
+import { MapPlacesModule, MapPlacesService } from '../places/map-place.module';
+
 import { MapVehicleInstanceJob, MapVehicleInstanceJobDto } from './map-vehicle-instance-job.entity';
 import { MapVehicleInstanceDto } from './map-vehicle-instance.entity';
 import { MapVehicleInstancesModule, MapVehicleInstancesService } from './map-vehicle-instance.module';
@@ -31,13 +33,13 @@ export class MapVehicleInstanceJobService extends AbstractService<MapVehicleInst
     return this.findAllWithQuery(
       pagination,
       'map_vehicle_instance_jobs.map.id = :mapId and map_vehicle_instance_jobs.player.id = :playerId',
-      { mapId, playerId },
+      { mapId, playerId }
     );
   }
 
   findAllByVehicle(pagination: any, vehicleId: string) {
     return this.findAllWithQuery(pagination, 'map_vehicle_instance_jobs.mapVehicleInstance.id = :vehicleId', {
-      vehicleId,
+      vehicleId
     });
   }
 }
@@ -47,7 +49,7 @@ export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleIns
   constructor(
     private readonly mapPlacesService: MapPlacesService,
     private readonly vehicleInstancesService: MapVehicleInstancesService,
-    private readonly mapService: MapTemplateService,
+    private readonly mapService: MapTemplateService
   ) {
     super();
   }
@@ -58,20 +60,20 @@ export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleIns
     }
 
     const dto: MapVehicleInstanceJobDto = {
-      id: domain.id,
+      id: domain._id.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
       load: domain.load,
       payType: domain.payType,
       pay: domain.pay,
-      mapVehicleInstanceId: domain.mapVehicleInstance?.id,
+      mapVehicleInstanceId: domain.mapVehicleInstance?._id.toString(),
       playerId: domain.playerId,
-      mapId: domain.map?.id,
-      startId: domain.start?.id,
-      endId: domain.end?.id,
+      mapId: domain.map?._id.toString(),
+      startId: domain.start?._id.toString(),
+      endId: domain.end?._id.toString(),
       startTime: domain.startTime?.toISOString(),
-      content: domain.content,
+      content: domain.content
     };
 
     return dto;
@@ -79,7 +81,7 @@ export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleIns
 
   async toDomain(
     dto: MapVehicleInstanceJobDto,
-    domain?: Partial<MapVehicleInstanceJob> | MapVehicleInstanceJob,
+    domain?: Partial<MapVehicleInstanceJob> | MapVehicleInstanceJob
   ): Promise<MapVehicleInstanceJob> {
     if (!dto) {
       return domain as any as MapVehicleInstanceJob;
@@ -89,10 +91,10 @@ export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleIns
       domain = {};
     }
 
-    const vehicleInstanceId = dto.mapVehicleInstanceId ?? domain.mapVehicleInstance?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
-    const startId = dto.startId ?? domain.start?.id;
-    const endId = dto.endId ?? domain.end?.id;
+    const vehicleInstanceId = dto.mapVehicleInstanceId ?? domain.mapVehicleInstance?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
+    const startId = dto.startId ?? domain.start?._id.toString();
+    const endId = dto.endId ?? domain.end?._id.toString();
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
     const fixedDto = omit(dto, ['vehicleInstanceId', 'mapId', 'startId', 'endId', 'startTime']);
@@ -104,7 +106,7 @@ export class MapVehicleInstanceJobMapper extends AbstractDtoMapper<MapVehicleIns
       map: await this.mapService.findOne(mapId),
       start: await this.mapPlacesService.findOne(startId),
       end: await this.mapPlacesService.findOne(endId),
-      startTime,
+      startTime
     } as any as MapVehicleInstanceJob;
   }
 }
@@ -117,7 +119,7 @@ export class MapVehicleInstanceJobsController extends AbstractServiceController<
 > {
   constructor(
     private readonly mapVehicleInstanceJobsService: MapVehicleInstanceJobService,
-    private readonly mapVehicleInstanceJobsMapper: MapVehicleInstanceJobMapper,
+    private readonly mapVehicleInstanceJobsMapper: MapVehicleInstanceJobMapper
   ) {
     super(mapVehicleInstanceJobsService, mapVehicleInstanceJobsMapper);
   }
@@ -127,7 +129,7 @@ export class MapVehicleInstanceJobsController extends AbstractServiceController<
   async findAllByPlayerAndMap(
     pagination: any,
     playerId: string,
-    mapId: string,
+    mapId: string
   ): Promise<PageDto<MapVehicleInstanceDto>> {
     return this.mapVehicleInstanceJobsService
       .findAllByPlayerAndMap(pagination, playerId, mapId)
@@ -146,10 +148,10 @@ export class MapVehicleInstanceJobsController extends AbstractServiceController<
     MapPlacesModule,
     MapVehicleInstancesModule,
     MapTemplateModule,
-    TypeOrmModule.forFeature([MapVehicleInstanceJob]),
+    TypeOrmModule.forFeature([MapVehicleInstanceJob])
   ],
   controllers: [MapVehicleInstanceJobsController],
   providers: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper, MapVehicleInstanceJobRepository],
-  exports: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper],
+  exports: [MapVehicleInstanceJobService, MapVehicleInstanceJobMapper]
 })
 export class MapVehicleInstanceJobsModule {}

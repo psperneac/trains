@@ -1,8 +1,9 @@
 import { Column, Entity } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'places' })
-export class Place extends AbstractEntity {
+export class Place2 extends AbstractEntity {
   @Column()
   name: string;
 
@@ -16,14 +17,5 @@ export class Place extends AbstractEntity {
   lat: number;
 
   @Column()
-  lng: number;
-}
-
-export interface PlaceDto {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  lat: number;
   lng: number;
 }

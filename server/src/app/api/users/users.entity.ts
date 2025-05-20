@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
 import { Expose } from 'class-transformer';
+import { Column, Entity } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 
 @Entity({ name: 'users' })

@@ -6,5 +6,5 @@ export const mockedConfigService = {
       case 'JWT_SECRET':
         return 'secret';
     }
-  },
+  }
 };

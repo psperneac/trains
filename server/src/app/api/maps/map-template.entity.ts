@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Column, Entity, OneToMany } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapPlaceConnection } from '../places/map-place-connection.entity';
 import { MapPlace } from '../places/map-place.entity';

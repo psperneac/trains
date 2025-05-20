@@ -1,12 +1,41 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { AbstractEntity } from 'src/utils/abstract.entity';
+import { Entity, Column } from 'typeorm';
+
 import { AuthenticationModule } from '../../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { Place, PlaceDto } from './place.entity';
+
+@Entity({ name: 'places' })
+export class Place extends AbstractEntity {
+  @Column()
+  name: string;
+
+  @Column()
+  description: string;
+
+  @Column()
+  type: string;
+
+  @Column()
+  lat: number;
+
+  @Column()
+  lng: number;
+}
+
+export interface PlaceDto {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  lat: number;
+  lng: number;
+}
 
 @Injectable()
 export class PlacesRepository extends RepositoryAccessor<Place> {
@@ -41,6 +70,6 @@ export class PlacesController extends AbstractServiceController<Place, PlaceDto>
   imports: [TypeOrmModule.forFeature([Place]), AuthenticationModule],
   controllers: [PlacesController],
   providers: [PlacesService, PlaceMapper, PlacesRepository],
-  exports: [PlacesService, PlaceMapper],
+  exports: [PlacesService, PlaceMapper]
 })
 export class PlacesModule {}

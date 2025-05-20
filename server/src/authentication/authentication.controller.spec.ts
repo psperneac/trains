@@ -1,13 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthenticationController } from './authentication.controller';
-import { AuthenticationService } from './authentication.service';
-import { authMocks } from '../utils/mocks/auth.mock';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
-import { getAuthorizationBearer } from '../utils/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import * as request from 'supertest';
+
 import User from '../app/api/users/users.entity';
 import { UsersService } from '../app/api/users/users.service';
+import { getAuthorizationBearer } from '../utils/jwt';
+import { authMocks } from '../utils/mocks/auth.mock';
+
+import { AuthenticationController } from './authentication.controller';
+import { AuthenticationService } from './authentication.service';
 
 describe('Authentication Controller', () => {
   let module: TestingModule;
@@ -20,7 +22,7 @@ describe('Authentication Controller', () => {
   beforeEach(async () => {
     module = await Test.createTestingModule({
       controllers: [AuthenticationController],
-      providers: [...authMocks, AuthenticationService],
+      providers: [...authMocks, AuthenticationService]
     }).compile();
 
     app = module.createNestApplication();
@@ -71,11 +73,11 @@ describe('Authentication Controller', () => {
         .send({
           email: 'testRegistrationEmail@trains.com',
           username: 'testRegistration',
-          password: 'passpass',
+          password: 'passpass'
         })
         .set({ Authorization: getAuthorizationBearer(module, 'ID1') })
         .expect(201)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body).toEqual({});
         });
 
@@ -92,7 +94,7 @@ describe('Authentication Controller', () => {
         .post('/authentication/login')
         .send({
           email: 'testUser1@trains.com',
-          password: 'testUser1!',
+          password: 'testUser1!'
         })
         .expect(200)
         .expect('Authorization', 'Bearer 1234');

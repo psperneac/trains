@@ -1,15 +1,17 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { omit } from 'lodash';
+
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { MapPlacesModule, MapPlacesService } from './map-places.module';
 import { MapTemplateModule, MapTemplateService } from '../maps/map-template.module';
+
 import { MapPlaceInstanceJob, MapPlaceInstanceJobDto } from './map-place-instance-job.entity';
 import { MapPlaceInstancesModule, MapPlaceInstancesService } from './map-place-instance.module';
+import { MapPlacesModule, MapPlacesService } from './map-place.module';
 
 @Injectable()
 export class MapPlaceInstanceJobRepository extends RepositoryAccessor<MapPlaceInstanceJob> {
@@ -30,7 +32,7 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
   constructor(
     private readonly placesService: MapPlacesService,
     private readonly mapService: MapTemplateService,
-    private readonly mapPlaceInstancesService: MapPlaceInstancesService,
+    private readonly mapPlaceInstancesService: MapPlaceInstancesService
   ) {
     super();
   }
@@ -41,7 +43,7 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
     }
 
     const dto: MapPlaceInstanceJobDto = {
-      id: domain.id,
+      id: domain._id.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
@@ -49,12 +51,12 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
       payType: domain.payType,
       pay: domain.pay,
       startTime: domain.startTime?.toISOString(),
-      startId: domain.start?.id,
-      endId: domain.end?.id,
-      mapPlaceInstanceId: domain.mapPlaceInstance?.id,
+      startId: domain.start?._id.toString(),
+      endId: domain.end?._id.toString(),
+      mapPlaceInstanceId: domain.mapPlaceInstance?._id.toString(),
       playerId: domain.playerId,
-      mapId: domain.map?.id,
-      content: domain.content,
+      mapId: domain.map?._id.toString(),
+      content: domain.content
     };
 
     return dto;
@@ -62,7 +64,7 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
 
   async toDomain(
     dto: MapPlaceInstanceJobDto,
-    domain?: Partial<MapPlaceInstanceJob> | MapPlaceInstanceJob,
+    domain?: Partial<MapPlaceInstanceJob> | MapPlaceInstanceJob
   ): Promise<MapPlaceInstanceJob> {
     if (!dto) {
       return domain as any as MapPlaceInstanceJob;
@@ -72,10 +74,10 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
       domain = {};
     }
 
-    const startId = dto.startId ?? domain.start?.id;
-    const endId = dto.endId ?? domain.end?.id;
-    const mapPlaceInstanceId = dto.mapPlaceInstanceId ?? domain.mapPlaceInstance?.id;
-    const mapId = dto.mapId ?? domain.map?.id;
+    const startId = dto.startId ?? domain.start?._id.toString();
+    const endId = dto.endId ?? domain.end?._id.toString();
+    const mapPlaceInstanceId = dto.mapPlaceInstanceId ?? domain.mapPlaceInstance?._id.toString();
+    const mapId = dto.mapId ?? domain.map?._id.toString();
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
     const fixedDto = omit({ ...dto }, ['startId', 'endId', 'mapPlaceInstanceId', 'mapId', 'startTime']);
@@ -87,7 +89,7 @@ export class MapPlaceInstanceJobMapper extends AbstractDtoMapper<MapPlaceInstanc
       end: await this.placesService.findOne(endId),
       startTime,
       mapPlaceInstance: await this.mapPlaceInstancesService.findOne(mapPlaceInstanceId),
-      map: await this.mapService.findOne(mapId),
+      map: await this.mapService.findOne(mapId)
     } as MapPlaceInstanceJob;
   }
 }
@@ -108,10 +110,10 @@ export class MapPlaceInstanceJobsController extends AbstractServiceController<
     MapPlacesModule,
     MapPlaceInstancesModule,
     MapTemplateModule,
-    TypeOrmModule.forFeature([MapPlaceInstanceJob]),
+    TypeOrmModule.forFeature([MapPlaceInstanceJob])
   ],
   controllers: [MapPlaceInstanceJobsController],
   providers: [MapPlaceInstanceJobsService, MapPlaceInstanceJobMapper, MapPlaceInstanceJobRepository],
-  exports: [MapPlaceInstanceJobsService, MapPlaceInstanceJobMapper],
+  exports: [MapPlaceInstanceJobsService, MapPlaceInstanceJobMapper]
 })
 export class MapPlaceInstanceJobsModule {}

@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Column, JoinColumn, ManyToOne } from 'typeorm';
+
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { MapPlace } from '../places/map-place.entity';
 

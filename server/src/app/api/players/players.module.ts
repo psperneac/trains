@@ -1,4 +1,3 @@
-import { AuthenticationModule } from './../../../authentication/authentication.module';
 import {
   Body,
   Controller,
@@ -12,13 +11,16 @@ import {
   Post,
   Put,
   UseFilters,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { InjectModel, MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import ParamsWithMongoId from '../../../utils/params-with-mongo-id';
+
+import { AuthenticationModule } from './../../../authentication/authentication.module';
 
 @Schema()
 export class Player {
@@ -141,7 +143,7 @@ export class PlayersController {
       vehicles: !!player.vehicles && player.vehicles.length === 0 ? undefined : player.vehicles,
       places: !!player.places && player.places.length === 0 ? undefined : player.places,
       placeConnections:
-        !!player.placeConnections && player.placeConnections.length === 0 ? undefined : player.placeConnections,
+        !!player.placeConnections && player.placeConnections.length === 0 ? undefined : player.placeConnections
     };
     return this.service.create(player);
   }
@@ -161,6 +163,6 @@ export class PlayersController {
   imports: [Player, MongooseModule.forFeature([{ name: Player.name, schema: PlayerSchema }]), AuthenticationModule],
   controllers: [PlayersController],
   providers: [PlayersService],
-  exports: [Player],
+  exports: [Player]
 })
 export class PlayersModule {}

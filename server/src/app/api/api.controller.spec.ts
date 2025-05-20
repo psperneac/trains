@@ -1,25 +1,25 @@
-import { getTestProviders } from './../../utils/test/test-config';
-import { Test, TestingModule } from '@nestjs/testing';
-import { authMocks } from '../../utils/mocks/auth.mock';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { MockRepository } from '../../utils/mocks/repository.mock';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import * as request from 'supertest';
-import { getAuthorizationBearer } from '../../utils/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { keys, pick, range } from 'lodash';
-import { JobTestConfig } from './jobs/job-test-config';
-import { TranslationTestConfig } from './translations/translations-test-config';
+import * as request from 'supertest';
+
+import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
+import { getAuthorizationBearer } from '../../utils/jwt';
+import { authMocks } from '../../utils/mocks/auth.mock';
+import { MockRepository } from '../../utils/mocks/repository.mock';
 import { TestConfig } from '../../utils/test/test-config';
-import { PlaceTestConfig } from './places/places-test-config';
-import { VehicleTestConfig } from './vehicles/vehicle-test-config';
+
+import { getTestProviders } from './../../utils/test/test-config';
+import { JobTestConfig } from './jobs/job-test-config';
 import { PlaceConnectionTestConfig } from './places/place-connection-test-config';
+import { TranslationTestConfig } from './translations/translations-test-config';
+import { VehicleTestConfig } from './vehicles/vehicle-test-config';
 
 describe('Abstract Controller', () => {
   let module: TestingModule;
   let app: INestApplication;
   const configs: TestConfig<any, any>[] = [
-    PlaceTestConfig,
     TranslationTestConfig,
     VehicleTestConfig,
     PlaceConnectionTestConfig,

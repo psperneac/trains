@@ -1,4 +1,5 @@
 import { assign, cloneDeep, pick } from 'lodash';
+
 import { AbstractEntity } from './abstract.entity';
 
 /**

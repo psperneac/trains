@@ -4,12 +4,20 @@ import {
   ExceptionFilter,
   HttpStatus,
   HttpException,
-  Logger, UnauthorizedException, ForbiddenException,
+  Logger,
+  UnauthorizedException,
+  ForbiddenException
 } from '@nestjs/common';
 import { Request } from 'express';
 import { QueryFailedError, EntityNotFoundError, CannotCreateEntityIdMapError } from 'typeorm';
 
-export const GlobalResponseError: (statusCode: number, message: string, code: string, request: Request, stack: any) => IResponseError = (
+export const GlobalResponseError: (
+  statusCode: number,
+  message: string,
+  code: string,
+  request: Request,
+  stack: any
+) => IResponseError = (
   statusCode: number,
   message: string,
   code: string,
@@ -24,12 +32,12 @@ export const GlobalResponseError: (statusCode: number, message: string, code: st
     timestamp: new Date().toISOString(),
     path: request.url,
     method: request.method,
-    stack: (process.env.NODE_ENV === 'development' ? stack : undefined)
+    stack: process.env.NODE_ENV === 'development' ? stack : undefined
   };
 };
 
 export interface IResponseError {
-  type: 'error',
+  type: 'error';
   statusCode: number;
   message: string;
   code: string;
@@ -64,18 +72,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
       case HttpException:
         status = (ex as HttpException).getStatus();
         break;
-      case QueryFailedError:  // this is a TypeOrm error
-        status = HttpStatus.UNPROCESSABLE_ENTITY
+      case QueryFailedError: // this is a TypeOrm error
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
         message = (ex as QueryFailedError).message;
         code = (ex as any).code;
         break;
-      case EntityNotFoundError:  // this is another TypeOrm error
-        status = HttpStatus.UNPROCESSABLE_ENTITY
+      case EntityNotFoundError: // this is another TypeOrm error
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
         message = (ex as EntityNotFoundError).message;
         code = (ex as any).code;
         break;
       case CannotCreateEntityIdMapError: // and another
-        status = HttpStatus.UNPROCESSABLE_ENTITY
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
         message = (ex as CannotCreateEntityIdMapError).message;
         code = (ex as any).code;
         break;
@@ -90,13 +98,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
         code = (ex as any).code;
         break;
       default:
-        status = HttpStatus.INTERNAL_SERVER_ERROR
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
         code = ex.constructor.toString();
         break;
     }
 
-    response.status(status).json(GlobalResponseError(status, message, code, request,
-      (ex as any)?.stack?.split('\n').map(str => str.trim())));
+    response.status(status).json(
+      GlobalResponseError(
+        status,
+        message,
+        code,
+        request,
+        (ex as any)?.stack?.split('\n').map(str => str.trim())
+      )
+    );
   }
 }
-
