@@ -1,8 +1,8 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { AbstractEntity } from 'src/utils/abstract.entity';
 import { Repository } from 'typeorm';
 
-import { Types } from 'mongoose';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractService } from '../../../utils/abstract.service';
@@ -34,10 +34,34 @@ export class PlaceTypeDto {
 */
 
 export const PLACE_TYPE_DATA: PlaceType[] = [
-  { _id: new Types.ObjectId('682be65aeffcff2be10510de'), type: 'RAIL', name: 'Railway station', description: 'Railway station', content: {} } as any as PlaceType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510df'), type: 'WAREHOUSE', name: 'Warehouse', description: 'Warehouse', content: {} } as any as PlaceType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510e0'), type: 'PORT', name: 'Port', description: 'Port', content: {} } as any as PlaceType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510e1'), type: 'BUSINESS', name: 'Business', description: 'A business place', content: {} } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510de'),
+    type: 'RAIL',
+    name: 'Railway station',
+    description: 'Railway station',
+    content: {}
+  } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510df'),
+    type: 'WAREHOUSE',
+    name: 'Warehouse',
+    description: 'Warehouse',
+    content: {}
+  } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510e0'),
+    type: 'PORT',
+    name: 'Port',
+    description: 'Port',
+    content: {}
+  } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('682be65aeffcff2be10510e1'),
+    type: 'BUSINESS',
+    name: 'Business',
+    description: 'A business place',
+    content: {}
+  } as any as PlaceType,
   {
     _id: new Types.ObjectId('682be65aeffcff2be10510e2'),
     type: 'TRANSIT',
@@ -50,6 +74,13 @@ export const PLACE_TYPE_DATA: PlaceType[] = [
     type: 'YARD',
     name: 'Yard',
     description: 'Vehicle, Train, Mass Transit or Shipyard',
+    content: {}
+  } as any as PlaceType,
+  {
+    _id: new Types.ObjectId('683bd04be7cc7a6c65087ab0'),
+    type: 'RESIDENCE',
+    name: 'Residence',
+    description: 'A private residence',
     content: {}
   } as any as PlaceType
 ];

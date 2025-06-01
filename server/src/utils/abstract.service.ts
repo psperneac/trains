@@ -47,8 +47,13 @@ export class AbstractService<T extends AbstractEntity> {
       this.repository.count()
     ]);
 
+    const mappedData = data.map(item => ({
+      ...item,
+      id: item._id?.toString()
+    }));
+
     return {
-      data,
+      data: mappedData,
       page: pagination.unpaged ? page : 1,
       limit: pagination.unpaged ? totalCount : limit,
       totalCount
@@ -74,7 +79,11 @@ export class AbstractService<T extends AbstractEntity> {
   }
 
   update(uuid: string, entity): Promise<T> {
-    const updatePromise = this.repository.update(uuid, entity);
+    // If id is provided, convert it to _id and remove id from payload
+    const { id, ...entityWithoutId } = entity;
+    const updateData = id ? { ...entityWithoutId, _id: new Types.ObjectId(id) } : entityWithoutId;
+
+    const updatePromise = this.repository.update(uuid, updateData);
 
     return updatePromise.then(updateResult => {
       if (updateResult.affected) {

@@ -55,11 +55,10 @@ export class AuthenticationService {
     }
   }
 
-  public getAuthorizationBearer(userId: string) {
+  public getAuthToken(userId: string) {
     // TODO: add expiry of max-session 15-30min
     // TODO: figure out how to refresh token when expired
     const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return `Bearer ${token}`;
+    return this.jwtService.sign(payload);
   }
 }

@@ -1,77 +1,35 @@
 {
-  "name": "trains-react-web",
-  "version": "0.1.0",
+  "name": "web-react",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host",
+    "preview": "vite preview",
+    "typecheck": "tsc"
+  },
   "dependencies": {
-    "@faker-js/faker": "^8.0.2",
-    "@fontsource/roboto": "^5.0.8",
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/react-fontawesome": "^0.2.0",
-    "@hookform/resolvers": "^3.3.1",
-    "@mswjs/data": "^0.13.0",
-    "@reduxjs/toolkit": "^1.9.5",
-    "bootstrap": "^5.3.2",
-    "classnames": "^2.3.2",
-    "date-fns": "^2.30.0",
-    "faker": "^6.6.6",
-    "i18next": "^23.5.1",
-    "json-loader": "^0.5.7",
+    "@react-router/node": "^7.5.3",
+    "@react-router/serve": "^7.5.3",
+    "isbot": "^5.1.27",
     "leaflet": "^1.9.4",
-    "mock-socket": "^9.3.0",
-    "msw": "^1.3.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-bootstrap": "^2.10.1",
-    "react-data-table-component": "^7.5.4",
-    "react-dom": "^17.0.0 || ^18.0.0",
-    "react-hook-form": "^7.46.1",
-    "react-i18next": "^13.2.2",
-    "react-leaflet": "^4.2.1",
-    "react-redux": "^8.1.2",
-    "react-router-dom": "^6.18.0",
-    "react-scripts": "^5.0.1",
-    "redux-devtools-extension": "^2.13.9",
-    "redux-thunk": "^2.4.2",
-    "seedrandom": "^3.0.5",
-    "styled-components": "^6.0.7",
-    "txtgen": "^3.0.6",
-    "web-vitals": "^3.4.0",
-    "yup": "^1.0.2"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0",
+    "react-router": "^7.5.3",
+    "react-router-dom": "^7.6.1",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.1.3",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
-    "eslint-plugin-react": "^7.33.2",
-    "prettier": "^3.0.3",
-    "sass": "^1.66.1"
-  },
-  "peerDependencies": {
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version",
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ]
-  },
-  "msw": {
-    "workerDirectory": "public"
+    "@react-router/dev": "^7.5.3",
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/leaflet": "^1.9.18",
+    "@types/node": "^20",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.3",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

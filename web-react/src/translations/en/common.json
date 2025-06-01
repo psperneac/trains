@@ -1,9 +1,0 @@
-{
-  "main": {
-    "add": "Add",
-    "delete": "Delete"
-  },
-  "place-types": {
-    "title": "Place Types"
-  }
-}

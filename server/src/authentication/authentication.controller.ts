@@ -59,12 +59,12 @@ export class AuthenticationController {
   @Post('login')
   async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
     const { user } = request;
-    const authorization = this.authenticationService.getAuthorizationBearer(user._id.toString());
+    const token = this.authenticationService.getAuthToken(user._id.toString());
     user.password = undefined;
     return response
-      .setHeader('Authorization', authorization)
+      .setHeader('Authorization', `Bearer ${token}`)
       .status(HttpStatus.OK)
-      .send({ ...user, authorization });
+      .send({ ...user, authToken: token });
   }
 
   // @UseGuards(JwtAuthenticationGuard)
