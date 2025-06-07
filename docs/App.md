@@ -140,3 +140,10 @@ Table of translation strings. B/E will cache this so it doesn't have to keep loa
 - [OpenTTD](OpenTtd.md) - https://www.openttd.org/
 - [The Sea Game??](SeaUnknownGame.md)
 - [Privateer](Privateer.md)
+
+## Resources
+
+- https://www.openrailwaymap.org/ - trains lines - no routes
+- https://maps.openrouteservice.org/ - routes w/o trains
+- https://github.com/perliedman/leaflet-routing-machine - old leaflet routing 
+- react-leaflet-routing-machine - unknown how old, can't find repo
