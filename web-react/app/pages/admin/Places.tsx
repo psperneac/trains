@@ -1,9 +1,10 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import Pagination from '../../components/Pagination';
 import { usePlaceStore } from '../../store/placeStore';
 
 // Color mapping for place types
@@ -50,18 +51,62 @@ function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
   return null;
 }
 
+function MapPositionTracker({ onPositionChange }: { onPositionChange: (pos: { lat: number; lng: number; zoom: number }) => void }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const center = map.getCenter();
+    onPositionChange({
+      lat: center.lat,
+      lng: center.lng,
+      zoom: map.getZoom()
+    });
+
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      onPositionChange({
+        lat: center.lat,
+        lng: center.lng,
+        zoom: map.getZoom()
+      });
+    });
+
+    return () => {
+      map.off('moveend');
+    };
+  }, [map, onPositionChange]);
+
+  return null;
+}
+
 export default function Places() {
-  const { places, loading, error, fetchPlaces, deletePlace } = usePlaceStore();
+  const { places, allPlaces, loading, error, fetchPlaces, fetchAllPlaces, deletePlace, page, limit, totalCount } = usePlaceStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
+  const [isTableExpanded, setIsTableExpanded] = useState(false);
 
   useEffect(() => {
-    fetchPlaces();
-  }, [fetchPlaces]);
+    Promise.all([
+      fetchPlaces(page, limit),
+      fetchAllPlaces()
+    ]);
+  }, [fetchPlaces, fetchAllPlaces, page, limit]);
 
-  const handleAdd = () => navigate('/admin/places/add');
+  const handlePageChange = (newPage: number) => {
+    fetchPlaces(newPage, limit);
+  };
+
+  const handleAdd = () => {
+    if (mapPosition) {
+      navigate('/admin/places/add', { state: { mapPosition } });
+    } else {
+      navigate('/admin/places/add');
+    }
+  };
+
   const handleEdit = (id: string) => navigate(`/admin/places/${id}/edit`);
   const handleDelete = (id: string) => {
     setDeleteId(id);
@@ -79,68 +124,152 @@ export default function Places() {
     setConfirming(false);
   };
 
+  const handleMapEdit = (id: string) => {
+    handleEdit(id);
+  };
+
+  const handleMapDelete = (id: string) => {
+    handleDelete(id);
+  };
+
   return (
     <Layout title="Places">
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between mb-4">
-          <div></div>
-          <button
-            onClick={handleAdd}
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
-          >
-            + Add Place
-          </button>
+      <div className="flex flex-col h-[calc(100vh-11rem)]">
+        <div className="bg-white shadow rounded-lg px-6 py-3">
+          <div className="flex justify-between">
+            <button
+              onClick={() => setIsTableExpanded(!isTableExpanded)}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm font-medium flex items-center gap-2"
+            >
+              {isTableExpanded ? (
+                <>
+                  <span>Collapse Table</span>
+                  <span>▼</span>
+                </>
+              ) : (
+                <>
+                  <span>Expand Table</span>
+                  <span>▶</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleAdd}
+              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
+            >
+              + Add Place
+            </button>
+          </div>
+          {loading && <div>Loading...</div>}
+          {error && <div className="text-red-500">{error}</div>}
+          {!loading && !error && isTableExpanded && (
+            <>
+              <div className={isTableExpanded ? 'h-54' : ''}>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latitude</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Longitude</th>
+                      <th className="px-4 py-2"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {places.map((place, idx) => (
+                      <tr key={place.id || idx}>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.name}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.description}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.type}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lat}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lng}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-sm flex gap-2">
+                          <button
+                            onClick={() => setMapFocus({ lat: place.lat, lng: place.lng })}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Show on map"
+                          >
+                            📍
+                          </button>
+                          <button
+                            onClick={() => handleEdit(place.id)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                            title="Edit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(place.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Delete"
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={Math.ceil(totalCount / limit)}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
         </div>
-        {loading && <div>Loading...</div>}
-        {error && <div className="text-red-500">{error}</div>}
-        {!loading && !error && (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latitude</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Longitude</th>
-                <th className="px-4 py-2"></th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {places.map((place, idx) => (
-                <tr key={place.id || idx}>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.name}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.description}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.type}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lat}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lng}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm flex gap-2">
-                    <button
-                      onClick={() => setMapFocus({ lat: place.lat, lng: place.lng })}
-                      className="text-blue-600 hover:text-blue-900"
-                      title="Show on map"
-                    >
-                      📍
-                    </button>
-                    <button
-                      onClick={() => handleEdit(place.id)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                      title="Edit"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => handleDelete(place.id)}
-                      className="text-red-600 hover:text-red-900"
-                      title="Delete"
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
+        {/* Map below the table */}
+        <div className="mt-8 bg-white shadow rounded-lg p-6 flex-1">
+          <h2 className="text-lg font-semibold mb-4">Map of Places</h2>
+          <div className="h-[calc(100%-3rem)]">
+            <MapContainer
+              style={{ height: '100%', width: '100%' }}
+              center={allPlaces.length ? [allPlaces[0].lat, allPlaces[0].lng] : [0, 0]}
+              zoom={13}
+              scrollWheelZoom={true}
+            >
+              <MapFocus focus={mapFocus} />
+              <FitBounds places={allPlaces} />
+              <MapPositionTracker onPositionChange={setMapPosition} />
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              {allPlaces.map((place, idx) => (
+                <Marker
+                  key={place.id || idx}
+                  position={[place.lat, place.lng]}
+                  icon={getPinIcon(place.type)}
+                  draggable={false}
+                >
+                  <Tooltip permanent>{place.name}</Tooltip>
+                  <Popup>
+                    <div className="p-2">
+                      <h3 className="font-medium text-gray-900 mb-2">{place.name}</h3>
+                      <p className="text-sm text-gray-500 mb-2">{place.description}</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleMapEdit(place.id)}
+                          className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleMapDelete(place.id)}
+                          className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
               ))}
-            </tbody>
-          </table>
-        )}
+            </MapContainer>
+          </div>
+        </div>
         {/* Confirmation Dialog */}
         {confirming && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
@@ -164,35 +293,6 @@ export default function Places() {
             </div>
           </div>
         )}
-      </div>
-      {/* Map below the table */}
-      <div className="mt-8 bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Map of Places</h2>
-        <div style={{ height: 400, width: '100%' }}>
-          <MapContainer
-            style={{ height: '100%', width: '100%' }}
-            center={places.length ? [places[0].lat, places[0].lng] : [0, 0]}
-            zoom={13}
-            scrollWheelZoom={true}
-          >
-            <MapFocus focus={mapFocus} />
-            <FitBounds places={places} />
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-            {places.map((place, idx) => (
-              <Marker
-                key={place.id || idx}
-                position={[place.lat, place.lng]}
-                icon={getPinIcon(place.type)}
-                draggable={false}
-              >
-                <Tooltip>{place.name}</Tooltip>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
       </div>
     </Layout>
   );

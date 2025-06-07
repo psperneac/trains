@@ -39,7 +39,7 @@ export const routes = [
     path: "/admin/places",
     element: (
       <ProtectedRoute>
-        <Places />
+        <Places className="h-screen" />
       </ProtectedRoute>
     ),
   },

@@ -1,10 +1,10 @@
 import {
-    isRouteErrorResponse,
-    Links,
-    Meta,
-    Scripts,
-    ScrollRestoration,
-    useRoutes
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Scripts,
+  ScrollRestoration,
+  useRoutes
 } from "react-router-dom";
 
 import "./app.css";
@@ -63,7 +63,7 @@ export function ErrorBoundary({ error }: { error: Error }) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="pt-16 p-4 container mx-auto h-[calc(100vh-5.125rem)]">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (

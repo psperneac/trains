@@ -2,7 +2,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { usePlaceStore } from '../../store/placeStore';
 import { usePlaceTypeStore } from '../../store/placeTypeStore';
@@ -69,9 +69,13 @@ function MapCenterer({ position }: { position: [number, number] }) {
 export default function PlaceForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { places, addPlace, updatePlace, fetchPlaces, loading, error } = usePlaceStore();
   const { placeTypes, fetchPlaceTypes } = usePlaceTypeStore();
   const isEdit = Boolean(id);
+
+  // Get map position from navigation state if available
+  const mapPosition = location.state?.mapPosition as { lat: number; lng: number; zoom: number } | undefined;
 
   // Memoize the current place from the store
   const currentPlace = useMemo(() => (isEdit ? places.find((p) => p.id === id) : null), [isEdit, id, places]);
@@ -101,10 +105,13 @@ export default function PlaceForm() {
     }
   }, [isEdit, currentPlace]);
 
-  // Effect 3: On add mode, get browser location for marker
+  // Effect 3: On add mode, get browser location for marker or use map position from navigation
   useEffect(() => {
     if (!isEdit && mapReady) {
-      if (navigator.geolocation) {
+      if (mapPosition) {
+        setMarkerPos([mapPosition.lat, mapPosition.lng]);
+        setForm((prev) => ({ ...prev, lat: mapPosition.lat, lng: mapPosition.lng }));
+      } else if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             setMarkerPos([pos.coords.latitude, pos.coords.longitude]);
@@ -119,7 +126,7 @@ export default function PlaceForm() {
         setMarkerPos([0, 0]);
       }
     }
-  }, [isEdit, mapReady]);
+  }, [isEdit, mapReady, mapPosition]);
 
   // Keep marker in sync with form lat/lng
   useEffect(() => {
@@ -265,7 +272,7 @@ export default function PlaceForm() {
         <div className="flex-1 min-h-[500px]">
           <MapContainer
             center={markerPos as [number, number]}
-            zoom={17}
+            zoom={mapPosition?.zoom || 17}
             style={{ height: '100%', minHeight: 500, width: '100%' }}
             whenReady={() => setMapReady(true)}
           >
