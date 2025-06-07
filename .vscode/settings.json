@@ -19,5 +19,11 @@
     "./server",
     "./web",
     "./web-react"
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "titleBar.activeForeground": "#fff",
+    "titleBar.inactiveForeground": "#ffffffcc",
+    "titleBar.activeBackground": "#ff927b",
+    "titleBar.inactiveBackground": "#feccc1"
+  }
 }
