@@ -31,8 +31,9 @@ export class AbstractService<T extends AbstractEntity> {
       pagination.unpaged = true;
     }
 
-    const page = pagination.page || 1;
-    const limit = pagination.limit || 10;
+    // Convert string page and limit to integers if needed
+    const page = typeof pagination.page === 'string' ? parseInt(pagination.page, 10) : pagination.page || 1;
+    const limit = typeof pagination.limit === 'string' ? parseInt(pagination.limit, 10) : pagination.limit || 10;
     const skip = (page - 1) * limit;
 
     const [data, totalCount] = await Promise.all([

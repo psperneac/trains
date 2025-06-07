@@ -1,15 +1,15 @@
 import {
-  Body,
-  Delete,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query,
-  UseGuards
+    Body,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    Put,
+    Query,
+    UseGuards
 } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
 
