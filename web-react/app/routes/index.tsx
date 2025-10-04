@@ -1,6 +1,8 @@
 import ProtectedRoute from "../components/ProtectedRoute";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import MapForm from "../pages/admin/MapForm";
+import Maps from "../pages/admin/Maps";
 import PlaceForm from "../pages/admin/PlaceForm";
 import PlaceTypes from "../pages/admin/PlaceTypes";
 import Places from "../pages/admin/Places";
@@ -39,7 +41,7 @@ export const routes = [
     path: "/admin/places",
     element: (
       <ProtectedRoute>
-        <Places className="h-screen" />
+        <Places />
       </ProtectedRoute>
     ),
   },
@@ -56,6 +58,30 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <PlaceForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/maps",
+    element: (
+      <ProtectedRoute>
+        <Maps />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/maps/new",
+    element: (
+      <ProtectedRoute>
+        <MapForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/maps/:id/edit",
+    element: (
+      <ProtectedRoute>
+        <MapForm />
       </ProtectedRoute>
     ),
   },

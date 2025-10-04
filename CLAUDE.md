@@ -1,0 +1,202 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Trains is a transportation game where players send jobs by vehicles from one place to another to earn cash. The application uses a multi-tenant architecture where each game is a tenant. The project consists of:
+
+- **server/** - NestJS backend with MongoDB (TypeORM + Mongoose)
+- **web-react/** - React frontend with Vite, React Router, and Leaflet maps
+- **web/** - Legacy Angular frontend (deprecated, use web-react)
+
+## Development Commands
+
+### Server (NestJS)
+
+```bash
+# From root
+npm run server-start
+
+# From server/ directory
+npm run start          # Runs start:debug (with watch and debug)
+npm run start:dev      # Development with watch
+npm run start:prod     # Production mode
+npm run build          # Build the project
+npm run lint           # Run ESLint with auto-fix
+npm run format         # Format code with Prettier
+npm run test           # Run Jest tests
+npm run test:watch     # Run tests in watch mode
+npm run test:cov       # Run tests with coverage
+npm run test:e2e       # Run e2e tests
+npm run seed           # Seed database
+```
+
+### Web-React Frontend
+
+```bash
+# From root
+npm run web-react-start
+
+# From web-react/ directory
+npm run dev           # Start dev server (with --host)
+npm run build         # Build for production
+npm run preview       # Preview production build
+npm run typecheck     # Run TypeScript type checking
+```
+
+### Database Setup
+
+**MongoDB** (primary database):
+```bash
+# Install and start MongoDB
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb/brew/mongodb-community
+
+# Enable authentication in /opt/homebrew/etc/mongod.conf
+security:
+  authorization: "enabled"
+
+brew services restart mongodb/brew/mongodb-community
+
+# Connect and create user
+mongosh -u admin -p Admin1! --authenticationDatabase admin
+
+# Create trains user
+trains=db.getSiblingDB('trains');
+trains.createUser({
+  user: 'trains',
+  pwd: 'trains1!',
+  roles: [{ role: 'readWrite', db: 'trains' }]
+});
+```
+
+**PostgreSQL** (legacy, documented but not actively used):
+```bash
+docker run --name p1 -p 5432:5432 -e POSTGRES_PASSWORD=Admin1! -e POSTGRES_HOST_AUTH_METHOD=password -d postgres
+```
+
+## Architecture & Code Organization
+
+### Server Architecture
+
+The server uses a **modular service-oriented architecture** with abstract base classes for rapid API development:
+
+#### Core Patterns
+
+1. **Abstract Service Pattern**: All API resources extend abstract classes that provide CRUD operations:
+   - `AbstractEntity` - Base entity with common fields (_id, createdAt, updatedAt)
+   - `AbstractService` - Generic service with findAll, findOne, create, update, delete
+   - `AbstractServiceController` - Generic REST controller with standard endpoints
+   - `AbstractDtoMapper` - Handles entity ↔ DTO conversion
+
+2. **Module Structure** (see [game.module.ts](server/src/app/api/game.module.ts) as reference):
+   - Entity: TypeORM entity definition with @Entity decorator
+   - DTO: Interface for data transfer objects
+   - Repository: Extends RepositoryAccessor for data access
+   - Service: Extends AbstractService for business logic
+   - Mapper: Extends AbstractDtoMapper for transformations
+   - Controller: Extends AbstractServiceController for HTTP endpoints
+   - Module: Combines all above components
+
+3. **Authentication**:
+   - JWT-based authentication with Passport strategies
+   - Guards: `@UseGuards(LoggedIn)` for authenticated routes, `@UseGuards(Admin)` for admin routes
+   - Cookie-based token storage
+
+4. **Database Layer**:
+   - Dual MongoDB support (TypeORM + Mongoose) for flexibility
+   - TypeORM for entities with decorators
+   - Mongoose schemas available for complex queries
+   - Connection config in [database.module.ts](server/src/database/database.module.ts)
+
+#### API Modules
+
+- **api/** - Main API module containing:
+  - **jobs/** - Job management
+  - **maps/** - Map templates for games
+  - **places/** - Places (stations, airports, etc.) and connections between places
+  - **players/** - Player management
+  - **vehicles/** - Vehicle types and instances
+  - **users/** - User management and preferences
+  - **translations/** - I18n translations
+  - **game.module.ts** - Multi-tenant game management (TEMPLATE vs GAME types)
+
+### Web-React Architecture
+
+- **React Router v7** for routing with protected routes
+- **Zustand** for state management (stores in [app/store/](web-react/app/store/))
+- **Leaflet + react-leaflet** for interactive maps
+- **Tailwind CSS v4** for styling
+- **Protected routes** via ProtectedRoute component for authentication
+
+Key directories:
+- [app/pages/](web-react/app/pages/) - Page components (Home, Login, admin pages)
+- [app/components/](web-react/app/components/) - Reusable components (Navigation, ProtectedRoute, etc.)
+- [app/routes/](web-react/app/routes/) - Route definitions
+- [app/types/](web-react/app/types/) - TypeScript type definitions
+- [app/store/](web-react/app/store/) - Zustand state stores
+
+## Domain Model
+
+Key entities in the game:
+
+- **Game** - Multi-tenant game instance (TEMPLATE or GAME type)
+- **Place** - Point on map where jobs can be obtained/delivered (stations, airports, etc.)
+- **PlaceConnection** - Connection between two places with route details
+- **Vehicle** - Base vehicle class with speed, range, fuel, cargo capacity
+- **VehicleInstance** - Player-owned vehicle with potential upgrades
+- **PlaceInstance** - Links player to a place, holds jobs and job offers
+- **Job** - Cargo to be transported between places
+- **Player** - Game participant owning vehicles, places, and connections
+- **Map** - Layout of places and connections for a game
+
+See [docs/README.md](docs/README.md) for detailed domain terminology and system overview.
+
+## Current Development State
+
+The project is undergoing a **redesign** (see feature/redesign branch):
+- Migrating from PostgreSQL/MySQL to MongoDB
+- Simplifying entity relationships
+- Moving from Angular (web/) to React (web-react/)
+- Implementing multi-tenant game architecture
+
+Recent work includes:
+- Map template management UI
+- Place administration with Leaflet maps
+- Pagination support in list views
+- MongoDB entity models with TypeORM
+
+## Configuration
+
+### Environment Variables (server/.env)
+
+Required environment variables:
+- `MONGO_USERNAME`, `MONGO_PASSWORD`, `MONGO_DATABASE`, `MONGO_HOST` - MongoDB connection
+- `JWT_SECRET`, `JWT_EXPIRATION_TIME` - JWT authentication
+- `PORT` - Server port (default: 5001)
+- `NODE_ENV` - Environment (development/production)
+
+### Server Configuration
+
+- API prefix: `/api` (all endpoints are prefixed with this)
+- Global validation pipe enabled
+- CORS enabled for all origins
+- Cookie parser middleware enabled
+- Custom exception filter for error handling
+
+## Testing
+
+Server uses Jest with TypeScript:
+- Unit tests: `*.spec.ts` files in src/ directory
+- E2E tests: test/ directory with jest-e2e.json config
+- Mocks available in [src/utils/mocks/](server/src/utils/mocks/)
+
+## Key Files to Reference
+
+- [server/src/utils/abstract-service.controller.ts](server/src/utils/abstract-service.controller.ts) - Base controller pattern
+- [server/src/utils/abstract.service.ts](server/src/utils/abstract.service.ts) - Base service pattern
+- [server/src/app/api/game.module.ts](server/src/app/api/game.module.ts) - Example of complete module structure
+- [docs/README.md](docs/README.md) - Comprehensive project documentation
+- [docs/misc/DesignNotes.md](docs/misc/DesignNotes.md) - Architecture design notes

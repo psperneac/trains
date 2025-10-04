@@ -2,9 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UserPreferencesService } from '../app/api/users/user-preference.module';
-import { User } from '../app/api/users/users.entity';
-import { UsersService } from '../app/api/users/users.service';
+import { User, UsersService } from '../app/api/support/users.module';
 import { SCOPE_USER } from '../utils/constants';
 
 import { RegisterDto, TokenPayload } from './authentication.model';
@@ -15,7 +13,6 @@ export class AuthenticationService {
 
   constructor(
     private readonly usersService: UsersService,
-    private readonly _userPreferencesService: UserPreferencesService,
     private readonly jwtService: JwtService
   ) {}
 
@@ -26,11 +23,6 @@ export class AuthenticationService {
       password: hashedPassword,
       scope: SCOPE_USER
     });
-
-    // const preferences = await this.userPreferencesService.create({
-    //   user: createdUser,
-    //   content: {}
-    // });
 
     createdUser.password = undefined;
     return createdUser;

@@ -27,6 +27,10 @@ const menuItems: MenuItem[] = [
         label: 'Places',
         path: '/admin/places',
       },
+      {
+        label: 'Maps',
+        path: '/admin/maps',
+      },
     ],
   },
 ];

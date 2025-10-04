@@ -1,0 +1,15 @@
+# Ignore specific files
+# server/src/app/api/places/map-place.module.ts
+
+# Ignore specific directories
+# server/src/app/api/places/
+
+# Ignore all TypeScript files in specific directories
+# server/src/app/api/**/*.ts
+
+# Ignore generated files
+dist/
+build/
+node_modules/
+*.min.js
+*.min.css 

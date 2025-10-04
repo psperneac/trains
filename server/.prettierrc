@@ -4,5 +4,11 @@
   "endOfLine": "auto",
   "printWidth": 120,
   "bracketSpacing": true,
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "bracketSameLine": false,
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+  "semi": true,
+  "useTabs": false,
+  "tabWidth": 2
 }

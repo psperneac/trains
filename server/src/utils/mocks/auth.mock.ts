@@ -3,8 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JWT_MODULE_OPTIONS } from '@nestjs/jwt/dist/jwt.constants';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { User } from '../../app/api/users/users.entity';
-import { UsersService } from '../../app/api/users/users.service';
+import { User, UsersService } from '../../app/api/support/users.module';
 import { AuthenticationService } from '../../authentication/authentication.service';
 import { JwtStrategy } from '../../authentication/jwt.strategy';
 import { LocalStrategy } from '../../authentication/local.strategy';

@@ -86,7 +86,6 @@ export default function Places() {
   const [confirming, setConfirming] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
-  const [isTableExpanded, setIsTableExpanded] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -134,94 +133,89 @@ export default function Places() {
 
   return (
     <Layout title="Places">
-      <div className="flex flex-col h-[calc(100vh-11rem)]">
-        <div className="bg-white shadow rounded-lg px-6 py-3">
-          <div className="flex justify-between">
-            <button
-              onClick={() => setIsTableExpanded(!isTableExpanded)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm font-medium flex items-center gap-2"
-            >
-              {isTableExpanded ? (
-                <>
-                  <span>Collapse Table</span>
-                  <span>▼</span>
-                </>
-              ) : (
-                <>
-                  <span>Expand Table</span>
-                  <span>▶</span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleAdd}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
-            >
-              + Add Place
-            </button>
+      <div className="flex h-[calc(100vh-11rem)] gap-4">
+        {/* Table Section - Left Side */}
+        <div className="w-96 flex-shrink-0 bg-white shadow rounded-lg">
+          <div className="px-6 py-3 border-b">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Places</h2>
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
+              >
+                + Add Place
+              </button>
+            </div>
           </div>
-          {loading && <div>Loading...</div>}
-          {error && <div className="text-red-500">{error}</div>}
-          {!loading && !error && isTableExpanded && (
-            <>
-              <div className={isTableExpanded ? 'h-54' : ''}>
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latitude</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Longitude</th>
-                      <th className="px-4 py-2"></th>
+          
+          {loading && <div className="p-4">Loading...</div>}
+          {error && <div className="p-4 text-red-500">{error}</div>}
+          
+          {!loading && !error && (
+            <div className="overflow-y-auto h-[calc(100%-4rem)]">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {places.map((place, idx) => (
+                    <tr key={place.id || idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm text-gray-900">
+                        <div>
+                          <div className="font-medium">{place.name}</div>
+                          <div className="text-xs text-gray-500 truncate">{place.description}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 text-sm text-gray-900">
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {place.type}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-sm flex gap-1">
+                        <button
+                          onClick={() => setMapFocus({ lat: place.lat, lng: place.lng })}
+                          className="text-blue-600 hover:text-blue-900 p-1"
+                          title="Show on map"
+                        >
+                          📍
+                        </button>
+                        <button
+                          onClick={() => handleEdit(place.id)}
+                          className="text-indigo-600 hover:text-indigo-900 p-1"
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(place.id)}
+                          className="text-red-600 hover:text-red-900 p-1"
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {places.map((place, idx) => (
-                      <tr key={place.id || idx}>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.name}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.description}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.type}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lat}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{place.lng}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm flex gap-2">
-                          <button
-                            onClick={() => setMapFocus({ lat: place.lat, lng: place.lng })}
-                            className="text-blue-600 hover:text-blue-900"
-                            title="Show on map"
-                          >
-                            📍
-                          </button>
-                          <button
-                            onClick={() => handleEdit(place.id)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                            title="Edit"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleDelete(place.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Delete"
-                          >
-                            🗑️
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <Pagination
-                currentPage={page}
-                totalPages={Math.ceil(totalCount / limit)}
-                onPageChange={handlePageChange}
-              />
-            </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
+          
+          <div className="px-4 py-3 border-t">
+            <Pagination
+              currentPage={page}
+              totalPages={Math.ceil(totalCount / limit)}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
-        {/* Map below the table */}
-        <div className="mt-8 bg-white shadow rounded-lg p-6 flex-1">
+
+        {/* Map Section - Right Side */}
+        <div className="flex-1 bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Map of Places</h2>
           <div className="h-[calc(100%-3rem)]">
             <MapContainer
@@ -247,20 +241,24 @@ export default function Places() {
                   <Tooltip permanent>{place.name}</Tooltip>
                   <Popup>
                     <div className="p-2">
-                      <h3 className="font-medium text-gray-900 mb-2">{place.name}</h3>
-                      <p className="text-sm text-gray-500 mb-2">{place.description}</p>
-                      <div className="flex gap-2">
+                      <h3 className="font-semibold">{place.name}</h3>
+                      <p className="text-sm text-gray-600">{place.description}</p>
+                      <p className="text-sm text-gray-500">Type: {place.type}</p>
+                      <p className="text-sm text-gray-500">
+                        Coordinates: {place.lat.toFixed(4)}, {place.lng.toFixed(4)}
+                      </p>
+                      <div className="mt-2 flex gap-2">
                         <button
                           onClick={() => handleMapEdit(place.id)}
-                          className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                          className="text-indigo-600 hover:text-indigo-900 text-sm"
                         >
-                          Edit
+                          ✏️ Edit
                         </button>
                         <button
                           onClick={() => handleMapDelete(place.id)}
-                          className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                          className="text-red-600 hover:text-red-900 text-sm"
                         >
-                          Delete
+                          🗑️ Delete
                         </button>
                       </div>
                     </div>
@@ -270,30 +268,37 @@ export default function Places() {
             </MapContainer>
           </div>
         </div>
-        {/* Confirmation Dialog */}
-        {confirming && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-            <div className="bg-white rounded shadow-lg p-6 w-full max-w-sm">
-              <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-              <p className="mb-6">Are you sure you want to delete this place?</p>
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={handleCancelDelete}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {confirming && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Confirm Delete
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Are you sure you want to delete this place? This action cannot be undone.
+              </p>
+              <div className="flex justify-center space-x-4">
                 <button
                   onClick={handleConfirmDelete}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                 >
                   Delete
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+                >
+                  Cancel
                 </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 } 

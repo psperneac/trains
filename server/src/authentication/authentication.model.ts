@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-import { User } from '../app/api/users/users.entity';
+import { User } from '../app/api/support/users.module';
 
 export class RegisterDto {
   @IsEmail()

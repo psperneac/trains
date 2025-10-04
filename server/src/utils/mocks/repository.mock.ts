@@ -77,7 +77,7 @@ export class MockRepository<T extends AbstractEntity> {
     entity = {
       ...existing,
       ...entity,
-      version: existing.version + 1,
+      // version: existing.version + 1,
       updated: new Date()
     };
 
