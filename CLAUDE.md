@@ -7,8 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Trains is a transportation game where players send jobs by vehicles from one place to another to earn cash. The application uses a multi-tenant architecture where each game is a tenant. The project consists of:
 
 - **server/** - NestJS backend with MongoDB (TypeORM + Mongoose)
-- **web-react/** - React frontend with Vite, React Router, and Leaflet maps
-- **web/** - Legacy Angular frontend (deprecated, use web-react)
+- **web/** - React frontend with Vite, React Router, and Leaflet maps
 
 ## Development Commands
 
@@ -36,9 +35,9 @@ npm run seed           # Seed database
 
 ```bash
 # From root
-npm run web-react-start
+npm run web-start
 
-# From web-react/ directory
+# From web/ directory
 npm run dev           # Start dev server (with --host)
 npm run build         # Build for production
 npm run preview       # Preview production build
@@ -126,17 +125,17 @@ The server uses a **modular service-oriented architecture** with abstract base c
 ### Web-React Architecture
 
 - **React Router v7** for routing with protected routes
-- **Zustand** for state management (stores in [app/store/](web-react/app/store/))
+- **Zustand** for state management (stores in [app/store/](web/app/store/))
 - **Leaflet + react-leaflet** for interactive maps
 - **Tailwind CSS v4** for styling
 - **Protected routes** via ProtectedRoute component for authentication
 
 Key directories:
-- [app/pages/](web-react/app/pages/) - Page components (Home, Login, admin pages)
-- [app/components/](web-react/app/components/) - Reusable components (Navigation, ProtectedRoute, etc.)
-- [app/routes/](web-react/app/routes/) - Route definitions
-- [app/types/](web-react/app/types/) - TypeScript type definitions
-- [app/store/](web-react/app/store/) - Zustand state stores
+- [app/pages/](web/app/pages/) - Page components (Home, Login, admin pages)
+- [app/components/](web/app/components/) - Reusable components (Navigation, ProtectedRoute, etc.)
+- [app/routes/](web/app/routes/) - Route definitions
+- [app/types/](web/app/types/) - TypeScript type definitions
+- [app/store/](web/app/store/) - Zustand state stores
 
 ## Domain Model
 
@@ -156,15 +155,17 @@ See [docs/README.md](docs/README.md) for detailed domain terminology and system 
 
 ## Current Development State
 
-The project is undergoing a **redesign** (see feature/redesign branch):
-- Migrating from PostgreSQL/MySQL to MongoDB
-- Simplifying entity relationships
-- Moving from Angular (web/) to React (web-react/)
-- Implementing multi-tenant game architecture
+The project has completed a major **redesign** (feature/redesign branch):
+- ✅ Migrated from PostgreSQL/MySQL to MongoDB
+- ✅ Simplified entity relationships
+- ✅ Replaced Angular frontend with React (web/ directory now contains the React app)
+- ✅ Implemented multi-tenant game architecture
 
 Recent work includes:
-- Map template management UI
-- Place administration with Leaflet maps
+- Removed legacy Angular web project
+- Renamed web-react to web as the primary frontend
+- Map template management UI with Leaflet integration
+- Place administration with interactive maps
 - Pagination support in list views
 - MongoDB entity models with TypeORM
 

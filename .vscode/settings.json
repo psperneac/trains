@@ -18,7 +18,6 @@
   "eslint.workingDirectories": [
     "./server",
     "./web",
-    "./web-react"
   ],
   "workbench.colorCustomizations": {
     "titleBar.activeForeground": "#fff",
