@@ -12,6 +12,7 @@ import { VehicleTypesModule } from './vehicle-types.module';
 import { VehiclesModule } from './vehicles.module';
 import { GamesModule } from './games.module';
 import { PlayersModule } from './support/players.module';
+import { WalletsModule } from './support/wallets.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { PlayersModule } from './support/players.module';
     PlaceInstancesModule,
     PlayersModule,
     JobsModule,
-    GamesModule
+    GamesModule,
+    WalletsModule
   ]
 })
 export class ApiModule {}

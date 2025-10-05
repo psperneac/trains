@@ -12,6 +12,9 @@ import { Vehicle } from 'src/app/api/vehicles.module';
 import { PlaceConnection } from 'src/app/api/place-connection.module';
 import { PlaceInstance } from 'src/app/api/place-instance.module';
 import { VehicleInstance } from 'src/app/api/vehicle-instances.module';
+import { Job } from 'src/app/api/jobs.module';
+import { Player } from 'src/app/api/support/players.module';
+import { Wallet } from 'src/app/api/support/wallets.module';
 
 export const TABLES = {
   USERS: 'users',
@@ -45,17 +48,10 @@ export const ENTITIES = [
   Vehicle,
   PlaceConnection,
   PlaceInstance,
-  VehicleInstance
-  // MapPlaceConnectionInstance,
-  // MapPlaceInstance,
-  // MapPlaceInstanceJob,
-  // MapPlaceInstanceJobOffer,
-  // MapVehicleInstance,
-  // MapVehicleInstanceJob,
-  // MapTemplate,
-  // MapPlace,
-  // MapPlaceConnection,
-  // MapVehicle
+  VehicleInstance,
+  Job,
+  Player,
+  Wallet,
 ];
 
 @Module({

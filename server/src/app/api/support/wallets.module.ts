@@ -10,14 +10,13 @@ import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 
-import { Player, PlayersModule, PlayersService } from './players.module';
+import { PlayersModule } from './players.module';
 
 @Entity({ name: 'wallets' })
 export class Wallet extends AbstractEntity {
-  @OneToOne(_type => Player, player => player.wallet)
-  @JoinColumn({ name: 'player_id' })
+  @Column({ name: 'player_id' })
   @Expose()
-  player: Player;
+  playerId: string;
 
   @Column('integer')
   @Expose()
@@ -61,7 +60,7 @@ export class WalletService extends AbstractService<Wallet> {
 
 @Injectable()
 export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
-  constructor(private readonly playersService: PlayersService) {
+  constructor() {
     super();
   }
 
@@ -72,7 +71,7 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
 
     const dto: WalletDto = {
       id: domain._id.toString(),
-      playerId: domain.player?._id.toString(),
+      playerId: domain.playerId,
       gold: domain.gold,
       gems: domain.gems,
       parts: domain.parts,
@@ -91,16 +90,13 @@ export class WalletMapper extends AbstractDtoMapper<Wallet, WalletDto> {
       domain = {};
     }
 
-    const playerId = dto.playerId ?? domain.player?._id.toString();
-    console.log('playerId', playerId);
-
     return {
       ...domain,
       _id: dto.id,
       gold: dto.gold,
       gems: dto.gems,
       parts: dto.parts,
-      player: await this.playersService.findOne(playerId),
+      playerId: dto.playerId,
       content: dto.content
     } as any as Wallet;
   }
@@ -120,4 +116,4 @@ export class WalletController extends AbstractServiceController<Wallet, WalletDt
   providers: [WalletService, WalletMapper, WalletRepository],
   exports: [WalletService]
 })
-export class WalletModule {}
+export class WalletsModule {}

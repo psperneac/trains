@@ -24,9 +24,8 @@ export class Player extends AbstractEntity {
   @Expose()
   description: string;
 
-  @OneToOne(_type => User, { eager: true })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @Column()
+  userId: string;
 
   @OneToMany(_type => VehicleInstance, vehicleInstance => vehicleInstance.playerId)
   @Expose()
@@ -36,9 +35,8 @@ export class Player extends AbstractEntity {
   @Expose()
   places: PlaceInstance[];
 
-  @OneToOne(() => Wallet, wallet => wallet.player, { eager: true }) // specify inverse side as a second parameter
-  @Expose()
-  wallet: Wallet;
+  @Column()
+  walletId: string;
 
   @Column({ type: 'json' })
   @Expose()
@@ -59,7 +57,7 @@ export interface PlayerDto {
 @Injectable()
 export class PlayerRepository extends RepositoryAccessor<Player> {
   constructor(@InjectRepository(Player) injectedRepo) {
-    super(injectedRepo, ['user', 'vehicles', 'places', 'placeConnections', 'wallet']);
+    super(injectedRepo, ['user', 'vehicles', 'places']);
   }
 }
 
@@ -72,9 +70,7 @@ export class PlayersService extends AbstractService<Player> {
 
 @Injectable()
 export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
-  constructor(
-    private readonly userService: UsersService,
-  ) {
+  constructor() {
     super();
   }
 
@@ -88,8 +84,8 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       id: domain._id.toString(),
       name: domain.name,
       description: domain.description,
-      userId: domain.user?._id.toString(),
-      walletId: domain.wallet?._id.toString(),
+      userId: domain.userId,
+      walletId: domain.walletId,
       vehicles: domain.vehicles?.map(v => v._id.toString()),
       places: domain.places?.map(p => p._id.toString()),
       content: domain.content
@@ -107,13 +103,11 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       domain = {};
     }
 
-    const userId = dto.userId ?? domain.user?._id.toString();
-
     return {
       ...domain,
       name: dto.name,
       description: dto.description,
-      user: userId ? await this.userService.getById(userId) : null,
+      userId: dto.userId,
     } as Player;
   }
 }
