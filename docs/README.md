@@ -7,6 +7,32 @@
 
 # Log
 
+
+## Key entities in the game:
+
+- **User** - a user is a person that can login to a game. Users are normal users or admins as defined by the scope field in User.. 
+- **Game** - Multi-tenant game instance (TEMPLATE or GAME type)
+- **Player** - Game participant owning vehicles, places, and connections
+- **Place** - Point on map where jobs can be obtained, delivered or stored (stations, airports, factories, warehouses etc.). Also a point in which manufacturing or repair can be done.
+  - **PlaceType** - types of places. determines what can happen at the Place. enum for now with controller/service.
+- **PlaceConnection** - Connection between two places with route details
+- **Vehicle** - Base vehicle class with speed, range, fuel, cargo capacity. General vehicle classes that can be obtained. 
+  - **VehicleType** - type of vehicles. Determines what connections they can take. eg SHIP type vehicles can only take SHIP connections. enum for now with controller/service.
+- **VehicleInstance** - Player-owned vehicle with potential upgrades. Specific vehicles depend on player and have a base class but can have augmentations. 
+- **PlaceInstance** - player owned place, holds job offers
+- **Job** - Cargo to be transported between places. There are 3 types of jobs. Jobs of type PLACE are stored in a place and the job entity then has a PlaceInstance id in the placeId field. Jobs of type VEHICLE are stored inside a vehicle and the job entity then has a Vehicleinstance id in the vehicleId field.
+- **JobOffer** - an object similar to a Job but not an entity. A PlaceInstance holds an array of job offers which the player can pick. If a player picks a job, a Job entity is created with a type of VEHICLE.
+
+## Game Mechanics
+
+### Player game setup
+
+A user logs in to the website and has access to all games he has decided previously to play and to all players he has previously created. If a user does not have any players, he can create a player. A user gets a number of free players, after which he has to pay game currency to create players. There are multiple playable games that the user can participate in. Once the user has a player not assigned to a game, the user can add the player to a game. The user can then join the game. A user can also decide to connect to a player already in a game. Once the user has joined the game with a player, he is redirected to the game's home page.
+
+### Admin game mangement
+
+There are 2 types of games, template games and playable games. An admin can connect to template games and create places, connections and all other editable entities. Once he has setup the game to his liking, 
+
 ## TODO
 
 - ! figure out a way how to navigate away from an edit after Save is clicked and is successful and print error on screen if not successful
@@ -15,7 +41,7 @@
 
 Not related to Trains App
 
-- research more transportation game names
+- research more transportation game names and transportation games
 - research features for the rest of transportation games found
 - make list of features desired in this game
 - filter list of features and decide on features for V0
@@ -67,7 +93,7 @@ Bugs, misc:
 
 ## .long-term-plan
 
-- player site in react once angular one is working - admin site remains in angular?
+- player and admin site in react
 - special types of jobs that give materials or vehicle parts
 - manufacturing facilities where vehicles are built when all components or materials are present
 - multiplayer - sharing jobs between players
@@ -135,23 +161,6 @@ Bugs, misc:
 - _ research deployment options (heroku?)
   - price of deployment for testing
   - automatic deployment from github
-
-# Terms
-
-- Place - a point on graph where jobs can be obtained, delivered or stored. Also a point in which manufacturing or repair can be done.
-- PlaceType - types of places. determines what can happen at the Place. enum for now with controller/service.
-- Vehicle - General vehicle classes that can be obtained. Specific vehicles depend on player and have a base class but can have augmentations. A vehicle contains the general attributes like speed, range, fuel capacity and cargo capacity
-- VehicleType - type of vehicles. Determines what connections they can take. eg SHIP type vehicles can only take SHIP connections. enum for now with controller/service.
-- PlaceConnection - a connection between 2 places. Has a type to determine what kind of vehicles can travel it.
-  - Route - path between 2 places inside a connection. It contains the detailed points that a vehicle takes. It determines the length of the connection. For simplicity of display route is ignored in some views. Route is saved in contents of PlaceConnection.
-- Map - contains the layout of a map with places and connections. MapPlaceConnection and MapPlace are join tables linking Places and PlaceConnections to a Map.
-- PlacesInstance - A place that a player has. Links to place and player
-- VehicleInstance - A vehicle that a player has. Links to vehicle and player
-- PlaceInstanceJob - jobs that a player left in a place instance
-- PlaceInstanceJobOffer - jobs offered for a player in a place instance
-- VehicleInstanceJob - jobs on a vehicle instance
-- PlaceConnectionInstance - place connections that a player has bought
-- Player - a player in the game. VehicleInstance, PlaceInstance, PlaceInstanceJob, PlaceInstanceJobOffer, VehicleInstanceJob, PlaceConnectionInstance are all linked to a player
 
 # SystemOverview
 

@@ -28,8 +28,8 @@ const menuItems: MenuItem[] = [
         path: '/admin/places',
       },
       {
-        label: 'Maps',
-        path: '/admin/maps',
+        label: 'Games',
+        path: '/admin/games',
       },
     ],
   },

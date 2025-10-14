@@ -1,6 +1,9 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+---
+description: "General project-wide instructions for the AI agent."
+globs:
+  - "**"
+---
+This file provides guidance to Cursor when working with code in this repository.
 
 ## Project Overview
 
@@ -139,22 +142,7 @@ Key directories:
 
 ## Domain Model
 
-Key entities in the game:
-
-- **User** - a user is a person that can login to a game. Users are normal users or admins as defined by the scope field in User.. 
-- **Game** - Multi-tenant game instance (TEMPLATE or GAME type)
-- **Player** - Game participant owning vehicles, places, and connections
-- **Place** - Point on map where jobs can be obtained/delivered (stations, airports, etc.)
-- **PlaceConnection** - Connection between two places with route details
-- **Vehicle** - Base vehicle class with speed, range, fuel, cargo capacity
-- **VehicleInstance** - Player-owned vehicle with potential upgrades
-- **PlaceInstance** - player owned place, holds job offers
-- **Job** - Cargo to be transported between places. There are 3 types of jobs. Jobs of type PLACE are stored in a place and the job entity then has a PlaceInstance id in the placeId field. Jobs of type VEHICLE are stored inside a vehicle and the job entity then has a Vehicleinstance id in the vehicleId field.
-- **JobOffer** - an object similar to a Job but not an entity. A PlaceInstance holds an array of job offers which the player can pick. If a player picks a job, a Job entity is created with a type of VEHICLE.
-
-### Games and Players
-
-See [docs/README.md](docs/README.md) for detailed domain terminology and system overview.
+See [docs/README.md](../../docs/README.md) for detailed domain terminology and system overview.
 
 ## Current Development State
 

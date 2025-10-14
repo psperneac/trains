@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import { useMapStore } from '../../store/mapStore';
-import type { MapDto } from '../../types/map';
-import { MapType } from '../../types/map';
+import { useGameStore } from '../../store/gameStore';
+import type { GameDto } from '../../types/game';
+import { GameType } from '../../types/game';
 
-export default function MapForm() {
+export default function GameForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { maps, loading, error, fetchMaps, addMap, updateMap } = useMapStore();
-  const [formData, setFormData] = useState<Omit<MapDto, 'id'>>({
+  const { games, loading, error, fetchGames, addGame, updateGame } = useGameStore();
+  const [formData, setFormData] = useState<Omit<GameDto, 'id'>>({
     name: '',
     description: '',
-    type: MapType.TEMPLATE,
+    type: GameType.TEMPLATE,
     places: [],
     placeConnections: [],
     content: {}
@@ -21,43 +21,43 @@ export default function MapForm() {
   const isEditing = !!id;
 
   useEffect(() => {
-    if (isEditing && maps.length > 0) {
-      const map = maps.find(m => m.id === id);
-      if (map) {
+    if (isEditing && games.length > 0) {
+      const game = games.find(g => g.id === id);
+      if (game) {
         setFormData({
-          name: map.name,
-          description: map.description,
-          type: map.type,
-          places: map.places || [],
-          placeConnections: map.placeConnections || [],
-          content: map.content || {}
+          name: game.name,
+          description: game.description,
+          type: game.type,
+          places: game.places || [],
+          placeConnections: game.placeConnections || [],
+          content: game.content || {}
         });
       }
     }
-  }, [id, maps, isEditing]);
+  }, [id, games, isEditing]);
 
   useEffect(() => {
     if (isEditing) {
-      fetchMaps(1, 1000); // Fetch all maps to find the one to edit
+      fetchGames(1, 1000); // Fetch all games to find the one to edit
     }
-  }, [fetchMaps, isEditing]);
+  }, [fetchGames, isEditing]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (isEditing && id) {
-        await updateMap({ ...formData, id });
+        await updateGame({ ...formData, id });
       } else {
-        await addMap(formData);
+        await addGame(formData);
       }
-      navigate('/admin/maps');
+      navigate('/admin/games');
     } catch (err) {
-      console.error('Error saving map:', err);
+      console.error('Error saving game:', err);
     }
   };
 
-  const handleChange = (field: keyof Omit<MapDto, 'id'>, value: any) => {
+  const handleChange = (field: keyof Omit<GameDto, 'id'>, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -68,7 +68,7 @@ export default function MapForm() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading map...</div>
+          <div className="text-lg">Loading game...</div>
         </div>
       </Layout>
     );
@@ -80,13 +80,13 @@ export default function MapForm() {
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900">
-              {isEditing ? 'Edit Map' : 'Add New Map'}
+              {isEditing ? 'Edit Game' : 'Add New Game'}
             </h1>
             <button
-              onClick={() => navigate('/admin/maps')}
+              onClick={() => navigate('/admin/games')}
               className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
             >
-              Back to Maps
+              Back to Games
             </button>
           </div>
 
@@ -132,12 +132,12 @@ export default function MapForm() {
               <select
                 id="type"
                 value={formData.type}
-                onChange={(e) => handleChange('type', e.target.value as MapType)}
+                onChange={(e) => handleChange('type', e.target.value as GameType)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value={MapType.TEMPLATE}>Template</option>
-                <option value={MapType.GAME}>Game</option>
+                <option value={GameType.TEMPLATE}>Template</option>
+                <option value={GameType.GAME}>Game</option>
               </select>
             </div>
 
@@ -165,7 +165,7 @@ export default function MapForm() {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/admin/maps')}
+                onClick={() => navigate('/admin/games')}
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
               >
                 Cancel
@@ -174,7 +174,7 @@ export default function MapForm() {
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               >
-                {isEditing ? 'Update Map' : 'Create Map'}
+                {isEditing ? 'Update Game' : 'Create Game'}
               </button>
             </div>
           </form>
@@ -182,4 +182,4 @@ export default function MapForm() {
       </div>
     </Layout>
   );
-} 
+}

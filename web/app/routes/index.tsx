@@ -1,8 +1,8 @@
 import ProtectedRoute from "../components/ProtectedRoute";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
-import MapForm from "../pages/admin/MapForm";
-import Maps from "../pages/admin/Maps";
+import GameForm from "../pages/admin/GameForm";
+import Games from "../pages/admin/Games";
 import PlaceForm from "../pages/admin/PlaceForm";
 import PlaceTypes from "../pages/admin/PlaceTypes";
 import Places from "../pages/admin/Places";
@@ -62,26 +62,26 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/maps",
+    path: "/admin/games",
     element: (
       <ProtectedRoute>
-        <Maps />
+        <Games />
       </ProtectedRoute>
     ),
   },
   {
-    path: "/admin/maps/new",
+    path: "/admin/games/new",
     element: (
       <ProtectedRoute>
-        <MapForm />
+        <GameForm />
       </ProtectedRoute>
     ),
   },
   {
-    path: "/admin/maps/:id/edit",
+    path: "/admin/games/:id/edit",
     element: (
       <ProtectedRoute>
-        <MapForm />
+        <GameForm />
       </ProtectedRoute>
     ),
   },

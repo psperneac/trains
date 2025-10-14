@@ -7,11 +7,13 @@ import { useAuthStore } from './authStore';
 interface PlaceState {
   places: PlaceDto[];
   allPlaces: PlaceDto[];
+  
   loading: boolean;
   error: string | null;
   page: number;
   limit: number;
   totalCount: number;
+  
   fetchPlaces: (page?: number, limit?: number) => Promise<void>;
   fetchAllPlaces: () => Promise<void>;
   addPlace: (place: Omit<PlaceDto, 'id'>) => Promise<void>;
@@ -22,11 +24,13 @@ interface PlaceState {
 export const usePlaceStore = create<PlaceState>((set, get) => ({
   places: [],
   allPlaces: [],
+  
   loading: false,
   error: null,
   page: 1,
   limit: DEFAULT_PAGE_SIZE,
   totalCount: 0,
+
   fetchPlaces: async (page = 1, limit = DEFAULT_PAGE_SIZE) => {
     set({ loading: true, error: null });
     try {
@@ -47,6 +51,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
+  
   fetchAllPlaces: async () => {
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -60,6 +65,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       console.error('Error fetching all places:', err);
     }
   },
+  
   addPlace: async (place) => {
     set({ loading: true, error: null });
     try {
@@ -78,6 +84,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
+  
   updatePlace: async (place) => {
     set({ loading: true, error: null });
     try {
@@ -96,6 +103,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
+  
   deletePlace: async (id) => {
     set({ loading: true, error: null });
     try {
@@ -113,4 +121,4 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-})); 
+}));

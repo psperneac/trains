@@ -1,14 +1,14 @@
-export enum MapType {
+export enum GameType {
   TEMPLATE = 'TEMPLATE',
   GAME = 'GAME'
 }
 
-export interface MapDto {
+export interface GameDto {
   id: string;
   name: string;
   description: string;
-  type: MapType;
+  type: GameType;
   places?: string[];
   placeConnections?: string[];
   content: any;
-} 
+}
