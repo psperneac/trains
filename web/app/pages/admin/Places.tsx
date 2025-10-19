@@ -135,7 +135,7 @@ export default function Places() {
     <Layout title="Places">
       <div className="flex h-[calc(100vh-11rem)] gap-4">
         {/* Table Section - Left Side */}
-        <div className="w-96 flex-shrink-0 bg-white shadow rounded-lg">
+        <div className="w-120 flex-shrink-0 bg-white shadow rounded-lg">
           <div className="px-6 py-3 border-b">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Places</h2>

@@ -3,6 +3,8 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import GameForm from "../pages/admin/GameForm";
 import Games from "../pages/admin/Games";
+import PlaceConnectionForm from "../pages/admin/PlaceConnectionForm";
+import PlaceConnections from "../pages/admin/PlaceConnections";
 import PlaceForm from "../pages/admin/PlaceForm";
 import PlaceTypes from "../pages/admin/PlaceTypes";
 import Places from "../pages/admin/Places";
@@ -58,6 +60,30 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <PlaceForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/place-connections",
+    element: (
+      <ProtectedRoute>
+        <PlaceConnections />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/place-connections/add",
+    element: (
+      <ProtectedRoute>
+        <PlaceConnectionForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/place-connections/:id/edit",
+    element: (
+      <ProtectedRoute>
+        <PlaceConnectionForm />
       </ProtectedRoute>
     ),
   },

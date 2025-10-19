@@ -1,10 +1,9 @@
 import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { omit } from 'lodash';
 import { AbstractDto } from 'src/utils/abstract-dto';
 import { AbstractEntity } from 'src/utils/abstract.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, ObjectId } from 'typeorm';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -17,7 +16,8 @@ import { RepositoryAccessor } from '../../utils/repository-accessor';
 
 import { GamesModule } from './games.module';
 
-import { Place, PlacesModule, PlacesService } from './places.module';
+import { Types } from 'mongoose';
+import { PlacesModule, PlacesService } from './places.module';
 
 @Entity({ name: 'place_connections' })
 export class PlaceConnection extends AbstractEntity {
@@ -37,17 +37,16 @@ export class PlaceConnection extends AbstractEntity {
   @Expose()
   content: any;
 
-  @ManyToOne(_type => Place, { eager: true })
-  @JoinColumn({ name: 'start_id' })
+  @Column('objectId')
   @Expose()
-  start: Place;
+  startId: ObjectId;
 
-  @ManyToOne(_type => Place, { eager: true })
-  @JoinColumn({ name: 'end_id' })
+  @Column('objectId')
   @Expose()
-  end: Place;
+  endId: ObjectId;
 
   @Column()
+  @Expose()
   gameId: string;
 }
 
@@ -66,7 +65,7 @@ export class PlaceConnectionDto implements AbstractDto {
 @Injectable()
 export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnection> {
   constructor(@InjectRepository(PlaceConnection) injectedRepo) {
-    super(injectedRepo, ['start', 'end']);
+    super(injectedRepo); // No relationships - using ObjectId columns directly
   }
 }
 
@@ -98,8 +97,8 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       name: domain.name,
       description: domain.description,
       content: domain.content,
-      startId: domain.start?._id.toString(),
-      endId: domain.end?._id.toString(),
+      startId: domain.startId.toString(),
+      endId: domain.endId.toString(),
       gameId: domain.gameId
     };
 
@@ -118,16 +117,17 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       domain = {};
     }
 
-    const startId = dto.startId ?? domain.start?._id.toString();
-    const endId = dto.endId ?? domain.end?._id.toString();
+    const { startId, endId, ...fixedDto } = dto;
 
-    const fixedDto = omit(dto, ['startId', 'endId']);
+    // Use DTO values if provided, otherwise keep domain values
+    const finalStartId = startId ? new Types.ObjectId(startId) : domain?.startId;
+    const finalEndId = endId ? new Types.ObjectId(endId) : domain?.endId;
 
     return {
       ...domain,
       ...fixedDto,
-      start: this.service.findOne(startId),
-      end: this.service.findOne(endId)
+      startId: finalStartId,
+      endId: finalEndId,
     } as any as PlaceConnection;
   }
 }

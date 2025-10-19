@@ -80,20 +80,21 @@ export class AbstractService<T extends AbstractEntity> {
     return this.repository.save(newData as any as DeepPartial<T>, {});
   }
 
-  update(uuid: string, entity): Promise<T> {
+  async update(uuid: string, entity): Promise<T> {
     // If id is provided, convert it to _id and remove id from payload
     const { id, ...entityWithoutId } = entity;
-    const updateData = id ? { ...entityWithoutId, _id: new Types.ObjectId(id) } : entityWithoutId;
+    
+    // Use save instead of update to properly handle relationships
+    const updateData = {
+      ...entityWithoutId,
+      _id: new Types.ObjectId(uuid)
+    };
 
-    const updatePromise = this.repository.update(uuid, updateData);
-
-    return updatePromise.then(updateResult => {
-      if (updateResult.affected) {
-        return this.findOne(uuid);
-      }
-
-      throw new SqlException(updateResult.raw);
-    });
+    try {
+      return this.repository.save(updateData as any);
+    } catch (error) {
+      throw new SqlException(error.message || 'Update failed');
+    }
   }
 
   delete(uuid: string): Promise<boolean> {
