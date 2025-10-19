@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import Pagination from '../../components/Pagination';
 import { usePlaceStore } from '../../store/placeStore';
 
 // Color mapping for place types
@@ -80,7 +79,7 @@ function MapPositionTracker({ onPositionChange }: { onPositionChange: (pos: { la
 }
 
 export default function Places() {
-  const { places, allPlaces, loading, error, fetchPlaces, fetchAllPlaces, deletePlace, page, limit, totalCount } = usePlaceStore();
+  const { allPlaces, loading, error, fetchPlaces, deletePlace } = usePlaceStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -88,15 +87,8 @@ export default function Places() {
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetchPlaces(page, limit),
-      fetchAllPlaces()
-    ]);
-  }, [fetchPlaces, fetchAllPlaces, page, limit]);
-
-  const handlePageChange = (newPage: number) => {
-    fetchPlaces(newPage, limit);
-  };
+    fetchPlaces();
+  }, [fetchPlaces]);
 
   const handleAdd = () => {
     if (mapPosition) {
@@ -133,12 +125,12 @@ export default function Places() {
 
   return (
     <Layout title="Places">
-      <div className="flex h-[calc(100vh-11rem)] gap-4">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
         {/* Table Section - Left Side */}
-        <div className="w-120 flex-shrink-0 bg-white shadow rounded-lg">
-          <div className="px-6 py-3 border-b">
+        <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
+          <div className="px-6 py-3 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Places</h2>
+              <h2 className="text-lg font-semibold">Places ({allPlaces.length})</h2>
               <button
                 onClick={handleAdd}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
@@ -152,7 +144,7 @@ export default function Places() {
           {error && <div className="p-4 text-red-500">{error}</div>}
           
           {!loading && !error && (
-            <div className="overflow-y-auto h-[calc(100%-4rem)]">
+            <div className="overflow-y-auto flex-1">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
@@ -162,7 +154,7 @@ export default function Places() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {places.map((place, idx) => (
+                  {allPlaces.map((place, idx) => (
                     <tr key={place.id || idx} className="hover:bg-gray-50">
                       <td className="px-4 py-2 text-sm text-gray-900">
                         <div>
@@ -204,14 +196,6 @@ export default function Places() {
               </table>
             </div>
           )}
-          
-          <div className="px-4 py-3 border-t">
-            <Pagination
-              currentPage={page}
-              totalPages={Math.ceil(totalCount / limit)}
-              onPageChange={handlePageChange}
-            />
-          </div>
         </div>
 
         {/* Map Section - Right Side */}

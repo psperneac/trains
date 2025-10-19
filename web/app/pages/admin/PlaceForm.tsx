@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
@@ -63,6 +63,26 @@ function MapCenterer({ position }: { position: [number, number] }) {
   useEffect(() => {
     map.setView(position);
   }, [position, map]);
+  return null;
+}
+
+function MapPositionUpdater({ onUpdatePosition }: { onUpdatePosition: (pos: [number, number]) => void }) {
+  const map = useMap();
+
+  // Store the update function in a ref so it can be called from outside
+  const updatePositionRef = useRef(onUpdatePosition);
+  updatePositionRef.current = onUpdatePosition;
+
+  useEffect(() => {
+    const handleUpdatePosition = () => {
+      const center = map.getCenter();
+      updatePositionRef.current([center.lat, center.lng]);
+    };
+
+    // Expose the function globally for the button to use
+    (window as any).updateMarkerToMapCenter = handleUpdatePosition;
+  }, [map]);
+
   return null;
 }
 
@@ -142,6 +162,12 @@ export default function PlaceForm() {
     setForm((prev) => ({ ...prev, lat: pos[0], lng: pos[1] }));
   };
 
+  // Callback to update marker position to map center
+  const handleUpdatePositionToMapCenter = useCallback((pos: [number, number]) => {
+    setMarkerPos(pos);
+    setForm((prev) => ({ ...prev, lat: pos[0], lng: pos[1] }));
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: name === 'lat' || name === 'lng' ? parseFloat(value) : value }));
@@ -159,10 +185,16 @@ export default function PlaceForm() {
 
   const handleCancel = () => navigate('/admin/places');
 
+  const handleCenterMap = () => {
+    if ((window as any).updateMarkerToMapCenter) {
+      (window as any).updateMarkerToMapCenter();
+    }
+  };
+
   return (
     <Layout title={isEdit ? 'Edit Place' : 'Add Place'}>
-      <div className="flex gap-8">
-        <div className="bg-white shadow rounded-lg p-6 max-w-md w-full">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md">
           <form onSubmit={handleSave} className="space-y-4">
             {isEdit && (
               <div>
@@ -251,38 +283,51 @@ export default function PlaceForm() {
               />
             </div>
             {error && <div className="text-red-500">{error}</div>}
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-2 justify-between items-center">
               <button
                 type="button"
-                onClick={handleCancel}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                onClick={handleCenterMap}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
               >
-                Cancel
+                Center
               </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-              >
-                Save
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </form>
         </div>
-        <div className="flex-1 min-h-[500px]">
-          <MapContainer
-            center={markerPos as [number, number]}
-            zoom={mapPosition?.zoom || 17}
-            style={{ height: '100%', minHeight: 500, width: '100%' }}
-            whenReady={() => setMapReady(true)}
-          >
-            <MapCenterer position={markerPos} />
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-            <DraggableMarker position={markerPos} setPosition={handleMarkerMove} />
-          </MapContainer>
+        <div className="flex-1 bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Map Location</h2>
+          <div className="h-[500px]">
+            <MapContainer
+              center={markerPos as [number, number]}
+              zoom={mapPosition?.zoom || 17}
+              style={{ height: '100%', width: '100%' }}
+              whenReady={() => setMapReady(true)}
+            >
+              <MapCenterer position={markerPos} />
+              <MapPositionUpdater onUpdatePosition={handleUpdatePositionToMapCenter} />
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <DraggableMarker position={markerPos} setPosition={handleMarkerMove} />
+            </MapContainer>
+          </div>
         </div>
       </div>
     </Layout>

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import Pagination from '../../components/Pagination';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
 
@@ -50,14 +49,11 @@ function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
 
 export default function PlaceConnections() {
   const { 
-    placeConnections, 
+    allPlaceConnections,
     loading, 
     error, 
     fetchPlaceConnections, 
-    deletePlaceConnection, 
-    page, 
-    limit, 
-    totalCount 
+    deletePlaceConnection
   } = usePlaceConnectionStore();
   const { allPlaces, fetchAllPlaces } = usePlaceStore();
   const navigate = useNavigate();
@@ -67,14 +63,10 @@ export default function PlaceConnections() {
 
   useEffect(() => {
     Promise.all([
-      fetchPlaceConnections(page, limit),
+      fetchPlaceConnections(),
       fetchAllPlaces()
     ]);
-  }, [fetchPlaceConnections, fetchAllPlaces, page, limit]);
-
-  const handlePageChange = (newPage: number) => {
-    fetchPlaceConnections(newPage, limit);
-  };
+  }, [fetchPlaceConnections, fetchAllPlaces]);
 
   const handleAdd = () => {
     navigate('/admin/place-connections/add');
@@ -128,12 +120,12 @@ export default function PlaceConnections() {
 
   return (
     <Layout title="Place Connections">
-      <div className="flex h-[calc(100vh-11rem)] gap-4">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
         {/* Table Section - Left Side */}
-        <div className="w-120 flex-shrink-0 bg-white shadow rounded-lg">
-          <div className="px-6 py-3 border-b">
+        <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
+          <div className="px-6 py-3 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Place Connections</h2>
+              <h2 className="text-lg font-semibold">Place Connections ({allPlaceConnections.length})</h2>
               <button
                 onClick={handleAdd}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
@@ -147,7 +139,7 @@ export default function PlaceConnections() {
           {error && <div className="p-4 text-red-500">{error}</div>}
           
           {!loading && !error && (
-            <div className="overflow-y-auto h-[calc(100%-4rem)]">
+            <div className="overflow-y-auto flex-1">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
@@ -158,7 +150,7 @@ export default function PlaceConnections() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {placeConnections.map((connection, idx) => {
+                  {allPlaceConnections.map((connection, idx) => {
                     const startPlace = placesById[connection.startId];
                     const endPlace = placesById[connection.endId];
                     
@@ -212,14 +204,6 @@ export default function PlaceConnections() {
               </table>
             </div>
           )}
-          
-          <div className="px-4 py-3 border-t">
-            <Pagination
-              currentPage={page}
-              totalPages={Math.ceil(totalCount / limit)}
-              onPageChange={handlePageChange}
-            />
-          </div>
         </div>
 
         {/* Map Section - Right Side */}
@@ -252,7 +236,7 @@ export default function PlaceConnections() {
               ))}
               
               {/* Draw all connections as polylines */}
-              {placeConnections.map((connection, idx) => {
+              {allPlaceConnections.map((connection, idx) => {
                 const startPlace = placesById[connection.startId];
                 const endPlace = placesById[connection.endId];
                 

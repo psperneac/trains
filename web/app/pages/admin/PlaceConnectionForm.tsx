@@ -218,8 +218,8 @@ export default function PlaceConnectionForm() {
 
   return (
     <Layout title={isEdit ? 'Edit Place Connection' : 'Add Place Connection'}>
-      <div className="flex gap-8">
-        <div className="bg-white shadow rounded-lg p-6 max-w-md w-full">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md">
           <form onSubmit={handleSave} className="space-y-4">
             {isEdit && (
               <div>
@@ -342,46 +342,49 @@ export default function PlaceConnectionForm() {
             </div>
           </form>
         </div>
-        <div className="flex-1 min-h-[500px]">
-          <MapContainer
-            center={allPlaces.length > 0 ? [allPlaces[0].lat, allPlaces[0].lng] : [0, 0]}
-            zoom={13}
-            style={{ height: '100%', minHeight: 500, width: '100%' }}
-          >
-            <FitBounds places={allPlaces} />
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-            
-            {/* Draw all places */}
-            {allPlaces.map((place) => {
-              const isStart = place.id === form.startId;
-              const isEnd = place.id === form.endId;
-              const isSelected = isStart || isEnd;
-              
-              return (
-                <Marker
-                  key={place.id}
-                  position={[place.lat, place.lng]}
-                  icon={isSelected ? greenPinIcon : grayPinIcon}
-                />
-              );
-            })}
-            
-            {/* Draw connection line if both places are selected */}
-            {startPlace && endPlace && (
-              <Polyline
-                positions={[
-                  [startPlace.lat, startPlace.lng],
-                  [endPlace.lat, endPlace.lng],
-                ]}
-                color="#43a047"
-                weight={4}
-                opacity={0.8}
+        <div className="flex-1 bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Connection Preview</h2>
+          <div className="h-[500px]">
+            <MapContainer
+              center={allPlaces.length > 0 ? [allPlaces[0].lat, allPlaces[0].lng] : [0, 0]}
+              zoom={13}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <FitBounds places={allPlaces} />
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
               />
-            )}
-          </MapContainer>
+              
+              {/* Draw all places */}
+              {allPlaces.map((place) => {
+                const isStart = place.id === form.startId;
+                const isEnd = place.id === form.endId;
+                const isSelected = isStart || isEnd;
+                
+                return (
+                  <Marker
+                    key={place.id}
+                    position={[place.lat, place.lng]}
+                    icon={isSelected ? greenPinIcon : grayPinIcon}
+                  />
+                );
+              })}
+              
+              {/* Draw connection line if both places are selected */}
+              {startPlace && endPlace && (
+                <Polyline
+                  positions={[
+                    [startPlace.lat, startPlace.lng],
+                    [endPlace.lat, endPlace.lng],
+                  ]}
+                  color="#43a047"
+                  weight={4}
+                  opacity={0.8}
+                />
+              )}
+            </MapContainer>
+          </div>
         </div>
       </div>
     </Layout>

@@ -1,20 +1,15 @@
 import { create } from 'zustand';
 import { apiRequest } from '../config/api';
-import { DEFAULT_PAGE_SIZE } from '../constants/pagination';
 import type { PlaceDto } from '../types/place';
 import { useAuthStore } from './authStore';
 
 interface PlaceState {
-  places: PlaceDto[];
   allPlaces: PlaceDto[];
   
   loading: boolean;
   error: string | null;
-  page: number;
-  limit: number;
-  totalCount: number;
   
-  fetchPlaces: (page?: number, limit?: number) => Promise<void>;
+  fetchPlaces: () => Promise<void>;
   fetchAllPlaces: () => Promise<void>;
   addPlace: (place: Omit<PlaceDto, 'id'>) => Promise<void>;
   updatePlace: (place: PlaceDto) => Promise<void>;
@@ -22,29 +17,22 @@ interface PlaceState {
 }
 
 export const usePlaceStore = create<PlaceState>((set, get) => ({
-  places: [],
   allPlaces: [],
   
   loading: false,
   error: null,
-  page: 1,
-  limit: DEFAULT_PAGE_SIZE,
-  totalCount: 0,
 
-  fetchPlaces: async (page = 1, limit = DEFAULT_PAGE_SIZE) => {
+  fetchPlaces: async () => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
       const authToken = typeof rawToken === 'string' ? rawToken : undefined;
-      const response = await apiRequest<{ data: PlaceDto[]; page: number; limit: number; totalCount: number }>(
-        `/api/places?page=${page}&limit=${limit}`,
+      const response = await apiRequest<{ data: PlaceDto[] }>(
+        '/api/places?limit=10000',
         { method: 'GET', authToken }
       );
       set({
-        places: response.data,
-        page: page,
-        limit: response.limit,
-        totalCount: response.totalCount,
+        allPlaces: response.data,
         loading: false
       });
     } catch (err: any) {
@@ -53,17 +41,8 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
   },
   
   fetchAllPlaces: async () => {
-    try {
-      const rawToken = useAuthStore.getState().authToken;
-      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
-      const response = await apiRequest<{ data: PlaceDto[] }>(
-        '/api/places?limit=1000',
-        { method: 'GET', authToken }
-      );
-      set({ allPlaces: response.data });
-    } catch (err: any) {
-      console.error('Error fetching all places:', err);
-    }
+    // Just delegate to fetchPlaces since we're loading all places now
+    await get().fetchPlaces();
   },
   
   addPlace: async (place) => {
@@ -76,10 +55,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
         authToken,
         body: JSON.stringify(place),
       });
-      await Promise.all([
-        get().fetchPlaces(get().page, get().limit),
-        get().fetchAllPlaces()
-      ]);
+      await get().fetchPlaces();
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }
@@ -95,10 +71,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
         authToken,
         body: JSON.stringify(place),
       });
-      await Promise.all([
-        get().fetchPlaces(get().page, get().limit),
-        get().fetchAllPlaces()
-      ]);
+      await get().fetchPlaces();
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }
@@ -113,10 +86,7 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
         method: 'DELETE',
         authToken,
       });
-      await Promise.all([
-        get().fetchPlaces(get().page, get().limit),
-        get().fetchAllPlaces()
-      ]);
+      await get().fetchPlaces();
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }

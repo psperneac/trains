@@ -18,12 +18,15 @@ Trains is a transportation game where players send jobs by vehicles from one pla
 
 ```bash
 # From root
-npm run server-start
+npm run start:local     # starts the server connecting to a local on machine database
+npm run start:k8s       # starts the server connecting to a local k8s database
 
 # From server/ directory
 npm run start          # Runs start:debug (with watch and debug)
 npm run start:dev      # Development with watch
 npm run start:prod     # Production mode
+npm run start:local    # starts the server connecting to a local on machine database
+npm run start:k8s      # starts the server connecting to a local k8s database
 npm run build          # Build the project
 npm run lint           # Run ESLint with auto-fix
 npm run format         # Format code with Prettier
@@ -177,6 +180,10 @@ Required environment variables:
 - CORS enabled for all origins
 - Cookie parser middleware enabled
 - Custom exception filter for error handling
+
+## Deployment
+
+- [README](../../deploy/README.md) - contains instructions on how to install and run the application on a k8s cluster
 
 ## Testing
 

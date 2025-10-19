@@ -45,9 +45,9 @@ export class PlaceConnection extends AbstractEntity {
   @Expose()
   endId: ObjectId;
 
-  @Column()
+  @Column('objectId')
   @Expose()
-  gameId: string;
+  gameId: ObjectId;
 }
 
 export class PlaceConnectionDto implements AbstractDto {
@@ -99,7 +99,7 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       content: domain.content,
       startId: domain.startId.toString(),
       endId: domain.endId.toString(),
-      gameId: domain.gameId
+      gameId: domain.gameId.toString(),
     };
 
     return dto;
@@ -117,17 +117,15 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
       domain = {};
     }
 
-    const { startId, endId, ...fixedDto } = dto;
-
     // Use DTO values if provided, otherwise keep domain values
-    const finalStartId = startId ? new Types.ObjectId(startId) : domain?.startId;
-    const finalEndId = endId ? new Types.ObjectId(endId) : domain?.endId;
+    const { startId, endId, gameId, ...fixedDto } = dto;
 
     return {
       ...domain,
       ...fixedDto,
-      startId: finalStartId,
-      endId: finalEndId,
+      startId: startId ? new Types.ObjectId(startId) : domain?.startId,
+      endId: endId ? new Types.ObjectId(endId) : domain?.endId,
+      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId,
     } as any as PlaceConnection;
   }
 }

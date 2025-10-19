@@ -93,7 +93,7 @@ export default function Navigation() {
             </svg>
           </button>
           {openSubmenu === item.label && (
-            <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+            <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
               <div className="py-1" role="menu">
                 {item.children.map((child) => (
                   <Link

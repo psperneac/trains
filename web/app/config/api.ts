@@ -1,4 +1,6 @@
 
+import { handleAuthError } from '../utils/auth';
+
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 interface ApiRequestOptions extends RequestInit {
@@ -30,6 +32,11 @@ export const apiRequest = async <T>(path: string, options: ApiRequestOptions): P
     ...options,
     headers,
   });
+
+  if (response.status === 401) {
+    handleAuthError();
+    throw new Error('Authentication required');
+  }
 
   if (!response.ok) {
     throw new Error(`API request failed: ${response.statusText}`);
