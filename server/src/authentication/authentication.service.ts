@@ -2,9 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UserPreferencesService } from '../app/api/users/user-preference.module';
-import { User } from '../app/api/users/users.entity';
-import { UsersService } from '../app/api/users/users.service';
+import { User, UsersService } from '../app/api/support/users.module';
 import { SCOPE_USER } from '../utils/constants';
 
 import { RegisterDto, TokenPayload } from './authentication.model';
@@ -15,7 +13,6 @@ export class AuthenticationService {
 
   constructor(
     private readonly usersService: UsersService,
-    private readonly _userPreferencesService: UserPreferencesService,
     private readonly jwtService: JwtService
   ) {}
 
@@ -26,11 +23,6 @@ export class AuthenticationService {
       password: hashedPassword,
       scope: SCOPE_USER
     });
-
-    // const preferences = await this.userPreferencesService.create({
-    //   user: createdUser,
-    //   content: {}
-    // });
 
     createdUser.password = undefined;
     return createdUser;
@@ -55,10 +47,26 @@ export class AuthenticationService {
     }
   }
 
-  public getAuthToken(userId: string) {
+  public getAuthToken(userId: string, scope: string) {
     // TODO: add expiry of max-session 15-30min
     // TODO: figure out how to refresh token when expired
-    const payload: TokenPayload = { userId };
-    return this.jwtService.sign(payload);
+    const payload: TokenPayload = {
+      sub: userId,  // Standard JWT subject claim
+      scope: scope,  // User scope/role
+      userId: userId  // Keep for backward compatibility
+    };
+    console.log('Creating JWT token with payload:', payload);
+    const token = this.jwtService.sign(payload);
+    console.log('Generated token (first 50 chars):', token.substring(0, 50) + '...');
+
+    // Decode and verify the token contains the right payload
+    try {
+      const decoded = this.jwtService.verify(token);
+      console.log('Verified token payload:', decoded);
+    } catch (error) {
+      console.error('Token verification failed:', error);
+    }
+
+    return token;
   }
 }

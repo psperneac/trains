@@ -3,8 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { UserPreferenceModule } from '../app/api/users/user-preference.module';
-import { UsersModule } from '../app/api/users/users.module';
+import { UsersModule } from '../app/api/support/users.module';
 
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
@@ -14,7 +13,6 @@ import { LocalStrategy } from './local.strategy';
 @Module({
   imports: [
     UsersModule,
-    UserPreferenceModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({

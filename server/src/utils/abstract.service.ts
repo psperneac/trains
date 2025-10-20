@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
 
 import { PageDto } from '../models/page.model';
 import { PageRequestDto } from '../models/pagination.model';
 
-import { Types } from 'mongoose';
 import { AbstractEntity } from './abstract.entity';
 import { RepositoryAccessor } from './repository-accessor';
 import { SqlException } from './sql.exception';
@@ -35,15 +35,16 @@ export class AbstractService<T extends AbstractEntity> {
     const page = typeof pagination.page === 'string' ? parseInt(pagination.page, 10) : pagination.page || 1;
     const limit = typeof pagination.limit === 'string' ? parseInt(pagination.limit, 10) : pagination.limit || 10;
     const skip = (page - 1) * limit;
+    const order = pagination.sortColumn
+      ? ({ [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC' } as any)
+      : undefined;
 
     const [data, totalCount] = await Promise.all([
       this.repository.find({
         relations: this.relationships,
         skip: pagination.unpaged ? undefined : skip,
         take: pagination.unpaged ? undefined : limit,
-        order: pagination.sortColumn ? {
-          [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC'
-        } as any : undefined
+        order: order
       }),
       this.repository.count()
     ]);
@@ -79,20 +80,21 @@ export class AbstractService<T extends AbstractEntity> {
     return this.repository.save(newData as any as DeepPartial<T>, {});
   }
 
-  update(uuid: string, entity): Promise<T> {
+  async update(uuid: string, entity): Promise<T> {
     // If id is provided, convert it to _id and remove id from payload
     const { id, ...entityWithoutId } = entity;
-    const updateData = id ? { ...entityWithoutId, _id: new Types.ObjectId(id) } : entityWithoutId;
+    
+    // Use save instead of update to properly handle relationships
+    const updateData = {
+      ...entityWithoutId,
+      _id: new Types.ObjectId(uuid)
+    };
 
-    const updatePromise = this.repository.update(uuid, updateData);
-
-    return updatePromise.then(updateResult => {
-      if (updateResult.affected) {
-        return this.findOne(uuid);
-      }
-
-      throw new SqlException(updateResult.raw);
-    });
+    try {
+      return this.repository.save(updateData as any);
+    } catch (error) {
+      throw new SqlException(error.message || 'Update failed');
+    }
   }
 
   delete(uuid: string): Promise<boolean> {
@@ -103,6 +105,49 @@ export class AbstractService<T extends AbstractEntity> {
 
       return true;
     });
+  }
+
+  async findAllWhere(whereClause: any, pagination?: PageRequestDto): Promise<PageDto<T>> {
+    if (!pagination) {
+      pagination = new PageRequestDto();
+      pagination.unpaged = true;
+    }
+
+    if (!pagination.page || !pagination.limit) {
+      pagination.unpaged = true;
+    }
+
+    const page = typeof pagination.page === 'string' ? parseInt(pagination.page, 10) : pagination.page || 1;
+    const limit = typeof pagination.limit === 'string' ? parseInt(pagination.limit, 10) : pagination.limit || 10;
+    const skip = (page - 1) * limit;
+    const order = pagination.sortColumn
+      ? ({ [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC' } as any)
+      : undefined;
+
+    const findOptions = {
+      where: whereClause as any,
+      relations: this.relationships,
+      skip: pagination.unpaged ? undefined : skip,
+      take: pagination.unpaged ? undefined : limit,
+      order: order
+    };
+
+    const [data, totalCount] = await Promise.all([
+      this.repository.find(findOptions),
+      this.repository.countBy(whereClause as any)
+    ]);
+
+    const mappedData = data.map(item => ({
+      ...item,
+      id: item._id?.toString()
+    }));
+
+    return {
+      data: mappedData,
+      page: pagination.unpaged ? 1 : page,
+      limit: pagination.unpaged ? totalCount : limit,
+      totalCount
+    };
   }
 
   findAllWithQuery(

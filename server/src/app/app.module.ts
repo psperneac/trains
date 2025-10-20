@@ -15,16 +15,6 @@ import { AppService } from './app.service';
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        MYSQL_HOST: Joi.string().required(),
-        MYSQL_PORT: Joi.number().required(),
-        MYSQL_USER: Joi.string().required(),
-        MYSQL_PASSWORD: Joi.string().required(),
-        MYSQL_DB: Joi.string().required(),
-        POSTGRESQL_HOST: Joi.string().required(),
-        POSTGRESQL_PORT: Joi.number().required(),
-        POSTGRESQL_USER: Joi.string().required(),
-        POSTGRESQL_PASSWORD: Joi.string().required(),
-        POSTGRESQL_DB: Joi.string().required(),
         MONGO_USERNAME: Joi.string().required(),
         MONGO_PASSWORD: Joi.string().required(),
         MONGO_DATABASE: Joi.string().required(),

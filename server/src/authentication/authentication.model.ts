@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-import { User } from '../app/api/users/users.entity';
+import { User } from '../app/api/support/users.module';
 
 export class RegisterDto {
   @IsEmail()
@@ -21,5 +21,7 @@ export interface RequestWithUser extends Request {
 }
 
 export interface TokenPayload {
-  userId: string;
+  sub: string;  // Subject (user ID) - standard JWT claim
+  scope: string;  // User scope/role
+  userId: string;  // Keep for backward compatibility
 }
