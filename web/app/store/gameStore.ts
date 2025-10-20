@@ -63,6 +63,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ allGames: response.data });
     } catch (err: any) {
       console.error('Error fetching all games:', err);
+      set({ error: err.message || 'Unknown error' });
     }
   },
 

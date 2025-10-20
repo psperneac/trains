@@ -21,5 +21,7 @@ export interface RequestWithUser extends Request {
 }
 
 export interface TokenPayload {
-  userId: string;
+  sub: string;  // Subject (user ID) - standard JWT claim
+  scope: string;  // User scope/role
+  userId: string;  // Keep for backward compatibility
 }

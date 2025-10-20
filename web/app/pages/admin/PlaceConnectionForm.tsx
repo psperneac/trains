@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useAuthStore } from '../../store/authStore';
 import { useGameStore } from '../../store/gameStore';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
@@ -36,7 +37,7 @@ const emptyConnection: Omit<PlaceConnectionDto, 'id'> = {
   content: {},
   startId: '',
   endId: '',
-  gameId: '',
+  gameId: '', // Will be set from currentGameId
 };
 
 function FitBounds({ places }: { places: { id: string; lat: number; lng: number }[] }) {
@@ -138,25 +139,37 @@ function SearchableSelect({
 export default function PlaceConnectionForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { 
-    placeConnections, 
-    addPlaceConnection, 
-    updatePlaceConnection, 
-    fetchPlaceConnections, 
-    loading, 
-    error 
+  const {
+    allPlaceConnections,
+    addPlaceConnection,
+    updatePlaceConnection,
+    fetchPlaceConnections,
+    loading,
+    error
   } = usePlaceConnectionStore();
   const { allPlaces, fetchAllPlaces } = usePlaceStore();
   const { allGames, fetchAllGames } = useGameStore();
+  const { currentGameId } = useAuthStore();
   const isEdit = Boolean(id);
 
+  // Redirect to home if no game is selected
+  useEffect(() => {
+    if (!currentGameId) {
+      navigate('/');
+      return;
+    }
+  }, [currentGameId, navigate]);
+
   const currentConnection = useMemo(
-    () => (isEdit ? placeConnections.find((c) => c.id === id) : null),
-    [isEdit, id, placeConnections]
+    () => (isEdit ? allPlaceConnections?.find((c) => c.id === id) : null),
+    [isEdit, id, allPlaceConnections]
   );
   const fetchedRef = useRef(false);
 
-  const [form, setForm] = useState<Omit<PlaceConnectionDto, 'id'> | PlaceConnectionDto>(emptyConnection);
+  const [form, setForm] = useState<Omit<PlaceConnectionDto, 'id'> | PlaceConnectionDto>(() => ({
+    ...emptyConnection,
+    gameId: currentGameId || ''
+  }));
 
   // Fetch data
   useEffect(() => {
@@ -218,8 +231,8 @@ export default function PlaceConnectionForm() {
 
   return (
     <Layout title={isEdit ? 'Edit Place Connection' : 'Add Place Connection'}>
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md">
+      <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-11rem)]">
+        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md lg:h-full">
           <form onSubmit={handleSave} className="space-y-4">
             {isEdit && (
               <div>
@@ -294,14 +307,12 @@ export default function PlaceConnectionForm() {
               placeholder="Select end place..."
             />
 
-            <SearchableSelect
-              label="Game"
-              value={form.gameId}
-              options={gameOptions}
-              onChange={(value) => handleSelectChange('gameId', value)}
-              required
-              placeholder="Select game..."
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Game</label>
+              <div className="mt-1 block w-full rounded border border-gray-300 bg-gray-100 p-2 text-gray-700 cursor-not-allowed">
+                {gameOptions.find(g => g.id === form.gameId)?.name || 'No game selected'}
+              </div>
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Content (JSON)</label>
@@ -342,7 +353,7 @@ export default function PlaceConnectionForm() {
             </div>
           </form>
         </div>
-        <div className="flex-1 bg-white shadow rounded-lg p-6">
+        <div className="flex-1 bg-white shadow rounded-lg p-6 lg:h-full">
           <h2 className="text-lg font-semibold mb-4">Connection Preview</h2>
           <div className="h-[500px]">
             <MapContainer

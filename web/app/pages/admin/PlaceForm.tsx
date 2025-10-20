@@ -90,7 +90,7 @@ export default function PlaceForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { places, addPlace, updatePlace, fetchPlaces, loading, error } = usePlaceStore();
+  const { allPlaces, addPlace, updatePlace, fetchPlaces, loading, error } = usePlaceStore();
   const { placeTypes, fetchPlaceTypes } = usePlaceTypeStore();
   const isEdit = Boolean(id);
 
@@ -98,7 +98,7 @@ export default function PlaceForm() {
   const mapPosition = location.state?.mapPosition as { lat: number; lng: number; zoom: number } | undefined;
 
   // Memoize the current place from the store
-  const currentPlace = useMemo(() => (isEdit ? places.find((p) => p.id === id) : null), [isEdit, id, places]);
+  const currentPlace = useMemo(() => (isEdit ? allPlaces?.find((p) => p.id === id) : null), [isEdit, id, allPlaces]);
   const fetchedRef = useRef(false);
 
   const [form, setForm] = useState<Omit<PlaceDto, 'id'> | PlaceDto>(emptyPlace);
@@ -193,8 +193,8 @@ export default function PlaceForm() {
 
   return (
     <Layout title={isEdit ? 'Edit Place' : 'Add Place'}>
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md">
+      <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-11rem)]">
+        <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md lg:h-full">
           <form onSubmit={handleSave} className="space-y-4">
             {isEdit && (
               <div>
@@ -310,7 +310,7 @@ export default function PlaceForm() {
             </div>
           </form>
         </div>
-        <div className="flex-1 bg-white shadow rounded-lg p-6">
+        <div className="flex-1 bg-white shadow rounded-lg p-6 lg:h-full">
           <h2 className="text-lg font-semibold mb-4">Map Location</h2>
           <div className="h-[500px]">
             <MapContainer

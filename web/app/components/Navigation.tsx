@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 interface MenuItem {
   label: string;
@@ -43,6 +44,7 @@ export default function Navigation() {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const location = useLocation();
   const submenuRef = useRef<HTMLDivElement>(null);
+  const { currentGameId } = useAuthStore();
 
   useEffect(() => {
     if (!openSubmenu) return;
@@ -95,20 +97,31 @@ export default function Navigation() {
           {openSubmenu === item.label && (
             <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
               <div className="py-1" role="menu">
-                {item.children.map((child) => (
-                  <Link
-                    key={child.path}
-                    to={child.path!}
-                    className={`block px-4 py-1 text-sm ${
-                      location.pathname === child.path
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                    role="menuitem"
-                  >
-                    {child.label}
-                  </Link>
-                ))}
+                {item.children.map((child) => {
+                  const isDisabled = child.label === 'Place Connections' && !currentGameId;
+                  return isDisabled ? (
+                    <div
+                      key={child.path}
+                      className="block px-4 py-1 text-sm text-gray-400 cursor-not-allowed"
+                      role="menuitem"
+                    >
+                      {child.label}
+                    </div>
+                  ) : (
+                    <Link
+                      key={child.path}
+                      to={child.path!}
+                      className={`block px-4 py-1 text-sm ${
+                        location.pathname === child.path
+                          ? 'bg-gray-100 text-gray-900'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                      role="menuitem"
+                    >
+                      {child.label}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}

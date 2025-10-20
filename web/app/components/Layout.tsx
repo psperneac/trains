@@ -22,7 +22,7 @@ export default function Layout({ children, title }: LayoutProps) {
             <h1 className="text-xl font-semibold text-gray-900">Train Management</h1>
             <button
               onClick={handleLogout}
-              className="px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="px-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
               Logout
             </button>

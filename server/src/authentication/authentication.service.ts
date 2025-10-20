@@ -47,10 +47,26 @@ export class AuthenticationService {
     }
   }
 
-  public getAuthToken(userId: string) {
+  public getAuthToken(userId: string, scope: string) {
     // TODO: add expiry of max-session 15-30min
     // TODO: figure out how to refresh token when expired
-    const payload: TokenPayload = { userId };
-    return this.jwtService.sign(payload);
+    const payload: TokenPayload = {
+      sub: userId,  // Standard JWT subject claim
+      scope: scope,  // User scope/role
+      userId: userId  // Keep for backward compatibility
+    };
+    console.log('Creating JWT token with payload:', payload);
+    const token = this.jwtService.sign(payload);
+    console.log('Generated token (first 50 chars):', token.substring(0, 50) + '...');
+
+    // Decode and verify the token contains the right payload
+    try {
+      const decoded = this.jwtService.verify(token);
+      console.log('Verified token payload:', decoded);
+    } catch (error) {
+      console.error('Token verification failed:', error);
+    }
+
+    return token;
   }
 }

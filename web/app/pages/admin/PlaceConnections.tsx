@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useAuthStore } from '../../store/authStore';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
 
@@ -48,18 +49,32 @@ function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
 }
 
 export default function PlaceConnections() {
-  const { 
+  const {
     allPlaceConnections,
-    loading, 
-    error, 
-    fetchPlaceConnections, 
+    loading,
+    error,
+    fetchPlaceConnections,
     deletePlaceConnection
   } = usePlaceConnectionStore();
   const { allPlaces, fetchAllPlaces } = usePlaceStore();
+  const { currentGameId } = useAuthStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Redirect to home if no game is selected
+  useEffect(() => {
+    if (!currentGameId) {
+      navigate('/');
+      return;
+    }
+  }, [currentGameId, navigate]);
+
+  // Filter place connections by current game
+  const filteredPlaceConnections = allPlaceConnections.filter(
+    connection => connection.gameId === currentGameId
+  );
 
   useEffect(() => {
     Promise.all([
@@ -125,7 +140,7 @@ export default function PlaceConnections() {
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Place Connections ({allPlaceConnections.length})</h2>
+              <h2 className="text-lg font-semibold">Place Connections ({filteredPlaceConnections.length})</h2>
               <button
                 onClick={handleAdd}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
@@ -150,7 +165,7 @@ export default function PlaceConnections() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {allPlaceConnections.map((connection, idx) => {
+                  {filteredPlaceConnections.map((connection, idx) => {
                     const startPlace = placesById[connection.startId];
                     const endPlace = placesById[connection.endId];
                     
@@ -236,7 +251,7 @@ export default function PlaceConnections() {
               ))}
               
               {/* Draw all connections as polylines */}
-              {allPlaceConnections.map((connection, idx) => {
+              {filteredPlaceConnections.map((connection, idx) => {
                 const startPlace = placesById[connection.startId];
                 const endPlace = placesById[connection.endId];
                 
