@@ -21,6 +21,8 @@ interface AuthState {
   isAuthenticated: () => boolean;
   isAdmin: () => boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, username: string, password: string) => Promise<void>;
+  changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -85,5 +87,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       body: JSON.stringify({ email, password }),
     });
     get().setAuthToken(data.authToken);
+  },
+
+  register: async (email: string, username: string, password: string) => {
+    const data = await apiRequest<LoginResponse>('/api/authentication/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, username, password }),
+    });
+    get().setAuthToken(data.authToken);
+  },
+
+  changePassword: async (oldPassword: string, newPassword: string) => {
+    const authToken = get().authToken;
+    const requestOptions: any = {
+      method: 'POST',
+      body: JSON.stringify({ oldPassword, newPassword }),
+    };
+    if (authToken) {
+      requestOptions.authToken = authToken;
+    }
+    await apiRequest('/api/authentication/change-password', requestOptions);
   },
 })); 

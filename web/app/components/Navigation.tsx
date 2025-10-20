@@ -38,6 +38,15 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
+  {
+    label: 'Settings',
+    children: [
+      {
+        label: 'Change Password',
+        path: '/settings/change-password',
+      },
+    ],
+  },
 ];
 
 export default function Navigation() {

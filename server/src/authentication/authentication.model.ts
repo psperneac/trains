@@ -16,6 +16,17 @@ export class RegisterDto {
   password: string;
 }
 
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  oldPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(7)
+  newPassword: string;
+}
+
 export interface RequestWithUser extends Request {
   user: User;
 }

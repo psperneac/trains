@@ -28,6 +28,18 @@ export class AuthenticationService {
     return createdUser;
   }
 
+  public async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<void> {
+    try {
+      const user = await this.usersService.getById(userId);
+      await this.verifyPassword(oldPassword, user.password);
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await this.usersService.replace(userId, { ...user, password: hashedNewPassword });
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException('Failed to change password. Please check your old password.', HttpStatus.BAD_REQUEST);
+    }
+  }
+
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.usersService.getByEmail(email);

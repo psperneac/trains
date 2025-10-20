@@ -1,6 +1,8 @@
 import ProtectedRoute from "../components/ProtectedRoute";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
+import ChangePassword from "../pages/ChangePassword";
 import GameForm from "../pages/admin/GameForm";
 import Games from "../pages/admin/Games";
 import PlaceConnectionForm from "../pages/admin/PlaceConnectionForm";
@@ -14,6 +16,18 @@ export const routes = [
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/settings/change-password",
+    element: (
+      <ProtectedRoute>
+        <ChangePassword />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/",

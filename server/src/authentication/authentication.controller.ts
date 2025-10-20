@@ -18,7 +18,7 @@ import { Response } from 'express';
 import { AllExceptionsFilter } from '../utils/all-exceptions.filter';
 
 import { LocalAuthenticationGuard, LoggedIn } from './authentication.guard';
-import { RegisterDto, RequestWithUser } from './authentication.model';
+import { RegisterDto, ChangePasswordDto, RequestWithUser } from './authentication.model';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('authentication')
@@ -52,6 +52,19 @@ export class AuthenticationController {
   async register(@Body() registrationData: RegisterDto, @Res() response: Response) {
     const created = await this.authenticationService.register(registrationData);
     return response.status(HttpStatus.CREATED).send({ ...created });
+  }
+
+  /**
+   * Changes the password of the authenticated user
+   * @param changePasswordData old and new password details
+   * @param request authenticated user request
+   * @param response success or error response
+   */
+  @UseGuards(LoggedIn)
+  @Post('change-password')
+  async changePassword(@Body() changePasswordData: ChangePasswordDto, @Req() request: RequestWithUser, @Res() response: Response) {
+    await this.authenticationService.changePassword(request.user._id.toString(), changePasswordData.oldPassword, changePasswordData.newPassword);
+    return response.status(HttpStatus.OK).send({ message: 'Password changed successfully' });
   }
 
   @HttpCode(200)

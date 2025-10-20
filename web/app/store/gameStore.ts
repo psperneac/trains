@@ -67,7 +67,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  addGame: async (game) => {
+  addGame: async (game: Omit<GameDto, 'id'>) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -86,7 +86,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  updateGame: async (game) => {
+  updateGame: async (game: GameDto) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -105,7 +105,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  deleteGame: async (id) => {
+  deleteGame: async (id: string) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
