@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { User, UsersService } from '../app/api/support/users.module';
+import { UserDto, UsersService } from '../app/api/support/users.module';
 import { SCOPE_USER } from '../utils/constants';
 
 import { RegisterDto, TokenPayload } from './authentication.model';
@@ -16,7 +16,7 @@ export class AuthenticationService {
     private readonly jwtService: JwtService
   ) {}
 
-  public async register(registrationData: RegisterDto): Promise<User> {
+  public async register(registrationData: RegisterDto): Promise<UserDto> {
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
     const createdUser = await this.usersService.create({
       ...registrationData,
@@ -24,7 +24,6 @@ export class AuthenticationService {
       scope: SCOPE_USER
     });
 
-    createdUser.password = undefined;
     return createdUser;
   }
 

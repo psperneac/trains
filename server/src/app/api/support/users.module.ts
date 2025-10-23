@@ -18,15 +18,35 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 import { Admin, LoggedIn } from 'src/authentication/authentication.guard';
-import { CreateUserDto, UpdateUserDto } from 'src/models/user.model';
-import { AbstractEntity } from 'src/utils/abstract.entity';
 import { AllExceptionsFilter } from 'src/utils/all-exceptions.filter';
 import { Column, Entity, Repository } from 'typeorm';
+import { AbstractEntity } from '../../../utils/abstract.entity';
+
+
+export class CreateUserDto {
+  email: string;
+  username: string;
+  password: string;
+  scope: string;
+}
+
+export class UpdateUserDto {
+  email: string;
+  username: string;
+  password: string;
+  scope: string;
+}
 
 export class UserPreference {
   @Column({ type: 'json' })
   @Expose()
   content: any;
+}
+
+export class UserWallet {
+  @Column()
+  @Expose()
+  gems: number;
 }
 
 export interface UserPreferenceDto {
@@ -35,33 +55,71 @@ export interface UserPreferenceDto {
   content: any;
 }
 
+export interface UserWalletDto {
+  id: string;
+  userId: string;
+  gems: number;
+}
+
+export class UserDto {
+  public username: string;
+  public email: string;
+  public scope: string;
+  public preferences?: UserPreference;
+  public wallet?: UserWallet;
+}
+
 @Entity({ name: 'users' })
 export class User extends AbstractEntity {
   @Column()
-  @Expose()
   public username: string;
 
   @Column()
   public password: string;
 
   @Column()
-  @Expose()
   public email: string;
 
   @Column()
-  @Expose()
   public scope: string;
 
-  @Column()
-  @Expose()
+  @Column({ type: 'json' })
   public preferences?: UserPreference;
+
+  @Column({ type: 'json' })
+  public wallet?: UserWallet;
+}
+
+@Injectable()
+class UserDtoMapper {
+  toDto(user: User): UserDto {
+    const userDto = new UserDto();
+    userDto.email = user.email;
+    userDto.username = user.username;
+    userDto.scope = user.scope;
+    userDto.preferences = user.preferences;
+    userDto.wallet = user.wallet;
+    return userDto;
+  }
+
+  toEntity(userDto: UserDto, user?: User): User {
+    const userEntity = user || new User();
+    userEntity.email = userDto.email;
+    userEntity.username = userDto.username;
+    userEntity.scope = userDto.scope;
+    userEntity.preferences = userDto.preferences;
+    // wallet is removed when mapping from DTO to model
+    userEntity.wallet = undefined;
+    return userEntity;
+  }
 }
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>
+    private usersRepository: Repository<User>,
+    private userDtoMapper: UserDtoMapper
   ) {}
 
   getAll() {
@@ -79,27 +137,25 @@ export class UsersService {
   async getById(userId: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ _id: new Types.ObjectId(userId) });
     if (user) {
-      console.log('user', user);
-      console.log('user._id', user._id);
       return user;
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async create(userData: CreateUserDto): Promise<User> {
+  async create(userData: CreateUserDto): Promise<UserDto> {
     const newUser = this.usersRepository.create({
       _id: new Types.ObjectId(),
-      ...userData
+      ...this.userDtoMapper.toEntity(userData as UserDto)
     });
     await this.usersRepository.save(newUser);
-    return newUser;
+    return this.userDtoMapper.toDto(newUser);
   }
 
-  async replace(uuid: string, user: UpdateUserDto): Promise<User> {
-    await this.usersRepository.update(uuid, user);
+  async replace(uuid: string, user: UpdateUserDto): Promise<UserDto> {
+    await this.usersRepository.update(uuid, this.userDtoMapper.toEntity(user as UserDto));
     const updatedUser = await this.usersRepository.findOne({ where: { _id: new Types.ObjectId(uuid) } });
     if (updatedUser) {
-      return updatedUser;
+      return this.userDtoMapper.toDto(updatedUser);
     }
 
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -156,9 +212,11 @@ export class UsersController {
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [
+    TypeOrmModule.forFeature([User])
+  ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, UserDtoMapper],
   exports: [UsersService]
 })
 export class UsersModule {}

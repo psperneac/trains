@@ -3,18 +3,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { Game } from 'src/app/api/games.module';
+import { Job } from 'src/app/api/jobs.module';
+import { PlaceConnection } from 'src/app/api/place-connection.module';
+import { PlaceInstance } from 'src/app/api/place-instance.module';
+import { Place } from 'src/app/api/places.module';
+import { Player } from 'src/app/api/support/players.module';
+import { VehicleInstance } from 'src/app/api/vehicle-instances.module';
+import { Vehicle } from 'src/app/api/vehicles.module';
 import { Translation } from '../app/api/support/translations.module';
 import { User } from '../app/api/support/users.module';
 import { environment } from '../environments/environment';
-import { Game } from 'src/app/api/games.module';
-import { Place } from 'src/app/api/places.module';
-import { Vehicle } from 'src/app/api/vehicles.module';
-import { PlaceConnection } from 'src/app/api/place-connection.module';
-import { PlaceInstance } from 'src/app/api/place-instance.module';
-import { VehicleInstance } from 'src/app/api/vehicle-instances.module';
-import { Job } from 'src/app/api/jobs.module';
-import { Player } from 'src/app/api/support/players.module';
-import { Wallet } from 'src/app/api/support/wallets.module';
 
 export const TABLES = {
   USERS: 'users',
@@ -36,8 +35,6 @@ export const TABLES = {
   MAP_PLACES: 'map_places',
   MAP_PLACE_CONNECTIONS: 'map_place_connections',
   PLAYERS: 'players',
-  USER_PREFERENCES: 'user_preferences',
-  WALLETS: 'wallets'
 };
 
 export const ENTITIES = [
@@ -51,7 +48,6 @@ export const ENTITIES = [
   VehicleInstance,
   Job,
   Player,
-  Wallet,
 ];
 
 @Module({

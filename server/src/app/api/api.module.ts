@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common';
 
+import { GamesModule } from './games.module';
 import { JobsModule } from './jobs.module';
-import { PlaceInstancesModule } from './place-instance.module';
 import { PlaceConnectionsModule } from './place-connection.module';
+import { PlaceInstancesModule } from './place-instance.module';
 import { PlaceTypeModule } from './place-type.module';
 import { PlacesModule } from './places.module';
 import { PostsModule } from './posts/posts.module';
+import { PlayersModule } from './support/players.module';
 import { TranslationsModule } from './support/translations.module';
 import { UsersModule } from './support/users.module';
 import { VehicleTypesModule } from './vehicle-types.module';
 import { VehiclesModule } from './vehicles.module';
-import { GamesModule } from './games.module';
-import { PlayersModule } from './support/players.module';
-import { WalletsModule } from './support/wallets.module';
 
 @Module({
   imports: [
@@ -27,8 +26,7 @@ import { WalletsModule } from './support/wallets.module';
     PlaceInstancesModule,
     PlayersModule,
     JobsModule,
-    GamesModule,
-    WalletsModule
+    GamesModule
   ]
 })
 export class ApiModule {}

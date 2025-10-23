@@ -1,18 +1,41 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, ObjectId } from 'typeorm';
 
+import { Types } from 'mongoose';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
-import { PlaceInstance } from '../place-instance.module';
-import { User, UsersModule, UsersService } from './users.module';
-import { VehicleInstance } from '../vehicle-instances.module';
-import { Wallet } from './wallets.module';
+
+export class Wallet {
+  @Column('integer')
+  @Expose()
+  gold = 0;
+
+  @Column('integer')
+  @Expose()
+  gems = 0;
+
+  @Column('integer')
+  @Expose()
+  parts = 0;
+
+  @Column({ type: 'json' })
+  @Expose()
+  content: any;
+}
+
+export interface WalletDto {
+  id: string;
+  gold: number;
+  gems: number;
+  parts: number;
+  content: any;
+}
 
 @Entity({ name: 'players' })
 export class Player extends AbstractEntity {
@@ -24,19 +47,17 @@ export class Player extends AbstractEntity {
   @Expose()
   description: string;
 
-  @Column()
-  userId: string;
-
-  @OneToMany(_type => VehicleInstance, vehicleInstance => vehicleInstance.playerId)
+  @Column('objectId')
   @Expose()
-  vehicles: VehicleInstance[];
+  userId: ObjectId;
 
-  @OneToMany(_type => PlaceInstance, placeInstance => placeInstance.playerId)
+  @Column('objectId')
   @Expose()
-  places: PlaceInstance[];
+  gameId: ObjectId;
 
-  @Column()
-  walletId: string;
+  @Column('objectId')
+  @Expose()
+  walletId: ObjectId;
 
   @Column({ type: 'json' })
   @Expose()
@@ -47,17 +68,16 @@ export interface PlayerDto {
   id: string;
   name: string;
   description: string;
-  walletId: string;
   userId: string;
-  vehicles: string[];
-  places: string[];
+  gameId: string;
+  walletId: string;
   content: any;
 }
 
 @Injectable()
 export class PlayerRepository extends RepositoryAccessor<Player> {
   constructor(@InjectRepository(Player) injectedRepo) {
-    super(injectedRepo, ['user', 'vehicles', 'places']);
+    super(injectedRepo);
   }
 }
 
@@ -84,10 +104,9 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       id: domain._id.toString(),
       name: domain.name,
       description: domain.description,
-      userId: domain.userId,
-      walletId: domain.walletId,
-      vehicles: domain.vehicles?.map(v => v._id.toString()),
-      places: domain.places?.map(p => p._id.toString()),
+      userId: domain.userId.toString(),
+      gameId: domain.gameId?.toString(),
+      walletId: domain.walletId.toString(),
       content: domain.content
     };
 
@@ -107,7 +126,9 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       ...domain,
       name: dto.name,
       description: dto.description,
-      userId: dto.userId,
+      userId: dto.userId ? new Types.ObjectId(dto.userId) : domain?.userId,
+      gameId: dto.gameId ? new Types.ObjectId(dto.gameId) : domain?.gameId,
+      walletId: dto.walletId ? new Types.ObjectId(dto.walletId) : domain?.walletId,
     } as Player;
   }
 }
@@ -121,7 +142,7 @@ export class PlayerController extends AbstractServiceController<Player, PlayerDt
 }
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([Player])],
+  imports: [TypeOrmModule.forFeature([Player])],
   controllers: [PlayerController],
   providers: [PlayersService, PlayerMapper, PlayerRepository],
   exports: [PlayersService]

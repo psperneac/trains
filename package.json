@@ -6,5 +6,10 @@
     "web-start": "npm --prefix ./web run dev",
     "start:local": "npm --prefix ./server run start:local",
     "start:k8s": "npm --prefix ./server run start:k8s"
+  },
+  "dependencies": {
+    "@automapper/classes": "^8.8.1",
+    "@automapper/core": "^8.8.1",
+    "@automapper/nestjs": "^8.8.1"
   }
 }
