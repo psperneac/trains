@@ -1,81 +1,79 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import GameSelect from '../components/GameSelect';
 import Layout from '../components/Layout';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
-import type { GameDto } from '../types/game';
+import { usePlayersStore } from '../store/playersStore';
+import { useRootStore } from '../store/rootStore';
 
 export default function Home() {
-  const { allGames: games, fetchAllGames, loading, error } = useGameStore();
-  const { currentGameId, setCurrentGame, isAdmin } = useAuthStore();
-  const [selectedGameId, setSelectedGameId] = useState<string>('');
+  const { allGames: games, fetchAllGames } = useGameStore();
+  const { isAdmin, userId } = useAuthStore();
+  const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
+  const navigate = useNavigate();
+  
+  // Initialize root store for unified Redux DevTools view
+  useRootStore();
 
+  // Force initialization of stores for Redux DevTools
   useEffect(() => {
     fetchAllGames();
-  }, [fetchAllGames]);
+    // Force players store to initialize if user exists
+    if (userId) {
+      fetchPlayersByUserId(userId);
+    }
+  }, [fetchAllGames, fetchPlayersByUserId, userId]);
 
   useEffect(() => {
-    setSelectedGameId(currentGameId || '');
-  }, [currentGameId]);
+    if (userId && !isAdmin()) {
+      fetchPlayersByUserId(userId);
+    }
+  }, [userId, fetchPlayersByUserId, isAdmin]);
 
-  const handleGameChange = (gameId: string) => {
-    setSelectedGameId(gameId);
-    setCurrentGame(gameId || null);
+  const handleNavigateToGames = () => {
+    navigate('/games');
   };
 
-  const selectedGame = games.find(game => game.id === selectedGameId);
+  // Check if user has any players (for regular users)
+  const hasPlayers = players.length > 0;
+
+  // Check if there are games the user hasn't joined (for regular users)
+  const availableGamesToJoin = games.filter(game => game.type === 'GAME');
+  const hasUnjoinedGames = !isAdmin() && availableGamesToJoin.some(game => 
+    !players.some(player => player.gameId === game.id)
+  );
 
   return (
     <Layout title="Home">
       <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm border">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Current Game</h2>
 
-
-        {loading && (
-          <div className="mb-4 text-sm text-gray-600">Loading games...</div>
-        )}
-
-        {error && (
-          <div className="mb-4 text-sm text-red-600">Error loading games: {error}</div>
-        )}
-
-
-
         <div className="space-y-4">
-          <div>
-            <label htmlFor="game-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Current Game
-            </label>
-            <select
-              id="game-select"
-              value={selectedGameId}
-              onChange={(e) => handleGameChange(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="">
-                {isAdmin() ? 'Select a game or template...' : 'Select a game...'}
-              </option>
-              {games
-                .filter(game => isAdmin() || game.type === 'GAME') // Admins see all, users see only games
-                .map((game: GameDto) => (
-                  <option key={game.id} value={game.id}>
-                    {game.name} {game.type === 'TEMPLATE' ? '(Template)' : ''}
-                  </option>
-                ))}
-            </select>
-          </div>
+          <GameSelect />
 
-          {selectedGame && (
-            <div className="bg-gray-50 p-4 rounded-md">
-              <h3 className="font-medium text-gray-900 mb-2">{selectedGame.name}</h3>
-              <p className="text-sm text-gray-600">{selectedGame.description}</p>
+          {/* Show "Join Games" button for users with unjoined games */}
+          {hasUnjoinedGames && !playersLoading && (
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-4">
+                {hasPlayers 
+                  ? "There are more games available to join!" 
+                  : "You haven't joined any games yet. Join a game to start playing!"
+                }
+              </p>
+              <button
+                onClick={handleNavigateToGames}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+              >
+                Join Games
+              </button>
             </div>
           )}
 
-          {!selectedGame && (
-            <div className="bg-yellow-50 p-4 rounded-md">
-              <p className="text-sm text-yellow-800">
-                Please select {isAdmin() ? 'a game or template' : 'a game'} to access Place Connections.
-              </p>
+          {/* Show loading state for players */}
+          {!isAdmin() && playersLoading && (
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Loading your players...</p>
             </div>
           )}
         </div>

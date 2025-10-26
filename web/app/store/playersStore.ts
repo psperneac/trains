@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import { DEFAULT_PAGE_SIZE } from '../constants/pagination';
 import type { PlayerDto } from '../types/player';
@@ -22,7 +23,9 @@ interface PlayersState {
   deletePlayer: (id: string) => Promise<void>;
 }
 
-export const usePlayersStore = create<PlayersState>((set, get) => ({
+export const usePlayersStore = create<PlayersState>()(
+  devtools(
+    (set, get) => ({
   players: [],
   allPlayers: [],
 
@@ -144,4 +147,10 @@ export const usePlayersStore = create<PlayersState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-}));
+    }),
+    {
+      name: 'players-store', // Name for Redux DevTools
+      enabled: process.env.NODE_ENV === 'development', // Only enable in development
+    }
+  )
+);

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { VehicleTypeDto } from '../types/vehicleType';
 import { useAuthStore } from './authStore';
@@ -13,7 +14,9 @@ interface VehicleTypeState {
   fetchVehicleTypes: () => Promise<void>;
 }
 
-export const useVehicleTypeStore = create<VehicleTypeState>((set) => ({
+export const useVehicleTypeStore = create<VehicleTypeState>()(
+  devtools(
+    (set) => ({
   vehicleTypes: [],
   loading: false,
   error: null,
@@ -37,4 +40,10 @@ export const useVehicleTypeStore = create<VehicleTypeState>((set) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-})); 
+    }),
+    {
+      name: 'vehicle-types-store',
+      enabled: process.env.NODE_ENV === 'development',
+    }
+  )
+); 

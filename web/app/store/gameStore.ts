@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import { DEFAULT_PAGE_SIZE } from '../constants/pagination';
 import type { GameDto } from '../types/game';
@@ -21,7 +22,9 @@ interface GameState {
   deleteGame: (id: string) => Promise<void>;
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+export const useGameStore = create<GameState>()(
+  devtools(
+    (set, get) => ({
   games: [],
   allGames: [],
 
@@ -122,4 +125,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-}));
+    }),
+    {
+      name: 'game-store', // Name for Redux DevTools
+      enabled: process.env.NODE_ENV === 'development', // Only enable in development
+    }
+  )
+);

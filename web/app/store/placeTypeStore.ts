@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { PlaceTypeDto } from '../types/placeType';
 import { useAuthStore } from './authStore';
@@ -13,7 +14,9 @@ interface PlaceTypeState {
   fetchPlaceTypes: () => Promise<void>;
 }
 
-export const usePlaceTypeStore = create<PlaceTypeState>((set) => ({
+export const usePlaceTypeStore = create<PlaceTypeState>()(
+  devtools(
+    (set) => ({
   placeTypes: [],
   loading: false,
   error: null,
@@ -37,4 +40,10 @@ export const usePlaceTypeStore = create<PlaceTypeState>((set) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-})); 
+    }),
+    {
+      name: 'place-types-store',
+      enabled: process.env.NODE_ENV === 'development',
+    }
+  )
+); 

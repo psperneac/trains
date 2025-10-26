@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { PlaceConnectionDto } from '../types/placeConnection';
 import { useAuthStore } from './authStore';
@@ -16,7 +17,9 @@ interface PlaceConnectionState {
   deletePlaceConnection: (id: string) => Promise<void>;
 }
 
-export const usePlaceConnectionStore = create<PlaceConnectionState>((set, get) => ({
+export const usePlaceConnectionStore = create<PlaceConnectionState>()(
+  devtools(
+    (set, get) => ({
   allPlaceConnections: [],
   
   loading: false,
@@ -104,5 +107,11 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>((set, get) =
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-}));
+    }),
+    {
+      name: 'place-connections-store',
+      enabled: process.env.NODE_ENV === 'development',
+    }
+  )
+);
 

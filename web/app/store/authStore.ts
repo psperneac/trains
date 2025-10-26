@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
+import type { GameDto } from '../types/game';
 
 interface LoginResponse {
   _id: string;
@@ -16,8 +18,9 @@ interface AuthState {
   userId: string | null;
   userScope: string | null;
   currentGameId: string | null;
+  currentGame: GameDto | null;
   setAuthToken: (token: string | null) => void;
-  setCurrentGame: (gameId: string | null) => void;
+  setCurrentGame: (game: GameDto | null) => void;
   isAuthenticated: () => boolean;
   isAdmin: () => boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -25,11 +28,14 @@ interface AuthState {
   changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>()(
+  devtools(
+    (set, get) => ({
   authToken: null,
   userId: null,
   userScope: null,
   currentGameId: null,
+  currentGame: null,
 
   setAuthToken: (token) => {
     if (token) {
@@ -48,9 +54,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
 
         // Load current game from localStorage
-        const storedGameId = localStorage.getItem(`currentGame_${userId}`);
-        if (storedGameId) {
-          set({ currentGameId: storedGameId });
+        const storageKey = `currentGame_${userId}`;
+        const storedGame = localStorage.getItem(storageKey);
+        if (storedGame) {
+          try {
+            const game = JSON.parse(storedGame) as GameDto;
+            set({ currentGameId: game.id, currentGame: game });
+          } catch (error) {
+            console.error('Failed to parse stored game:', error);
+            // Clear invalid stored game
+            localStorage.removeItem(storageKey);
+          }
         }
       } catch (error) {
         console.error('Failed to parse auth token:', error);
@@ -58,20 +72,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
     } else {
       // Clear current game when logging out
-      set({ authToken: null, userId: null, userScope: null, currentGameId: null });
+      set({ authToken: null, userId: null, userScope: null, currentGameId: null, currentGame: null });
     }
   },
 
-  setCurrentGame: (gameId) => {
+  setCurrentGame: (game) => {
     const userId = get().userId;
-    if (userId && gameId) {
+    if (userId && game) {
       const storageKey = `currentGame_${userId}`;
-      localStorage.setItem(storageKey, gameId);
-    } else if (userId && !gameId) {
+      localStorage.setItem(storageKey, JSON.stringify(game));
+      set({ currentGameId: game.id, currentGame: game });
+    } else if (userId && !game) {
       const storageKey = `currentGame_${userId}`;
       localStorage.removeItem(storageKey);
+      set({ currentGameId: null, currentGame: null });
     }
-    set({ currentGameId: gameId });
   },
 
   isAuthenticated: () => !!get().authToken,
@@ -108,4 +123,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     await apiRequest('/api/authentication/change-password', requestOptions);
   },
-})); 
+    }),
+    {
+      name: 'auth-store', // Name for Redux DevTools
+      enabled: process.env.NODE_ENV === 'development', // Only enable in development
+    }
+  )
+); 

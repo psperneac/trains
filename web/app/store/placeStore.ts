@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { PlaceDto } from '../types/place';
 import { useAuthStore } from './authStore';
@@ -16,7 +17,9 @@ interface PlaceState {
   deletePlace: (id: string) => Promise<void>;
 }
 
-export const usePlaceStore = create<PlaceState>((set, get) => ({
+export const usePlaceStore = create<PlaceState>()(
+  devtools(
+    (set, get) => ({
   allPlaces: [],
   
   loading: false,
@@ -91,4 +94,10 @@ export const usePlaceStore = create<PlaceState>((set, get) => ({
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
-}));
+    }),
+    {
+      name: 'places-store',
+      enabled: process.env.NODE_ENV === 'development',
+    }
+  )
+);
