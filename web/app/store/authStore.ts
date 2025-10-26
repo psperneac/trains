@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { GameDto } from '../types/game';
+import type { PlayerDto } from '../types/player';
 
 interface LoginResponse {
   _id: string;
@@ -19,8 +20,11 @@ interface AuthState {
   userScope: string | null;
   currentGameId: string | null;
   currentGame: GameDto | null;
+  currentPlayerId: string | null;
+  currentPlayer: PlayerDto | null;
   setAuthToken: (token: string | null) => void;
   setCurrentGame: (game: GameDto | null) => void;
+  setCurrentPlayer: (player: PlayerDto | null) => void;
   isAuthenticated: () => boolean;
   isAdmin: () => boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -36,6 +40,8 @@ export const useAuthStore = create<AuthState>()(
   userScope: null,
   currentGameId: null,
   currentGame: null,
+  currentPlayerId: null,
+  currentPlayer: null,
 
   setAuthToken: (token) => {
     if (token) {
@@ -59,12 +65,32 @@ export const useAuthStore = create<AuthState>()(
         if (storedGame) {
           try {
             const game = JSON.parse(storedGame) as GameDto;
-            set({ currentGameId: game.id, currentGame: game });
+            // Use setCurrentGame to trigger Redux DevTools action
+            get().setCurrentGame(game);
           } catch (error) {
             console.error('Failed to parse stored game:', error);
             // Clear invalid stored game
             localStorage.removeItem(storageKey);
           }
+        }
+
+        // Load current player from localStorage
+        const playerStorageKey = `currentPlayer_${userId}`;
+        const storedPlayer = localStorage.getItem(playerStorageKey);
+        if (storedPlayer) {
+          try {
+            const player = JSON.parse(storedPlayer) as PlayerDto;
+            // Use setCurrentPlayer to trigger Redux DevTools action
+            get().setCurrentPlayer(player);
+          } catch (error) {
+            console.error('Failed to parse stored player:', error);
+            // Clear invalid stored player
+            localStorage.removeItem(playerStorageKey);
+          }
+        } else {
+          // No player in localStorage, but we might have a game selected
+          // We'll need to find the player for the current game from the players list
+          // This will be handled by the Home component after players are loaded
         }
       } catch (error) {
         console.error('Failed to parse auth token:', error);
@@ -72,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
       }
     } else {
       // Clear current game when logging out
-      set({ authToken: null, userId: null, userScope: null, currentGameId: null, currentGame: null });
+      set({ authToken: null, userId: null, userScope: null, currentGameId: null, currentGame: null, currentPlayerId: null, currentPlayer: null });
     }
   },
 
@@ -86,6 +112,22 @@ export const useAuthStore = create<AuthState>()(
       const storageKey = `currentGame_${userId}`;
       localStorage.removeItem(storageKey);
       set({ currentGameId: null, currentGame: null });
+    }
+  },
+
+  setCurrentPlayer: (player) => {
+    const userId = get().userId;
+    console.log('setCurrentPlayer called:', { player, userId });
+    if (userId && player) {
+      const storageKey = `currentPlayer_${userId}`;
+      localStorage.setItem(storageKey, JSON.stringify(player));
+      console.log('Player saved to localStorage:', storageKey);
+      set({ currentPlayerId: player.id, currentPlayer: player });
+    } else if (userId && !player) {
+      const storageKey = `currentPlayer_${userId}`;
+      localStorage.removeItem(storageKey);
+      console.log('Player removed from localStorage:', storageKey);
+      set({ currentPlayerId: null, currentPlayer: null });
     }
   },
 

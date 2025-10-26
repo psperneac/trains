@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import { usePlayersStore } from '../store/playersStore';
@@ -10,9 +10,8 @@ interface GameSelectProps {
 
 export default function GameSelect({ onGameChange }: GameSelectProps) {
   const { allGames: games, fetchAllGames, loading, error } = useGameStore();
-  const { currentGameId, currentGame, setCurrentGame, isAdmin, userId } = useAuthStore();
+  const { currentGameId, currentGame, currentPlayer, setCurrentGame, setCurrentPlayer, isAdmin, userId } = useAuthStore();
   const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
-  const [selectedGameId, setSelectedGameId] = useState<string>('');
 
   useEffect(() => {
     fetchAllGames();
@@ -24,14 +23,18 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
     }
   }, [userId, fetchPlayersByUserId, isAdmin]);
 
-  useEffect(() => {
-    setSelectedGameId(currentGameId || '');
-  }, [currentGameId]);
-
   const handleGameChange = (gameId: string) => {
-    setSelectedGameId(gameId);
     const selectedGame = games.find(game => game.id === gameId);
     setCurrentGame(selectedGame || null);
+    
+    // Set current player for the selected game
+    if (selectedGame && players.length > 0) {
+      const playerForGame = players.find(player => player.gameId === gameId);
+      setCurrentPlayer(playerForGame || null);
+    } else {
+      setCurrentPlayer(null);
+    }
+    
     onGameChange?.(selectedGame || null);
   };
 
@@ -64,7 +67,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
           </label>
           <select
             id="game-select"
-            value={selectedGameId}
+            value={currentGameId || ''}
             onChange={(e) => handleGameChange(e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
@@ -93,6 +96,17 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
         <div className="bg-gray-50 p-4 rounded-md">
           <h3 className="font-medium text-gray-900 mb-2">{selectedGame.name}</h3>
           <p className="text-sm text-gray-600 mb-3">{selectedGame.description}</p>
+          
+          {currentPlayer && (
+            <div className="mb-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <p className="text-sm font-medium text-blue-900">Your Player:</p>
+              <p className="text-sm text-blue-700">{currentPlayer.name}</p>
+              {currentPlayer.description && (
+                <p className="text-xs text-blue-600 mt-1">{currentPlayer.description}</p>
+              )}
+            </div>
+          )}
+          
           <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded">
             Play {selectedGame.name}
           </button>

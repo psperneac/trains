@@ -9,7 +9,7 @@ import { useRootStore } from '../store/rootStore';
 
 export default function Home() {
   const { allGames: games, fetchAllGames } = useGameStore();
-  const { isAdmin, userId } = useAuthStore();
+  const { isAdmin, userId, currentGameId, currentPlayer, setCurrentPlayer } = useAuthStore();
   const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
   const navigate = useNavigate();
   
@@ -25,11 +25,30 @@ export default function Home() {
     }
   }, [fetchAllGames, fetchPlayersByUserId, userId]);
 
+  // Set current player when game changes or when players are loaded
   useEffect(() => {
-    if (userId && !isAdmin()) {
-      fetchPlayersByUserId(userId);
+    if (currentGameId && players.length > 0) {
+      const playerForCurrentGame = players.find(player => player.gameId === currentGameId);
+      if (playerForCurrentGame) {
+        setCurrentPlayer(playerForCurrentGame);
+      } else {
+        setCurrentPlayer(null);
+      }
+    } else if (!currentGameId) {
+      setCurrentPlayer(null);
     }
-  }, [userId, fetchPlayersByUserId, isAdmin]);
+  }, [currentGameId, players, setCurrentPlayer]);
+
+  // Smart player selection: if we have a game but no current player, find and set it
+  useEffect(() => {
+    if (currentGameId && !currentPlayer && players.length > 0) {
+      const playerForCurrentGame = players.find(player => player.gameId === currentGameId);
+      if (playerForCurrentGame) {
+        setCurrentPlayer(playerForCurrentGame);
+      }
+    }
+  }, [currentGameId, currentPlayer, players, setCurrentPlayer]);
+
 
   const handleNavigateToGames = () => {
     navigate('/games');
