@@ -11,6 +11,7 @@ import { Place } from 'src/app/api/places.module';
 import { Player } from 'src/app/api/support/players.module';
 import { VehicleInstance } from 'src/app/api/vehicle-instances.module';
 import { Vehicle } from 'src/app/api/vehicles.module';
+import { Transaction } from '../app/api/support/transactions.module';
 import { Translation } from '../app/api/support/translations.module';
 import { User } from '../app/api/support/users.module';
 import { environment } from '../environments/environment';
@@ -48,6 +49,7 @@ export const ENTITIES = [
   VehicleInstance,
   Job,
   Player,
+  Transaction
 ];
 
 @Module({

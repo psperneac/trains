@@ -51,6 +51,14 @@ export default function Navigation() {
           label: 'Games',
           path: '/admin/games',
         },
+        {
+          label: 'Players',
+          path: '/admin/players',
+        },
+        {
+          label: 'Transactions',
+          path: '/admin/transactions',
+        },
       ],
     },
   ];

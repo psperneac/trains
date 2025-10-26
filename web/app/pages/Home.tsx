@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import GameInfoCard from '../components/GameInfoCard';
 import GameSelect from '../components/GameSelect';
 import Layout from '../components/Layout';
 import { useAuthStore } from '../store/authStore';
@@ -8,10 +8,9 @@ import { usePlayersStore } from '../store/playersStore';
 import { useRootStore } from '../store/rootStore';
 
 export default function Home() {
-  const { allGames: games, fetchAllGames } = useGameStore();
-  const { isAdmin, userId, currentGameId, currentPlayer, setCurrentPlayer } = useAuthStore();
-  const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
-  const navigate = useNavigate();
+  const { fetchAllGames } = useGameStore();
+  const { userId, currentGameId, currentGame, currentPlayer, setCurrentPlayer } = useAuthStore();
+  const { players, fetchPlayersByUserId } = usePlayersStore();
   
   // Initialize root store for unified Redux DevTools view
   useRootStore();
@@ -49,52 +48,21 @@ export default function Home() {
     }
   }, [currentGameId, currentPlayer, players, setCurrentPlayer]);
 
-
-  const handleNavigateToGames = () => {
-    navigate('/games');
-  };
-
-  // Check if user has any players (for regular users)
-  const hasPlayers = players.length > 0;
-
-  // Check if there are games the user hasn't joined (for regular users)
-  const availableGamesToJoin = games.filter(game => game.type === 'GAME');
-  const hasUnjoinedGames = !isAdmin() && availableGamesToJoin.some(game => 
-    !players.some(player => player.gameId === game.id)
-  );
-
   return (
     <Layout title="Home">
-      <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm border">
+      <div className="max-w-4xl mx-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Current Game</h2>
 
-        <div className="space-y-4">
-          <GameSelect />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Game Selection Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <GameSelect />
+          </div>
 
-          {/* Show "Join Games" button for users with unjoined games */}
-          {hasUnjoinedGames && !playersLoading && (
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
-                {hasPlayers 
-                  ? "There are more games available to join!" 
-                  : "You haven't joined any games yet. Join a game to start playing!"
-                }
-              </p>
-              <button
-                onClick={handleNavigateToGames}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
-              >
-                Join Games
-              </button>
-            </div>
-          )}
-
-          {/* Show loading state for players */}
-          {!isAdmin() && playersLoading && (
-            <div className="text-center">
-              <p className="text-sm text-gray-600">Loading your players...</p>
-            </div>
-          )}
+          {/* Game Info Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <GameInfoCard game={currentGame} />
+          </div>
         </div>
       </div>
     </Layout>

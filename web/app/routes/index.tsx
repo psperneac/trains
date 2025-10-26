@@ -11,6 +11,8 @@ import PlaceConnections from "../pages/admin/PlaceConnections";
 import PlaceForm from "../pages/admin/PlaceForm";
 import PlaceTypes from "../pages/admin/PlaceTypes";
 import Places from "../pages/admin/Places";
+import Players from "../pages/admin/Players";
+import Transactions from "../pages/admin/Transactions";
 import VehicleTypes from "../pages/admin/VehicleTypes";
 
 export const routes = [
@@ -131,6 +133,22 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <GameForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/players",
+    element: (
+      <ProtectedRoute>
+        <Players />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/transactions",
+    element: (
+      <ProtectedRoute>
+        <Transactions />
       </ProtectedRoute>
     ),
   },

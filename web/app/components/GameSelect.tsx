@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import { usePlayersStore } from '../store/playersStore';
@@ -12,6 +13,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
   const { allGames: games, fetchAllGames, loading, error } = useGameStore();
   const { currentGameId, currentGame, currentPlayer, setCurrentGame, setCurrentPlayer, isAdmin, userId } = useAuthStore();
   const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAllGames();
@@ -46,8 +48,15 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
   // Check if user has any players (for regular users)
   const hasPlayers = players.length > 0;
 
-  // Use currentGame from store instead of finding it
-  const selectedGame = currentGame;
+  // Check if there are games the user hasn't joined (for regular users)
+  const availableGamesToJoin = games.filter(game => game.type === 'GAME');
+  const hasUnjoinedGames = !isAdmin() && availableGamesToJoin.some(game =>
+    !players.some(player => player.gameId === game.id)
+  );
+
+  const handleNavigateToGames = () => {
+    navigate('/games');
+  };
 
   return (
     <div className="space-y-4">
@@ -85,6 +94,24 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
         </div>
       )}
 
+      {/* Show "Join Games" button for users with unjoined games */}
+      {hasUnjoinedGames && !playersLoading && (
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-4">
+            {hasPlayers
+              ? "There are more games available to join!"
+              : "You haven't joined any games yet. Join a game to start playing!"
+            }
+          </p>
+          <button
+            onClick={handleNavigateToGames}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+          >
+            Join Games
+          </button>
+        </div>
+      )}
+
       {/* Show loading state for players */}
       {!isAdmin() && playersLoading && (
         <div className="text-center">
@@ -92,28 +119,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
         </div>
       )}
 
-      {selectedGame && (
-        <div className="bg-gray-50 p-4 rounded-md">
-          <h3 className="font-medium text-gray-900 mb-2">{selectedGame.name}</h3>
-          <p className="text-sm text-gray-600 mb-3">{selectedGame.description}</p>
-          
-          {currentPlayer && (
-            <div className="mb-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
-              <p className="text-sm font-medium text-blue-900">Your Player:</p>
-              <p className="text-sm text-blue-700">{currentPlayer.name}</p>
-              {currentPlayer.description && (
-                <p className="text-xs text-blue-600 mt-1">{currentPlayer.description}</p>
-              )}
-            </div>
-          )}
-          
-          <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded">
-            Play {selectedGame.name}
-          </button>
-        </div>
-      )}
-
-      {!selectedGame && isAdmin() && (
+      {!currentGame && isAdmin() && (
         <div className="bg-yellow-50 p-4 rounded-md">
           <p className="text-sm text-yellow-800">
             Please select a game to manage game features.
