@@ -9,8 +9,10 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards
 } from '@nestjs/common';
+import { Request } from 'express';
 import { DeepPartial } from 'typeorm';
 
 import { Admin, LoggedIn } from '../authentication/authentication.guard';
@@ -101,7 +103,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Post()
   @UseGuards(LoggedIn, Admin)
-  async create(@Body() dto: R): Promise<R> {
+  async create(@Body() dto: R, @Req() _request: Request): Promise<R> {
     return this.mapper
       .toDomain(dto)
       .then(domain => {
@@ -115,7 +117,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Put(':id')
   @UseGuards(LoggedIn, Admin)
-  async update(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
+  async update(@Param('id') uuid: string, @Body() dto: R, @Req() _request: Request): Promise<R> {
     return this.service
       .findOne(uuid)
       .then((entity: T) => {
@@ -145,7 +147,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Patch(':id')
   @UseGuards(LoggedIn, Admin)
-  patch(@Param('id') uuid: string, @Body() dto: R): Promise<R> {
+  patch(@Param('id') uuid: string, @Body() dto: R, @Req() _request: Request): Promise<R> {
     return this.service
       .findOne(uuid)
       .then(entity => {
@@ -182,7 +184,7 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Delete(':id')
   @UseGuards(LoggedIn, Admin)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string, @Req() _request: Request) {
     return this.service.delete(id).catch(e => {
       if (e instanceof HttpException) {
         throw e;

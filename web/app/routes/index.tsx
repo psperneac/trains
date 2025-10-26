@@ -1,10 +1,11 @@
 import ProtectedRoute from "../components/ProtectedRoute";
+import ChangePassword from "../pages/ChangePassword";
+import Games from "../pages/Games";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import ChangePassword from "../pages/ChangePassword";
 import GameForm from "../pages/admin/GameForm";
-import Games from "../pages/admin/Games";
+import AdminGames from "../pages/admin/Games";
 import PlaceConnectionForm from "../pages/admin/PlaceConnectionForm";
 import PlaceConnections from "../pages/admin/PlaceConnections";
 import PlaceForm from "../pages/admin/PlaceForm";
@@ -34,6 +35,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/games",
+    element: (
+      <ProtectedRoute>
+        <Games />
       </ProtectedRoute>
     ),
   },
@@ -105,7 +114,7 @@ export const routes = [
     path: "/admin/games",
     element: (
       <ProtectedRoute>
-        <Games />
+        <AdminGames />
       </ProtectedRoute>
     ),
   },

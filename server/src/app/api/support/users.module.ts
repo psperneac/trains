@@ -56,8 +56,6 @@ export interface UserPreferenceDto {
 }
 
 export interface UserWalletDto {
-  id: string;
-  userId: string;
   gems: number;
 }
 
@@ -65,8 +63,8 @@ export class UserDto {
   public username: string;
   public email: string;
   public scope: string;
-  public preferences?: UserPreference;
-  public wallet?: UserWallet;
+  public preferences?: UserPreferenceDto;
+  public wallet?: UserWalletDto;
 }
 
 @Entity({ name: 'users' })
@@ -97,8 +95,8 @@ class UserDtoMapper {
     userDto.email = user.email;
     userDto.username = user.username;
     userDto.scope = user.scope;
-    userDto.preferences = user.preferences;
-    userDto.wallet = user.wallet;
+    userDto.preferences = { ...user.preferences } as UserPreferenceDto;
+    userDto.wallet = { ...user.wallet } as UserWalletDto;
     return userDto;
   }
 
@@ -107,7 +105,8 @@ class UserDtoMapper {
     userEntity.email = userDto.email;
     userEntity.username = userDto.username;
     userEntity.scope = userDto.scope;
-    userEntity.preferences = userDto.preferences;
+    userEntity.password = userDto['password'] ?? userEntity.password;
+    userEntity.preferences = { ...userDto.preferences } as UserPreference;
     // wallet is removed when mapping from DTO to model
     userEntity.wallet = undefined;
     return userEntity;
@@ -220,3 +219,4 @@ export class UsersController {
   exports: [UsersService]
 })
 export class UsersModule {}
+

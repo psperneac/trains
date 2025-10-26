@@ -14,13 +14,20 @@ export default function Navigation() {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const location = useLocation();
   const submenuRef = useRef<HTMLDivElement>(null);
-  const { currentGameId, setAuthToken } = useAuthStore();
+  const { currentGameId, setAuthToken, isAdmin } = useAuthStore();
 
-  const menuItems: MenuItem[] = [
+  const baseMenuItems: MenuItem[] = [
     {
       label: 'Home',
       path: '/',
     },
+    {
+      label: 'Games',
+      path: '/games',
+    },
+  ];
+
+  const adminMenuItems: MenuItem[] = [
     {
       label: 'Admin',
       children: [
@@ -46,6 +53,9 @@ export default function Navigation() {
         },
       ],
     },
+  ];
+
+  const settingsMenuItems: MenuItem[] = [
     {
       label: 'Settings',
       children: [
@@ -62,6 +72,12 @@ export default function Navigation() {
         },
       ],
     },
+  ];
+
+  const menuItems: MenuItem[] = [
+    ...baseMenuItems,
+    ...(isAdmin() ? adminMenuItems : []),
+    ...settingsMenuItems,
   ];
 
   useEffect(() => {

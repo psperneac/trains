@@ -1,11 +1,14 @@
-import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { Column, Entity, ObjectId } from 'typeorm';
 
 import { Types } from 'mongoose';
+import { AbstractUserServiceController } from 'src/utils/abstract-user-service.controller';
+import { LoggedIn } from '../../../authentication/authentication.guard';
+import { PageDto } from '../../../models/page.model';
+import { PageRequestDto } from '../../../models/pagination.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../../utils/abstract-service.controller';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { AbstractService } from '../../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
@@ -55,9 +58,9 @@ export class Player extends AbstractEntity {
   @Expose()
   gameId: ObjectId;
 
-  @Column('objectId')
+  @Column({ type: 'json' })
   @Expose()
-  walletId: ObjectId;
+  wallet: Wallet;
 
   @Column({ type: 'json' })
   @Expose()
@@ -70,7 +73,7 @@ export interface PlayerDto {
   description: string;
   userId: string;
   gameId: string;
-  walletId: string;
+  wallet: WalletDto;
   content: any;
 }
 
@@ -79,12 +82,17 @@ export class PlayerRepository extends RepositoryAccessor<Player> {
   constructor(@InjectRepository(Player) injectedRepo) {
     super(injectedRepo);
   }
+
 }
 
 @Injectable()
 export class PlayersService extends AbstractService<Player> {
   constructor(repo: PlayerRepository) {
     super(repo);
+  }
+
+  async findAllByUserId(userId: string, pagination?: PageRequestDto): Promise<PageDto<Player>> {
+    return this.findAllWhere({ userId: new Types.ObjectId(userId) }, pagination);
   }
 }
 
@@ -104,9 +112,9 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       id: domain._id.toString(),
       name: domain.name,
       description: domain.description,
-      userId: domain.userId.toString(),
+      userId: domain.userId?.toString(),
       gameId: domain.gameId?.toString(),
-      walletId: domain.walletId.toString(),
+      wallet: { ...domain.wallet } as WalletDto,
       content: domain.content
     };
 
@@ -128,17 +136,30 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       description: dto.description,
       userId: dto.userId ? new Types.ObjectId(dto.userId) : domain?.userId,
       gameId: dto.gameId ? new Types.ObjectId(dto.gameId) : domain?.gameId,
-      walletId: dto.walletId ? new Types.ObjectId(dto.walletId) : domain?.walletId,
+      wallet: { ...dto.wallet } as Wallet,
+      content: dto.content,
     } as Player;
   }
 }
 
 @Controller('players')
 @UseFilters(AllExceptionsFilter)
-export class PlayerController extends AbstractServiceController<Player, PlayerDto> {
-  constructor(service: PlayersService, mapper: PlayerMapper) {
-    super(service, mapper);
+export class PlayerController extends AbstractUserServiceController<Player, PlayerDto> {
+  constructor(
+    private readonly playersService: PlayersService, 
+    private readonly playersMapper: PlayerMapper) {
+    super(playersService, playersMapper);
   }
+
+  @Get('by-user/:userId')
+  @UseGuards(LoggedIn)
+  async findAllByUserId(
+    @Param('userId') userId: string,
+    @Query() pagination: PageRequestDto
+  ): Promise<PageDto<PlayerDto>> {
+    return this.playersService.findAllByUserId(userId, pagination).then(this.makeHandler());
+  }
+
 }
 
 @Module({
