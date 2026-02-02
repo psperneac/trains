@@ -10,6 +10,7 @@
   "dependencies": {
     "@automapper/classes": "^8.8.1",
     "@automapper/core": "^8.8.1",
-    "@automapper/nestjs": "^8.8.1"
+    "@automapper/nestjs": "^8.8.1",
+    "zukeeper": "^1.0.2"
   }
 }

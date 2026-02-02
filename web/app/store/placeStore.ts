@@ -94,6 +94,7 @@ export const usePlaceStore = create<PlaceState>()(
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
+
     }),
     {
       name: 'places-store',

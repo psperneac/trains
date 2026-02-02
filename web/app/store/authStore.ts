@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import type { GameDto } from '../types/game';
 import type { PlayerDto } from '../types/player';
+import { useOptionsStore } from './optionsStore';
 
 interface LoginResponse {
   _id: string;
@@ -58,6 +59,9 @@ export const useAuthStore = create<AuthState>()(
           userId,
           userScope
         });
+
+        // Initialize user options
+        useOptionsStore.getState().initializeOptions(userId);
 
         // Load current game from localStorage
         const storageKey = `currentGame_${userId}`;

@@ -3,7 +3,11 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
+import Drawer from '../../components/Drawer';
 import Layout from '../../components/Layout';
+import PlacesOptions from '../../components/PlacesOptions';
+import { useAuthStore } from '../../store/authStore';
+import { useOptionsStore } from '../../store/optionsStore';
 import { usePlaceStore } from '../../store/placeStore';
 
 // Color mapping for place types
@@ -80,6 +84,8 @@ function MapPositionTracker({ onPositionChange }: { onPositionChange: (pos: { la
 
 export default function Places() {
   const { allPlaces, loading, error, fetchPlaces, deletePlace } = usePlaceStore();
+  const { showLabels } = useOptionsStore();
+  const userId = useAuthStore((state) => state.userId);
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -125,7 +131,7 @@ export default function Places() {
 
   return (
     <Layout title="Places">
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
+      <div id="places-page-container" className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">
@@ -222,7 +228,7 @@ export default function Places() {
                   icon={getPinIcon(place.type)}
                   draggable={false}
                 >
-                  <Tooltip permanent>{place.name}</Tooltip>
+                  {showLabels && <Tooltip permanent>{place.name}</Tooltip>}
                   <Popup>
                     <div className="p-2">
                       <h3 className="font-semibold">{place.name}</h3>
@@ -283,6 +289,10 @@ export default function Places() {
           </div>
         </div>
       )}
+
+      <Drawer side="right" title="Options">
+        <PlacesOptions />
+      </Drawer>
     </Layout>
   );
-} 
+}

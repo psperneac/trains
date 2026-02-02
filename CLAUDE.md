@@ -47,6 +47,7 @@ npm run typecheck     # Run TypeScript type checking
 ### Database Setup
 
 **MongoDB** (primary database):
+
 ```bash
 # Install and start MongoDB
 brew tap mongodb/brew
@@ -72,6 +73,7 @@ trains.createUser({
 ```
 
 **PostgreSQL** (legacy, documented but not actively used):
+
 ```bash
 docker run --name p1 -p 5432:5432 -e POSTGRES_PASSWORD=Admin1! -e POSTGRES_HOST_AUTH_METHOD=password -d postgres
 ```
@@ -85,7 +87,7 @@ The server uses a **modular service-oriented architecture** with abstract base c
 #### Core Patterns
 
 1. **Abstract Service Pattern**: All API resources extend abstract classes that provide CRUD operations:
-   - `AbstractEntity` - Base entity with common fields (_id, createdAt, updatedAt)
+   - `AbstractEntity` - Base entity with common fields (\_id, createdAt, updatedAt)
    - `AbstractService` - Generic service with findAll, findOne, create, update, delete
    - `AbstractServiceController` - Generic REST controller with standard endpoints
    - `AbstractDtoMapper` - Handles entity ↔ DTO conversion
@@ -103,6 +105,12 @@ The server uses a **modular service-oriented architecture** with abstract base c
    - JWT-based authentication with Passport strategies
    - Guards: `@UseGuards(LoggedIn)` for authenticated routes, `@UseGuards(Admin)` for admin routes
    - Cookie-based token storage
+   - **Browser Automation**:
+     - Use `#auth-email`, `#auth-password`, and `#auth-submit-button` IDs for reliable selection.
+     - **Quirk**: Chrome may autofill the password field when focused. Always clear the field and dispatch a React `input` event before typing to avoid double-pasting (e.g., `passwordpassword`).
+     - **Credentials**: `admin@example.com` / `password`.
+     - **State Check**: Look for `#places-page-container` to confirm successful login.
+     - See detailed workflow in [.agent/workflows/login.md](file:///Volumes/MacMiniExt/PaulExt/dev/trains/.agent/workflows/login.md).
 
 4. **Database Layer**:
    - Dual MongoDB support (TypeORM + Mongoose) for flexibility
@@ -131,6 +139,7 @@ The server uses a **modular service-oriented architecture** with abstract base c
 - **Protected routes** via ProtectedRoute component for authentication
 
 Key directories:
+
 - [app/pages/](web/app/pages/) - Page components (Home, Login, admin pages)
 - [app/components/](web/app/components/) - Reusable components (Navigation, ProtectedRoute, etc.)
 - [app/routes/](web/app/routes/) - Route definitions
@@ -141,7 +150,7 @@ Key directories:
 
 Key entities in the game:
 
-- **User** - a user is a person that can login to a game. Users are normal users or admins as defined by the scope field in User.. 
+- **User** - a user is a person that can login to a game. Users are normal users or admins as defined by the scope field in User..
 - **Game** - Multi-tenant game instance (TEMPLATE or GAME type)
 - **Player** - Game participant owning vehicles, places, and connections
 - **Place** - Point on map where jobs can be obtained/delivered (stations, airports, etc.)
@@ -159,12 +168,14 @@ See [docs/README.md](docs/README.md) for detailed domain terminology and system 
 ## Current Development State
 
 The project has completed a major **redesign** (feature/redesign branch):
+
 - ✅ Migrated from PostgreSQL/MySQL to MongoDB
 - ✅ Simplified entity relationships
 - ✅ Replaced Angular frontend with React (web/ directory now contains the React app)
 - ✅ Implemented multi-tenant game architecture
 
 Recent work includes:
+
 - Removed legacy Angular web project
 - Renamed web-react to web as the primary frontend
 - Map template management UI with Leaflet integration
@@ -177,6 +188,7 @@ Recent work includes:
 ### Environment Variables (server/.env)
 
 Required environment variables:
+
 - `MONGO_USERNAME`, `MONGO_PASSWORD`, `MONGO_DATABASE`, `MONGO_HOST` - MongoDB connection
 - `JWT_SECRET`, `JWT_EXPIRATION_TIME` - JWT authentication
 - `PORT` - Server port (default: 5001)
@@ -193,6 +205,7 @@ Required environment variables:
 ## Testing
 
 Server uses Jest with TypeScript:
+
 - Unit tests: `*.spec.ts` files in src/ directory
 - E2E tests: test/ directory with jest-e2e.json config
 - Mocks available in [src/utils/mocks/](server/src/utils/mocks/)

@@ -39,7 +39,16 @@ export const apiRequest = async <T>(path: string, options: ApiRequestOptions): P
   }
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.statusText}`);
+    let errorMessage = `API request failed: ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      if (errorData && (errorData.message || errorData.error)) {
+        errorMessage = errorData.message || errorData.error;
+      }
+    } catch (e) {
+      // If parsing fails, stick with the generic statusText error
+    }
+    throw new Error(errorMessage);
   }
 
   return response.json();

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Navigation from './Navigation';
+import StatusComponent from './StatusComponent';
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,7 +18,8 @@ export default function Layout({ children, title }: LayoutProps) {
         </div>
       </header>
       <Navigation />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-5.125rem)]">
+      <StatusComponent />
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-6.125rem)]">
         <div className="px-4 py-0 sm:px-0 h-full">
           {title && (
             <div className="mb-3">
