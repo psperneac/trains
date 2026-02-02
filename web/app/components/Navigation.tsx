@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -15,14 +16,15 @@ export default function Navigation() {
   const location = useLocation();
   const submenuRef = useRef<HTMLDivElement>(null);
   const { currentGameId, setAuthToken, isAdmin } = useAuthStore();
-
+  const { t } = useTranslation();
+  
   const baseMenuItems: MenuItem[] = [
     {
-      label: 'Home',
+      label: t('navigation.home'),
       path: '/',
     },
     {
-      label: 'Games',
+      label: t('navigation.games'),
       path: '/games',
     },
   ];
@@ -32,31 +34,31 @@ export default function Navigation() {
       label: 'Admin',
       children: [
         {
-          label: 'Place Types',
+          label: t('navigation.placeTypes'),
           path: '/admin/place-types',
         },
         {
-          label: 'Vehicle Types',
+          label: t('navigation.vehicleTypes'),
           path: '/admin/vehicle-types',
         },
         {
-          label: 'Places',
+          label: t('navigation.places'),
           path: '/admin/places',
         },
         {
-          label: 'Place Connections',
+          label: t('navigation.placeConnections'),
           path: '/admin/place-connections',
         },
         {
-          label: 'Games',
+          label: t('navigation.games'),
           path: '/admin/games',
         },
         {
-          label: 'Players',
+          label: t('navigation.players'),
           path: '/admin/players',
         },
         {
-          label: 'Transactions',
+          label: t('navigation.transactions'),
           path: '/admin/transactions',
         },
       ],
@@ -68,14 +70,14 @@ export default function Navigation() {
       label: 'Settings',
       children: [
         {
-          label: 'Change Password',
+          label: t('navigation.changePassword'),
           path: '/settings/change-password',
         },
         {
           separator: true,
         },
         {
-          label: 'Logout',
+          label: t('navigation.logout'),
           action: () => setAuthToken(null),
         },
       ],

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { WalletDto } from '../types/player';
 
 interface WalletDisplayProps {
@@ -11,10 +12,12 @@ export default function WalletDisplay({
   showHidden = false, 
   className = "" 
 }: WalletDisplayProps) {
+  const { t } = useTranslation();
+  
   if (!wallet) {
     return (
       <span className={`text-gray-400 text-xs ${className}`}>
-        {showHidden ? 'Hidden' : 'Not visible'}
+        {showHidden ? t('walletDisplay.hidden') : t('walletDisplay.notVisible')}
       </span>
     );
   }

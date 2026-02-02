@@ -1,0 +1,54 @@
+{
+  "title": "Train Management",
+
+  "drawer": {
+    "unpin": "Unpin Drawer",
+    "pin": "Pin Drawer",
+    "options": "Options"
+  },
+  "gameInfoCard": {
+    "pleaseSelectGame": "Please select a game to see game details.",
+    "selectGame": "Select a game to view details and play.",
+    "yourPlayer": "Your Player:",
+    "play": "Play"
+  },
+  "gameSelect": {
+    "currentGame": "Current Game",
+    "selectGameOrTemplate": "Select a game or template...",
+    "selectGame": "Select a game...",
+    "moreGamesAvailableToJoin": "There are more games available to join!",
+    "noGamesJoined": "You haven't joined any games yet. Join a game to start playing!",
+    "joinGames": "Join Games",
+    "loadingPlayers": "Loading your players...",
+    "pleaseSelectGameToManageFeatures": "Please select a game to manage game features."
+  },
+  "navigation": {
+    "home": "Home",
+    "games": "Games",
+    "placeTypes": "Place Types",
+    "vehicleTypes": "Vehicle Types",
+    "places": "Places",
+    "placeConnections": "Place Connections",
+    "players": "Players",
+    "transactions": "Transactions",
+    "changePassword": "Change Password",
+    "logout": "Logout"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "placesOptions": {
+    "description": "Toggle this setting to show or hide the permanent name labels above each place pin on the map. This setting is saved to your session.",
+    "showLabels": "Show Place Names on Map"
+  },
+  "status": {
+    "currentGame": "Current Game",
+    "noGameSelected": "No game selected",
+    "player": "Player"
+  },
+  "walletDisplay": {
+    "hidden": "Hidden",
+    "notVisible": "Not visible"
+  }
+}

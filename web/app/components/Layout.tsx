@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import '../i18n';
 import Navigation from './Navigation';
 import StatusComponent from './StatusComponent';
 

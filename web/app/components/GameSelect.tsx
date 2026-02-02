@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
@@ -14,6 +15,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
   const { currentGameId, currentGame, currentPlayer, setCurrentGame, setCurrentPlayer, isAdmin, userId } = useAuthStore();
   const { players, fetchPlayersByUserId, loading: playersLoading } = usePlayersStore();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchAllGames();
@@ -72,7 +74,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
       {(isAdmin() || hasPlayers) && (
         <div>
           <label htmlFor="game-select" className="block text-sm font-medium text-gray-700 mb-2">
-            Current Game
+            {t('gameSelect.currentGame')}
           </label>
           <select
             id="game-select"
@@ -81,7 +83,7 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">
-              {isAdmin() ? 'Select a game or template...' : 'Select a game...'}
+              {isAdmin() ? t('gameSelect.selectGameOrTemplate') : t('gameSelect.selectGame')}
             </option>
             {availableGames
               .filter(game => isAdmin() || game.type === 'GAME') // Admins see all, users see only games
@@ -99,15 +101,15 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-4">
             {hasPlayers
-              ? "There are more games available to join!"
-              : "You haven't joined any games yet. Join a game to start playing!"
+              ? t('gameSelect.moreGamesAvailableToJoin')
+              : t('gameSelect.noGamesJoined')
             }
           </p>
           <button
             onClick={handleNavigateToGames}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
           >
-            Join Games
+            {t('gameSelect.joinGames')}
           </button>
         </div>
       )}
@@ -115,14 +117,14 @@ export default function GameSelect({ onGameChange }: GameSelectProps) {
       {/* Show loading state for players */}
       {!isAdmin() && playersLoading && (
         <div className="text-center">
-          <p className="text-sm text-gray-600">Loading your players...</p>
+          <p className="text-sm text-gray-600">{t('gameSelect.loadingPlayers')}</p>
         </div>
       )}
 
       {!currentGame && isAdmin() && (
         <div className="bg-yellow-50 p-4 rounded-md">
           <p className="text-sm text-yellow-800">
-            Please select a game to manage game features.
+            {t('gameSelect.pleaseSelectGameToManageFeatures')}
           </p>
         </div>
       )}

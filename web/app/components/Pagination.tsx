@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { MAX_VISIBLE_PAGES } from '../constants/pagination';
 
 interface PaginationProps {
@@ -9,6 +10,7 @@ interface PaginationProps {
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const halfVisible = Math.floor(MAX_VISIBLE_PAGES / 2);
+  const { t } = useTranslation();
 
   let visiblePages = pages;
   if (totalPages > MAX_VISIBLE_PAGES) {
@@ -30,7 +32,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         disabled={currentPage === 1}
         className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
       >
-        Previous
+        {t('pagination.previous')}
       </button>
       
       {visiblePages[0] > 1 && (
@@ -86,7 +88,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         disabled={currentPage === totalPages}
         className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
       >
-        Next
+        {t('pagination.next')}
       </button>
     </div>
   );

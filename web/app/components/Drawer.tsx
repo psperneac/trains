@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DrawerProps {
   side?: 'left' | 'right' | 'bottom';
@@ -18,6 +19,7 @@ const Drawer: React.FC<DrawerProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isPinned, setIsPinned] = useState(defaultPinned);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   // Auto-open if pinned
   useEffect(() => {
@@ -101,12 +103,12 @@ const Drawer: React.FC<DrawerProps> = ({
       {/* Content */}
       <div className="h-full flex flex-col p-4">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="font-bold text-gray-800 text-lg">{title || 'Options'}</h3>
+          <h3 className="font-bold text-gray-800 text-lg">{title || t('drawer.options')}</h3>
           <div className="flex gap-2">
             <button 
               onClick={togglePinned}
               className={`p-1.5 rounded-full transition-colors ${isPinned ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-gray-100 text-gray-400'}`}
-              title={isPinned ? "Unpin Drawer" : "Pin Drawer"}
+              title={isPinned ? t('drawer.unpin') : t('drawer.pin')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill={isPinned ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />

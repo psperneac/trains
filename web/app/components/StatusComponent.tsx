@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 
 export default function StatusComponent() {
   const { currentGame, currentPlayer } = useAuthStore();
+  const { t } = useTranslation();
 
   return (
     <div className="bg-blue-50 dark:bg-blue-900/20 border-t border-b border-blue-200 dark:border-blue-800">
@@ -11,7 +13,7 @@ export default function StatusComponent() {
             {currentGame ? (
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                  Current Game:
+                  {t('status.currentGame')}:
                 </span>
                 <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
                   {currentGame.name}
@@ -22,7 +24,7 @@ export default function StatusComponent() {
               </div>
             ) : (
               <span className="text-sm text-blue-600 dark:text-blue-400">
-                No game selected
+                {t('status.noGameSelected')}
               </span>
             )}
           </div>
@@ -30,7 +32,7 @@ export default function StatusComponent() {
           {currentPlayer && (
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                Player:
+                {t('status.player')}:
               </span>
               <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
                 {currentPlayer.name}
