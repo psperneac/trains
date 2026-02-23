@@ -286,6 +286,6 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
   imports: [TypeOrmModule.forFeature([Player]), TransactionsModule],
   controllers: [PlayerController],
   providers: [PlayersService, PlayerMapper, PlayerRepository],
-  exports: [PlayersService]
+  exports: [PlayersService, PlayerMapper]
 })
 export class PlayersModule {}

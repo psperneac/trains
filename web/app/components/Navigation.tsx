@@ -29,37 +29,49 @@ export default function Navigation() {
     },
   ];
 
-  const adminMenuItems: MenuItem[] = [
+  const gameAdminMenuItems: MenuItem[] = [
     {
-      label: 'Admin',
+      label: t('navigation.gameAdmin'),
       children: [
         {
           label: t('navigation.placeTypes'),
-          path: '/admin/place-types',
+          path: '/game-admin/place-types',
         },
         {
           label: t('navigation.vehicleTypes'),
-          path: '/admin/vehicle-types',
+          path: '/game-admin/vehicle-types',
         },
         {
           label: t('navigation.places'),
-          path: '/admin/places',
+          path: '/game-admin/places',
         },
         {
           label: t('navigation.placeConnections'),
-          path: '/admin/place-connections',
+          path: '/game-admin/place-connections',
         },
         {
           label: t('navigation.games'),
-          path: '/admin/games',
+          path: '/game-admin/games',
         },
         {
           label: t('navigation.players'),
-          path: '/admin/players',
+          path: '/game-admin/players',
         },
         {
           label: t('navigation.transactions'),
-          path: '/admin/transactions',
+          path: '/game-admin/transactions',
+        },
+      ],
+    },
+  ];
+
+  const adminMenuItems: MenuItem[] = [
+    {
+      label: t('navigation.admin'),
+      children: [
+        {
+          label: t('navigation.users'),
+          path: '/admin/users',
         },
       ],
     },
@@ -86,6 +98,7 @@ export default function Navigation() {
 
   const menuItems: MenuItem[] = [
     ...baseMenuItems,
+    ...(isAdmin() ? gameAdminMenuItems : []),
     ...(isAdmin() ? adminMenuItems : []),
     ...settingsMenuItems,
   ];

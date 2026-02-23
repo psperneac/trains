@@ -13,6 +13,7 @@ import PlaceTypes from "../pages/admin/PlaceTypes";
 import Places from "../pages/admin/Places";
 import Players from "../pages/admin/Players";
 import Transactions from "../pages/admin/Transactions";
+import Users from "../pages/admin/Users";
 import VehicleTypes from "../pages/admin/VehicleTypes";
 
 export const routes = [
@@ -49,7 +50,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/place-types",
+    path: "/game-admin/place-types",
     element: (
       <ProtectedRoute>
         <PlaceTypes />
@@ -57,7 +58,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/vehicle-types",
+    path: "/game-admin/vehicle-types",
     element: (
       <ProtectedRoute>
         <VehicleTypes />
@@ -65,7 +66,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/places",
+    path: "/game-admin/places",
     element: (
       <ProtectedRoute>
         <Places />
@@ -73,7 +74,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/places/add",
+    path: "/game-admin/places/add",
     element: (
       <ProtectedRoute>
         <PlaceForm />
@@ -81,7 +82,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/places/:id/edit",
+    path: "/game-admin/places/:id/edit",
     element: (
       <ProtectedRoute>
         <PlaceForm />
@@ -89,7 +90,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/place-connections",
+    path: "/game-admin/place-connections",
     element: (
       <ProtectedRoute>
         <PlaceConnections />
@@ -97,7 +98,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/place-connections/add",
+    path: "/game-admin/place-connections/add",
     element: (
       <ProtectedRoute>
         <PlaceConnectionForm />
@@ -105,7 +106,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/place-connections/:id/edit",
+    path: "/game-admin/place-connections/:id/edit",
     element: (
       <ProtectedRoute>
         <PlaceConnectionForm />
@@ -113,7 +114,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/games",
+    path: "/game-admin/games",
     element: (
       <ProtectedRoute>
         <AdminGames />
@@ -121,7 +122,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/games/new",
+    path: "/game-admin/games/new",
     element: (
       <ProtectedRoute>
         <GameForm />
@@ -129,7 +130,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/games/:id/edit",
+    path: "/game-admin/games/:id/edit",
     element: (
       <ProtectedRoute>
         <GameForm />
@@ -137,7 +138,7 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/players",
+    path: "/game-admin/players",
     element: (
       <ProtectedRoute>
         <Players />
@@ -145,11 +146,19 @@ export const routes = [
     ),
   },
   {
-    path: "/admin/transactions",
+    path: "/game-admin/transactions",
     element: (
       <ProtectedRoute>
         <Transactions />
       </ProtectedRoute>
     ),
   },
-]; 
+  {
+    path: "/admin/users",
+    element: (
+      <ProtectedRoute>
+        <Users />
+      </ProtectedRoute>
+    ),
+  },
+];

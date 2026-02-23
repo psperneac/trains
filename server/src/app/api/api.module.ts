@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AdminUsersModule } from './admin-users.module';
 
 import { GamesModule } from './games.module';
 import { JobsModule } from './jobs.module';
@@ -27,6 +28,7 @@ import { VehiclesModule } from './vehicles.module';
     PlaceInstancesModule,
     PlayersModule,
     TransactionsModule,
+    AdminUsersModule,
     JobsModule,
     GamesModule
   ]
