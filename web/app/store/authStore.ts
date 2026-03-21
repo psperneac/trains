@@ -5,6 +5,8 @@ import type { GameDto } from '../types/game';
 import type { PlayerDto } from '../types/player';
 import { useOptionsStore } from './optionsStore';
 
+const AUTH_TOKEN_KEY = 'authToken';
+
 interface LoginResponse {
   _id: string;
   created: string;
@@ -12,7 +14,7 @@ interface LoginResponse {
   username: string;
   email: string;
   scope: string;
-  authToken: string;  // just the authentication token, not the whole response
+  authToken: string;
 }
 
 interface AuthState {
@@ -31,6 +33,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
+  initializeAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -46,62 +49,17 @@ export const useAuthStore = create<AuthState>()(
 
   setAuthToken: (token) => {
     if (token) {
-      // Extract userId and scope from JWT token
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Client received JWT payload:', payload);
-        const userId = payload.sub || payload.userId;
-        const userScope = payload.scope;
-        console.log('Client extracted:', { userId, userScope });
-
-        set({
-          authToken: token,
-          userId,
-          userScope
-        });
-
-        // Initialize user options
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      const { userId, userScope } = parseToken(token);
+      if (userId) {
+        set({ authToken: token, userId, userScope });
         useOptionsStore.getState().initializeOptions(userId);
-
-        // Load current game from localStorage
-        const storageKey = `currentGame_${userId}`;
-        const storedGame = localStorage.getItem(storageKey);
-        if (storedGame) {
-          try {
-            const game = JSON.parse(storedGame) as GameDto;
-            // Use setCurrentGame to trigger Redux DevTools action
-            get().setCurrentGame(game);
-          } catch (error) {
-            console.error('Failed to parse stored game:', error);
-            // Clear invalid stored game
-            localStorage.removeItem(storageKey);
-          }
-        }
-
-        // Load current player from localStorage
-        const playerStorageKey = `currentPlayer_${userId}`;
-        const storedPlayer = localStorage.getItem(playerStorageKey);
-        if (storedPlayer) {
-          try {
-            const player = JSON.parse(storedPlayer) as PlayerDto;
-            // Use setCurrentPlayer to trigger Redux DevTools action
-            get().setCurrentPlayer(player);
-          } catch (error) {
-            console.error('Failed to parse stored player:', error);
-            // Clear invalid stored player
-            localStorage.removeItem(playerStorageKey);
-          }
-        } else {
-          // No player in localStorage, but we might have a game selected
-          // We'll need to find the player for the current game from the players list
-          // This will be handled by the Home component after players are loaded
-        }
-      } catch (error) {
-        console.error('Failed to parse auth token:', error);
-        set({ authToken: token });
+        restoreGameAndPlayer(userId);
+      } else {
+        set({ authToken: token, userId: null, userScope });
       }
     } else {
-      // Clear current game when logging out
+      localStorage.removeItem(AUTH_TOKEN_KEY);
       set({ authToken: null, userId: null, userScope: null, currentGameId: null, currentGame: null, currentPlayerId: null, currentPlayer: null });
     }
   },
@@ -175,4 +133,72 @@ export const useAuthStore = create<AuthState>()(
       enabled: process.env.NODE_ENV === 'development', // Only enable in development
     }
   )
-); 
+);
+
+function parseToken(token: string): { userId: string | null; userScope: string | null } {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return {
+      userId: payload.sub || payload.userId || null,
+      userScope: payload.scope || null,
+    };
+  } catch {
+    return { userId: null, userScope: null };
+  }
+}
+
+function isTokenValid(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp) {
+      return Date.now() < payload.exp * 1000;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function restoreGameAndPlayer(userId: string): void {
+  const storageKey = `currentGame_${userId}`;
+  const storedGame = localStorage.getItem(storageKey);
+  if (storedGame) {
+    try {
+      const game = JSON.parse(storedGame) as GameDto;
+      useAuthStore.getState().setCurrentGame(game);
+    } catch {
+      localStorage.removeItem(storageKey);
+    }
+  }
+
+  const playerStorageKey = `currentPlayer_${userId}`;
+  const storedPlayer = localStorage.getItem(playerStorageKey);
+  if (storedPlayer) {
+    try {
+      const player = JSON.parse(storedPlayer) as PlayerDto;
+      useAuthStore.getState().setCurrentPlayer(player);
+    } catch {
+      localStorage.removeItem(playerStorageKey);
+    }
+  }
+}
+
+useAuthStore.setState({
+  initializeAuth: function () {
+    const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (storedToken && isTokenValid(storedToken)) {
+      const { userId, userScope } = parseToken(storedToken);
+      if (userId) {
+        useAuthStore.setState({
+          authToken: storedToken,
+          userId,
+          userScope,
+        });
+        useOptionsStore.getState().initializeOptions(userId);
+        restoreGameAndPlayer(userId);
+      }
+    } else if (storedToken) {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+  },
+}); 
