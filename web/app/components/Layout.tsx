@@ -20,7 +20,7 @@ export default function Layout({ children, title }: LayoutProps) {
       </header>
       <Navigation />
       <StatusComponent />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-6.125rem)]">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-8rem)]">
         <div className="px-4 py-0 sm:px-0 h-full">
           {title && (
             <div className="mb-3">

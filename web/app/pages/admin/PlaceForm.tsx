@@ -193,7 +193,7 @@ export default function PlaceForm() {
 
   return (
     <Layout title={isEdit ? 'Edit Place' : 'Add Place'}>
-      <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-11rem)]">
+      <div className="flex flex-col lg:flex-row gap-8 h-admin-content">
         <div className="bg-white shadow rounded-lg p-6 w-full lg:max-w-md lg:h-full">
           <form onSubmit={handleSave} className="space-y-4">
             {isEdit && (

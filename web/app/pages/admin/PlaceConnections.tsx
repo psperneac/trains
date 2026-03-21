@@ -135,7 +135,7 @@ export default function PlaceConnections() {
 
   return (
     <Layout title="Place Connections">
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
+      <div className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">

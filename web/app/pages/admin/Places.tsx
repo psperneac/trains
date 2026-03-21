@@ -131,7 +131,7 @@ export default function Places() {
 
   return (
     <Layout title="Places">
-      <div id="places-page-container" className="flex flex-col lg:flex-row h-[calc(100vh-11rem)] gap-4">
+      <div id="places-page-container" className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">
