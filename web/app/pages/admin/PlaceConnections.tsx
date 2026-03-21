@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
@@ -350,35 +351,12 @@ export default function PlaceConnections() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {confirming && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Confirm Delete
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Are you sure you want to delete this connection? This action cannot be undone.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={handleConfirmDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={handleCancelDelete}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmation
+        isOpen={confirming}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        message="Are you sure you want to delete this connection? This action cannot be undone."
+      />
     </Layout>
   );
 }
