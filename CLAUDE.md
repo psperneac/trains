@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents like Claude Code (claude.ai/code) or OpenCode (https://opencode.ai/docs/) when working with code in this repository.
 
 ## Project Overview
 
