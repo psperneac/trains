@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Drawer from '../../components/Drawer';
 import Layout from '../../components/Layout';
@@ -9,6 +9,7 @@ import PlacesOptions from '../../components/PlacesOptions';
 import { useAuthStore } from '../../store/authStore';
 import { useOptionsStore } from '../../store/optionsStore';
 import { usePlaceStore } from '../../store/placeStore';
+import { FitBounds, MapFocus, MapPositionTracker } from '../../utils/map';
 
 // Color mapping for place types
 const typeColorMap: Record<string, string> = {
@@ -34,54 +35,6 @@ function getPinIcon(type: string) {
   });
 }
 
-function FitBounds({ places }: { places: { lat: number; lng: number }[] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (places.length === 0) return;
-    const bounds = L.latLngBounds(places.map((p) => [p.lat, p.lng]));
-    map.fitBounds(bounds, { padding: [40, 40] });
-  }, [places, map]);
-  return null;
-}
-
-function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (focus) {
-      map.setView([focus.lat, focus.lng], 17);
-    }
-  }, [focus, map]);
-  return null;
-}
-
-function MapPositionTracker({ onPositionChange }: { onPositionChange: (pos: { lat: number; lng: number; zoom: number }) => void }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const center = map.getCenter();
-    onPositionChange({
-      lat: center.lat,
-      lng: center.lng,
-      zoom: map.getZoom()
-    });
-
-    map.on('moveend', () => {
-      const center = map.getCenter();
-      onPositionChange({
-        lat: center.lat,
-        lng: center.lng,
-        zoom: map.getZoom()
-      });
-    });
-
-    return () => {
-      map.off('moveend');
-    };
-  }, [map, onPositionChange]);
-
-  return null;
-}
-
 export default function Places() {
   const { allPlaces, loading, error, fetchPlaces, deletePlace } = usePlaceStore();
   const { showLabels } = useOptionsStore();
@@ -91,6 +44,8 @@ export default function Places() {
   const [confirming, setConfirming] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
+  const [showVisible, setShowVisible] = useState(false);
+  const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
 
   useEffect(() => {
     fetchPlaces();
@@ -129,14 +84,25 @@ export default function Places() {
     handleDelete(id);
   };
 
+  const filteredPlaces = showVisible && visibleBounds
+    ? allPlaces.filter(place => visibleBounds.contains([place.lat, place.lng]))
+    : allPlaces;
+
+  const options = [
+    {
+      label: showVisible ? '✓ Show visible' : 'Show visible',
+      onClick: () => setShowVisible(prev => !prev),
+    }
+  ];
+
   return (
-    <Layout title="Places">
+    <Layout title="Places" statusOptions={options}>
       <div id="places-page-container" className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Places ({allPlaces.length})</h2>
+              <h2 className="text-lg font-semibold">Places ({filteredPlaces.length})</h2>
               <button
                 onClick={handleAdd}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
@@ -160,7 +126,7 @@ export default function Places() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {allPlaces.map((place, idx) => (
+{filteredPlaces.map((place, idx) => (
                     <tr key={place.id || idx} className="hover:bg-gray-50">
                       <td className="px-4 py-2 text-sm text-gray-900">
                         <div>
@@ -216,7 +182,7 @@ export default function Places() {
             >
               <MapFocus focus={mapFocus} />
               <FitBounds places={allPlaces} />
-              <MapPositionTracker onPositionChange={setMapPosition} />
+              <MapPositionTracker onPositionChange={setMapPosition} onBoundsChange={setVisibleBounds} />
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"

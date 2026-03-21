@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import '../i18n';
 import Navigation from './Navigation';
-import StatusComponent from './StatusComponent';
+import StatusComponent, { type OptionsMenuItem } from './StatusComponent';
 
 interface LayoutProps {
   children: ReactNode;
   title?: string;
+  statusOptions?: OptionsMenuItem[];
 }
 
-export default function Layout({ children, title }: LayoutProps) {
+export default function Layout({ children, title, statusOptions = [] }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow-sm">
@@ -19,7 +20,7 @@ export default function Layout({ children, title }: LayoutProps) {
         </div>
       </header>
       <Navigation />
-      <StatusComponent />
+      <StatusComponent options={statusOptions} />
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-8rem)]">
         <div className="px-4 py-0 sm:px-0 h-full">
           {title && (

@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
+import { connectionVisible } from '../../utils/geometry';
 
 // Color mapping for connection types
 const typeColorMap: Record<string, string> = {
@@ -48,6 +49,26 @@ function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
   return null;
 }
 
+function MapBoundsTracker({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds) => void }) {
+  const map = useMap();
+
+  useEffect(() => {
+    onBoundsChange(map.getBounds());
+
+    const handleMoveEnd = () => {
+      onBoundsChange(map.getBounds());
+    };
+
+    map.on('moveend', handleMoveEnd);
+
+    return () => {
+      map.off('moveend', handleMoveEnd);
+    };
+  }, [map, onBoundsChange]);
+
+  return null;
+}
+
 export default function PlaceConnections() {
   const {
     allPlaceConnections,
@@ -62,6 +83,8 @@ export default function PlaceConnections() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
+  const [showVisible, setShowVisible] = useState(false);
+  const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
 
   // Redirect to home if no game is selected
   useEffect(() => {
@@ -133,14 +156,36 @@ export default function PlaceConnections() {
     return acc;
   }, {} as Record<string, any>);
 
+  const visiblePlaces = showVisible && visibleBounds
+    ? allPlaces.filter(place => visibleBounds.contains([place.lat, place.lng]))
+    : allPlaces;
+
+  const visiblePlaceIds = new Set(visiblePlaces.map(p => p.id));
+
+  const visibleConnections = showVisible && visibleBounds
+    ? filteredPlaceConnections.filter(conn => {
+        const startPlace = placesById[conn.startId];
+        const endPlace = placesById[conn.endId];
+        if (!startPlace || !endPlace) return false;
+        return connectionVisible(startPlace, endPlace, visibleBounds);
+      })
+    : filteredPlaceConnections;
+
+  const options = [
+    {
+      label: showVisible ? '✓ Show visible' : 'Show visible',
+      onClick: () => setShowVisible(prev => !prev),
+    }
+  ];
+
   return (
-    <Layout title="Place Connections">
+    <Layout title="Place Connections" statusOptions={options}>
       <div className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
           <div className="px-6 py-3 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Place Connections ({filteredPlaceConnections.length})</h2>
+              <h2 className="text-lg font-semibold">Place Connections ({visibleConnections.length})</h2>
               <button
                 onClick={handleAdd}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
@@ -165,7 +210,7 @@ export default function PlaceConnections() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPlaceConnections.map((connection, idx) => {
+{visibleConnections.map((connection, idx) => {
                     const startPlace = placesById[connection.startId];
                     const endPlace = placesById[connection.endId];
                     
@@ -233,13 +278,14 @@ export default function PlaceConnections() {
             >
               <MapFocus focus={mapFocus} />
               <FitBounds places={allPlaces} />
+              <MapBoundsTracker onBoundsChange={setVisibleBounds} />
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"
               />
               
               {/* Draw all place markers */}
-              {allPlaces.map((place, idx) => (
+              {visiblePlaces.map((place, idx) => (
                 <Marker
                   key={place.id || idx}
                   position={[place.lat, place.lng]}
@@ -251,7 +297,7 @@ export default function PlaceConnections() {
               ))}
               
               {/* Draw all connections as polylines */}
-              {filteredPlaceConnections.map((connection, idx) => {
+              {visibleConnections.map((connection, idx) => {
                 const startPlace = placesById[connection.startId];
                 const endPlace = placesById[connection.endId];
                 
