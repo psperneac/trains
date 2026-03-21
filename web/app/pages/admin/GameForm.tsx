@@ -51,7 +51,7 @@ export default function GameForm() {
       } else {
         await addGame(formData);
       }
-      navigate('/admin/games');
+      navigate('/game-admin/games');
     } catch (err) {
       console.error('Error saving game:', err);
     }
@@ -83,7 +83,7 @@ export default function GameForm() {
               {isEditing ? 'Edit Game' : 'Add New Game'}
             </h1>
             <button
-              onClick={() => navigate('/admin/games')}
+              onClick={() => navigate('/game-admin/games')}
               className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
             >
               Back to Games
@@ -165,7 +165,7 @@ export default function GameForm() {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/admin/games')}
+                onClick={() => navigate('/game-admin/games')}
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
               >
                 Cancel

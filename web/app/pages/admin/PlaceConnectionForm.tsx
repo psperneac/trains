@@ -208,10 +208,10 @@ export default function PlaceConnectionForm() {
     } else {
       await addPlaceConnection(form as Omit<PlaceConnectionDto, 'id'>);
     }
-    navigate('/admin/place-connections');
+    navigate('/game-admin/place-connections');
   };
 
-  const handleCancel = () => navigate('/admin/place-connections');
+  const handleCancel = () => navigate('/game-admin/place-connections');
 
   // Get selected places for map
   const startPlace = allPlaces.find((p) => p.id === form.startId);

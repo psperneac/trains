@@ -20,11 +20,11 @@ export default function Games() {
   };
 
   const handleAdd = () => {
-    navigate('/admin/games/new');
+    navigate('/game-admin/games/new');
   };
 
   const handleEdit = (id: string) => {
-    navigate(`/admin/games/${id}/edit`);
+    navigate(`/game-admin/games/${id}/edit`);
   };
 
   const handleDelete = (id: string) => {

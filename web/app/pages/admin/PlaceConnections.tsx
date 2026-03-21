@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
@@ -30,16 +30,23 @@ function getPinIcon(color: string) {
   });
 }
 
-function FitBounds({ places }: { places: { lat: number; lng: number }[] }) {
+// Fits the map to show all places in the `places` array.
+// Uses `enabled` to control whether this runs - when disabled or already fitted, it does nothing.
+// The `hasFitted` ref ensures this only runs once on initial page load, not on every re-render.
+function FitBounds({ places, enabled }: { places: { lat: number; lng: number }[]; enabled: boolean }) {
   const map = useMap();
+  const hasFitted = useRef(false);
   useEffect(() => {
-    if (places.length === 0) return;
+    if (!enabled || hasFitted.current || places.length === 0) return;
     const bounds = L.latLngBounds(places.map((p) => [p.lat, p.lng]));
     map.fitBounds(bounds, { padding: [40, 40] });
-  }, [places, map]);
+    hasFitted.current = true;
+  }, [enabled, places, map]);
   return null;
 }
 
+// Sets the map view to a single point (lat/lng) at a fixed zoom level.
+// Used when user clicks the pin icon next to a place to focus on that place.
 function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
   const map = useMap();
   useEffect(() => {
@@ -47,6 +54,34 @@ function MapFocus({ focus }: { focus: { lat: number; lng: number } | null }) {
       map.setView([focus.lat, focus.lng], 15);
     }
   }, [focus, map]);
+  return null;
+}
+
+// Fits the map to show a specific connection (between two places).
+// After fitting, listens for user map interactions (moveend) and calls onMove
+// to signal that the pin should be cleared and normal map behavior restored.
+function ConnectionFocus({ startId, endId, placesById, onMove }: { startId: string; endId: string; placesById: Record<string, any>; onMove: () => void }) {
+  const map = useMap();
+  useEffect(() => {
+    const startPlace = placesById[startId];
+    const endPlace = placesById[endId];
+    if (startPlace && endPlace) {
+      const bounds = L.latLngBounds([
+        [startPlace.lat, startPlace.lng],
+        [endPlace.lat, endPlace.lng]
+      ]);
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    const handleMoveEnd = () => {
+      onMove();
+    };
+    map.on('moveend', handleMoveEnd);
+
+    return () => {
+      map.off('moveend', handleMoveEnd);
+    };
+  }, [startId, endId, placesById, map, onMove]);
   return null;
 }
 
@@ -83,7 +118,13 @@ export default function PlaceConnections() {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  // mapFocus: Single point to center the map on (used for place pin button)
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
+  // connectionToFocus: When set, shows a specific connection's endpoints fitting the map view
+  const [connectionToFocus, setConnectionToFocus] = useState<{ startId: string; endId: string } | null>(null);
+  // hasUserMovedMap: Tracks if user has manually moved the map after page load or after pinning.
+  // Used to prevent FitBounds from overriding user-initiated map positions.
+  const [hasUserMovedMap, setHasUserMovedMap] = useState(false);
   const [showVisible, setShowVisible] = useState(false);
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
 
@@ -108,10 +149,10 @@ export default function PlaceConnections() {
   }, [fetchPlaceConnections, fetchAllPlaces]);
 
   const handleAdd = () => {
-    navigate('/admin/place-connections/add');
+    navigate('/game-admin/place-connections/add');
   };
 
-  const handleEdit = (id: string) => navigate(`/admin/place-connections/${id}/edit`);
+  const handleEdit = (id: string) => navigate(`/game-admin/place-connections/${id}/edit`);
   
   const handleDelete = (id: string) => {
     setDeleteId(id);
@@ -139,23 +180,26 @@ export default function PlaceConnections() {
     handleDelete(id);
   };
 
+  // Pin button: Fit map to show the full connection between two places
   const handleShowOnMap = (connection: any) => {
-    const startPlace = allPlaces.find(p => p.id === connection.startId);
-    const endPlace = allPlaces.find(p => p.id === connection.endId);
-    
-    if (startPlace && endPlace) {
-      // Focus on midpoint between start and end
-      const midLat = (startPlace.lat + endPlace.lat) / 2;
-      const midLng = (startPlace.lng + endPlace.lng) / 2;
-      setMapFocus({ lat: midLat, lng: midLng });
-    }
+    setConnectionToFocus({ startId: connection.startId, endId: connection.endId });
+    setHasUserMovedMap(false); // Reset so FitBounds doesn't fight with ConnectionFocus
   };
 
-  // Create a map of place IDs to place objects for quick lookup
-  const placesById = allPlaces.reduce((acc, place) => {
+  // Called when user moves the map after pinning a connection.
+  // Clears the connection pin and marks that user has moved the map
+  // so FitBounds won't override the user's chosen position.
+  const handleMapMove = () => {
+    setConnectionToFocus(null);
+    setHasUserMovedMap(true);
+  };
+
+  // Memoized lookup map for place ID -> place object.
+  // Passed to ConnectionFocus to avoid re-creating the bounds on every render.
+  const placesById = useMemo(() => allPlaces.reduce((acc, place) => {
     acc[place.id] = place;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, any>), [allPlaces]);
 
   const visiblePlaces = showVisible && visibleBounds
     ? allPlaces.filter(place => visibleBounds.contains([place.lat, place.lng]))
@@ -277,8 +321,23 @@ export default function PlaceConnections() {
               zoom={13}
               scrollWheelZoom={true}
             >
-              <MapFocus focus={mapFocus} />
-              <FitBounds places={allPlaces} />
+              {/*
+                Map focus logic:
+                - If connectionToFocus is set: show that connection fitting the map (ConnectionFocus takes over)
+                - Otherwise: normal behavior with MapFocus (single point) and FitBounds (initial load only)
+                
+                FitBounds is enabled only when:
+                1. User hasn't manually moved the map yet (hasUserMovedMap = false)
+                2. No connection is being focused (connectionToFocus = null)
+              */}
+              {connectionToFocus ? (
+                <ConnectionFocus startId={connectionToFocus.startId} endId={connectionToFocus.endId} placesById={placesById} onMove={handleMapMove} />
+              ) : (
+                <>
+                  <MapFocus focus={mapFocus} />
+                  <FitBounds places={allPlaces} enabled={!hasUserMovedMap && !connectionToFocus} />
+                </>
+              )}
               <MapBoundsTracker onBoundsChange={setVisibleBounds} />
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

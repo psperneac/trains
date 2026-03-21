@@ -180,10 +180,10 @@ export default function PlaceForm() {
     } else {
       await addPlace(form as Omit<PlaceDto, 'id'>);
     }
-    navigate('/admin/places');
+    navigate('/game-admin/places');
   };
 
-  const handleCancel = () => navigate('/admin/places');
+  const handleCancel = () => navigate('/game-admin/places');
 
   const handleCenterMap = () => {
     if ((window as any).updateMarkerToMapCenter) {

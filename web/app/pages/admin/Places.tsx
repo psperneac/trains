@@ -54,13 +54,13 @@ export default function Places() {
 
   const handleAdd = () => {
     if (mapPosition) {
-      navigate('/admin/places/add', { state: { mapPosition } });
+      navigate('/game-admin/places/add', { state: { mapPosition } });
     } else {
-      navigate('/admin/places/add');
+      navigate('/game-admin/places/add');
     }
   };
 
-  const handleEdit = (id: string) => navigate(`/admin/places/${id}/edit`);
+  const handleEdit = (id: string) => navigate(`/game-admin/places/${id}/edit`);
   const handleDelete = (id: string) => {
     setDeleteId(id);
     setConfirming(true);
