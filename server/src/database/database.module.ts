@@ -58,8 +58,6 @@ export const ENTITIES = [
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log('environment', environment);
-
         const username = configService.get('MONGO_USERNAME');
         const password = configService.get('MONGO_PASSWORD');
         const database = configService.get('MONGO_DATABASE');

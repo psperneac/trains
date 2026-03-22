@@ -143,11 +143,11 @@ export default function PlaceConnectionForm() {
     allPlaceConnections,
     addPlaceConnection,
     updatePlaceConnection,
-    fetchPlaceConnections,
+    fetchPlaceConnectionsByGameId,
     loading,
     error
   } = usePlaceConnectionStore();
-  const { allPlaces, fetchAllPlaces } = usePlaceStore();
+  const { allPlaces, fetchPlacesByGameId } = usePlaceStore();
   const { allGames, fetchAllGames } = useGameStore();
   const { currentGameId } = useAuthStore();
   const isEdit = Boolean(id);
@@ -173,17 +173,17 @@ export default function PlaceConnectionForm() {
 
   // Fetch data
   useEffect(() => {
-    if (isEdit && !currentConnection && !fetchedRef.current) {
+    if (isEdit && !currentConnection && !fetchedRef.current && currentGameId) {
       fetchedRef.current = true;
-      fetchPlaceConnections();
+      fetchPlaceConnectionsByGameId(currentGameId);
     }
-    if (allPlaces.length === 0) {
-      fetchAllPlaces();
+    if (allPlaces.length === 0 && currentGameId) {
+      fetchPlacesByGameId(currentGameId);
     }
     if (allGames.length === 0) {
       fetchAllGames();
     }
-  }, [isEdit, currentConnection, fetchPlaceConnections, allPlaces.length, fetchAllPlaces, allGames.length, fetchAllGames]);
+  }, [isEdit, currentConnection, currentGameId, fetchPlaceConnectionsByGameId, allPlaces.length, fetchPlacesByGameId, allGames.length, fetchAllGames]);
 
   // Set form when editing
   useEffect(() => {
@@ -203,10 +203,11 @@ export default function PlaceConnectionForm() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentGameId) return;
     if (isEdit) {
-      await updatePlaceConnection(form as PlaceConnectionDto);
+      await updatePlaceConnection(form as PlaceConnectionDto, currentGameId);
     } else {
-      await addPlaceConnection(form as Omit<PlaceConnectionDto, 'id'>);
+      await addPlaceConnection(form as Omit<PlaceConnectionDto, 'id'>, currentGameId);
     }
     navigate('/game-admin/place-connections');
   };

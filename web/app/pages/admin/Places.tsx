@@ -11,6 +11,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useOptionsStore } from '../../store/optionsStore';
 import { usePlaceStore } from '../../store/placeStore';
 import { FitBounds, MapFocus, MapPositionTracker } from '../../utils/map';
+import { useTranslation } from 'react-i18next';
 
 // Color mapping for place types
 const typeColorMap: Record<string, string> = {
@@ -37,9 +38,9 @@ function getPinIcon(type: string) {
 }
 
 export default function Places() {
-  const { allPlaces, loading, error, fetchPlaces, deletePlace } = usePlaceStore();
+  const { allPlaces, loading, error, fetchPlacesByGameId, deletePlace } = usePlaceStore();
   const { showLabels } = useOptionsStore();
-  const userId = useAuthStore((state) => state.userId);
+  const { currentGameId } = useAuthStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -47,10 +48,15 @@ export default function Places() {
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
   const [showVisible, setShowVisible] = useState(false);
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    fetchPlaces();
-  }, [fetchPlaces]);
+    if (!currentGameId) {
+      navigate('/');
+      return;
+    }
+    fetchPlacesByGameId(currentGameId);
+  }, [currentGameId, fetchPlacesByGameId, navigate]);
 
   const handleAdd = () => {
     if (mapPosition) {
@@ -66,8 +72,8 @@ export default function Places() {
     setConfirming(true);
   };
   const handleConfirmDelete = async () => {
-    if (deleteId) {
-      await deletePlace(deleteId);
+    if (deleteId && currentGameId) {
+      await deletePlace(deleteId, currentGameId);
       setDeleteId(null);
       setConfirming(false);
     }
@@ -89,11 +95,48 @@ export default function Places() {
     ? allPlaces.filter(place => visibleBounds.contains([place.lat, place.lng]))
     : allPlaces;
 
+  const handleDeleteAll = () => {
+    console.log('Delete All clicked');
+  };
+
+  const handleCopy = () => {
+    console.log('Copy clicked');
+  };
+
+  const handleImport = () => {
+    console.log('Import clicked');
+  };
+
+  const handleExport = () => {
+    console.log('Export clicked');
+  };
+
   const options = [
     {
-      label: showVisible ? '✓ Show visible' : 'Show visible',
+      label: t('common.copy'),
+      onClick: handleCopy,
+    },
+    {
+      label: t('common.deleteAll'),
+      onClick: handleDeleteAll,
+    },
+    {
+      label: t('common.import'),
+      onClick: handleImport,
+    },
+    {
+      label: t('common.export'),
+      onClick: handleExport,
+    },
+    {
+      label: '',
+      onClick: () => {},
+      separator: true,
+    },
+    {
+      label: showVisible ? t('common.showVisibleSelected') : t('common.showVisible'),
       onClick: () => setShowVisible(prev => !prev),
-    }
+    },
   ];
 
   return (

@@ -72,7 +72,6 @@ export class AuthenticationController {
   @Post('login')
   async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
     const { user } = request;
-    console.log('Login user data:', { _id: user._id, scope: user.scope, email: user.email });
     const token = this.authenticationService.getAuthToken(user._id.toString(), user.scope);
     user.password = undefined;
     return response

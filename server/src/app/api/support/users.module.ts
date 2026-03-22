@@ -15,12 +15,12 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 import { Admin, LoggedIn } from 'src/authentication/authentication.guard';
 import { AllExceptionsFilter } from 'src/utils/all-exceptions.filter';
 import { Column, Entity, Repository } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
+import { Wallet, WalletDto } from './wallet.model';
 
 
 export class CreateUserDto {
@@ -39,14 +39,7 @@ export class UpdateUserDto {
 
 export class UserPreference {
   @Column({ type: 'json' })
-  @Expose()
   content: any;
-}
-
-export class UserWallet {
-  @Column()
-  @Expose()
-  gems: number;
 }
 
 export interface UserPreferenceDto {
@@ -55,16 +48,12 @@ export interface UserPreferenceDto {
   content: any;
 }
 
-export interface UserWalletDto {
-  gems: number;
-}
-
 export class UserDto {
   public username: string;
   public email: string;
   public scope: string;
   public preferences?: UserPreferenceDto;
-  public wallet?: UserWalletDto;
+  public wallet?: WalletDto;
 }
 
 @Entity({ name: 'users' })
@@ -85,7 +74,7 @@ export class User extends AbstractEntity {
   public preferences?: UserPreference;
 
   @Column({ type: 'json' })
-  public wallet?: UserWallet;
+  public wallet?: Wallet;
 }
 
 @Injectable()
@@ -96,7 +85,7 @@ class UserDtoMapper {
     userDto.username = user.username;
     userDto.scope = user.scope;
     userDto.preferences = { ...user.preferences } as UserPreferenceDto;
-    userDto.wallet = { ...user.wallet } as UserWalletDto;
+    userDto.wallet = { ...user.wallet } as WalletDto;
     return userDto;
   }
 

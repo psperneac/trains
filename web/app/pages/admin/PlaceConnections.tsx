@@ -110,10 +110,10 @@ export default function PlaceConnections() {
     allPlaceConnections,
     loading,
     error,
-    fetchPlaceConnections,
+    fetchPlaceConnectionsByGameId,
     deletePlaceConnection
   } = usePlaceConnectionStore();
-  const { allPlaces, fetchAllPlaces } = usePlaceStore();
+  const { allPlaces, fetchPlacesByGameId } = usePlaceStore();
   const { currentGameId } = useAuthStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -136,17 +136,14 @@ export default function PlaceConnections() {
     }
   }, [currentGameId, navigate]);
 
-  // Filter place connections by current game
-  const filteredPlaceConnections = allPlaceConnections.filter(
-    connection => connection.gameId === currentGameId
-  );
-
   useEffect(() => {
-    Promise.all([
-      fetchPlaceConnections(),
-      fetchAllPlaces()
-    ]);
-  }, [fetchPlaceConnections, fetchAllPlaces]);
+    if (currentGameId) {
+      Promise.all([
+        fetchPlaceConnectionsByGameId(currentGameId),
+        fetchPlacesByGameId(currentGameId)
+      ]);
+    }
+  }, [currentGameId, fetchPlaceConnectionsByGameId, fetchPlacesByGameId]);
 
   const handleAdd = () => {
     navigate('/game-admin/place-connections/add');
@@ -160,8 +157,8 @@ export default function PlaceConnections() {
   };
   
   const handleConfirmDelete = async () => {
-    if (deleteId) {
-      await deletePlaceConnection(deleteId);
+    if (deleteId && currentGameId) {
+      await deletePlaceConnection(deleteId, currentGameId);
       setDeleteId(null);
       setConfirming(false);
     }
@@ -208,13 +205,13 @@ export default function PlaceConnections() {
   const visiblePlaceIds = new Set(visiblePlaces.map(p => p.id));
 
   const visibleConnections = showVisible && visibleBounds
-    ? filteredPlaceConnections.filter(conn => {
+    ? allPlaceConnections.filter(conn => {
         const startPlace = placesById[conn.startId];
         const endPlace = placesById[conn.endId];
         if (!startPlace || !endPlace) return false;
         return connectionVisible(startPlace, endPlace, visibleBounds);
       })
-    : filteredPlaceConnections;
+    : allPlaceConnections;
 
   const options = [
     {

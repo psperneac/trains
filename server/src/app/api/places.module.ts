@@ -14,6 +14,7 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { GamesModule } from './games.module';
 import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 @Entity({ name: 'places' })
 export class Place extends AbstractEntity {
@@ -73,7 +74,7 @@ export class PlacesService extends AbstractService<Place> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Place>> {
-    return this.findAllWhere({ gameId }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 }
 

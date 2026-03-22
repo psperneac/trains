@@ -1,5 +1,6 @@
-import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { Admin, LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -10,9 +11,21 @@ import { AbstractService } from '../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { User } from './support/users.module';
+import { WalletDto } from './support/wallet.model';
 
 import { GameMapper, GamesModule, GamesService } from './games.module';
 import { PlayerDto, PlayerMapper, PlayersModule, PlayersService } from './support/players.module';
+
+export class ResetPasswordDto {
+  newPassword: string;
+}
+
+export class SendGoldAndGemsDto {
+  userId: string;
+  gold: number;
+  gems: number;
+  parts: number;
+}
 
 export interface AdminUserDto {
   id: string;
@@ -20,6 +33,7 @@ export interface AdminUserDto {
   email: string;
   scope: string;
   preferences: any;
+  wallet?: WalletDto;
   created: Date;
   updated: Date;
   players?: (PlayerDto & { game?: any })[];
@@ -36,6 +50,17 @@ export class AdminUsersRepository extends RepositoryAccessor<User> {
 export class AdminUserMapper extends AbstractDtoMapper<User, AdminUserDto> {
   getMappedProperties(): string[] {
     return ['id', 'username', 'email', 'scope', 'preferences', 'created', 'updated'];
+  }
+
+  async toDto(domain: User): Promise<AdminUserDto> {
+    if (!domain) {
+      return null;
+    }
+    const dto = await super.toDto(domain);
+    if (dto && domain.wallet) {
+      dto.wallet = { ...domain.wallet } as WalletDto;
+    }
+    return dto;
   }
 }
 
@@ -65,6 +90,39 @@ export class AdminUsersService extends AbstractService<User> {
 
     return dto;
   }
+
+  async resetPassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (user.scope === 'ADMIN') {
+      throw new HttpException('Cannot reset password for an admin user', HttpStatus.FORBIDDEN);
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.repo.getRepository().update(userId, { password: hashedPassword });
+  }
+
+  async sendGoldAndGems(userId: string, gold: number, gems: number, parts: number): Promise<User> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (!user.wallet) {
+      user.wallet = { gold: 0, gems: 0, parts: 0, content: {} };
+    }
+
+    const currentGold = typeof user.wallet.gold === 'number' && !isNaN(user.wallet.gold) ? user.wallet.gold : 0;
+    const currentGems = typeof user.wallet.gems === 'number' && !isNaN(user.wallet.gems) ? user.wallet.gems : 0;
+    const currentParts = typeof user.wallet.parts === 'number' && !isNaN(user.wallet.parts) ? user.wallet.parts : 0;
+
+    user.wallet.gold = currentGold + gold;
+    user.wallet.gems = currentGems + gems;
+    user.wallet.parts = currentParts + parts;
+
+    return this.repo.getRepository().save(user) as Promise<User>;
+  }
 }
 
 @Controller('admin')
@@ -91,6 +149,27 @@ export class AdminUsersController extends AbstractServiceController<User, AdminU
     if (!user) {
       throw new Error('User not found');
     }
+    const userDto = await this.adminUserMapper.toDto(user);
+    return this.adminUsersService.enrichUserWithData(userDto, user);
+  }
+
+  @Post('user/:userId/reset-password')
+  @UseGuards(LoggedIn, Admin)
+  async resetPassword(
+    @Param('userId') userId: string,
+    @Body() resetDto: ResetPasswordDto
+  ): Promise<{ message: string }> {
+    await this.adminUsersService.resetPassword(userId, resetDto.newPassword);
+    return { message: 'Password reset successfully' };
+  }
+
+  @Post('user/:userId/send')
+  @UseGuards(LoggedIn, Admin)
+  async sendGoldAndGems(
+    @Param('userId') userId: string,
+    @Body() sendDto: SendGoldAndGemsDto
+  ): Promise<AdminUserDto> {
+    const user = await this.adminUsersService.sendGoldAndGems(userId, sendDto.gold, sendDto.gems, sendDto.parts);
     const userDto = await this.adminUserMapper.toDto(user);
     return this.adminUsersService.enrichUserWithData(userDto, user);
   }

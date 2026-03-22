@@ -54,7 +54,7 @@ describe('Abstract Controller', () => {
         config.mapper = module.get(config.mapperClass);
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   });
 

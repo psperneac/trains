@@ -67,8 +67,6 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   @Get()
   @UseGuards(LoggedIn)
   async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<R>> {
-    console.log('findAll', pagination, this.service, this.mapper);
-
     return this.service.findAll(pagination).then(this.makeHandler());
   }
 

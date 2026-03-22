@@ -76,7 +76,7 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<PlaceConnection>> {
-    return this.findAllWhere({ gameId }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 }
 

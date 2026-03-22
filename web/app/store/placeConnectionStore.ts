@@ -12,9 +12,9 @@ interface PlaceConnectionState {
   
   fetchPlaceConnections: () => Promise<void>;
   fetchPlaceConnectionsByGameId: (gameId: string) => Promise<void>;
-  addPlaceConnection: (placeConnection: Omit<PlaceConnectionDto, 'id'>) => Promise<void>;
-  updatePlaceConnection: (placeConnection: PlaceConnectionDto) => Promise<void>;
-  deletePlaceConnection: (id: string) => Promise<void>;
+  addPlaceConnection: (placeConnection: Omit<PlaceConnectionDto, 'id'>, gameId: string) => Promise<void>;
+  updatePlaceConnection: (placeConnection: PlaceConnectionDto, gameId: string) => Promise<void>;
+  deletePlaceConnection: (id: string, gameId: string) => Promise<void>;
 }
 
 export const usePlaceConnectionStore = create<PlaceConnectionState>()(
@@ -61,7 +61,7 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
     }
   },
   
-  addPlaceConnection: async (placeConnection) => {
+  addPlaceConnection: async (placeConnection, gameId) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -71,13 +71,13 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
         authToken,
         body: JSON.stringify(placeConnection),
       });
-      await get().fetchPlaceConnections();
+      await get().fetchPlaceConnectionsByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
   
-  updatePlaceConnection: async (placeConnection) => {
+  updatePlaceConnection: async (placeConnection, gameId) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -87,13 +87,13 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
         authToken,
         body: JSON.stringify(placeConnection),
       });
-      await get().fetchPlaceConnections();
+      await get().fetchPlaceConnectionsByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
   
-  deletePlaceConnection: async (id) => {
+  deletePlaceConnection: async (id, gameId) => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
@@ -102,7 +102,7 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
         method: 'DELETE',
         authToken,
       });
-      await get().fetchPlaceConnections();
+      await get().fetchPlaceConnectionsByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }

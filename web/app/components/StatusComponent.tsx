@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
+import { useGameStore } from '../store/gameStore';
+import { usePlayersStore } from '../store/playersStore';
+import type { GameDto } from '../types/game';
 
 export interface OptionsMenuItem {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  separator?: boolean;
 }
 
 interface StatusComponentProps {
@@ -13,7 +17,9 @@ interface StatusComponentProps {
 }
 
 export default function StatusComponent({ options = [] }: StatusComponentProps) {
-  const { currentGame, currentPlayer } = useAuthStore();
+  const { currentGame, currentPlayer, setCurrentGame, setCurrentPlayer, isAdmin, userId } = useAuthStore();
+  const { allGames, fetchAllGames } = useGameStore();
+  const { players, fetchPlayersByUserId } = usePlayersStore();
   const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -32,12 +38,50 @@ export default function StatusComponent({ options = [] }: StatusComponentProps) 
     };
   }, [showMenu]);
 
+  useEffect(() => {
+    if (isAdmin()) {
+      fetchAllGames();
+      if (userId) {
+        fetchPlayersByUserId(userId);
+      }
+    }
+  }, [isAdmin, fetchAllGames, fetchPlayersByUserId, userId]);
+
+  const handleGameChange = (gameId: string) => {
+    const selectedGame = allGames.find(game => game.id === gameId);
+    setCurrentGame(selectedGame || null);
+    if (selectedGame && players.length > 0) {
+      const playerForGame = players.find(player => player.gameId === gameId);
+      setCurrentPlayer(playerForGame || null);
+    } else {
+      setCurrentPlayer(null);
+    }
+  };
+
   return (
     <div className="bg-blue-50 dark:bg-blue-900/20 border-t border-b border-blue-200 dark:border-blue-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center space-x-4">
-            {currentGame ? (
+            {isAdmin() ? (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  {t('status.currentGame')}:
+                </span>
+                <select
+                  value={currentGame?.id || ''}
+                  onChange={(e) => handleGameChange(e.target.value)}
+                  className="text-sm font-semibold bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded px-2 py-0.5 text-blue-900 dark:text-blue-100"
+                >
+                  <option value="">{t('status.selectGame')}</option>
+                  {allGames.map((game: GameDto) => (
+                    <option key={game.id} value={game.id}>
+                      {game.name} {game.type === 'TEMPLATE' ? t('status.template') : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : currentGame ? (
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
                   {t('status.currentGame')}:
@@ -77,23 +121,27 @@ export default function StatusComponent({ options = [] }: StatusComponentProps) 
                   Options ▾
                 </button>
                 {showMenu && (
-                  <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                  <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-[9999]">
                     {options.map((item, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          item.onClick();
-                          setShowMenu(false);
-                        }}
-                        disabled={item.disabled}
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          item.disabled
-                            ? 'text-gray-400 cursor-not-allowed'
-                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
+                      item.separator ? (
+                        <div key={`separator-${index}`} className="border-t border-gray-200 dark:border-gray-700 my-1" />
+                      ) : (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            item.onClick();
+                            setShowMenu(false);
+                          }}
+                          disabled={item.disabled}
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            item.disabled
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      )
                     ))}
                   </div>
                 )}

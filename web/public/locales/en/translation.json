@@ -1,6 +1,14 @@
 {
   "title": "Train Management",
 
+  "common": {
+    "copy": "Copy",
+    "deleteAll": "Delete All",
+    "export": "Export",
+    "import": "Import",
+    "showVisible": "Show visible",
+    "showVisibleSelected": "✓ Show visible"
+  },
   "drawer": {
     "unpin": "Unpin Drawer",
     "pin": "Pin Drawer",
@@ -48,7 +56,9 @@
   "status": {
     "currentGame": "Current Game",
     "noGameSelected": "No game selected",
-    "player": "Player"
+    "player": "Player",
+    "selectGame": "Select a game...",
+    "template": "(Template)"
   },
   "walletDisplay": {
     "hidden": "Hidden",

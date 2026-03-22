@@ -16,39 +16,9 @@ import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { EntityType, TransactionType, TransactionsModule, TransactionsService } from './transactions.module';
 import { User } from './users.module';
+import { Wallet, WalletDto, SendGoldAndGemsDto } from './wallet.model';
 
-export class Wallet {
-  @Column('integer')
-  @Expose()
-  gold = 0;
-
-  @Column('integer')
-  @Expose()
-  gems = 0;
-
-  @Column('integer')
-  @Expose()
-  parts = 0;
-
-  @Column({ type: 'json' })
-  @Expose()
-  content: any;
-}
-
-export interface WalletDto {
-  id: string;
-  gold: number;
-  gems: number;
-  parts: number;
-  content: any;
-}
-
-export class SendGoldAndGemsDto {
-  playerId: string;
-  gold: number;
-  gems: number;
-  parts: number;
-}
+export { Wallet, WalletDto, SendGoldAndGemsDto };
 
 @Entity({ name: 'players' })
 export class Player extends AbstractEntity {
@@ -256,7 +226,6 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     @Req() request: RequestWithUser
   ): Promise<PlayerDto> {
     const currentUser = request.user;
-    console.log(`Admin ${currentUser.username} (${currentUser._id}) sending ${sendDto.gold} gold, ${sendDto.gems} gems, and ${sendDto.parts} parts to player ${sendDto.playerId}`);
 
     // Create transaction record first
     await this.transactionsService.createTransaction(

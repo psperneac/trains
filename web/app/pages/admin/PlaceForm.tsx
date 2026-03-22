@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
+import { useAuthStore } from '../../store/authStore';
 import { usePlaceStore } from '../../store/placeStore';
 import { usePlaceTypeStore } from '../../store/placeTypeStore';
 import type { PlaceDto } from '../../types/place';
@@ -90,9 +91,18 @@ export default function PlaceForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { allPlaces, addPlace, updatePlace, fetchPlaces, loading, error } = usePlaceStore();
+  const { currentGameId } = useAuthStore();
+  const { allPlaces, addPlace, updatePlace, fetchPlacesByGameId, loading, error } = usePlaceStore();
   const { placeTypes, fetchPlaceTypes } = usePlaceTypeStore();
   const isEdit = Boolean(id);
+
+  // Redirect to home if no game is selected when adding
+  useEffect(() => {
+    if (!isEdit && !currentGameId) {
+      navigate('/');
+      return;
+    }
+  }, [isEdit, currentGameId, navigate]);
 
   // Get map position from navigation state if available
   const mapPosition = location.state?.mapPosition as { lat: number; lng: number; zoom: number } | undefined;
@@ -107,15 +117,15 @@ export default function PlaceForm() {
 
   // Effect 1: Fetch places if needed
   useEffect(() => {
-    if (isEdit && !currentPlace && !fetchedRef.current) {
+    if (isEdit && !currentPlace && !fetchedRef.current && currentGameId) {
       fetchedRef.current = true;
-      fetchPlaces();
+      fetchPlacesByGameId(currentGameId);
     }
     // Fetch place types if not loaded
     if (placeTypes.length === 0) {
       fetchPlaceTypes();
     }
-  }, [isEdit, currentPlace, fetchPlaces, placeTypes.length, fetchPlaceTypes]);
+  }, [isEdit, currentPlace, currentGameId, fetchPlacesByGameId, placeTypes.length, fetchPlaceTypes]);
 
   // Effect 2: Set form state when currentPlace becomes available
   useEffect(() => {
@@ -175,10 +185,11 @@ export default function PlaceForm() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentGameId) return;
     if (isEdit) {
-      await updatePlace(form as PlaceDto);
+      await updatePlace(form as PlaceDto, currentGameId);
     } else {
-      await addPlace(form as Omit<PlaceDto, 'id'>);
+      await addPlace(form as Omit<PlaceDto, 'id'>, currentGameId);
     }
     navigate('/game-admin/places');
   };
