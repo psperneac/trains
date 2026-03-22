@@ -21,7 +21,7 @@ export default function Layout({ children, title, statusOptions = [] }: LayoutPr
       </header>
       <Navigation />
       <StatusComponent options={statusOptions} />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-8rem)]">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-9rem)] overflow-hidden">
         <div className="px-4 py-0 sm:px-0 h-full">
           {title && (
             <div className="mb-3">

@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 interface OptionsState {
   showLabels: boolean;
   setShowLabels: (show: boolean, userId?: string | null) => void;
+  showVisible: boolean;
+  setShowVisible: (show: boolean) => void;
   initializeOptions: (userId: string) => void;
 }
 
@@ -10,12 +12,23 @@ export const useOptionsStore = create<OptionsState>()(
   devtools(
     (set) => ({
       showLabels: false,
+      showVisible: false,
 
       setShowLabels: (show: boolean, userId?: string | null) => {
-        if (userId) {
-          localStorage.setItem(`placeSettings_${userId}`, JSON.stringify({ showLabels: show }));
-        }
-        set({ showLabels: show });
+        set((state) => {
+          const newState = { showLabels: show };
+          if (userId) {
+            localStorage.setItem(`placeSettings_${userId}`, JSON.stringify({ 
+              ...JSON.parse(localStorage.getItem(`placeSettings_${userId}`) || '{}'),
+              showLabels: show 
+            }));
+          }
+          return newState;
+        });
+      },
+
+      setShowVisible: (show: boolean) => {
+        set({ showVisible: show });
       },
 
       initializeOptions: (userId: string) => {
@@ -26,12 +39,14 @@ export const useOptionsStore = create<OptionsState>()(
             if (typeof settings.showLabels === 'boolean') {
               set({ showLabels: settings.showLabels });
             }
+            if (typeof settings.showVisible === 'boolean') {
+              set({ showVisible: settings.showVisible });
+            }
           } catch (e) {
             console.error('Failed to parse place settings', e);
           }
         } else {
-          // Default for new users or if no settings found
-          set({ showLabels: false });
+          set({ showLabels: false, showVisible: false });
         }
       },
     }),

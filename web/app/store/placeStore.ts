@@ -4,6 +4,12 @@ import { apiRequest } from '../config/api';
 import type { PlaceDto } from '../types/place';
 import { useAuthStore } from './authStore';
 
+interface CopyResult {
+  copiedCount: number;
+  skippedCount: number;
+  overwrittenCount: number;
+}
+
 interface PlaceState {
   allPlaces: PlaceDto[];
   
@@ -16,6 +22,8 @@ interface PlaceState {
   addPlace: (place: Omit<PlaceDto, 'id'>, gameId: string) => Promise<void>;
   updatePlace: (place: PlaceDto, gameId: string) => Promise<void>;
   deletePlace: (id: string, gameId: string) => Promise<void>;
+  deleteAllPlaces: (gameId: string) => Promise<number>;
+  copyPlaces: (sourceGameId: string, targetGameId: string, overwrite?: boolean) => Promise<CopyResult>;
 }
 
 export const usePlaceStore = create<PlaceState>()(
@@ -111,6 +119,43 @@ export const usePlaceStore = create<PlaceState>()(
       await get().fetchPlacesByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
+
+  deleteAllPlaces: async (gameId) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const result = await apiRequest<{ deletedCount: number }>(`/api/places/game/${gameId}`, {
+        method: 'DELETE',
+        authToken,
+      });
+      await get().fetchPlacesByGameId(gameId);
+      set({ loading: false });
+      return result.deletedCount;
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
+    }
+  },
+
+  copyPlaces: async (sourceGameId, targetGameId, overwrite = false) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const result = await apiRequest<CopyResult>('/api/places/copy', {
+        method: 'POST',
+        authToken,
+        body: JSON.stringify({ sourceGameId, targetGameId, overwrite }),
+      });
+      await get().fetchPlacesByGameId(targetGameId);
+      set({ loading: false });
+      return result;
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
     }
   },
 

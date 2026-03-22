@@ -1,7 +1,8 @@
-import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards, Body } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { AbstractEntity } from 'src/utils/abstract.entity';
 import { Column, Entity } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { LoggedIn } from '../../authentication/authentication.guard';
@@ -38,9 +39,9 @@ export class Place extends AbstractEntity {
   @Expose()
   lng: number;
 
-  @Column()
+  @Column('objectId')
   @Expose()
-  gameId: string;
+  gameId: ObjectId;
 }
 
 export interface PlaceDto {
@@ -51,6 +52,28 @@ export interface PlaceDto {
   lat: number;
   lng: number;
   gameId: string;
+}
+
+export class CopyPlacesDto {
+  @Expose()
+  sourceGameId: string;
+
+  @Expose()
+  targetGameId: string;
+
+  @Expose()
+  overwrite: boolean;
+}
+
+export class CopyResultDto {
+  @Expose()
+  copiedCount: number;
+
+  @Expose()
+  skippedCount: number;
+
+  @Expose()
+  overwrittenCount: number;
 }
 
 @Injectable()
@@ -76,6 +99,63 @@ export class PlacesService extends AbstractService<Place> {
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Place>> {
     return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
+
+  async copyPlaces(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
+    const repo = this.repo.getRepository();
+    const sourcePlaces = await repo.find({ where: { gameId: new Types.ObjectId(sourceGameId) } });
+    const targetPlaces = await repo.find({ where: { gameId: new Types.ObjectId(targetGameId) } });
+    
+    const targetPlacesByName = new Map(targetPlaces.map(p => [p.name, p]));
+
+    let copiedCount = 0;
+    let skippedCount = 0;
+    let overwrittenCount = 0;
+
+    for (const place of sourcePlaces) {
+      const existingPlace = targetPlacesByName.get(place.name);
+      
+      if (existingPlace) {
+        if (overwrite) {
+          existingPlace.description = place.description;
+          existingPlace.type = place.type;
+          existingPlace.lat = place.lat;
+          existingPlace.lng = place.lng;
+          await repo.save(existingPlace);
+          overwrittenCount++;
+        } else {
+          skippedCount++;
+        }
+      } else {
+        const newPlace = repo.create({
+          name: place.name,
+          description: place.description,
+          type: place.type,
+          lat: place.lat,
+          lng: place.lng,
+          gameId: new Types.ObjectId(targetGameId),
+        });
+        await repo.save(newPlace);
+        copiedCount++;
+      }
+    }
+
+    return {
+      copiedCount,
+      skippedCount,
+      overwrittenCount,
+    };
+  }
+
+  async deleteAllByGameId(gameId: string): Promise<number> {
+    const repo = this.repo.getRepository();
+    const places = await repo.find({ where: { gameId: new Types.ObjectId(gameId) } });
+    let deletedCount = 0;
+    for (const place of places) {
+      await repo.delete(place._id);
+      deletedCount++;
+    }
+    return deletedCount;
+  }
 }
 
 @Controller('places')
@@ -96,6 +176,19 @@ export class PlacesController extends AbstractServiceController<Place, PlaceDto>
   ): Promise<PageDto<PlaceDto>> {
     const page = await this.placesService.findByGameId(gameId, pagination);
     return this.handlePagedResults(page, this.placeMapper);
+  }
+
+  @Post('copy')
+  @UseGuards(LoggedIn)
+  async copyPlaces(@Body() copyPlacesDto: CopyPlacesDto): Promise<CopyResultDto> {
+    return this.placesService.copyPlaces(copyPlacesDto.sourceGameId, copyPlacesDto.targetGameId, copyPlacesDto.overwrite);
+  }
+
+  @Delete('game/:gameId')
+  @UseGuards(LoggedIn)
+  async deleteAllByGameId(@Param('gameId') gameId: string): Promise<{ deletedCount: number }> {
+    const deletedCount = await this.placesService.deleteAllByGameId(gameId);
+    return { deletedCount };
   }
 }
 

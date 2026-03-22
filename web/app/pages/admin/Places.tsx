@@ -7,6 +7,8 @@ import Drawer from '../../components/Drawer';
 import Layout from '../../components/Layout';
 import DeleteConfirmation from '../../components/DeleteConfirmation';
 import PlacesOptions from '../../components/PlacesOptions';
+import CopyPlacesModal from '../../components/CopyPlacesModal';
+import Toast from '../../components/Toast';
 import { useAuthStore } from '../../store/authStore';
 import { useOptionsStore } from '../../store/optionsStore';
 import { usePlaceStore } from '../../store/placeStore';
@@ -38,16 +40,19 @@ function getPinIcon(type: string) {
 }
 
 export default function Places() {
-  const { allPlaces, loading, error, fetchPlacesByGameId, deletePlace } = usePlaceStore();
-  const { showLabels } = useOptionsStore();
+  const { allPlaces, loading, error, fetchPlacesByGameId, deletePlace, copyPlaces, deleteAllPlaces } = usePlaceStore();
+  const { showLabels, showVisible, setShowVisible } = useOptionsStore();
   const { currentGameId } = useAuthStore();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
-  const [showVisible, setShowVisible] = useState(false);
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -96,11 +101,32 @@ export default function Places() {
     : allPlaces;
 
   const handleDeleteAll = () => {
-    console.log('Delete All clicked');
+    setShowDeleteAllConfirm(true);
+  };
+
+  const handleConfirmDeleteAll = async () => {
+    if (currentGameId) {
+      const deletedCount = await deleteAllPlaces(currentGameId);
+      setShowDeleteAllConfirm(false);
+      setToastMessage(`Deleted ${deletedCount} places.`);
+      setToastType('success');
+    }
   };
 
   const handleCopy = () => {
-    console.log('Copy clicked');
+    setShowCopyModal(true);
+  };
+
+  const handleConfirmCopy = async (sourceGameId: string, overwrite: boolean) => {
+    if (currentGameId) {
+      const result = await copyPlaces(sourceGameId, currentGameId, overwrite);
+      const parts = [];
+      if (result.copiedCount > 0) parts.push(`Copied ${result.copiedCount}`);
+      if (result.overwrittenCount > 0) parts.push(`Overwritten ${result.overwrittenCount}`);
+      if (result.skippedCount > 0) parts.push(`Skipped ${result.skippedCount} duplicates`);
+      setToastMessage(parts.join('. ') + '.');
+      setToastType('success');
+    }
   };
 
   const handleImport = () => {
@@ -111,36 +137,8 @@ export default function Places() {
     console.log('Export clicked');
   };
 
-  const options = [
-    {
-      label: t('common.copy'),
-      onClick: handleCopy,
-    },
-    {
-      label: t('common.deleteAll'),
-      onClick: handleDeleteAll,
-    },
-    {
-      label: t('common.import'),
-      onClick: handleImport,
-    },
-    {
-      label: t('common.export'),
-      onClick: handleExport,
-    },
-    {
-      label: '',
-      onClick: () => {},
-      separator: true,
-    },
-    {
-      label: showVisible ? t('common.showVisibleSelected') : t('common.showVisible'),
-      onClick: () => setShowVisible(prev => !prev),
-    },
-  ];
-
   return (
-    <Layout title="Places" statusOptions={options}>
+    <Layout title="Places">
       <div id="places-page-container" className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
@@ -277,8 +275,35 @@ export default function Places() {
         message="Are you sure you want to delete this place? This action cannot be undone."
       />
 
+      <DeleteConfirmation
+        isOpen={showDeleteAllConfirm}
+        onConfirm={handleConfirmDeleteAll}
+        onCancel={() => setShowDeleteAllConfirm(false)}
+        title="Confirm Delete All Places"
+        message={`Are you sure you want to delete all ${allPlaces.length} places? This action cannot be undone.`}
+      />
+
+      <CopyPlacesModal
+        isOpen={showCopyModal}
+        onClose={() => setShowCopyModal(false)}
+        onCopy={handleConfirmCopy}
+      />
+
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
+
       <Drawer side="right" title="Options">
-        <PlacesOptions />
+        <PlacesOptions
+          onCopy={handleCopy}
+          onDeleteAll={handleDeleteAll}
+          onImport={handleImport}
+          onExport={handleExport}
+        />
       </Drawer>
     </Layout>
   );

@@ -51,7 +51,14 @@
   },
   "placesOptions": {
     "description": "Toggle this setting to show or hide the permanent name labels above each place pin on the map. This setting is saved to your session.",
-    "showLabels": "Show Place Names on Map"
+    "showLabels": "Show Place Names on Map",
+    "showLabelsDescription": "Toggle this setting to show or hide the permanent name labels above each place pin on the map. This setting is saved to your session.",
+    "showVisible": "Show Visible Only",
+    "showVisibleDescription": "Only show places that are currently visible in the map viewport.",
+    "copyDescription": "Copy places from another game into the current game.",
+    "deleteAllDescription": "Delete all places from the current game. This action cannot be undone.",
+    "importDescription": "Import places from a JSON or CSV file.",
+    "exportDescription": "Export all places to a JSON or CSV file."
   },
   "status": {
     "currentGame": "Current Game",
