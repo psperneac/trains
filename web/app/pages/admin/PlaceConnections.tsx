@@ -3,8 +3,12 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
+import CopyPlaceConnectionsModal from '../../components/CopyPlaceConnectionsModal';
+import Drawer from '../../components/Drawer';
 import Layout from '../../components/Layout';
 import DeleteConfirmation from '../../components/DeleteConfirmation';
+import PlaceConnectionsOptions from '../../components/PlaceConnectionsOptions';
+import Toast from '../../components/Toast';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaceConnectionStore } from '../../store/placeConnectionStore';
 import { usePlaceStore } from '../../store/placeStore';
@@ -111,7 +115,8 @@ export default function PlaceConnections() {
     loading,
     error,
     fetchPlaceConnectionsByGameId,
-    deletePlaceConnection
+    deletePlaceConnection,
+    copyPlaceConnections
   } = usePlaceConnectionStore();
   const { allPlaces, fetchPlacesByGameId } = usePlaceStore();
   const { currentGameId } = useAuthStore();
@@ -127,6 +132,9 @@ export default function PlaceConnections() {
   const [hasUserMovedMap, setHasUserMovedMap] = useState(false);
   const [showVisible, setShowVisible] = useState(false);
   const [visibleBounds, setVisibleBounds] = useState<L.LatLngBounds | null>(null);
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
   // Redirect to home if no game is selected
   useEffect(() => {
@@ -191,6 +199,22 @@ export default function PlaceConnections() {
     setHasUserMovedMap(true);
   };
 
+  const handleCopy = () => {
+    setShowCopyModal(true);
+  };
+
+  const handleConfirmCopy = async (sourceGameId: string, overwrite: boolean) => {
+    if (currentGameId) {
+      const result = await copyPlaceConnections(sourceGameId, currentGameId, overwrite);
+      const parts = [];
+      if (result.copiedCount > 0) parts.push(`Copied ${result.copiedCount}`);
+      if (result.overwrittenCount > 0) parts.push(`Overwritten ${result.overwrittenCount}`);
+      if (result.skippedCount > 0) parts.push(`Skipped ${result.skippedCount} duplicates`);
+      setToastMessage(parts.join('. ') + '.');
+      setToastType('success');
+    }
+  };
+
   // Memoized lookup map for place ID -> place object.
   // Passed to ConnectionFocus to avoid re-creating the bounds on every render.
   const placesById = useMemo(() => allPlaces.reduce((acc, place) => {
@@ -213,15 +237,8 @@ export default function PlaceConnections() {
       })
     : allPlaceConnections;
 
-  const options = [
-    {
-      label: showVisible ? '✓ Show visible' : 'Show visible',
-      onClick: () => setShowVisible(prev => !prev),
-    }
-  ];
-
   return (
-    <Layout title="Place Connections" statusOptions={options}>
+    <Layout title="Place Connections">
       <div className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
@@ -413,6 +430,31 @@ export default function PlaceConnections() {
         onCancel={handleCancelDelete}
         message="Are you sure you want to delete this connection? This action cannot be undone."
       />
+
+      <Drawer side="right" title="Options">
+        <PlaceConnectionsOptions
+          showVisible={showVisible}
+          onShowVisibleChange={setShowVisible}
+          onCopy={handleCopy}
+          onDeleteAll={() => {}}
+          onImport={() => {}}
+          onExport={() => {}}
+        />
+      </Drawer>
+
+      <CopyPlaceConnectionsModal
+        isOpen={showCopyModal}
+        onClose={() => setShowCopyModal(false)}
+        onCopy={handleConfirmCopy}
+      />
+
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </Layout>
   );
 }

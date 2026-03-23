@@ -1,4 +1,4 @@
-import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { AbstractDto } from 'src/utils/abstract-dto';
@@ -62,6 +62,31 @@ export class PlaceConnectionDto implements AbstractDto {
   gameId: string;
 }
 
+export class CopyPlaceConnectionsDto {
+  @Expose()
+  sourceGameId: string;
+
+  @Expose()
+  targetGameId: string;
+
+  @Expose()
+  overwrite: boolean;
+}
+
+export class CopyResultDto {
+  @Expose()
+  copiedCount: number;
+
+  @Expose()
+  skippedCount: number;
+
+  @Expose()
+  overwrittenCount: number;
+
+  @Expose()
+  errorCount: number;
+}
+
 @Injectable()
 export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnection> {
   constructor(@InjectRepository(PlaceConnection) injectedRepo) {
@@ -71,12 +96,100 @@ export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnectio
 
 @Injectable()
 export class PlaceConnectionService extends AbstractService<PlaceConnection> {
-  constructor(repo: PlaceConnectionRepository) {
+  constructor(
+    repo: PlaceConnectionRepository,
+    private readonly placesService: PlacesService
+  ) {
     super(repo);
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<PlaceConnection>> {
     return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
+  }
+
+  async copyPlaceConnections(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
+    // Copies place connections from source game to target game.
+    // Connections are matched to places by name: for each source connection, we look up the
+    // place names (start/end), then find those places in the target game to get their new IDs.
+    // If a connection between the same two places exists in target, it either gets overwritten
+    // (with overwrite=true) or is skipped (with overwrite=false).
+    // Errors are logged but do not stop the process.
+    // Returns counts of connections copied, overwritten, skipped, and failed.
+    const sourceConnections = await this.repository.find({ where: { gameId: new Types.ObjectId(sourceGameId) } });
+    const targetConnections = await this.repository.find({ where: { gameId: new Types.ObjectId(targetGameId) } });
+    
+    const targetConnectionsByRoute = new Map(
+      targetConnections.map(c => [`${c.startId.toString()}-${c.endId.toString()}`, c])
+    );
+
+    const sourcePlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(sourceGameId) });
+    const sourcePlaceIdToName = new Map(sourcePlacesResult.data.map((p: any) => [p._id.toString(), p.name]));
+
+    const targetPlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(targetGameId) });
+    const targetPlaceNameToId = new Map(targetPlacesResult.data.map((p: any) => [p.name, p._id.toString()]));
+
+    let copiedCount = 0;
+    let skippedCount = 0;
+    let overwrittenCount = 0;
+    let errorCount = 0;
+
+    for (const connection of sourceConnections) {
+      try {
+        const startName = sourcePlaceIdToName.get(connection.startId.toString());
+        const endName = sourcePlaceIdToName.get(connection.endId.toString());
+        
+        if (!startName || !endName) {
+          skippedCount++;
+          continue;
+        }
+
+        const targetStartId = targetPlaceNameToId.get(startName);
+        const targetEndId = targetPlaceNameToId.get(endName);
+        
+        if (!targetStartId || !targetEndId) {
+          skippedCount++;
+          continue;
+        }
+
+        const routeKey = `${targetStartId}-${targetEndId}`;
+        const existingConnection = targetConnectionsByRoute.get(routeKey);
+        
+        if (existingConnection) {
+          if (overwrite) {
+            existingConnection.name = connection.name;
+            existingConnection.description = connection.description;
+            existingConnection.type = connection.type;
+            existingConnection.content = connection.content;
+            await this.repository.save(existingConnection as any);
+            overwrittenCount++;
+          } else {
+            skippedCount++;
+          }
+        } else {
+          const newConnection = this.repository.create({
+            type: connection.type,
+            name: connection.name,
+            description: connection.description,
+            content: connection.content,
+            startId: new Types.ObjectId(targetStartId),
+            endId: new Types.ObjectId(targetEndId),
+            gameId: new Types.ObjectId(targetGameId),
+          } as any);
+          await this.repository.save(newConnection);
+          copiedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to copy connection "${connection.name}" (${connection.startId} -> ${connection.endId}):`, error.message);
+        errorCount++;
+      }
+    }
+
+    return {
+      copiedCount,
+      skippedCount,
+      overwrittenCount,
+      errorCount,
+    };
   }
 }
 
@@ -148,6 +261,12 @@ export class PlaceConnectionController extends AbstractServiceController<PlaceCo
   ): Promise<PageDto<PlaceConnectionDto>> {
     const page = await this.placeConnectionService.findByGameId(gameId, pagination);
     return this.handlePagedResults(page, this.placeConnectionMapper);
+  }
+
+  @Post('copy')
+  @UseGuards(LoggedIn)
+  async copyPlaceConnections(@Body() copyDto: CopyPlaceConnectionsDto): Promise<CopyResultDto> {
+    return this.placeConnectionService.copyPlaceConnections(copyDto.sourceGameId, copyDto.targetGameId, copyDto.overwrite);
   }
 }
 

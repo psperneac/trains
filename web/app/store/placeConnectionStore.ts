@@ -4,6 +4,12 @@ import { apiRequest } from '../config/api';
 import type { PlaceConnectionDto } from '../types/placeConnection';
 import { useAuthStore } from './authStore';
 
+interface CopyResult {
+  copiedCount: number;
+  skippedCount: number;
+  overwrittenCount: number;
+}
+
 interface PlaceConnectionState {
   allPlaceConnections: PlaceConnectionDto[];
   
@@ -15,6 +21,7 @@ interface PlaceConnectionState {
   addPlaceConnection: (placeConnection: Omit<PlaceConnectionDto, 'id'>, gameId: string) => Promise<void>;
   updatePlaceConnection: (placeConnection: PlaceConnectionDto, gameId: string) => Promise<void>;
   deletePlaceConnection: (id: string, gameId: string) => Promise<void>;
+  copyPlaceConnections: (sourceGameId: string, targetGameId: string, overwrite?: boolean) => Promise<CopyResult>;
 }
 
 export const usePlaceConnectionStore = create<PlaceConnectionState>()(
@@ -105,6 +112,25 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
       await get().fetchPlaceConnectionsByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
+
+  copyPlaceConnections: async (sourceGameId, targetGameId, overwrite = false) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const result = await apiRequest<CopyResult>('/api/place-connections/copy', {
+        method: 'POST',
+        authToken,
+        body: JSON.stringify({ sourceGameId, targetGameId, overwrite }),
+      });
+      await get().fetchPlaceConnectionsByGameId(targetGameId);
+      set({ loading: false });
+      return result;
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
     }
   },
     }),

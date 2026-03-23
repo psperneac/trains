@@ -74,6 +74,9 @@ export class CopyResultDto {
 
   @Expose()
   overwrittenCount: number;
+
+  @Expose()
+  errorCount: number;
 }
 
 @Injectable()
@@ -101,6 +104,11 @@ export class PlacesService extends AbstractService<Place> {
   }
 
   async copyPlaces(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
+    // Copies places from source game to target game.
+    // Places are matched by name: if a place with the same name exists in target, it either gets
+    // overwritten (with overwrite=true) or is skipped (with overwrite=false).
+    // Errors are logged but do not stop the process.
+    // Returns counts of places copied, overwritten, skipped, and failed.
     const repo = this.repo.getRepository();
     const sourcePlaces = await repo.find({ where: { gameId: new Types.ObjectId(sourceGameId) } });
     const targetPlaces = await repo.find({ where: { gameId: new Types.ObjectId(targetGameId) } });
@@ -110,32 +118,38 @@ export class PlacesService extends AbstractService<Place> {
     let copiedCount = 0;
     let skippedCount = 0;
     let overwrittenCount = 0;
+    let errorCount = 0;
 
     for (const place of sourcePlaces) {
-      const existingPlace = targetPlacesByName.get(place.name);
-      
-      if (existingPlace) {
-        if (overwrite) {
-          existingPlace.description = place.description;
-          existingPlace.type = place.type;
-          existingPlace.lat = place.lat;
-          existingPlace.lng = place.lng;
-          await repo.save(existingPlace);
-          overwrittenCount++;
+      try {
+        const existingPlace = targetPlacesByName.get(place.name);
+        
+        if (existingPlace) {
+          if (overwrite) {
+            existingPlace.description = place.description;
+            existingPlace.type = place.type;
+            existingPlace.lat = place.lat;
+            existingPlace.lng = place.lng;
+            await repo.save(existingPlace);
+            overwrittenCount++;
+          } else {
+            skippedCount++;
+          }
         } else {
-          skippedCount++;
+          const newPlace = repo.create({
+            name: place.name,
+            description: place.description,
+            type: place.type,
+            lat: place.lat,
+            lng: place.lng,
+            gameId: new Types.ObjectId(targetGameId),
+          });
+          await repo.save(newPlace);
+          copiedCount++;
         }
-      } else {
-        const newPlace = repo.create({
-          name: place.name,
-          description: place.description,
-          type: place.type,
-          lat: place.lat,
-          lng: place.lng,
-          gameId: new Types.ObjectId(targetGameId),
-        });
-        await repo.save(newPlace);
-        copiedCount++;
+      } catch (error) {
+        console.error(`Failed to copy place "${place.name}":`, error.message);
+        errorCount++;
       }
     }
 
@@ -143,6 +157,7 @@ export class PlacesService extends AbstractService<Place> {
       copiedCount,
       skippedCount,
       overwrittenCount,
+      errorCount,
     };
   }
 
