@@ -82,6 +82,13 @@ export const PLACE_TYPE_DATA: PlaceType[] = [
     name: 'Residence',
     description: 'A private residence',
     content: {}
+  } as any as PlaceType,
+    {
+    _id: new Types.ObjectId('683bd04be7cc7a6c65087ab1'),
+    type: 'AIRPORT',
+    name: 'Airport',
+    description: 'An airport where planes take off and land',
+    content: {}
   } as any as PlaceType
 ];
 

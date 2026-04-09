@@ -44,6 +44,8 @@ npm run preview       # Preview production build
 npm run typecheck     # Run TypeScript type checking
 ```
 
+**Note on typecheck**: React Router v7 generates route types in `.react-router/types/` at runtime. Running `tsc` directly will fail on `Cannot find module './+types/home'` errors because those generated types don't exist yet. The app works correctly when running `npm run dev` since the dev server generates the types before starting. This is a known limitation - don't be alarmed by these errors during typecheck.
+
 ### Database Setup
 
 **MongoDB** (primary database):

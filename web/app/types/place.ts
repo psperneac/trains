@@ -5,4 +5,5 @@ export interface PlaceDto {
   type: string;
   lat: number;
   lng: number;
+  gameId: string;
 } 

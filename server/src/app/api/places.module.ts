@@ -88,8 +88,44 @@ export class PlacesRepository extends RepositoryAccessor<Place> {
 
 @Injectable()
 export class PlaceMapper extends AbstractDtoMapper<Place, PlaceDto> {
-  getMappedProperties(): string[] {
-    return ['id', 'name', 'description', 'type', 'lat', 'lng', 'gameId'];
+  constructor() {
+    super();
+  }
+
+  async toDto(domain: Place): Promise<PlaceDto> {
+    if (!domain) {
+      return null;
+    }
+
+    const dto: PlaceDto = {
+      id: domain._id.toString(),
+      name: domain.name,
+      description: domain.description,
+      type: domain.type,
+      lat: domain.lat,
+      lng: domain.lng,
+      gameId: domain.gameId.toString(),
+    };
+
+    return dto;
+  }
+
+  async toDomain(dto: PlaceDto, domain?: Partial<Place> | Place): Promise<Place> {
+    if (!dto) {
+      return domain as any as Place;
+    }
+
+    if (!domain) {
+      domain = {};
+    }
+
+    const { gameId, ...fixedDto } = dto;
+
+    return {
+      ...domain,
+      ...fixedDto,
+      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId,
+    } as any as Place;
   }
 }
 

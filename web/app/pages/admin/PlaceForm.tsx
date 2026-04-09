@@ -35,6 +35,7 @@ const emptyPlace: Omit<PlaceDto, 'id'> = {
   type: '',
   lat: 0,
   lng: 0,
+  gameId: '',
 };
 
 function DraggableMarker({ position, setPosition }: { position: [number, number]; setPosition: (pos: [number, number]) => void }) {
@@ -187,9 +188,9 @@ export default function PlaceForm() {
     e.preventDefault();
     if (!currentGameId) return;
     if (isEdit) {
-      await updatePlace(form as PlaceDto, currentGameId);
+      await updatePlace({ ...form, gameId: currentGameId } as PlaceDto, currentGameId);
     } else {
-      await addPlace(form as Omit<PlaceDto, 'id'>, currentGameId);
+      await addPlace({ ...form, gameId: currentGameId } as Omit<PlaceDto, 'id'>, currentGameId);
     }
     navigate('/game-admin/places');
   };

@@ -147,7 +147,8 @@ export default function Places() {
               <h2 className="text-lg font-semibold">Places ({filteredPlaces.length})</h2>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium"
+                disabled={!currentGameId}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 + Add Place
               </button>
