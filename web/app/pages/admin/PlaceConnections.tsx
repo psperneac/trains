@@ -116,6 +116,7 @@ export default function PlaceConnections() {
     error,
     fetchPlaceConnectionsByGameId,
     deletePlaceConnection,
+    deleteAllPlaceConnections,
     copyPlaceConnections
   } = usePlaceConnectionStore();
   const { allPlaces, fetchPlacesByGameId } = usePlaceStore();
@@ -123,6 +124,7 @@ export default function PlaceConnections() {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   // mapFocus: Single point to center the map on (used for place pin button)
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
   // connectionToFocus: When set, shows a specific connection's endpoints fitting the map view
@@ -175,6 +177,19 @@ export default function PlaceConnections() {
   const handleCancelDelete = () => {
     setDeleteId(null);
     setConfirming(false);
+  };
+
+  const handleDeleteAll = () => {
+    setShowDeleteAllConfirm(true);
+  };
+
+  const handleConfirmDeleteAll = async () => {
+    if (currentGameId) {
+      const deletedCount = await deleteAllPlaceConnections(currentGameId);
+      setShowDeleteAllConfirm(false);
+      setToastMessage(`Deleted ${deletedCount} connections.`);
+      setToastType('success');
+    }
   };
 
   const handleMapEdit = (id: string) => {
@@ -436,11 +451,18 @@ export default function PlaceConnections() {
           showVisible={showVisible}
           onShowVisibleChange={setShowVisible}
           onCopy={handleCopy}
-          onDeleteAll={() => {}}
+          onDeleteAll={handleDeleteAll}
           onImport={() => {}}
           onExport={() => {}}
         />
       </Drawer>
+
+      <DeleteConfirmation
+        isOpen={showDeleteAllConfirm}
+        onConfirm={handleConfirmDeleteAll}
+        onCancel={() => setShowDeleteAllConfirm(false)}
+        message="Are you sure you want to delete all connections? This action cannot be undone."
+      />
 
       <CopyPlaceConnectionsModal
         isOpen={showCopyModal}

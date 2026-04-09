@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { AbstractDto } from 'src/utils/abstract-dto';
@@ -191,6 +191,16 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
       errorCount,
     };
   }
+
+  async deleteAllByGameId(gameId: string): Promise<number> {
+    const connections = await this.repository.find({ where: { gameId: new Types.ObjectId(gameId) } });
+    let deletedCount = 0;
+    for (const connection of connections) {
+      await this.repository.delete(connection._id);
+      deletedCount++;
+    }
+    return deletedCount;
+  }
 }
 
 @Injectable()
@@ -267,6 +277,12 @@ export class PlaceConnectionController extends AbstractServiceController<PlaceCo
   @UseGuards(LoggedIn)
   async copyPlaceConnections(@Body() copyDto: CopyPlaceConnectionsDto): Promise<CopyResultDto> {
     return this.placeConnectionService.copyPlaceConnections(copyDto.sourceGameId, copyDto.targetGameId, copyDto.overwrite);
+  }
+
+  @Delete('game/:gameId')
+  @UseGuards(LoggedIn)
+  async deleteAllByGameId(@Param('gameId') gameId: string): Promise<number> {
+    return this.placeConnectionService.deleteAllByGameId(gameId);
   }
 }
 

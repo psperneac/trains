@@ -21,6 +21,7 @@ interface PlaceConnectionState {
   addPlaceConnection: (placeConnection: Omit<PlaceConnectionDto, 'id'>, gameId: string) => Promise<void>;
   updatePlaceConnection: (placeConnection: PlaceConnectionDto, gameId: string) => Promise<void>;
   deletePlaceConnection: (id: string, gameId: string) => Promise<void>;
+  deleteAllPlaceConnections: (gameId: string) => Promise<number>;
   copyPlaceConnections: (sourceGameId: string, targetGameId: string, overwrite?: boolean) => Promise<CopyResult>;
 }
 
@@ -112,6 +113,24 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
       await get().fetchPlaceConnectionsByGameId(gameId);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
+
+  deleteAllPlaceConnections: async (gameId) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const result = await apiRequest<number>(`/api/place-connections/game/${gameId}`, {
+        method: 'DELETE',
+        authToken,
+      });
+      await get().fetchPlaceConnectionsByGameId(gameId);
+      set({ loading: false });
+      return result;
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
     }
   },
 
