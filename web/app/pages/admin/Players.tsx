@@ -7,6 +7,7 @@ import { usePlayersStore } from '../../store/playersStore';
 import { usePlaceInstanceStore } from '../../store/placeInstanceStore';
 import { useVehicleInstanceStore } from '../../store/vehicleInstanceStore';
 import type { PlayerDto } from '../../types/player';
+import type { PlayerFullStateDto } from '../../types/player';
 
 export default function Players() {
   const {
@@ -35,6 +36,12 @@ export default function Players() {
   // Player detail modal state
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [detailsPlayer, setDetailsPlayer] = useState<PlayerDto | null>(null);
+
+  // Debug modal state
+  const [debugModalOpen, setDebugModalOpen] = useState(false);
+  const [debugPlayer, setDebugPlayer] = useState<PlayerDto | null>(null);
+  const [debugData, setDebugData] = useState<PlayerFullStateDto | null>(null);
+  const [debugLoading, setDebugLoading] = useState(false);
 
   useEffect(() => {
     if (currentGameId) {
@@ -126,6 +133,28 @@ export default function Players() {
   const handleDetailsClose = () => {
     setDetailsModalOpen(false);
     setDetailsPlayer(null);
+  };
+
+  const handleDebugClick = async (player: PlayerDto) => {
+    setDebugPlayer(player);
+    setDebugModalOpen(true);
+    setDebugLoading(true);
+    setDebugData(null);
+
+    try {
+      const fullState = await usePlayersStore.getState().fetchFullState(player.id);
+      setDebugData(fullState);
+    } catch (err) {
+      console.error('Error fetching full state:', err);
+    } finally {
+      setDebugLoading(false);
+    }
+  };
+
+  const handleDebugClose = () => {
+    setDebugModalOpen(false);
+    setDebugPlayer(null);
+    setDebugData(null);
   };
 
   if (loading && players.length === 0) {
@@ -230,10 +259,19 @@ export default function Players() {
                     </button>
                     <button
                       onClick={() => handleGiveClick(player)}
-                      className="bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-3 rounded text-sm"
+                      className="bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-3 rounded text-sm mr-2"
                     >
                       Give
                     </button>
+                    {isAdmin() && (
+                      <button
+                        onClick={() => handleDebugClick(player)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded text-sm"
+                        title="Debug: View full state"
+                      >
+                        Debug
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -466,6 +504,72 @@ export default function Players() {
                 <button
                   onClick={handleDetailsClose}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {debugModalOpen && debugPlayer && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border shadow-lg rounded-md bg-white max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+              <div className="flex-1 overflow-y-auto">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">
+                  Debug: {debugPlayer.name}
+                </h3>
+
+                {debugLoading && (
+                  <div className="text-center py-8">
+                    <div className="text-lg">Loading...</div>
+                  </div>
+                )}
+
+                {!debugLoading && debugData && (
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800 mb-2 border-b pb-1">
+                        Player Data
+                      </h4>
+                      <pre className="bg-gray-50 rounded p-3 text-xs overflow-x-auto max-h-64">
+                        {JSON.stringify(debugData.player, null, 2)}
+                      </pre>
+                    </div>
+
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800 mb-2 border-b pb-1">
+                        Place Instances ({debugData.placeInstances?.length ?? 0})
+                      </h4>
+                      {debugData.placeInstances?.length > 0 ? (
+                        <pre className="bg-gray-50 rounded p-3 text-xs overflow-x-auto max-h-64">
+                          {JSON.stringify(debugData.placeInstances, null, 2)}
+                        </pre>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No place instances</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800 mb-2 border-b pb-1">
+                        Vehicle Instances ({debugData.vehicleInstances?.length ?? 0})
+                      </h4>
+                      {debugData.vehicleInstances?.length > 0 ? (
+                        <pre className="bg-gray-50 rounded p-3 text-xs overflow-x-auto max-h-64">
+                          {JSON.stringify(debugData.vehicleInstances, null, 2)}
+                        </pre>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No vehicle instances</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={handleDebugClose}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
                 >
                   Close
                 </button>

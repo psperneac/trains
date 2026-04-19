@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { apiRequest } from '../config/api';
 import { DEFAULT_PAGE_SIZE } from '../constants/pagination';
-import type { PlayerDto, SendGoldAndGemsDto, TransactionDto } from '../types/player';
+import type { PlayerDto, SendGoldAndGemsDto, TransactionDto, PlayerFullStateDto } from '../types/player';
 import { useAuthStore } from './authStore';
 
 interface PlayersState {
@@ -25,6 +25,7 @@ interface PlayersState {
   addPlayer: (player: Omit<PlayerDto, 'id'>) => Promise<PlayerDto>;
   updatePlayer: (player: PlayerDto) => Promise<void>;
   deletePlayer: (id: string) => Promise<void>;
+  fetchFullState: (playerId: string) => Promise<PlayerFullStateDto>;
 }
 
 export const usePlayersStore = create<PlayersState>()(
@@ -216,6 +217,23 @@ export const usePlayersStore = create<PlayersState>()(
       ]);
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
+
+  fetchFullState: async (playerId: string): Promise<PlayerFullStateDto> => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const response = await apiRequest<PlayerFullStateDto>(
+        `/api/players/${playerId}/full-state`,
+        { method: 'GET', authToken }
+      );
+      set({ loading: false });
+      return response;
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
     }
   },
     }),

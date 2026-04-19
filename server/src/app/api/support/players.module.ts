@@ -17,6 +17,8 @@ import { RepositoryAccessor } from '../../../utils/repository-accessor';
 import { EntityType, TransactionType, TransactionsModule, TransactionsService } from './transactions.module';
 import { User } from './users.module';
 import { Wallet, WalletDto, SendGoldAndGemsDto } from './wallet.model';
+import { PlaceInstancesModule, PlaceInstanceMapper, PlaceInstancesService } from '../place-instance.module';
+import { VehicleInstancesModule, VehicleInstanceMapper, VehicleInstancesService } from '../vehicle-instances.module';
 
 export { Wallet, WalletDto, SendGoldAndGemsDto };
 
@@ -55,6 +57,16 @@ export interface PlayerDto {
   gameId: string;
   wallet?: WalletDto;
   content: any;
+}
+
+/**
+ * Full state response DTO for debugging and verifying data flow.
+ * Includes player data along with all owned place instances and vehicle instances.
+ */
+export interface PlayerFullStateDto {
+  player: PlayerDto;
+  placeInstances: any[];
+  vehicleInstances: any[];
 }
 
 @Injectable()
@@ -173,7 +185,11 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
   constructor(
     private readonly playersService: PlayersService,
     private readonly playersMapper: PlayerMapper,
-    private readonly transactionsService: TransactionsService) {
+    private readonly transactionsService: TransactionsService,
+    private readonly placeInstancesService: PlaceInstancesService,
+    private readonly placeInstanceMapper: PlaceInstanceMapper,
+    private readonly vehicleInstancesService: VehicleInstancesService,
+    private readonly vehicleInstanceMapper: VehicleInstanceMapper) {
     super(playersService, playersMapper);
   }
 
@@ -280,10 +296,51 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     return player.userId?.toString() === currentUser._id.toString();
   }
 
+  /**
+   * GET /players/:id/full-state
+   * Returns the complete state of a player including all place instances and vehicle instances.
+   * Useful for debugging and verifying data flow before map view implementation.
+   */
+  @Get(':id/full-state')
+  @UseGuards(LoggedIn)
+  async getFullState(@Param('id') playerId: string): Promise<PlayerFullStateDto> {
+    // Fetch the player
+    const player = await this.playersService.findOne(playerId);
+    if (!player) {
+      throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Convert player to DTO
+    const playerDto = await this.playersMapper.toDto(player);
+
+    // Fetch all place instances for this player (no pagination for full state)
+    const placeInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
+    const placeInstances = await Promise.all(
+      placeInstancesPage.data.map(pi => this.placeInstanceMapper.toDto(pi))
+    );
+
+    // Fetch all vehicle instances for this player (no pagination for full state)
+    const vehicleInstancesPage = await this.vehicleInstancesService.findAllByPlayer({}, playerId);
+    const vehicleInstances = await Promise.all(
+      vehicleInstancesPage.data.map(vi => this.vehicleInstanceMapper.toDto(vi))
+    );
+
+    return {
+      player: playerDto,
+      placeInstances,
+      vehicleInstances
+    };
+  }
+
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Player]), TransactionsModule],
+  imports: [
+    TypeOrmModule.forFeature([Player]),
+    TransactionsModule,
+    PlaceInstancesModule,
+    VehicleInstancesModule
+  ],
   controllers: [PlayerController],
   providers: [PlayersService, PlayerMapper, PlayerRepository],
   exports: [PlayersService, PlayerMapper]

@@ -152,10 +152,10 @@
 
 ### 4.7 Player Full State Debug Endpoint
 
-- [ ] Create `GET /players/:id/full-state` endpoint
-- [ ] Return player data + all place instances (populated) + all vehicle instances (populated)
-- [ ] Useful for debugging and verifying data flow before map view implementation
-- [ ] Write unit tests for the endpoint (verify response structure, 404 handling, data inclusion)
+- [x] Create `GET /players/:id/full-state` endpoint
+- [x] Return player data + all place instances (populated) + all vehicle instances (populated)
+- [x] Useful for debugging and verifying data flow before map view implementation
+- [x] Write unit tests for the endpoint (verify response structure, 404 handling, data inclusion)
 
 ---
 

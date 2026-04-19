@@ -78,11 +78,7 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
   }
 
   findAllByPlayer(pagination: PageRequestDto, playerId: string): Promise<PageDto<PlaceInstance>> {
-    return this.findAllWithQuery(
-      pagination,
-      'map_place_instances.playerId = :playerId',
-      { playerId: new Types.ObjectId(playerId) }
-    ) as Promise<PageDto<PlaceInstance>>;
+    return this.findAllWhere({ playerId: new Types.ObjectId(playerId) }, pagination);
   }
 }
 

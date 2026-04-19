@@ -49,3 +49,9 @@ export interface TransactionDto {
   updated: string;
 }
 
+export interface PlayerFullStateDto {
+  player: PlayerDto;
+  placeInstances: any[];
+  vehicleInstances: any[];
+}
+
