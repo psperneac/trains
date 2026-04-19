@@ -169,10 +169,10 @@
 - [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.2 Job Endpoints
-- [ ] `GET /place-instances/:id/jobs` - get job offers at owned place
-- [ ] `POST /place-instances/:id/accept-job` - accept offer → creates Job entity
-- [ ] `POST /place-instances/:id/warehouse-job` - leave job at place
-- [ ] Write unit tests to verify the endpoints work correctly
+- [x] `GET /place-instances/:id/jobs` - get job offers at owned place
+- [x] `POST /place-instances/:id/accept-job` - accept offer → creates Job entity
+- [x] `POST /place-instances/:id/warehouse-job` - leave job at place
+- [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.3 Vehicle Job Endpoints
 - [ ] `POST /vehicles/:id/load-job` - load job from place into vehicle

@@ -181,6 +181,7 @@ export class JobOfferService implements OnModuleInit {
 
     // Update place instance with new offers
     placeInst.jobOffers = offers.map(o => ({
+      jobOfferId: o.id,
       name: `Delivery to ${o.destinationName}`,
       description: `Transport ${o.cargoType} to destination`,
       cargoType: o.cargoType,

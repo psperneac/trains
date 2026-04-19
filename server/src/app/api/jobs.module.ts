@@ -116,6 +116,8 @@ export interface JobDto {
 }
 
 export interface JobOffer {
+  /** Unique identifier for this job offer (used when accepting) */
+  jobOfferId: string;
   name: string;
   description: string;
   cargoType: string;

@@ -1342,3 +1342,221 @@ fuelBurnRate = baseBurn + (totalLoad * perLoadBurn)
 - MongoDB ObjectId is used for all entity IDs
 - Breaking changes to VehicleInstance require data migration for existing games
 - Test with small map (5-10 places) first before scaling
+
+---
+
+## Implementation Quick Reference
+
+### Common File Locations
+
+| Purpose | File Path |
+|---------|-----------|
+| Players (entity + controller + service) | `server/src/app/api/support/players.module.ts` |
+| PlaceInstances | `server/src/app/api/place-instance.module.ts` |
+| VehicleInstances | `server/src/app/api/vehicle-instances.module.ts` |
+| PlaceConnections | `server/src/app/api/place-connection.module.ts` |
+| Places (templates) | `server/src/app/api/places.module.ts` |
+| Jobs | `server/src/app/api/jobs.module.ts` |
+| Vehicles (templates) | `server/src/app/api/vehicles.module.ts` |
+| Game services | `server/src/app/game/` |
+| Tests | Co-located with source, `*.spec.ts` suffix |
+
+### Module Structure Pattern
+
+Each module follows this pattern:
+
+```typescript
+// 1. Entity (TypeORM)
+// @Entity({ name: 'collection_name' })
+// export class EntityName extends AbstractEntity { ... }
+
+// 2. DTOs (interfaces)
+// export interface EntityNameDto { ... }
+
+// 3. Repository
+// @Injectable()
+// export class EntityNameRepository extends RepositoryAccessor<EntityName> { ... }
+
+// 4. Service
+// @Injectable()
+// export class EntityNameService extends AbstractService<EntityName> { ... }
+
+// 5. Mapper
+// @Injectable()
+// export class EntityNameMapper extends AbstractDtoMapper<EntityName, EntityNameDto> { ... }
+
+// 6. Controller
+// @Controller('resource-name')
+// export class EntityNameController extends AbstractServiceController<EntityName, EntityNameDto> { ... }
+
+// 7. Module
+// @Module({
+//   imports: [TypeOrmModule.forFeature([EntityName]), ...],
+//   controllers: [EntityNameController],
+//   providers: [EntityNameService, EntityNameMapper, EntityNameRepository],
+//   exports: [EntityNameService, EntityNameMapper]
+// })
+// export class EntityNameModule {}
+```
+
+### Adding Endpoints to Existing Controller
+
+When adding a new endpoint to an existing controller (e.g., `players.module.ts`):
+
+1. **Add imports** for any new services needed:
+
+```typescript
+import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
+import { PlaceConnectionService, PlaceConnectionDto } from '../place-connection.module';
+```
+
+2. **Add DTOs** before the controller class:
+
+```typescript
+export interface NewEndpointResponseDto {
+  // fields
+}
+```
+
+3. **Update constructor** to inject new services:
+
+```typescript
+constructor(
+  private readonly existingService: ExistingService,
+  private readonly newService: NewService // ADD THIS
+) { ... }
+```
+
+4. **Add module imports** and **provider**:
+
+```typescript
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Player]),
+    NewDependencyModule  // ADD IF NEEDED
+  ],
+  providers: [..., NewService],  // ADD SERVICE
+  ...
+})
+```
+
+### Common Service Operations
+
+**Get all PlaceInstances for a player:**
+
+```typescript
+const page = await placeInstancesService.findAllByPlayer({}, playerId);
+// page.data contains PlaceInstance[]
+```
+
+**Find PlaceConnection by game:**
+
+```typescript
+const connections = await placeConnectionService.findAllWhere(
+  { gameId: new Types.ObjectId(gameId) } as any,
+  { page: 1, pageSize: 1000 } as any
+);
+```
+
+**Get player's owned place IDs:**
+
+```typescript
+const ownedPlaceIds = ownedPlaceInstances
+  .map(pi => pi.place?._id?.toString())
+  .filter(id => id);
+```
+
+### Test Pattern
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { PlayerController } from './players.module';
+import { PlayersService } from './players.module';
+import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
+
+describe('FeatureName', () => {
+  let controller: PlayerController;
+  let mockService: jest.Mocked<Service>;
+
+  const mockDataId = '507f1f77bcf86cd799439011';
+
+  beforeEach(async () => {
+    const mockServiceMethods = {
+      methodName: jest.fn(),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [PlayerController],
+      providers: [
+        { provide: Service, useValue: mockServiceMethods },
+      ],
+    }).compile();
+
+    controller = module.get<PlayerController>(PlayerController);
+    mockService = module.get(Service);
+  });
+
+  it('should do something', async () => {
+    mockService.methodName.mockResolvedValue(expectedResult as any);
+    const result = await controller.method(params);
+    expect(result).toHaveProperty('expectedProperty');
+  });
+});
+```
+
+### Testing Checklist
+
+1. Run full test suite: `cd server && npm test`
+2. Test passes: 119 tests should all green
+3. Build succeeds: `npm run build`
+4. No new lint issues (pre-existing ESLint config errors are OK)
+
+### Import Path Cheat Sheet
+
+```typescript
+// From players.module.ts (in server/src/app/api/support/)
+// TO module in server/src/app/api/
+
+import { SomeService } from '../some-module';           // sibling
+import { SomeService } from '../place-instance.module'; // sibling
+
+// TO module in server/src/app/game/
+import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
+
+// TO utils
+import { AbstractService } from '../../utils/abstract.service';
+import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
+```
+
+### Key DTOs and Interfaces
+
+| Entity | Key DTOs |
+|--------|----------|
+| Player | `PlayerDto`, `PlayerFullStateDto`, `WalletDto` |
+| PlaceInstance | `PlaceInstanceDto` |
+| VehicleInstance | `VehicleInstanceDto` |
+| Job | `JobDto`, `JobOffer` |
+| Map View | `MapViewResponseDto`, `AvailablePlacesResponseDto` |
+
+### Service Discovery Pattern
+
+When implementing a new feature, check existing services:
+
+1. **MapRevealService** (`game/map-reveal/`) - for visibility logic
+2. **EconomyService** (`game/economy/`) - for wallet operations
+3. **PlacePurchaseService** (`game/place-purchase/`) - for purchasing flow
+4. **JobOfferService** (`game/job-offer/`) - for job generation
+5. **VehicleDispatchService** (`game/vehicle-dispatch/`) - for routing/arrivals
+
+### Build and Test Commands
+
+```bash
+# Server commands (from server/ directory)
+npm run build          # Compile TypeScript
+npm test               # Run all tests
+npm run test:watch     # Watch mode
+
+# Web commands (from web/ directory)
+npm run dev            # Start dev server
+npm run build          # Production build
+```
