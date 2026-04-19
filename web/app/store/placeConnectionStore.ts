@@ -155,7 +155,7 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
     }),
     {
       name: 'place-connections-store',
-      enabled: process.env.NODE_ENV === 'development',
+      enabled: import.meta.env.DEV,
     }
   )
 );

@@ -21,6 +21,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(cookieParser());
+  // TODO: Configure CORS with allowed origins before production (e.g., app.use(cors({ origin: configService.get('CORS_ORIGIN') }))
   app.use(cors());
   const port = process.env.PORT || 3333;
   await app.listen(port, () => {

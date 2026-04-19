@@ -32,7 +32,7 @@ export class AuthenticationService {
       const user = await this.usersService.getById(userId);
       await this.verifyPassword(oldPassword, user.password);
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      await this.usersService.replace(userId, { ...user, password: hashedNewPassword });
+      await this.usersService.replace(userId, { email: user.email, username: user.username, scope: user.scope, password: hashedNewPassword });
     } catch (error) {
       this.logger.error(error);
       throw new HttpException('Failed to change password. Please check your old password.', HttpStatus.BAD_REQUEST);
@@ -59,20 +59,16 @@ export class AuthenticationService {
   }
 
   public getAuthToken(userId: string, scope: string) {
-    // TODO: add expiry of max-session 15-30min
-    // TODO: figure out how to refresh token when expired
     const payload: TokenPayload = {
-      sub: userId,  // Standard JWT subject claim
-      scope: scope,  // User scope/role
-      userId: userId  // Keep for backward compatibility
+      sub: userId,
+      scope: scope,
+      userId: userId
     };
     const token = this.jwtService.sign(payload);
 
-    // Decode and verify the token contains the right payload
-    try {
-      const decoded = this.jwtService.verify(token);
-    } catch (error) {
-      console.error('Token verification failed:', error);
+    const decoded = this.jwtService.verify(token);
+    if (decoded.sub !== userId || decoded.scope !== scope) {
+      throw new Error('Token verification failed: payload mismatch');
     }
 
     return token;

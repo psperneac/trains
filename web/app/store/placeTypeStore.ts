@@ -43,7 +43,7 @@ export const usePlaceTypeStore = create<PlaceTypeState>()(
     }),
     {
       name: 'place-types-store',
-      enabled: process.env.NODE_ENV === 'development',
+      enabled: import.meta.env.DEV,
     }
   )
 ); 

@@ -174,13 +174,18 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
 
     const fixedDto = omit({ ...dto }, ['startId', 'endId', 'startTime']);
 
+    const [start, end] = await Promise.all([
+      this.service.findOne(startId),
+      this.service.findOne(endId)
+    ]);
+
     return {
       ...domain,
       ...fixedDto,
-      start: this.service.findOne(startId),
-      end: this.service.findOne(endId),
+      start,
+      end,
       startTime
-    } as any as Job;
+    } as unknown as Job;
   }
 }
 

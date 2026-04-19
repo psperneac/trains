@@ -10,7 +10,7 @@ export const useRootStore = create()(
     }),
     {
       name: 'all-stores', // Unified store name
-      enabled: process.env.NODE_ENV === 'development',
+      enabled: import.meta.env.DEV,
     }
   )
 );

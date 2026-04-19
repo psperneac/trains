@@ -15,6 +15,7 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
 import { Admin, LoggedIn } from 'src/authentication/authentication.guard';
 import { AllExceptionsFilter } from 'src/utils/all-exceptions.filter';
@@ -28,6 +29,7 @@ export class CreateUserDto {
   username: string;
   password: string;
   scope: string;
+  preferences?: UserPreferenceDto;
 }
 
 export class UpdateUserDto {
@@ -35,6 +37,7 @@ export class UpdateUserDto {
   username: string;
   password: string;
   scope: string;
+  preferences?: UserPreferenceDto;
 }
 
 export class UserPreference {
@@ -89,14 +92,13 @@ class UserDtoMapper {
     return userDto;
   }
 
-  toEntity(userDto: UserDto, user?: User): User {
+  toEntity(userDto: CreateUserDto | UpdateUserDto, user?: User): User {
     const userEntity = user || new User();
     userEntity.email = userDto.email;
     userEntity.username = userDto.username;
     userEntity.scope = userDto.scope;
-    userEntity.password = userDto['password'] ?? userEntity.password;
+    userEntity.password = userDto.password ?? userEntity.password;
     userEntity.preferences = { ...userDto.preferences } as UserPreference;
-    // wallet is removed when mapping from DTO to model
     userEntity.wallet = undefined;
     return userEntity;
   }
@@ -133,14 +135,18 @@ export class UsersService {
   async create(userData: CreateUserDto): Promise<UserDto> {
     const newUser = this.usersRepository.create({
       _id: new Types.ObjectId(),
-      ...this.userDtoMapper.toEntity(userData as UserDto)
+      ...this.userDtoMapper.toEntity(userData)
     });
     await this.usersRepository.save(newUser);
     return this.userDtoMapper.toDto(newUser);
   }
 
   async replace(uuid: string, user: UpdateUserDto): Promise<UserDto> {
-    await this.usersRepository.update(uuid, this.userDtoMapper.toEntity(user as UserDto));
+    const userEntity = this.userDtoMapper.toEntity(user);
+    if (userEntity.password) {
+      userEntity.password = await bcrypt.hash(userEntity.password, 10);
+    }
+    await this.usersRepository.update(uuid, userEntity);
     const updatedUser = await this.usersRepository.findOne({ where: { _id: new Types.ObjectId(uuid) } });
     if (updatedUser) {
       return this.userDtoMapper.toDto(updatedUser);

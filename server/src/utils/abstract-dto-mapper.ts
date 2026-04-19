@@ -1,4 +1,4 @@
-import { assign, cloneDeep, pick } from 'lodash';
+import { cloneDeep, pick } from 'lodash';
 
 import { AbstractEntity } from './abstract.entity';
 
@@ -22,15 +22,10 @@ export interface Mapper<T, R> {
  */
 export class AbstractDtoMapper<T extends AbstractEntity, R> implements Mapper<T, R> {
   async toDomain(dto: R, domain?: T | Partial<T>): Promise<T> {
-    const ret = {
-      ...domain
-    };
-
-    assign(ret, {
+    return {
+      ...domain,
       ...dto
-    });
-
-    return ret as T;
+    } as T;
   }
 
   async toDto(domain: T): Promise<R> {

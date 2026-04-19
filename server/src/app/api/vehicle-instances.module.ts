@@ -151,7 +151,7 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
       end: await this.placesService.findOne(endId.toString()),
       startTime,
       endTime
-    } as any as VehicleInstance;
+    } as VehicleInstance;
   }
 }
 

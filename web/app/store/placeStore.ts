@@ -162,7 +162,7 @@ export const usePlaceStore = create<PlaceState>()(
     }),
     {
       name: 'places-store',
-      enabled: process.env.NODE_ENV === 'development',
+      enabled: import.meta.env.DEV,
     }
   )
 );

@@ -128,7 +128,7 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'game-store', // Name for Redux DevTools
-      enabled: process.env.NODE_ENV === 'development', // Only enable in development
+      enabled: import.meta.env.DEV, // Only enable in development
     }
   )
 );

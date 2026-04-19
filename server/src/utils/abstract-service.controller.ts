@@ -78,25 +78,14 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   }
 
   public async handlePagedResults(page, mapper) {
-    return Promise.all(page?.data?.map(item => {
-      const dto = mapper.toDto(item);
-      return dto;
-    }))
-      .then(mappedData => {
-          return ({
-            ...page,
-            data: mappedData
-          });
-      })
-      .catch(e => {
-        if (e instanceof HttpException) {
-          throw e;
-        } else if (e instanceof Error) {
-          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-          throw new HttpException('Entities cannot be located', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-      });
+    const mappedData = await Promise.all(page?.data?.map(async item => {
+      return await mapper.toDto(item);
+    }));
+
+    return {
+      ...page,
+      data: mappedData
+    };
   }
 
   @Post()
@@ -104,12 +93,16 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
   async create(@Body() dto: R, @Req() _request: Request): Promise<R> {
     return this.mapper
       .toDomain(dto)
-      .then(domain => {
-        return this.service.create(domain as any as DeepPartial<T>);
-      })
+      .then(domain => this.service.create(domain as any as DeepPartial<T>))
       .then(created => this.mapper.toDto(created))
       .catch(e => {
-        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (e instanceof HttpException) {
+          throw e;
+        } else if (e instanceof Error) {
+          throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+          throw new HttpException('Entity cannot be created', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
       });
   }
 
@@ -145,30 +138,24 @@ export class AbstractServiceController<T extends AbstractEntity, R> {
 
   @Patch(':id')
   @UseGuards(LoggedIn, Admin)
-  patch(@Param('id') uuid: string, @Body() dto: R, @Req() _request: Request): Promise<R> {
+  async patch(@Param('id') uuid: string, @Body() dto: R, @Req() _request: Request): Promise<R> {
     return this.service
       .findOne(uuid)
       .then(entity => {
         if (!entity) {
           throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
         }
-
+        return entity;
+      })
+      .then(async entity => this.mapper.toDomain(dto, entity))
+      .then(domain => {
         return {
-          ...this.mapper.toDomain(dto, entity),
-          id: uuid // don't allow id updating
+          ...domain,
+          id: uuid
         };
       })
-      .then(entity => {
-        return this.service.update(uuid, entity);
-      })
-      .then(() => this.service.findOne(uuid))
-      .then(updatedEntity => {
-        if (updatedEntity) {
-          return this.mapper.toDto(updatedEntity);
-        }
-
-        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
-      })
+      .then(entity => this.service.update(uuid, entity))
+      .then(updated => this.mapper.toDto(updated))
       .catch(e => {
         if (e instanceof HttpException) {
           throw e;

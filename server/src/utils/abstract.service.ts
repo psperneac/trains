@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { DeepPartial, FindOptionsUtils, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsOrder, FindOptionsWhere, FindOptionsUtils, Repository } from 'typeorm';
 
 import { PageDto } from '../models/page.model';
 import { PageRequestDto } from '../models/pagination.model';
@@ -35,8 +35,8 @@ export class AbstractService<T extends AbstractEntity> {
     const page = typeof pagination.page === 'string' ? parseInt(pagination.page, 10) : pagination.page || 1;
     const limit = typeof pagination.limit === 'string' ? parseInt(pagination.limit, 10) : pagination.limit || 10;
     const skip = (page - 1) * limit;
-    const order = pagination.sortColumn
-      ? ({ [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC' } as any)
+    const order: FindOptionsOrder<T> | undefined = pagination.sortColumn
+      ? { [pagination.sortColumn]: pagination.sortDescending ? 'DESC' : 'ASC' } as FindOptionsOrder<T>
       : undefined;
 
     const [data, totalCount] = await Promise.all([
@@ -68,7 +68,7 @@ export class AbstractService<T extends AbstractEntity> {
     }
 
     const data = await this.repository.findOne({
-      where: { _id: new Types.ObjectId(uuid) } as any,
+      where: { _id: new Types.ObjectId(uuid) } as unknown as FindOptionsWhere<T>,
       relations: this.relationships
     });
 
@@ -77,27 +77,21 @@ export class AbstractService<T extends AbstractEntity> {
 
   create(entity: DeepPartial<T>): Promise<T> {
     const newData = this.repository.create(entity);
-    return this.repository.save(newData as any as DeepPartial<T>, {});
+    return this.repository.save(newData as any as DeepPartial<T>, {}) as any;
   }
 
-  async update(uuid: string, entity): Promise<T> {
-    // If id is provided, convert it to _id and remove id from payload
-    const { id, ...entityWithoutId } = entity;
-    
-    // Use save instead of update to properly handle relationships
+  update(uuid: string, entity: DeepPartial<T>): Promise<T> {
+    const { id: _ignored, ...entityWithoutId } = entity as DeepPartial<T> & { id?: string };
+
     const updateData = {
       ...entityWithoutId,
       _id: new Types.ObjectId(uuid)
     };
 
-    try {
-      return this.repository.save(updateData as any);
-    } catch (error) {
-      throw new SqlException(error.message || 'Update failed');
-    }
+    return this.repository.save(updateData as unknown as DeepPartial<T>) as any;
   }
 
-  delete(uuid: string): Promise<boolean> {
+  async delete(uuid: string): Promise<boolean> {
     return this.repository.delete(uuid).then(deleteResponse => {
       if (!deleteResponse || !deleteResponse.affected) {
         throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);

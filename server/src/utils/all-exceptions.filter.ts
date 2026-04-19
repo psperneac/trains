@@ -63,7 +63,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let code = 'HttpException';
 
     if (Logger.isLevelEnabled('debug')) {
-      Logger.debug(process.env, message, (ex as any)?.stack, `${request.method} ${request.url}`);
+      Logger.debug(message, (ex as any)?.stack, `${request.method} ${request.url}`);
     }
 
     let status;
