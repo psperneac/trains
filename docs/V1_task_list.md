@@ -39,11 +39,11 @@
 - [x] Add to `server/src/app/api/places.module.ts`
 
 ### 2.2 Vehicle Entity - Add Price and Fuel Fields
-- [ ] Add `priceGold` field
-- [ ] Add `priceGems` field
-- [ ] Add `fuelBaseBurn` field (base fuel consumption per distance)
-- [ ] Add `fuelPerLoadBurn` field (additional fuel per cargo unit)
-- [ ] Add to `server/src/app/api/vehicles.module.ts`
+- [x] Add `priceGold` field
+- [x] Add `priceGems` field
+- [x] Add `fuelBaseBurn` field (base fuel consumption per distance)
+- [x] Add `fuelPerLoadBurn` field (additional fuel per cargo unit)
+- [x] Add to `server/src/app/api/vehicles.module.ts`
 
 ### 2.3 VehicleInstance Entity - Refactor for Movement
 - [ ] Rename `start` → `currentPlaceInstance` (PlaceInstance reference)

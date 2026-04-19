@@ -63,6 +63,22 @@ export class Vehicle extends AbstractEntity {
 
   @Column()
   gameId: string;
+
+  @Column({ default: 5000 })
+  @Expose()
+  priceGold: number;
+
+  @Column({ default: 10 })
+  @Expose()
+  priceGems: number;
+
+  @Column({ default: 1 })
+  @Expose()
+  fuelBaseBurn: number;
+
+  @Column({ default: 0.1 })
+  @Expose()
+  fuelPerLoadBurn: number;
 }
 
 export class VehicleDto implements AbstractDto {
@@ -82,6 +98,10 @@ export class VehicleDto implements AbstractDto {
 
   speed: number;
   gameId: string;
+  priceGold: number;
+  priceGems: number;
+  fuelBaseBurn: number;
+  fuelPerLoadBurn: number;
 }
 
 @Injectable()
@@ -118,7 +138,11 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
       'auxLoad',
       'auxFuel',
       'speed',
-      'gameId'
+      'gameId',
+      'priceGold',
+      'priceGems',
+      'fuelBaseBurn',
+      'fuelPerLoadBurn'
     ];
   }
 }
