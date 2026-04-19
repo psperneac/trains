@@ -181,8 +181,9 @@
 - [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.4 Job Details
-- [ ] `GET /jobs/:id` - get job details
-- [ ] Write unit tests to verify the endpoints work correctly
+
+- [x] `GET /jobs/:id` - get job details (already provided by AbstractServiceController)
+- [x] Write unit tests to verify the endpoints work correctly
 
 ---
 
