@@ -175,10 +175,10 @@
 - [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.3 Vehicle Job Endpoints
-- [ ] `POST /vehicles/:id/load-job` - load job from place into vehicle
-- [ ] `POST /vehicles/:id/unload-job` - unload job at current place
-- [ ] `POST /vehicles/:id/dispatch` - dispatch with route
-- [ ] Write unit tests to verify the endpoints work correctly
+- [x] `POST /vehicles/:id/load-job` - load job from place into vehicle
+- [x] `POST /vehicles/:id/unload-job` - unload job at current place
+- [x] `POST /vehicles/:id/dispatch` - dispatch with route (already existed)
+- [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.4 Job Details
 - [ ] `GET /jobs/:id` - get job details
