@@ -94,12 +94,12 @@
 - [x] Write unit tests to verify the place purchase service works correctly
 
 ### 3.4 JobOfferService
-- [ ] Create `server/src/app/game/job-offer/job-offer.service.ts`
-- [ ] Implement `generateOffersForPlace()` - only when player has 2+ places
-- [ ] Implement `generateRandomJob()` - random cargo type, load, pay
-- [ ] Implement global tick refresh (all places at same interval)
-- [ ] Create `job-offer.controller.ts`
-- [ ] Write unit tests to verify the job offer service works correctly
+- [x] Create `server/src/app/game/job-offer/job-offer.service.ts`
+- [x] Implement `generateOffersForPlace()` - only when player has 2+ places
+- [x] Implement `generateRandomJob()` - random cargo type, load, pay
+- [x] Implement global tick refresh (all places at same interval)
+- [x] Create `job-offer.controller.ts`
+- [x] Write unit tests to verify the job offer service works correctly
 
 ### 3.5 VehicleDispatchService
 - [ ] Create `server/src/app/game/vehicle-dispatch/vehicle-dispatch.service.ts`
