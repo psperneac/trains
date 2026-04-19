@@ -3,6 +3,7 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
@@ -33,11 +34,18 @@ export class Job extends AbstractEntity {
   @Expose()
   description: string;
 
+  /** Type of cargo being transported (e.g., 'Coal', 'Grain', 'Electronics') */
+  @Column('varchar', { length: 100 })
+  @Expose()
+  cargoType: string;
+
+  /** Origin PlaceInstance where the job was accepted or warehoused */
   @ManyToOne(_type => PlaceInstance, { eager: true })
   @JoinColumn({ name: 'start' })
   @Expose()
   start: Place;
 
+  /** Destination PlaceInstance for job delivery */
   @ManyToOne(_type => PlaceInstance, { eager: true })
   @JoinColumn({ name: 'end' })
   @Expose()
@@ -59,6 +67,26 @@ export class Job extends AbstractEntity {
   @Expose()
   startTime: Date;
 
+  /** Template Place origin - the template Place this job originates from */
+  @Column({ name: 'start_place_id', type: 'objectId', nullable: true })
+  @Expose()
+  startPlaceId: ObjectId;
+
+  /** Template Place destination - the template Place this job goes to */
+  @Column({ name: 'end_place_id', type: 'objectId', nullable: true })
+  @Expose()
+  endPlaceId: ObjectId;
+
+  /** PlaceInstance where this job is warehoused (if type=PLACE) */
+  @Column({ name: 'place_instance_id', type: 'objectId', nullable: true })
+  @Expose()
+  placeInstanceId: ObjectId;
+
+  /** VehicleInstance carrying this job (if type=VEHICLE) */
+  @Column({ name: 'vehicle_instance_id', type: 'objectId', nullable: true })
+  @Expose()
+  vehicleInstanceId: ObjectId;
+
   @Column({ name: 'place_id' })
   @Expose()
   placeId: string;
@@ -77,12 +105,17 @@ export interface JobDto {
   name: string;
   description: string;
   type: string;
+  cargoType: string;
   startId: string;
   endId: string;
   load: number;
   payType: string;
   pay: number;
   startTime: string;
+  startPlaceId: string;
+  endPlaceId: string;
+  placeInstanceId: string;
+  vehicleInstanceId: string;
   placeId: string;
   vehicleId: string;
   content: any;
@@ -91,6 +124,7 @@ export interface JobDto {
 export interface JobOffer {
   name: string;
   description: string;
+  cargoType: string;
   startId: string;
   endId: string;
   load: number;
@@ -103,6 +137,7 @@ export interface JobOffer {
 export interface JobOfferDto {
   name: string;
   description: string;
+  cargoType: string;
   startId: string;
   endId: string;
   load: number;
@@ -146,12 +181,17 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       name: domain.name,
       description: domain.description,
       content: domain.content,
+      cargoType: domain.cargoType,
       load: domain.load,
       payType: domain.payType,
       pay: domain.pay,
       startTime: domain.startTime?.toISOString(),
       startId: domain.start?._id.toString(),
       endId: domain.end?._id.toString(),
+      startPlaceId: domain.startPlaceId?.toString(),
+      endPlaceId: domain.endPlaceId?.toString(),
+      placeInstanceId: domain.placeInstanceId?.toString(),
+      vehicleInstanceId: domain.vehicleInstanceId?.toString(),
       placeId: domain.placeId,
       vehicleId: domain.vehicleId
     };

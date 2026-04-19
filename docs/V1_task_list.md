@@ -54,15 +54,15 @@
 - [x] Update in `server/src/app/api/vehicle-instances.module.ts`
 
 ### 2.4 Job Entity - Add Cargo Type and Flexible Location
-- [ ] Add `cargoType: string` field ('Coal', 'Grain', 'Electronics', etc.)
-- [ ] Add `load: number` field (already exists - verify)
-- [ ] Add `pay: number` field (already exists - verify)
-- [ ] Add `payType: 'GOLD' | 'GEMS'` (already exists - verify)
-- [ ] Add `startPlaceId: ObjectId` (template Place origin)
-- [ ] Add `endPlaceId: ObjectId` (template Place destination)
-- [ ] Add `placeInstanceId: ObjectId` (warehoused at this PlaceInstance)
-- [ ] Add `vehicleInstanceId: ObjectId` (loaded on this VehicleInstance)
-- [ ] Update in `server/src/app/api/jobs.module.ts`
+- [x] Add `cargoType: string` field ('Coal', 'Grain', 'Electronics', etc.)
+- [x] Add `load: number` field (already exists - verify)
+- [x] Add `pay: number` field (already exists - verify)
+- [x] Add `payType: 'GOLD' | 'GEMS'` (already exists - verify)
+- [x] Add `startPlaceId: ObjectId` (template Place origin)
+- [x] Add `endPlaceId: ObjectId` (template Place destination)
+- [x] Add `placeInstanceId: ObjectId` (warehoused at this PlaceInstance)
+- [x] Add `vehicleInstanceId: ObjectId` (loaded on this VehicleInstance)
+- [x] Update in `server/src/app/api/jobs.module.ts`
 
 ### 2.5 CargoType Enum
 - [ ] Define `CargoTypes` constant array in `server/src/app/api/vehicles.module.ts`
