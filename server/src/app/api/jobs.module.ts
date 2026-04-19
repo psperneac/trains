@@ -4,6 +4,7 @@ import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
@@ -68,23 +69,16 @@ export class Job extends AbstractEntity {
   startTime: Date;
 
   /** Template Place origin - the template Place this job originates from */
-  @Column({ name: 'start_place_id', type: 'objectId', nullable: true })
-  @Expose()
+  @Column('objectId')
   startPlaceId: ObjectId;
 
-  /** Template Place destination - the template Place this job goes to */
-  @Column({ name: 'end_place_id', type: 'objectId', nullable: true })
-  @Expose()
+  @Column('objectId')
   endPlaceId: ObjectId;
 
-  /** PlaceInstance where this job is warehoused (if type=PLACE) */
-  @Column({ name: 'place_instance_id', type: 'objectId', nullable: true })
-  @Expose()
+  @Column('objectId')
   placeInstanceId: ObjectId;
 
-  /** VehicleInstance carrying this job (if type=VEHICLE) */
-  @Column({ name: 'vehicle_instance_id', type: 'objectId', nullable: true })
-  @Expose()
+  @Column('objectId')
   vehicleInstanceId: ObjectId;
 
   @Column({ name: 'place_id' })
@@ -212,7 +206,15 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
     const endId = dto.endId ?? domain.end?._id.toString();
     const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
 
-    const fixedDto = omit({ ...dto }, ['startId', 'endId', 'startTime']);
+    const fixedDto = omit({ ...dto }, [
+      'startId',
+      'endId',
+      'startTime',
+      'startPlaceId',
+      'endPlaceId',
+      'placeInstanceId',
+      'vehicleInstanceId'
+    ]);
 
     const [start, end] = await Promise.all([
       this.service.findOne(startId),
@@ -224,7 +226,11 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       ...fixedDto,
       start,
       end,
-      startTime
+      startTime,
+      startPlaceId: dto.startPlaceId ? new Types.ObjectId(dto.startPlaceId) : domain?.startPlaceId,
+      endPlaceId: dto.endPlaceId ? new Types.ObjectId(dto.endPlaceId) : domain?.endPlaceId,
+      placeInstanceId: dto.placeInstanceId ? new Types.ObjectId(dto.placeInstanceId) : domain?.placeInstanceId,
+      vehicleInstanceId: dto.vehicleInstanceId ? new Types.ObjectId(dto.vehicleInstanceId) : domain?.vehicleInstanceId
     } as unknown as Job;
   }
 }
