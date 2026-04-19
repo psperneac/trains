@@ -42,6 +42,14 @@ export class Place extends AbstractEntity {
   @Column('objectId')
   @Expose()
   gameId: ObjectId;
+
+  @Column({ default: 1000 })
+  @Expose()
+  priceGold: number;
+
+  @Column({ default: 0 })
+  @Expose()
+  priceGems: number;
 }
 
 export interface PlaceDto {
@@ -52,6 +60,8 @@ export interface PlaceDto {
   lat: number;
   lng: number;
   gameId: string;
+  priceGold: number;
+  priceGems: number;
 }
 
 export class CopyPlacesDto {
@@ -105,6 +115,8 @@ export class PlaceMapper extends AbstractDtoMapper<Place, PlaceDto> {
       lat: domain.lat,
       lng: domain.lng,
       gameId: domain.gameId.toString(),
+      priceGold: domain.priceGold ?? 1000,
+      priceGems: domain.priceGems ?? 0,
     };
 
     return dto;

@@ -34,9 +34,9 @@
 ## Phase 2: Entity Modifications
 
 ### 2.1 Place Entity - Add Price Fields
-- [ ] Add `priceGold` field to Place entity (default: 1000)
-- [ ] Add `priceGems` field to Place entity (default: 0)
-- [ ] Add to `server/src/app/api/places.module.ts`
+- [x] Add `priceGold` field to Place entity (default: 1000)
+- [x] Add `priceGems` field to Place entity (default: 0)
+- [x] Add to `server/src/app/api/places.module.ts`
 
 ### 2.2 Vehicle Entity - Add Price and Fuel Fields
 - [ ] Add `priceGold` field
