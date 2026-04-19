@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards, Body } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import { AbstractEntity } from 'src/utils/abstract.entity';
+import { AbstractEntity } from '../../utils/abstract.entity';
 import { Column, Entity } from 'typeorm';
 import { ObjectId } from 'mongodb';
 

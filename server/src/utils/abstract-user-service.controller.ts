@@ -1,7 +1,7 @@
 import { Body, Delete, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { User } from 'src/app/api/support/users.module';
-import { LoggedIn, UserOrAdmin } from 'src/authentication/authentication.guard';
+import { User } from '../app/api/support/users.module';
+import { LoggedIn, UserOrAdmin } from '../authentication/authentication.guard';
 import { AbstractDtoMapper } from './abstract-dto-mapper';
 import { AbstractServiceController } from './abstract-service.controller';
 import { AbstractEntity } from './abstract.entity';

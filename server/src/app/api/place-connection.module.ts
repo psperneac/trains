@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { AbstractDto } from 'src/utils/abstract-dto';
-import { AbstractEntity } from 'src/utils/abstract.entity';
+import { AbstractDto } from '../../utils/abstract-dto';
+import { AbstractEntity } from '../../utils/abstract.entity';
 import { Column, Entity, ObjectId } from 'typeorm';
 
 import { LoggedIn } from '../../authentication/authentication.guard';

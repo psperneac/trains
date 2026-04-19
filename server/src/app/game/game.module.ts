@@ -7,12 +7,16 @@ import { PlacePurchaseService } from './place-purchase/place-purchase.service';
 import { PlacePurchaseController } from './place-purchase/place-purchase.controller';
 import { JobOfferService } from './job-offer/job-offer.service';
 import { JobOfferController } from './job-offer/job-offer.controller';
+import { VehicleDispatchService } from './vehicle-dispatch/vehicle-dispatch.service';
+import { VehicleDispatchController } from './vehicle-dispatch/vehicle-dispatch.controller';
 import { PlayersModule } from '../api/support/players.module';
 import { TransactionsModule } from '../api/support/transactions.module';
 import { PlaceInstancesModule } from '../api/place-instance.module';
 import { PlaceConnectionsModule } from '../api/place-connection.module';
 import { PlacesModule } from '../api/places.module';
 import { VehiclesModule } from '../api/vehicles.module';
+import { VehicleInstancesModule } from '../api/vehicle-instances.module';
+import { JobsModule } from '../api/jobs.module';
 import { AuthenticationModule } from '../../authentication/authentication.module';
 
 @Module({
@@ -23,16 +27,19 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     PlaceConnectionsModule,
     PlacesModule,
     VehiclesModule,
+    VehicleInstancesModule,
+    JobsModule,
     AuthenticationModule
   ],
-  controllers: [PlacePurchaseController, JobOfferController],
+  controllers: [PlacePurchaseController, JobOfferController, VehicleDispatchController],
   providers: [
     InMemorySchedulerService,
     GameClockService,
     EconomyService,
     MapRevealService,
     PlacePurchaseService,
-    JobOfferService
+    JobOfferService,
+    VehicleDispatchService
   ],
   exports: [
     InMemorySchedulerService,
@@ -40,7 +47,8 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     EconomyService,
     MapRevealService,
     PlacePurchaseService,
-    JobOfferService
+    JobOfferService,
+    VehicleDispatchService
   ]
 })
 export class GameModule {}

@@ -88,7 +88,9 @@ The server uses a **modular service-oriented architecture** with abstract base c
 
 #### Core Patterns
 
-1. **Abstract Service Pattern**: All API resources extend abstract classes that provide CRUD operations:
+1. **Import Style**: Always use relative imports (e.g., `../../utils/abstract.entity`) instead of `src/` prefixed imports. Using `src/` prefixed imports causes module resolution failures in Jest tests.
+
+2. **Abstract Service Pattern**: All API resources extend abstract classes that provide CRUD operations:
    - `AbstractEntity` - Base entity with common fields (\_id, createdAt, updatedAt)
    - `AbstractService` - Generic service with findAll, findOne, create, update, delete
    - `AbstractServiceController` - Generic REST controller with standard endpoints

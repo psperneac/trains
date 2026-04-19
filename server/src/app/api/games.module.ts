@@ -1,15 +1,15 @@
 import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { LoggedIn } from 'src/authentication/authentication.guard';
-import { PageDto } from 'src/models/page.model';
-import { PageRequestDto } from 'src/models/pagination.model';
-import { AbstractDtoMapper } from 'src/utils/abstract-dto-mapper';
-import { AbstractServiceController } from 'src/utils/abstract-service.controller';
-import { AbstractEntity } from 'src/utils/abstract.entity';
-import { AbstractService } from 'src/utils/abstract.service';
-import { AllExceptionsFilter } from 'src/utils/all-exceptions.filter';
-import { RepositoryAccessor } from 'src/utils/repository-accessor';
+import { LoggedIn } from '../../authentication/authentication.guard';
+import { PageDto } from '../../models/page.model';
+import { PageRequestDto } from '../../models/pagination.model';
+import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractServiceController } from '../../utils/abstract-service.controller';
+import { AbstractEntity } from '../../utils/abstract.entity';
+import { AbstractService } from '../../utils/abstract.service';
+import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
+import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { Column, Entity } from 'typeorm';
 
 export enum GameType {

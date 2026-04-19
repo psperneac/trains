@@ -17,8 +17,8 @@ import {
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Types } from 'mongoose';
-import { Admin, LoggedIn } from 'src/authentication/authentication.guard';
-import { AllExceptionsFilter } from 'src/utils/all-exceptions.filter';
+import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
+import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { Column, Entity, Repository } from 'typeorm';
 import { AbstractEntity } from '../../../utils/abstract.entity';
 import { Wallet, WalletDto } from './wallet.model';

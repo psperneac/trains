@@ -5,7 +5,7 @@ import { Column, Entity, ObjectId } from 'typeorm';
 import { RequestWithUser } from '../../../authentication/authentication.model';
 
 import { Types } from 'mongoose';
-import { AbstractUserServiceController } from 'src/utils/abstract-user-service.controller';
+import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';

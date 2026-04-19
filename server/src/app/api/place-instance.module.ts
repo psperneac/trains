@@ -2,7 +2,7 @@ import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nes
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
-import { AbstractEntity } from 'src/utils/abstract.entity';
+import { AbstractEntity } from '../../utils/abstract.entity';
 import { Column, Entity, JoinColumn, ManyToOne, ObjectId } from 'typeorm';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
