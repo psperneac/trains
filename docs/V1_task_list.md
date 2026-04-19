@@ -9,6 +9,11 @@
 - **Vehicle upgrades**: NOT in V1 - fixed 1 engine, 0 aux cars
 - **Task style**: Atomic tasks (one feature per session)
 
+## Notes
+- on all section X.Y you have to implement unit tests for the added functionality, and run the whole suite of tests to verify the rest of the app still works
+- on all added services and code, add documentation both at method level and on important blocks of code. the documentation should make it clear to the viewer what the code does.
+- after implementing each step inside a section, mark it as complete
+
 ---
 
 ## Phase 1: Foundation Services
@@ -22,6 +27,7 @@
 - [ ] Create `server/src/app/game/game-clock/game-clock.service.ts`
 - [ ] Implement `getGameTime()`, `syncWithWallClock()`
 - [ ] Note: `pause()`, `resume()`, `setSpeed()` are future features
+- [ ] Write basic unit tests to verify game clock service works correctly
 
 ---
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AdminUsersModule } from './admin-users.module';
 
+import { GameModule } from '../game/game.module';
 import { GamesModule } from './games.module';
 import { JobsModule } from './jobs.module';
 import { PlaceConnectionsModule } from './place-connection.module';
@@ -30,7 +31,8 @@ import { VehiclesModule } from './vehicles.module';
     TransactionsModule,
     AdminUsersModule,
     JobsModule,
-    GamesModule
+    GamesModule,
+    GameModule
   ]
 })
 export class ApiModule {}
