@@ -87,11 +87,11 @@
 - [x] Write unit tests to verify the map reveal service works correctly
 
 ### 3.3 PlacePurchaseService
-- [ ] Create `server/src/app/game/place-purchase/place-purchase.service.ts`
-- [ ] Implement `purchasePlace()` - validate affordability, deduct, create PlaceInstance
-- [ ] Create `place-purchase.controller.ts`
-- [ ] Create `POST /players/:id/purchase-place` endpoint
-- [ ] Write unit tests to verify the place purchase service works correctly
+- [x] Create `server/src/app/game/place-purchase/place-purchase.service.ts`
+- [x] Implement `purchasePlace()` - validate affordability, deduct, create PlaceInstance
+- [x] Create `place-purchase.controller.ts`
+- [x] Create `POST /players/:id/purchase-place` endpoint
+- [x] Write unit tests to verify the place purchase service works correctly
 
 ### 3.4 JobOfferService
 - [ ] Create `server/src/app/game/job-offer/job-offer.service.ts`
