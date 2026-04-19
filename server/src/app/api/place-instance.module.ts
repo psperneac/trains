@@ -3,7 +3,7 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { AbstractEntity } from 'src/utils/abstract.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, ObjectId } from 'typeorm';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -24,13 +24,13 @@ export class PlaceInstance extends AbstractEntity {
   @Expose()
   place: Place;
 
-  @Column({ name: 'game_id' })
+  @Column('objectId')
   @Expose()
-  gameId: string;
+  gameId: ObjectId;
 
-  @Column({ name: 'player_id' })
+  @Column('objectId')
   @Expose()
-  playerId: string;
+  playerId: ObjectId;
 
   @Column()
   @Expose()
@@ -92,8 +92,8 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
     const dto: PlaceInstanceDto = {
       id: domain._id.toString(),
       placeId: domain.place?._id.toString(),
-      gameId: domain.gameId,
-      playerId: domain.playerId,
+      gameId: domain.gameId?.toString(),
+      playerId: domain.playerId?.toString(),
       jobOffers: domain.jobOffers?.map(j => j as JobOfferDto),
       content: domain.content
     };

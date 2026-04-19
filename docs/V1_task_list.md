@@ -80,11 +80,11 @@
 - [x] Write unit tests to verify the economy service works correctly
 
 ### 3.2 MapRevealService
-- [ ] Create `server/src/app/game/map-reveal/map-reveal.service.ts`
-- [ ] Implement `getOwnedPlaceInstances(playerId)` - get player's places
-- [ ] Implement `getAvailablePlaces(playerId)` - places 1 hop from owned
-- [ ] Implement map visibility algorithm (see V1 plan lines 432-465)
-- [ ] Write unit tests to verify the map reveal service works correctly
+- [x] Create `server/src/app/game/map-reveal/map-reveal.service.ts`
+- [x] Implement `getOwnedPlaceInstances(playerId)` - get player's places
+- [x] Implement `getAvailablePlaces(playerId)` - places 1 hop from owned
+- [x] Implement map visibility algorithm (see V1 plan lines 432-465)
+- [x] Write unit tests to verify the map reveal service works correctly
 
 ### 3.3 PlacePurchaseService
 - [ ] Create `server/src/app/game/place-purchase/place-purchase.service.ts`
