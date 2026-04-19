@@ -65,8 +65,8 @@
 - [x] Update in `server/src/app/api/jobs.module.ts`
 
 ### 2.5 CargoType Enum
-- [ ] Define `CargoTypes` constant array in `server/src/app/api/vehicles.module.ts`
-- [ ] Export `CargoType` type
+- [x] Define `CargoTypes` constant array in `server/src/app/api/vehicles.module.ts`
+- [x] Export `CargoType` type
 
 ---
 

@@ -15,6 +15,30 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { GamesModule } from './games.module';
 
+/**
+ * Supported cargo types in the game.
+ * Used by Job entities to specify what type of cargo is being transported.
+ */
+export const CargoTypes = [
+  'Coal',
+  'Grain',
+  'Electronics',
+  'Machinery',
+  'Livestock',
+  'Lumber',
+  'Steel',
+  'Textiles',
+  'Food',
+  'Chemicals',
+  'Vehicles',
+  'Minerals'
+] as const;
+
+/**
+ * Type alias for cargo type values.
+ */
+export type CargoType = (typeof CargoTypes)[number];
+
 @Entity({ name: 'vehicles' })
 export class Vehicle extends AbstractEntity {
   @Column('varchar', { length: 20 })
