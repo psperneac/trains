@@ -162,24 +162,27 @@
 ## Phase 5: Core API Endpoints
 
 ### 5.1 Map View Endpoints
-- [ ] Create `GET /players/:id/map-view` endpoint
-- [ ] Return: owned places (with jobOffers), available places (with prices), connections
-- [ ] Create `GET /players/:id/available-places` endpoint (dedicated endpoint for available places only)
-- [ ] Uses MapRevealService
-- [ ] Uses MapRevealService
+- [x] Create `GET /players/:id/map-view` endpoint
+- [x] Return: owned places (with jobOffers), available places (with prices), connections
+- [x] Create `GET /players/:id/available-places` endpoint (dedicated endpoint for available places only)
+- [x] Uses MapRevealService
+- [x] Write unit tests to verify the endpoints work correctly
 
 ### 5.2 Job Endpoints
 - [ ] `GET /place-instances/:id/jobs` - get job offers at owned place
 - [ ] `POST /place-instances/:id/accept-job` - accept offer → creates Job entity
 - [ ] `POST /place-instances/:id/warehouse-job` - leave job at place
+- [ ] Write unit tests to verify the endpoints work correctly
 
 ### 5.3 Vehicle Job Endpoints
 - [ ] `POST /vehicles/:id/load-job` - load job from place into vehicle
 - [ ] `POST /vehicles/:id/unload-job` - unload job at current place
 - [ ] `POST /vehicles/:id/dispatch` - dispatch with route
+- [ ] Write unit tests to verify the endpoints work correctly
 
 ### 5.4 Job Details
 - [ ] `GET /jobs/:id` - get job details
+- [ ] Write unit tests to verify the endpoints work correctly
 
 ---
 

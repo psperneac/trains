@@ -19,6 +19,9 @@ import { User } from './users.module';
 import { Wallet, WalletDto, SendGoldAndGemsDto } from './wallet.model';
 import { PlaceInstancesModule, PlaceInstanceMapper, PlaceInstancesService } from '../place-instance.module';
 import { VehicleInstancesModule, VehicleInstanceMapper, VehicleInstancesService } from '../vehicle-instances.module';
+import { PlaceConnectionService, PlaceConnectionDto, PlaceConnectionsModule } from '../place-connection.module';
+import { PlacesModule } from '../places.module';
+import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
 
 export { Wallet, WalletDto, SendGoldAndGemsDto };
 
@@ -67,6 +70,26 @@ export interface PlayerFullStateDto {
   player: PlayerDto;
   placeInstances: any[];
   vehicleInstances: any[];
+}
+
+/**
+ * Response DTO for map view endpoint.
+ * Contains owned place instances (with job offers), available places (with prices),
+ * and the connections between places for rendering the map.
+ */
+export interface MapViewResponseDto {
+  owned: any[];           // PlaceInstance objects with jobOffers populated
+  available: any[];       // Place template objects with priceGold/priceGems
+  connections: PlaceConnectionDto[];  // All connections in the game (filtered by proximity)
+}
+
+/**
+ * Response DTO for available places endpoint.
+ * Returns only the places available for purchase by the player.
+ */
+export interface AvailablePlacesResponseDto {
+  places: any[];          // Place template objects with priceGold/priceGems
+  ownedPlaceIds: string[]; // IDs of places the player already owns (for reference)
 }
 
 @Injectable()
@@ -189,7 +212,9 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     private readonly placeInstancesService: PlaceInstancesService,
     private readonly placeInstanceMapper: PlaceInstanceMapper,
     private readonly vehicleInstancesService: VehicleInstancesService,
-    private readonly vehicleInstanceMapper: VehicleInstanceMapper) {
+    private readonly vehicleInstanceMapper: VehicleInstanceMapper,
+    private readonly mapRevealService: MapRevealService,
+    private readonly placeConnectionService: PlaceConnectionService) {
     super(playersService, playersMapper);
   }
 
@@ -332,6 +357,127 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     };
   }
 
+  /**
+   * GET /players/:id/map-view
+   * Returns the map view for a player including:
+   * - owned: PlaceInstance objects with jobOffers populated (places the player owns)
+   * - available: Place template objects with priceGold/priceGems (places available for purchase)
+   * - connections: PlaceConnection objects for the game's places (filtered to relevant ones)
+   */
+  @Get(':id/map-view')
+  @UseGuards(LoggedIn)
+  async getMapView(@Param('id') playerId: string): Promise<MapViewResponseDto> {
+    // Fetch the player to verify they exist and get their gameId
+    const player = await this.playersService.findOne(playerId);
+    if (!player) {
+      throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Get owned place instances
+    const ownedPlaceInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
+    const ownedPlaceInstances = await Promise.all(
+      ownedPlaceInstancesPage.data.map(pi => this.placeInstanceMapper.toDto(pi))
+    );
+
+    // Get available places (templates) for purchase
+    const availablePlaces = await this.mapRevealService.getAvailablePlaces(playerId);
+
+    // Get the player's owned place IDs to include in response for reference
+    const ownedPlaceIds = ownedPlaceInstances
+      .map(pi => pi.placeId)
+      .filter(id => id);
+
+    // Get connections for the player's game
+    // Filter connections to only those involving owned or available places
+    const gameId = player.gameId;
+    const allConnectionsPage = await this.placeConnectionService.findAllWhere(
+      { gameId: new Types.ObjectId(gameId.toString()) } as any,
+      { page: 1, pageSize: 1000 } as any
+    );
+
+    // Filter connections to only those relevant to the player's map view
+    // (connections where startId or endId is in owned or available places)
+    const relevantPlaceIds = new Set([
+      ...ownedPlaceIds,
+      ...availablePlaces.map(p => p._id?.toString()).filter(id => id)
+    ]);
+
+    const relevantConnections = allConnectionsPage.data.filter(conn => {
+      const startId = conn.startId?.toString();
+      const endId = conn.endId?.toString();
+      return relevantPlaceIds.has(startId) || relevantPlaceIds.has(endId);
+    });
+
+    // Map connections to DTOs
+    const connections: PlaceConnectionDto[] = await Promise.all(
+      relevantConnections.map(async (conn: any) => ({
+        id: conn._id?.toString(),
+        type: conn.type,
+        name: conn.name,
+        description: conn.description,
+        content: conn.content,
+        startId: conn.startId?.toString(),
+        endId: conn.endId?.toString(),
+        gameId: conn.gameId?.toString()
+      }))
+    );
+
+    return {
+      owned: ownedPlaceInstances,
+      available: availablePlaces.map(place => ({
+        id: place._id?.toString(),
+        name: place.name,
+        description: place.description,
+        type: place.type,
+        lat: place.lat,
+        lng: place.lng,
+        gameId: place.gameId?.toString(),
+        priceGold: place.priceGold,
+        priceGems: place.priceGems
+      })),
+      connections
+    };
+  }
+
+  /**
+   * GET /players/:id/available-places
+   * Returns only the places available for purchase by the player.
+   * Useful for dedicated UI components showing available purchases.
+   */
+  @Get(':id/available-places')
+  @UseGuards(LoggedIn)
+  async getAvailablePlaces(@Param('id') playerId: string): Promise<AvailablePlacesResponseDto> {
+    // Verify player exists
+    const player = await this.playersService.findOne(playerId);
+    if (!player) {
+      throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Get owned place instances to get the list of owned place IDs
+    const ownedPlaceInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
+    const ownedPlaceIds = ownedPlaceInstancesPage.data
+      .map(pi => pi.place?._id?.toString())
+      .filter(id => id);
+
+    // Get available places (templates) for purchase
+    const availablePlaces = await this.mapRevealService.getAvailablePlaces(playerId);
+
+    return {
+      places: availablePlaces.map(place => ({
+        id: place._id?.toString(),
+        name: place.name,
+        description: place.description,
+        type: place.type,
+        lat: place.lat,
+        lng: place.lng,
+        gameId: place.gameId?.toString(),
+        priceGold: place.priceGold,
+        priceGems: place.priceGems
+      })),
+      ownedPlaceIds
+    };
+  }
+
 }
 
 @Module({
@@ -339,10 +485,12 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     TypeOrmModule.forFeature([Player]),
     TransactionsModule,
     PlaceInstancesModule,
-    VehicleInstancesModule
+    VehicleInstancesModule,
+    PlaceConnectionsModule,
+    PlacesModule
   ],
   controllers: [PlayerController],
-  providers: [PlayersService, PlayerMapper, PlayerRepository],
+  providers: [PlayersService, PlayerMapper, PlayerRepository, MapRevealService],
   exports: [PlayersService, PlayerMapper]
 })
 export class PlayersModule {}
