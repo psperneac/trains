@@ -160,12 +160,12 @@ export const usePlayersStore = create<PlayersState>()(
     }
   },
 
-  addPlayer: async (player: Omit<PlayerDto, 'id'>) => {
+  addPlayer: async (player: Omit<PlayerDto, 'id'>): Promise<PlayerDto> => {
     set({ loading: true, error: null });
     try {
       const rawToken = useAuthStore.getState().authToken;
       const authToken = typeof rawToken === 'string' ? rawToken : undefined;
-      await apiRequest<PlayerDto>('/api/players', {
+      const created = await apiRequest<PlayerDto>('/api/players', {
         method: 'POST',
         authToken,
         body: JSON.stringify(player),
@@ -174,8 +174,11 @@ export const usePlayersStore = create<PlayersState>()(
         get().fetchPlayers(get().page, get().limit),
         get().fetchAllPlayers()
       ]);
+      set({ loading: false });
+      return created;
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
+      throw err;
     }
   },
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Pagination from '../components/Pagination';
 import { useAuthStore } from '../store/authStore';
@@ -8,6 +9,7 @@ import type { GameDto } from '../types/game';
 import { GameType } from '../types/game';
 
 export default function Games() {
+  const navigate = useNavigate();
   const { games, loading, error, fetchGames, page, limit, totalCount } = useGameStore();
   const { players, loading: playersLoading, fetchPlayersByUserId, addPlayer } = usePlayersStore();
   const { userId } = useAuthStore();
@@ -81,15 +83,15 @@ export default function Games() {
     setModalError('');
 
     try {
-      await addPlayer({
+      const newPlayer = await addPlayer({
         name: playerName.trim(),
         description: playerDescription.trim(),
         userId: userId,
         gameId: selectedGame.id,
         wallet: {
           id: '',
-          gold: 100,
-          gems: 0,
+          gold: 10000,
+          gems: 100,
           parts: 0,
           content: {}
         },
@@ -102,6 +104,9 @@ export default function Games() {
         fetchGames(page, limit)
       ]);
       handleModalClose();
+
+      // Redirect to Select Starting Place page for the new player
+      navigate(`/select-starting-place/${newPlayer.id}`);
     } catch (err: any) {
       setModalError(err.message || 'Failed to join game. Please try again.');
       setIsSubmitting(false);

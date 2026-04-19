@@ -102,26 +102,26 @@
 - [x] Write unit tests to verify the job offer service works correctly
 
 ### 3.5 VehicleDispatchService
-- [ ] Create `server/src/app/game/vehicle-dispatch/vehicle-dispatch.service.ts`
-- [ ] Implement `dispatch()` - validate route, calculate travel time, schedule arrival
-- [ ] Implement route validation algorithm (V1 plan lines 1022-1044)
-- [ ] Implement travel time calculation (V1 plan lines 1047-1090)
-- [ ] Implement `processArrival()` handler - deliver jobs, update position
-- [ ] Implement multi-stop handling (continue to next stop or end journey)
-- [ ] Create `vehicle-dispatch.controller.ts`
-- [ ] Write unit tests to verify the vehicle dispatch service works correctly
+- [x] Create `server/src/app/game/vehicle-dispatch/vehicle-dispatch.service.ts`
+- [x] Implement `dispatch()` - validate route, calculate travel time, schedule arrival
+- [x] Implement route validation algorithm (V1 plan lines 1022-1044)
+- [x] Implement travel time calculation (V1 plan lines 1047-1090)
+- [x] Implement `processArrival()` handler - deliver jobs, update position
+- [x] Implement multi-stop handling (continue to next stop or end journey)
+- [x] Create `vehicle-dispatch.controller.ts`
+- [x] Write unit tests to verify the vehicle dispatch service works correctly
 
 ---
 
 ## Phase 4: Player Initialization Flow
 
 ### 4.1 Starting Resources Change
-- [ ] Modify `web/app/pages/Games.tsx` line ~91: 100 gold → 10,000 gold
-- [ ] Add 100 gems to starting wallet
+- [x] Modify `web/app/pages/Games.tsx` line ~91: 100 gold → 10,000 gold
+- [x] Add 100 gems to starting wallet
 
 ### 4.2 Join Flow Modification
-- [ ] After player creation, redirect to "Select Starting Place" page
-- [ ] Modify `Games.tsx` `handleSave()` to redirect
+- [x] After player creation, redirect to "Select Starting Place" page
+- [x] Modify `Games.tsx` `handleModalSubmit()` to redirect
 
 ### 4.3 Select Starting Place Page
 - [ ] Create `web/app/pages/SelectStartingPlace.tsx`
