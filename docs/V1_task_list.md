@@ -73,22 +73,25 @@
 ## Phase 3: Game Services
 
 ### 3.1 EconomyService
-- [ ] Create `server/src/app/game/economy/economy.service.ts`
-- [ ] Implement `creditPlayer()` - add gold/gems to wallet
-- [ ] Implement `debitPlayer()` - deduct gold/gems from wallet
-- [ ] Log transactions via TransactionService
+- [x] Create `server/src/app/game/economy/economy.service.ts`
+- [x] Implement `creditPlayer()` - add gold/gems to wallet
+- [x] Implement `debitPlayer()` - deduct gold/gems from wallet
+- [x] Log transactions via TransactionService
+- [x] Write unit tests to verify the economy service works correctly
 
 ### 3.2 MapRevealService
 - [ ] Create `server/src/app/game/map-reveal/map-reveal.service.ts`
 - [ ] Implement `getOwnedPlaceInstances(playerId)` - get player's places
 - [ ] Implement `getAvailablePlaces(playerId)` - places 1 hop from owned
 - [ ] Implement map visibility algorithm (see V1 plan lines 432-465)
+- [ ] Write unit tests to verify the map reveal service works correctly
 
 ### 3.3 PlacePurchaseService
 - [ ] Create `server/src/app/game/place-purchase/place-purchase.service.ts`
 - [ ] Implement `purchasePlace()` - validate affordability, deduct, create PlaceInstance
 - [ ] Create `place-purchase.controller.ts`
 - [ ] Create `POST /players/:id/purchase-place` endpoint
+- [ ] Write unit tests to verify the place purchase service works correctly
 
 ### 3.4 JobOfferService
 - [ ] Create `server/src/app/game/job-offer/job-offer.service.ts`
@@ -96,6 +99,7 @@
 - [ ] Implement `generateRandomJob()` - random cargo type, load, pay
 - [ ] Implement global tick refresh (all places at same interval)
 - [ ] Create `job-offer.controller.ts`
+- [ ] Write unit tests to verify the job offer service works correctly
 
 ### 3.5 VehicleDispatchService
 - [ ] Create `server/src/app/game/vehicle-dispatch/vehicle-dispatch.service.ts`
@@ -105,6 +109,7 @@
 - [ ] Implement `processArrival()` handler - deliver jobs, update position
 - [ ] Implement multi-stop handling (continue to next stop or end journey)
 - [ ] Create `vehicle-dispatch.controller.ts`
+- [ ] Write unit tests to verify the vehicle dispatch service works correctly
 
 ---
 
