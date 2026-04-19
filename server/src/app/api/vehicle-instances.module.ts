@@ -3,9 +3,11 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 import { AbstractEntity } from '../../utils/abstract.entity';
 import { Place, PlacesModule, PlacesService } from './places.module';
+import { PlaceInstance, PlaceInstancesModule, PlaceInstancesService } from './place-instance.module';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -16,6 +18,8 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { Vehicle, VehiclesModule, VehiclesService } from './vehicles.module';
 
+export type VehicleInstanceStatus = 'AT_PLACE' | 'IN_TRANSIT';
+
 @Entity({ name: 'vehicle_instances' })
 export class VehicleInstance extends AbstractEntity {
   @ManyToOne(_type => Vehicle, { eager: true })
@@ -23,23 +27,23 @@ export class VehicleInstance extends AbstractEntity {
   @Expose()
   vehicle: Vehicle;
 
-  @ManyToOne(_type => Place, { eager: true })
-  @JoinColumn({ name: 'start_id' })
+  @ManyToOne(_type => PlaceInstance, { eager: true })
+  @JoinColumn({ name: 'current_place_instance_id' })
   @Expose()
-  start: Place;
+  currentPlaceInstance: PlaceInstance;
 
-  @ManyToOne(_type => Place, { eager: true })
-  @JoinColumn({ name: 'end_id' })
+  @ManyToOne(_type => PlaceInstance, { eager: true })
+  @JoinColumn({ name: 'destination_place_instance_id' })
   @Expose()
-  end: Place;
+  destinationPlaceInstance: PlaceInstance;
 
-  @Column({ name: 'start_time' })
+  @Column({ type: 'simple-array' })
   @Expose()
-  startTime: Date;
+  route: ObjectId[];
 
-  @Column({ name: 'end_time' })
+  @Column({ type: 'varchar', length: 20 })
   @Expose()
-  endTime: Date;
+  status: VehicleInstanceStatus;
 
   @Column({ name: 'game_id' })
   @Expose()
@@ -57,10 +61,10 @@ export class VehicleInstance extends AbstractEntity {
 export interface VehicleInstanceDto {
   id: string;
   vehicleId: string;
-  startId: string;
-  endId: string;
-  startTime: string;
-  endTime: string;
+  currentPlaceInstanceId: string;
+  destinationPlaceInstanceId: string;
+  route: string[];
+  status: VehicleInstanceStatus;
   gameId: string;
   playerId: string;
   content: any;
@@ -97,7 +101,7 @@ export class VehicleInstancesService extends AbstractService<VehicleInstance> {
 @Injectable()
 export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, VehicleInstanceDto> {
   constructor(
-    private readonly placesService: PlacesService,
+    private readonly placeInstancesService: PlaceInstancesService,
     private readonly vehiclesService: VehiclesService
   ) {
     super();
@@ -113,10 +117,10 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
       vehicleId: domain.vehicle?._id.toString(),
       gameId: domain.gameId,
       playerId: domain.playerId,
-      startId: domain.start?._id.toString(),
-      endId: domain.end?._id.toString(),
-      startTime: domain.startTime?.toISOString(),
-      endTime: domain.endTime?.toISOString(),
+      currentPlaceInstanceId: domain.currentPlaceInstance?._id.toString(),
+      destinationPlaceInstanceId: domain.destinationPlaceInstance?._id.toString(),
+      route: domain.route?.map(id => id.toString()) ?? [],
+      status: domain.status,
       content: domain.content
     };
 
@@ -136,21 +140,27 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
     }
 
     const vehicleId = dto.vehicleId ?? domain.vehicle?._id.toString();
-    const startId = dto.startId ?? domain.start?._id.toString();
-    const endId = dto.endId ?? domain.end?._id.toString();
-    const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
-    const endTime = dto.endTime ? new Date(dto.endTime) : domain.endTime;
+    const currentPlaceInstanceId = dto.currentPlaceInstanceId ?? domain.currentPlaceInstance?._id.toString();
+    const destinationPlaceInstanceId = dto.destinationPlaceInstanceId ?? domain.destinationPlaceInstance?._id.toString();
 
-    const fixedDto = omit(dto, ['vehicleId', 'playerId', 'mapId', 'startId', 'endId', 'startTime', 'endTime']);
+    const fixedDto = omit(dto, [
+      'vehicleId',
+      'playerId',
+      'mapId',
+      'currentPlaceInstanceId',
+      'destinationPlaceInstanceId',
+      'route',
+      'status'
+    ]);
 
     return {
       ...domain,
       ...fixedDto,
       vehicle: await this.vehiclesService.findOne(vehicleId),
-      start: await this.placesService.findOne(startId.toString()),
-      end: await this.placesService.findOne(endId.toString()),
-      startTime,
-      endTime
+      currentPlaceInstance: await this.placeInstancesService.findOne(currentPlaceInstanceId.toString()),
+      destinationPlaceInstance: await this.placeInstancesService.findOne(destinationPlaceInstanceId.toString()),
+      route: dto.route?.map(id => new ObjectId(id)) ?? [],
+      status: dto.status ?? 'AT_PLACE'
     } as VehicleInstance;
   }
 }
@@ -186,7 +196,7 @@ export class VehicleInstancesController extends AbstractServiceController<
 }
 
 @Module({
-  imports: [PlacesModule, VehiclesModule, TypeOrmModule.forFeature([VehicleInstance])],
+  imports: [PlaceInstancesModule, VehiclesModule, TypeOrmModule.forFeature([VehicleInstance])],
   controllers: [VehicleInstancesController],
   providers: [VehicleInstancesService, VehicleInstanceMapper, VehicleInstanceRepository],
   exports: [VehicleInstancesService, VehicleInstanceMapper]

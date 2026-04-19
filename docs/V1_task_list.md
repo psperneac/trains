@@ -46,12 +46,12 @@
 - [x] Add to `server/src/app/api/vehicles.module.ts`
 
 ### 2.3 VehicleInstance Entity - Refactor for Movement
-- [ ] Rename `start` → `currentPlaceInstance` (PlaceInstance reference)
-- [ ] Rename `end` → `destinationPlaceInstance` (PlaceInstance reference)
-- [ ] Add `route: ObjectId[]` for multi-stop routes
-- [ ] Add `status: 'AT_PLACE' | 'IN_TRANSIT'`
-- [ ] Note: `content.upgrades` NOT in V1 (fixed 1 engine, 0 aux cars)
-- [ ] Update in `server/src/app/api/vehicle-instances.module.ts`
+- [x] Rename `start` → `currentPlaceInstance` (PlaceInstance reference)
+- [x] Rename `end` → `destinationPlaceInstance` (PlaceInstance reference)
+- [x] Add `route: ObjectId[]` for multi-stop routes
+- [x] Add `status: 'AT_PLACE' | 'IN_TRANSIT'`
+- [x] Note: `content.upgrades` NOT in V1 (fixed 1 engine, 0 aux cars)
+- [x] Update in `server/src/app/api/vehicle-instances.module.ts`
 
 ### 2.4 Job Entity - Add Cargo Type and Flexible Location
 - [ ] Add `cargoType: string` field ('Coal', 'Grain', 'Electronics', etc.)
