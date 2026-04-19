@@ -24,10 +24,10 @@
 - [x] Write basic test to verify scheduling works
 
 ### 1.2 GameClockService
-- [ ] Create `server/src/app/game/game-clock/game-clock.service.ts`
-- [ ] Implement `getGameTime()`, `syncWithWallClock()`
-- [ ] Note: `pause()`, `resume()`, `setSpeed()` are future features
-- [ ] Write basic unit tests to verify game clock service works correctly
+- [x] Create `server/src/app/game/game-clock/game-clock.service.ts`
+- [x] Implement `getGameTime()`, `syncWithWallClock()`
+- [x] Note: `pause()`, `resume()`, `setSpeed()` are future features
+- [x] Write basic unit tests to verify game clock service works correctly
 
 ---
 
