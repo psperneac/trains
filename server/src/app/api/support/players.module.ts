@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Injectable, Module, Param, Post, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { Column, Entity, ObjectId } from 'typeorm';
@@ -6,7 +6,7 @@ import { RequestWithUser } from '../../../authentication/authentication.model';
 
 import { Types } from 'mongoose';
 import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
-import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
+import { Admin, LoggedIn, UserOrAdmin } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
@@ -186,6 +186,21 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     return this.playersService.findAllByUserId(userId, pagination).then(this.makeHandler());
   }
 
+  @Delete(':id')
+  @UseGuards(LoggedIn, UserOrAdmin)
+  async delete(@Param('id') id: string, @Req() request: RequestWithUser): Promise<{ success: boolean }> {
+    const currentUser = request.user;
+    const canDeleteResult = this.canDelete(id, currentUser);
+    const isAllowed = canDeleteResult instanceof Promise ? await canDeleteResult : canDeleteResult;
+
+    if (!isAllowed) {
+      throw new HttpException('Delete operation not allowed', HttpStatus.FORBIDDEN);
+    }
+
+    await this.playersService.delete(id);
+    return { success: true };
+  }
+
   @Get('by-game/:gameId')
   @UseGuards(LoggedIn)
   async findAllByGameId(
@@ -247,6 +262,22 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     return this.playersService.sendGoldAndGems(sendDto.playerId, sendDto.gold, sendDto.gems, sendDto.parts).then(
       player => this.playersMapper.toDto(player, currentUser)
     );
+  }
+
+  /**
+   * Allow users to delete their own players, and admins to delete any player.
+   */
+  protected async canDelete(playerId: string, currentUser: User): Promise<boolean> {
+    // Admins can delete any player
+    if (currentUser.scope === 'ADMIN') {
+      return true;
+    }
+    // Users can only delete their own player
+    const player = await this.playersService.findOne(playerId);
+    if (!player) {
+      return false;
+    }
+    return player.userId?.toString() === currentUser._id.toString();
   }
 
 }

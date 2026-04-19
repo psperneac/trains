@@ -9,6 +9,8 @@ import { JobOfferService } from './job-offer/job-offer.service';
 import { JobOfferController } from './job-offer/job-offer.controller';
 import { VehicleDispatchService } from './vehicle-dispatch/vehicle-dispatch.service';
 import { VehicleDispatchController } from './vehicle-dispatch/vehicle-dispatch.controller';
+import { PlayerInitService } from './player-init/player-init.service';
+import { PlayerInitController } from './player-init/player-init.controller';
 import { PlayersModule } from '../api/support/players.module';
 import { TransactionsModule } from '../api/support/transactions.module';
 import { PlaceInstancesModule } from '../api/place-instance.module';
@@ -31,7 +33,7 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     JobsModule,
     AuthenticationModule
   ],
-  controllers: [PlacePurchaseController, JobOfferController, VehicleDispatchController],
+  controllers: [PlacePurchaseController, JobOfferController, VehicleDispatchController, PlayerInitController],
   providers: [
     InMemorySchedulerService,
     GameClockService,
@@ -39,7 +41,8 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     MapRevealService,
     PlacePurchaseService,
     JobOfferService,
-    VehicleDispatchService
+    VehicleDispatchService,
+    PlayerInitService
   ],
   exports: [
     InMemorySchedulerService,
@@ -48,7 +51,8 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     MapRevealService,
     PlacePurchaseService,
     JobOfferService,
-    VehicleDispatchService
+    VehicleDispatchService,
+    PlayerInitService
   ]
 })
 export class GameModule {}

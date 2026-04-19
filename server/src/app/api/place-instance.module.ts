@@ -1,9 +1,10 @@
-import { Controller, Get, Injectable, Module, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { AbstractEntity } from '../../utils/abstract.entity';
 import { Column, Entity, JoinColumn, ManyToOne, ObjectId } from 'typeorm';
+import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -46,9 +47,8 @@ export interface PlaceInstanceDto {
   placeId: string;
   gameId: string;
   playerId: string;
-
+  place?: any;
   jobOffers: JobOfferDto[];
-
   content: any;
 }
 
@@ -76,6 +76,14 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
       { mapId, playerId }
     ) as Promise<PageDto<PlaceInstance>>;
   }
+
+  findAllByPlayer(pagination: PageRequestDto, playerId: string): Promise<PageDto<PlaceInstance>> {
+    return this.findAllWithQuery(
+      pagination,
+      'map_place_instances.playerId = :playerId',
+      { playerId: new Types.ObjectId(playerId) }
+    ) as Promise<PageDto<PlaceInstance>>;
+  }
 }
 
 @Injectable()
@@ -94,6 +102,15 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
       placeId: domain.place?._id.toString(),
       gameId: domain.gameId?.toString(),
       playerId: domain.playerId?.toString(),
+      place: domain.place ? {
+        id: domain.place._id?.toString(),
+        name: domain.place.name,
+        description: domain.place.description,
+        type: domain.place.type,
+        lat: domain.place.lat,
+        lng: domain.place.lng,
+        gameId: domain.place.gameId?.toString()
+      } : undefined,
       jobOffers: domain.jobOffers?.map(j => j as JobOfferDto),
       content: domain.content
     };
@@ -130,6 +147,17 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
 export class PlaceInstanceController extends AbstractServiceController<PlaceInstance, PlaceInstanceDto> {
   constructor(service: PlaceInstancesService, mapper: PlaceInstanceMapper) {
     super(service, mapper);
+  }
+
+  @Get('by-player/:playerId')
+  @UseGuards(LoggedIn)
+  async findAllByPlayer(
+    @Query() pagination: PageRequestDto,
+    @Param('playerId') playerId: string
+  ): Promise<PageDto<PlaceInstanceDto>> {
+    return (this.service as PlaceInstancesService)
+      .findAllByPlayer(pagination, playerId)
+      .then(this.makeHandler());
   }
 
   @Get('by-player-and-map/:playerId/:mapId')

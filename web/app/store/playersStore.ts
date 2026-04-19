@@ -22,7 +22,7 @@ interface PlayersState {
   fetchPlayersByGameId: (gameId: string, page?: number, limit?: number) => Promise<void>;
   fetchTransactions: (page?: number, limit?: number) => Promise<void>;
   sendGoldAndGems: (sendDto: SendGoldAndGemsDto) => Promise<PlayerDto>;
-  addPlayer: (player: Omit<PlayerDto, 'id'>) => Promise<void>;
+  addPlayer: (player: Omit<PlayerDto, 'id'>) => Promise<PlayerDto>;
   updatePlayer: (player: PlayerDto) => Promise<void>;
   deletePlayer: (id: string) => Promise<void>;
 }

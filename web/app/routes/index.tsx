@@ -4,6 +4,7 @@ import Games from "../pages/Games";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import SelectStartingPlace from "../pages/SelectStartingPlace";
 import GameForm from "../pages/admin/GameForm";
 import AdminGames from "../pages/admin/Games";
 import PlaceConnectionForm from "../pages/admin/PlaceConnectionForm";
@@ -15,6 +16,8 @@ import Players from "../pages/admin/Players";
 import Transactions from "../pages/admin/Transactions";
 import Users from "../pages/admin/Users";
 import VehicleTypes from "../pages/admin/VehicleTypes";
+import Vehicles from "../pages/admin/Vehicles";
+import VehicleForm from "../pages/admin/VehicleForm";
 
 export const routes = [
   {
@@ -50,6 +53,14 @@ export const routes = [
     ),
   },
   {
+    path: "/select-starting-place/:playerId",
+    element: (
+      <ProtectedRoute>
+        <SelectStartingPlace />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/game-admin/place-types",
     element: (
       <ProtectedRoute>
@@ -62,6 +73,30 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <VehicleTypes />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/game-admin/vehicles",
+    element: (
+      <ProtectedRoute>
+        <Vehicles />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/game-admin/vehicles/add",
+    element: (
+      <ProtectedRoute>
+        <VehicleForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/game-admin/vehicles/:id/edit",
+    element: (
+      <ProtectedRoute>
+        <VehicleForm />
       </ProtectedRoute>
     ),
   },

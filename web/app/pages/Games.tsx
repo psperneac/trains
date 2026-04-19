@@ -5,17 +5,21 @@ import Pagination from '../components/Pagination';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import { usePlayersStore } from '../store/playersStore';
+import { useVehicleInstanceStore } from '../store/vehicleInstanceStore';
 import type { GameDto } from '../types/game';
 import { GameType } from '../types/game';
 
 export default function Games() {
   const navigate = useNavigate();
   const { games, loading, error, fetchGames, page, limit, totalCount } = useGameStore();
-  const { players, loading: playersLoading, fetchPlayersByUserId, addPlayer } = usePlayersStore();
+  const { players, loading: playersLoading, fetchPlayersByUserId, addPlayer, deletePlayer } = usePlayersStore();
+  const { vehicleInstancesByPlayer, fetchVehicleInstancesByPlayerId } = useVehicleInstanceStore();
   const { userId } = useAuthStore();
 
   // Modal state
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [playerToDelete, setPlayerToDelete] = useState<{ id: string; name: string; gameId: string } | null>(null);
   const [selectedGame, setSelectedGame] = useState<GameDto | null>(null);
   const [playerName, setPlayerName] = useState('');
   const [playerDescription, setPlayerDescription] = useState('');
@@ -31,6 +35,14 @@ export default function Games() {
       fetchPlayersByUserId(userId);
     }
   }, [userId, fetchPlayersByUserId]);
+
+  useEffect(() => {
+    players.forEach(player => {
+      if (!vehicleInstancesByPlayer[player.id]) {
+        fetchVehicleInstancesByPlayerId(player.id);
+      }
+    });
+  }, [players, vehicleInstancesByPlayer, fetchVehicleInstancesByPlayerId]);
 
   const handlePageChange = (newPage: number) => {
     fetchGames(newPage, limit);
@@ -68,6 +80,33 @@ export default function Games() {
     setPlayerName('');
     setPlayerDescription('');
     setModalError('');
+    setIsSubmitting(false);
+  };
+
+  const handleDeletePlayer = (player: { id: string; name: string; gameId: string }) => {
+    setPlayerToDelete(player);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!playerToDelete) return;
+
+    setIsSubmitting(true);
+    try {
+      await deletePlayer(playerToDelete.id);
+      await fetchPlayersByUserId(userId);
+      setShowDeleteModal(false);
+      setPlayerToDelete(null);
+    } catch (err: any) {
+      setModalError(err.message || 'Failed to delete player');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setPlayerToDelete(null);
     setIsSubmitting(false);
   };
 
@@ -159,6 +198,9 @@ export default function Games() {
                     Places
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vehicles
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Your Player
                   </th>
                 </tr>
@@ -185,10 +227,21 @@ export default function Games() {
                           {game.places?.length || 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {vehicleInstancesByPlayer[player?.id ?? '']?.length || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {player ? (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                              {player.name}
-                            </span>
+                            <div className="flex items-center space-x-2">
+                              <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                {player.name}
+                              </span>
+                              <button
+                                onClick={() => handleDeletePlayer({ id: player.id, name: player.name, gameId: game.id })}
+                                className="text-red-600 hover:text-red-800 text-xs font-medium"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           ) : (
                           <button
                             onClick={() => handleJoinGame(game.id)}
@@ -299,6 +352,41 @@ export default function Games() {
           </div>
         )}
       </div>
+
+      {/* Delete Player Confirmation Modal */}
+      {showDeleteModal && playerToDelete && (
+        <div
+          className="fixed inset-0 bg-black/35 overflow-y-auto h-full w-full z-50"
+          onClick={handleDeleteCancel}
+        >
+          <div
+            className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mt-3 text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Delete Player</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete player <strong>{playerToDelete.name}</strong>? This action cannot be undone.
+              </p>
+              <div className="flex justify-center space-x-3">
+                <button
+                  onClick={handleDeleteCancel}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={isSubmitting}
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

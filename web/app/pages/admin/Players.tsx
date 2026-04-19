@@ -4,6 +4,8 @@ import Pagination from '../../components/Pagination';
 import WalletDisplay from '../../components/WalletDisplay';
 import { useAuthStore } from '../../store/authStore';
 import { usePlayersStore } from '../../store/playersStore';
+import { usePlaceInstanceStore } from '../../store/placeInstanceStore';
+import { useVehicleInstanceStore } from '../../store/vehicleInstanceStore';
 import type { PlayerDto } from '../../types/player';
 
 export default function Players() {
@@ -18,6 +20,8 @@ export default function Players() {
     totalCount
   } = usePlayersStore();
   const { currentGameId, currentGame, isAdmin } = useAuthStore();
+  const { placeInstancesByPlayer, fetchPlaceInstancesByPlayerId } = usePlaceInstanceStore();
+  const { vehicleInstancesByPlayer, fetchVehicleInstancesByPlayerId } = useVehicleInstanceStore();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
@@ -28,11 +32,25 @@ export default function Players() {
   const [gemsAmount, setGemsAmount] = useState<number>(0);
   const [partsAmount, setPartsAmount] = useState<number>(0);
 
+  // Player detail modal state
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [detailsPlayer, setDetailsPlayer] = useState<PlayerDto | null>(null);
+
   useEffect(() => {
     if (currentGameId) {
       fetchPlayersByGameId(currentGameId, page, limit);
     }
   }, [fetchPlayersByGameId, currentGameId, page, limit]);
+
+  // Fetch place and vehicle instance counts for all players
+  useEffect(() => {
+    if (players.length > 0) {
+      players.forEach(player => {
+        fetchPlaceInstancesByPlayerId(player.id);
+        fetchVehicleInstancesByPlayerId(player.id);
+      });
+    }
+  }, [players, fetchPlaceInstancesByPlayerId, fetchVehicleInstancesByPlayerId]);
 
   const handlePageChange = (newPage: number) => {
     if (currentGameId) {
@@ -100,6 +118,16 @@ export default function Players() {
     setPartsAmount(0);
   };
 
+  const handleDetailsClick = (player: PlayerDto) => {
+    setDetailsPlayer(player);
+    setDetailsModalOpen(true);
+  };
+
+  const handleDetailsClose = () => {
+    setDetailsModalOpen(false);
+    setDetailsPlayer(null);
+  };
+
   if (loading && players.length === 0) {
     return (
       <Layout>
@@ -160,6 +188,12 @@ export default function Players() {
                   Wallet
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Places
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Vehicles
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -181,7 +215,19 @@ export default function Players() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <WalletDisplay wallet={player.wallet} showHidden={isAdmin()} />
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {placeInstancesByPlayer[player.id]?.length ?? '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {vehicleInstancesByPlayer[player.id]?.length ?? '-'}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      onClick={() => handleDetailsClick(player)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-3 rounded text-sm mr-2"
+                    >
+                      Details
+                    </button>
                     <button
                       onClick={() => handleGiveClick(player)}
                       className="bg-green-600 hover:bg-green-700 text-white font-medium py-1 px-3 rounded text-sm"
@@ -313,6 +359,116 @@ export default function Players() {
                     Send
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {detailsModalOpen && detailsPlayer && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border shadow-lg rounded-md bg-white max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+              <div className="flex-1 overflow-y-auto">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">
+                  Player Details: {detailsPlayer.name}
+                </h3>
+
+                {/* Place Instances Section */}
+                <div className="mb-6">
+                  <h4 className="text-md font-semibold text-gray-800 mb-2 border-b pb-1">
+                    Place Instances ({placeInstancesByPlayer[detailsPlayer.id]?.length ?? 0})
+                  </h4>
+                  {placeInstancesByPlayer[detailsPlayer.id]?.length > 0 ? (
+                    <div className="space-y-2">
+                      {placeInstancesByPlayer[detailsPlayer.id].map((placeInstance) => (
+                        <div key={placeInstance.id} className="bg-gray-50 rounded p-3 text-sm">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="font-semibold text-gray-900">
+                                {placeInstance.place?.name || 'Unknown Place'}
+                              </span>
+                              <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                {placeInstance.place?.type || 'Unknown Type'}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-500 font-mono">
+                              ID: {placeInstance.id.slice(-8)}
+                            </span>
+                          </div>
+                          <div className="mt-1 text-gray-600">
+                            <span>Coords: </span>
+                            <span className="font-mono text-xs">
+                              {placeInstance.place?.lat?.toFixed(4)}, {placeInstance.place?.lng?.toFixed(4)}
+                            </span>
+                          </div>
+                          {placeInstance.jobOffers && placeInstance.jobOffers.length > 0 && (
+                            <div className="mt-1 text-xs text-green-600">
+                              {placeInstance.jobOffers.length} job offer(s) available
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">No place instances</p>
+                  )}
+                </div>
+
+                {/* Vehicle Instances Section */}
+                <div>
+                  <h4 className="text-md font-semibold text-gray-800 mb-2 border-b pb-1">
+                    Vehicle Instances ({vehicleInstancesByPlayer[detailsPlayer.id]?.length ?? 0})
+                  </h4>
+                  {vehicleInstancesByPlayer[detailsPlayer.id]?.length > 0 ? (
+                    <div className="space-y-2">
+                      {vehicleInstancesByPlayer[detailsPlayer.id].map((vehicleInstance) => (
+                        <div key={vehicleInstance.id} className="bg-gray-50 rounded p-3 text-sm">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="font-semibold text-gray-900">
+                                {vehicleInstance.vehicle?.name || 'Unknown Vehicle'}
+                              </span>
+                              <span className="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
+                                {vehicleInstance.vehicle?.type || 'Unknown Type'}
+                              </span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              vehicleInstance.status === 'AT_PLACE'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {vehicleInstance.status === 'AT_PLACE' ? 'At Place' : 'In Transit'}
+                            </span>
+                          </div>
+                          <div className="mt-1 text-gray-600">
+                            <span>Location: </span>
+                            <span className="font-mono text-xs">
+                              {vehicleInstance.currentPlaceInstance?.place?.name || 'Unknown'}
+                              {vehicleInstance.status === 'IN_TRANSIT' && vehicleInstance.destinationPlaceInstance?.place?.name && (
+                                <span> → {vehicleInstance.destinationPlaceInstance.place.name}</span>
+                              )}
+                            </span>
+                          </div>
+                          {vehicleInstance.vehicle && (
+                            <div className="mt-1 text-xs text-gray-500">
+                              Speed: {vehicleInstance.vehicle.speed} | Fuel burn: {vehicleInstance.vehicle.fuelBaseBurn} base + {vehicleInstance.vehicle.fuelPerLoadBurn}/load
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">No vehicle instances</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={handleDetailsClose}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

@@ -2,6 +2,8 @@ import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuard
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { Column, Entity } from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -57,27 +59,27 @@ export class Vehicle extends AbstractEntity {
   @Expose()
   content: any;
 
-  @Column('int', { name: 'engine_max' })
+  @Column('int')
   @Expose()
   engineMax: number;
 
-  @Column('int', { name: 'engine_load' })
+  @Column('int')
   @Expose()
   engineLoad: number;
 
-  @Column('int', { name: 'engine_fuel' })
+  @Column('int')
   @Expose()
   engineFuel: number;
 
-  @Column('int', { name: 'aux_max' })
+  @Column('int')
   @Expose()
   auxMax: number;
 
-  @Column('int', { name: 'aux_load' })
+  @Column('int')
   @Expose()
   auxLoad: number;
 
-  @Column('int', { name: 'aux_fuel' })
+  @Column('int')
   @Expose()
   auxFuel: number;
 
@@ -85,8 +87,8 @@ export class Vehicle extends AbstractEntity {
   @Expose()
   speed: number;
 
-  @Column()
-  gameId: string;
+  @Column('objectId')
+  gameId: ObjectId;
 
   @Column({ default: 5000 })
   @Expose()
@@ -142,32 +144,60 @@ export class VehiclesService extends AbstractService<Vehicle> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Vehicle>> {
-    return this.findAllWhere({ gameId }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 }
 
 @Injectable()
 export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
-  getMappedProperties(): string[] {
-    return [
-      'id',
-      'type',
-      'name',
-      'description',
-      'content',
-      'engineMax',
-      'engineLoad',
-      'engineFuel',
-      'auxMax',
-      'auxLoad',
-      'auxFuel',
-      'speed',
-      'gameId',
-      'priceGold',
-      'priceGems',
-      'fuelBaseBurn',
-      'fuelPerLoadBurn'
-    ];
+  constructor() {
+    super();
+  }
+
+  async toDto(domain: Vehicle): Promise<VehicleDto> {
+    if (!domain) {
+      return null;
+    }
+
+    const dto: VehicleDto = {
+      id: domain._id.toString(),
+      type: domain.type,
+      name: domain.name,
+      description: domain.description,
+      content: domain.content,
+      engineMax: domain.engineMax,
+      engineLoad: domain.engineLoad,
+      engineFuel: domain.engineFuel,
+      auxMax: domain.auxMax,
+      auxLoad: domain.auxLoad,
+      auxFuel: domain.auxFuel,
+      speed: domain.speed,
+      gameId: domain.gameId.toString(),
+      priceGold: domain.priceGold,
+      priceGems: domain.priceGems,
+      fuelBaseBurn: domain.fuelBaseBurn,
+      fuelPerLoadBurn: domain.fuelPerLoadBurn
+    };
+
+    return dto;
+  }
+
+  async toDomain(dto: VehicleDto, domain?: Partial<Vehicle> | Vehicle): Promise<Vehicle> {
+    if (!dto) {
+      return domain as any as Vehicle;
+    }
+
+    if (!domain) {
+      domain = {};
+    }
+
+    const { gameId, ...fixedDto } = dto;
+
+    return {
+      ...domain,
+      ...fixedDto,
+      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId
+    } as any as Vehicle;
   }
 }
 

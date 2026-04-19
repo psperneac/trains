@@ -22,10 +22,11 @@ export interface Mapper<T, R> {
  */
 export class AbstractDtoMapper<T extends AbstractEntity, R> implements Mapper<T, R> {
   async toDomain(dto: R, domain?: T | Partial<T>): Promise<T> {
-    return {
-      ...domain,
-      ...dto
-    } as T;
+    if (!domain) {
+      return dto as unknown as T;
+    }
+    Object.assign(domain, cloneDeep(dto));
+    return domain as T;
   }
 
   async toDto(domain: T): Promise<R> {

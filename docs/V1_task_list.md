@@ -124,15 +124,38 @@
 - [x] Modify `Games.tsx` `handleModalSubmit()` to redirect
 
 ### 4.3 Select Starting Place Page
-- [ ] Create `web/app/pages/SelectStartingPlace.tsx`
-- [ ] Display available Places from game's template
-- [ ] Create `POST /players/:id/select-starting-place` endpoint
-- [ ] On selection: create PlaceInstance, create starter VehicleInstance, set wallet
+- [x] Create `web/app/pages/SelectStartingPlace.tsx`
+- [x] Display available Places from game's template
+- [x] Create `POST /player-init/:id/select-starting-place` endpoint
+- [x] On selection: create PlaceInstance, create starter VehicleInstance, set wallet
 
 ### 4.4 Starter Vehicle
-- [ ] Determine: Is there a "starter" vehicle template, or always level 1 locomotive?
-- [ ] Create VehicleInstance at selected PlaceInstance
-- [ ] Set `status: 'AT_PLACE'`, `currentPlaceInstance` to new PlaceInstance
+
+- [x] Starter vehicle created in selectStartingPlace (first locomotive or cheapest vehicle)
+- [x] Create VehicleInstance at selected PlaceInstance
+- [x] Set `status: 'AT_PLACE'`, `currentPlaceInstance` to new PlaceInstance
+
+### 4.5 Admin Players Page - Places & Vehicles Counts
+
+- [x] Add place instance count column to Players table
+- [x] Add vehicle instance count column to Players table
+- [x] Create `GET /place-instances/by-player/:playerId` endpoint (if not exists)
+- [x] Create `usePlaceInstanceStore` for frontend (similar to vehicleInstanceStore)
+- [x] Fetch and display counts on admin Players page
+- [x] Write unit tests for `usePlaceInstanceStore` (note: web frontend lacks test infrastructure; store follows vehicleInstanceStore pattern)
+
+### 4.6 Player Detail Modal
+
+- [x] Add modal that opens when clicking a player row
+- [x] Display list of player's place instances with details (name, type, coordinates)
+- [x] Display list of player's vehicle instances with details (vehicle type, status, current location)
+
+### 4.7 Player Full State Debug Endpoint
+
+- [ ] Create `GET /players/:id/full-state` endpoint
+- [ ] Return player data + all place instances (populated) + all vehicle instances (populated)
+- [ ] Useful for debugging and verifying data flow before map view implementation
+- [ ] Write unit tests for the endpoint (verify response structure, 404 handling, data inclusion)
 
 ---
 
@@ -222,7 +245,10 @@ Phase 4 (Player Init) - depends on Phase 2 & 3
   ├─ 4.1 Starting resources
   ├─ 4.2 Join flow modification
   ├─ 4.3 SelectStartingPlace page
-  └─ 4.4 Starter vehicle
+  ├─ 4.4 Starter vehicle
+  ├─ 4.5 Admin Players page counts
+  ├─ 4.6 Player detail modal
+  └─ 4.7 Full state debug endpoint
 
 Phase 5 (API Endpoints) - depends on Phase 3
   ├─ 5.1 Map view endpoint

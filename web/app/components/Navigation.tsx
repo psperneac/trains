@@ -42,6 +42,10 @@ export default function Navigation() {
           path: '/game-admin/vehicle-types',
         },
         {
+          label: t('navigation.vehicles'),
+          path: '/game-admin/vehicles',
+        },
+        {
           label: t('navigation.places'),
           path: '/game-admin/places',
         },
