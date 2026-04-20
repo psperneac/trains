@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { Game } from 'src/app/api/games.module';
 import { Job } from 'src/app/api/jobs.module';
@@ -40,7 +41,6 @@ export const TABLES = {
 export const ENTITIES = [
   User,
   Translation,
-  Game,
   Place,
   Vehicle,
   PlaceConnection,
@@ -50,6 +50,10 @@ export const ENTITIES = [
   Player,
   Transaction
 ];
+
+export const MONGOOSE_ENTITIES = [
+  Game,
+]
 
 @Module({
   imports: [
@@ -72,6 +76,24 @@ export const ENTITIES = [
         };
       }
     }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const username = configService.get('MONGO_USERNAME');
+        const password = configService.get('MONGO_PASSWORD');
+        const database = configService.get('MONGO_DATABASE');
+        const host = configService.get('MONGO_HOST');
+
+        // https://mongoosejs.com/docs/connections.html
+        const config = {
+          uri: `mongodb://${username}:${password}@${host}/${database}?authSource=${database}`,
+          dbName: database,
+        };
+
+        return config;
+      },
+      inject: [ConfigService],
+    })
   ],
 })
 export class DatabaseModule {}
