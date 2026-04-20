@@ -1,40 +1,43 @@
 import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
 import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { AbstractService } from '../../utils/abstract.service';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
-import { Column, Entity } from 'typeorm';
+import { InjectModel, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
+import { HydratedDocument, Model } from 'mongoose';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../utils/abstract-mongo-service.controller';
 
 export enum GameType {
   TEMPLATE = 'TEMPLATE',
   GAME = 'GAME'
 }
 
-@Entity({ name: 'games'})
-export class Game extends AbstractEntity {
-  @Column()
+@Schema({ collection: 'games'})
+export class Game extends AbstractMongoEntity {
+  @Prop()
   @Expose()
   name: string;
 
-  @Column()
+  @Prop()
   @Expose()
   description: string;
 
-  @Column()
+  @Prop()
   @Expose()
   type: GameType;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 }
+
+export type GameDocument = HydratedDocument<Game>;
+export const GameSchema = SchemaFactory.createForClass(Game);
 
 export interface GameDto {
   id: string;
@@ -45,16 +48,9 @@ export interface GameDto {
 }
 
 @Injectable()
-export class GameRepository extends RepositoryAccessor<Game> {
-  constructor(@InjectRepository(Game) injectedRepo) {
-    super(injectedRepo);
-  }
-}
-
-@Injectable()
-export class GamesService extends AbstractService<Game> {
-  constructor(private readonly repo: GameRepository) {
-    super(repo);
+export class GamesService extends AbstractMongoService<Game> {
+  constructor(@InjectModel(Game.name) private readonly gameModel: Model<GameDocument>) {
+    super(gameModel);
   }
 
   async findByType(type: GameType, pagination?: PageRequestDto): Promise<PageDto<Game>> {
@@ -74,7 +70,7 @@ export class GameMapper extends AbstractDtoMapper<Game, GameDto> {
     }
 
     const dto: GameDto = {
-      id: domain._id.toString(),
+      id: (domain as any).id || (domain as any)._id?.toString(),
       name: domain.name,
       description: domain.description,
       type: domain.type,
@@ -102,7 +98,7 @@ export class GameMapper extends AbstractDtoMapper<Game, GameDto> {
 
 @Controller('games')
 @UseFilters(AllExceptionsFilter)
-export class GamesController extends AbstractServiceController<Game, GameDto> {
+export class GamesController extends AbstractMongoServiceController<Game, GameDto> {
   constructor(
     private readonly gamesService: GamesService,
     private readonly gameMapper: GameMapper
@@ -122,9 +118,9 @@ export class GamesController extends AbstractServiceController<Game, GameDto> {
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game])],
+  imports: [MongooseModule.forFeature([{ name: Game.name, schema: GameSchema }])],
   controllers: [GamesController],
-  providers: [GamesService, GameMapper, GameRepository],
-  exports: [GamesService, GameMapper]
+  providers: [GamesService, GameMapper],
+  exports: [GamesService, GameMapper, MongooseModule]
 })
 export class GamesModule {}

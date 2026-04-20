@@ -5,8 +5,8 @@
 
 import { Logger, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-import * as cookieParser from 'cookie-parser';
-import * as cors from 'cors';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import { AppModule } from './app/app.module';
 import { AllExceptionsFilter } from './utils/all-exceptions.filter';
