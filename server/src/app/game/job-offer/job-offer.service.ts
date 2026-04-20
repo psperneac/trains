@@ -170,7 +170,9 @@ export class JobOfferService implements OnModuleInit {
         JobOfferService.MAX_JOBS_PER_DESTINATION + 1
       );
 
-      const destName = dest.place?.name || 'Unknown';
+      // Fetch destination place to get name
+      const destPlaceTemplate = dest.placeId ? await this.placesService.findOne(dest.placeId.toString()) : null;
+      const destName = destPlaceTemplate?.name || 'Unknown';
 
       for (let i = 0; i < numJobs; i++) {
         const job = this.generateRandomJob(placeInst, dest);
@@ -260,14 +262,11 @@ export class JobOfferService implements OnModuleInit {
    * @returns Generated job offer
    */
   private generateRandomJob(source: PlaceInstance, dest: PlaceInstance): GameJobOffer {
-    const sourcePlace = source.place;
-    const destPlace = dest.place;
-
     return {
       id: new ObjectId().toString(),
       cargoType: this.randomCargoType(),
-      startPlaceId: sourcePlace?._id?.toString() || '',
-      endPlaceId: destPlace?._id?.toString() || '',
+      startPlaceId: source.placeId?.toString() || '',
+      endPlaceId: dest.placeId?.toString() || '',
       load: this.randomInt(JobOfferService.MIN_LOAD, JobOfferService.MAX_LOAD + 1),
       pay: this.randomInt(JobOfferService.MIN_PAY, JobOfferService.MAX_PAY + 1),
       payType: Math.random() > 0.1 ? 'GOLD' : 'GEMS', // 90% gold, 10% gems

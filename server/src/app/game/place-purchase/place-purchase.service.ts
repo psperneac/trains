@@ -79,7 +79,7 @@ export class PlacePurchaseService {
     // 3. Check if player already owns this place
     const ownedPlaceInstances = await this.mapRevealService.getOwnedPlaceInstances(playerId);
     const alreadyOwned = ownedPlaceInstances.some(
-      pi => pi.place?._id?.toString() === placeId
+      pi => pi.placeId?.toString() === placeId
     );
     if (alreadyOwned) {
       return {

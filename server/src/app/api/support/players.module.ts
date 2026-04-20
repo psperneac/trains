@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { Column, Entity, ObjectId } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { RequestWithUser } from '../../../authentication/authentication.model';
 
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
 import { Admin, LoggedIn, UserOrAdmin } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
@@ -107,11 +107,11 @@ export class PlayersService extends AbstractService<Player> {
   }
 
   async findAllByUserId(userId: string, pagination?: PageRequestDto): Promise<PageDto<Player>> {
-    return this.findAllWhere({ userId: new Types.ObjectId(userId) }, pagination);
+    return this.findAllWhere({ userId: new ObjectId(userId) }, pagination);
   }
 
   async findAllByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Player>> {
-    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
   }
 
   async sendGoldAndGems(playerId: string, gold: number, gems: number, parts: number): Promise<Player> {
@@ -194,8 +194,8 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
       ...domain,
       name: dto.name,
       description: dto.description,
-      userId: dto.userId ? new Types.ObjectId(dto.userId) : domain?.userId,
-      gameId: dto.gameId ? new Types.ObjectId(dto.gameId) : domain?.gameId,
+      userId: dto.userId ? new ObjectId(dto.userId) : domain?.userId,
+      gameId: dto.gameId ? new ObjectId(dto.gameId) : domain?.gameId,
       wallet: { ...dto.wallet } as Wallet,
       content: dto.content,
     } as Player;
@@ -238,6 +238,19 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
       throw new HttpException('Delete operation not allowed', HttpStatus.FORBIDDEN);
     }
 
+    // Delete all PlaceInstances owned by this player
+    const placeInstancesPage = await this.placeInstancesService.findAllByPlayer({}, id);
+    for (const pi of placeInstancesPage.data) {
+      await this.placeInstancesService.delete(pi._id.toString());
+    }
+
+    // Delete all VehicleInstances owned by this player
+    const vehicleInstancesPage = await this.vehicleInstancesService.findAllByPlayer({}, id);
+    for (const vi of vehicleInstancesPage.data) {
+      await this.vehicleInstancesService.delete(vi._id.toString());
+    }
+
+    // Delete the player
     await this.playersService.delete(id);
     return { success: true };
   }
@@ -391,7 +404,7 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     // Filter connections to only those involving owned or available places
     const gameId = player.gameId;
     const allConnectionsPage = await this.placeConnectionService.findAllWhere(
-      { gameId: new Types.ObjectId(gameId.toString()) } as any,
+      { gameId: new ObjectId(gameId.toString()) } as any,
       { page: 1, pageSize: 1000 } as any
     );
 
@@ -456,7 +469,7 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     // Get owned place instances to get the list of owned place IDs
     const ownedPlaceInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
     const ownedPlaceIds = ownedPlaceInstancesPage.data
-      .map(pi => pi.place?._id?.toString())
+      .map(pi => pi.placeId?.toString())
       .filter(id => id);
 
     // Get available places (templates) for purchase

@@ -5,6 +5,7 @@ import { VehicleInstancesService } from '../../api/vehicle-instances.module';
 import { PlaceInstancesService } from '../../api/place-instance.module';
 import { PlaceConnectionService } from '../../api/place-connection.module';
 import { JobsService } from '../../api/jobs.module';
+import { PlacesService } from '../../api/places.module';
 import { EconomyService, CurrencyType } from '../economy/economy.service';
 
 /**
@@ -63,6 +64,7 @@ export class VehicleDispatchService {
     private readonly placeInstancesService: PlaceInstancesService,
     private readonly placeConnectionService: PlaceConnectionService,
     private readonly jobsService: JobsService,
+    private readonly placesService: PlacesService,
     private readonly economyService: EconomyService,
     private readonly schedulerService: InMemorySchedulerService
   ) {
@@ -110,7 +112,7 @@ export class VehicleDispatchService {
     }
 
     // 4. Validate first stop is current location
-    const currentPlaceId = vehicle.currentPlaceInstance?._id?.toString();
+    const currentPlaceId = vehicle.currentPlaceInstance?.toString();
     if (route[0] !== currentPlaceId) {
       return {
         success: false,
@@ -127,9 +129,9 @@ export class VehicleDispatchService {
     // 7. Update vehicle status
     const destinationPlaceInstanceId = route[route.length - 1];
     vehicle.status = 'IN_TRANSIT';
-    vehicle.destinationPlaceInstance = await this.placeInstancesService.findOne(destinationPlaceInstanceId) as any;
+    vehicle.destinationPlaceInstance = new ObjectId(destinationPlaceInstanceId);
     vehicle.route = route.map(id => new ObjectId(id));
-    vehicle.currentPlaceInstance = null as any; // Clear current during transit
+    vehicle.currentPlaceInstance = null;
     await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
 
     // 8. Schedule arrival
@@ -177,8 +179,8 @@ export class VehicleDispatchService {
         throw new BadRequestException(`Invalid place in route at index ${i}`);
       }
 
-      const startTemplateId = startPlaceInstance.place?._id;
-      const endTemplateId = endPlaceInstance.place?._id;
+      const startTemplateId = startPlaceInstance.placeId;
+      const endTemplateId = endPlaceInstance.placeId;
 
       if (!startTemplateId || !endTemplateId) {
         throw new BadRequestException(`Place instance missing template reference at index ${i}`);
@@ -191,8 +193,11 @@ export class VehicleDispatchService {
       );
 
       if (!connection) {
+        // Fetch place names for error message
+        const startPlaceName = (await this.placesService.findOne(startTemplateId.toString()))?.name;
+        const endPlaceName = (await this.placesService.findOne(endTemplateId.toString()))?.name;
         throw new BadRequestException(
-          `No route between place ${startPlaceInstance.place?.name || startId} and ${endPlaceInstance.place?.name || endId}`
+          `No route between place ${startPlaceName || startId} and ${endPlaceName || endId}`
         );
       }
     }
@@ -235,8 +240,8 @@ export class VehicleDispatchService {
       const startPlaceInstance = await this.placeInstancesService.findOne(route[i]);
       const endPlaceInstance = await this.placeInstancesService.findOne(route[i + 1]);
 
-      const startTemplateId = startPlaceInstance.place?._id?.toString();
-      const endTemplateId = endPlaceInstance.place?._id?.toString();
+      const startTemplateId = startPlaceInstance.placeId?.toString();
+      const endTemplateId = endPlaceInstance.placeId?.toString();
 
       const connection = await this.findConnectionBetweenPlaces(startTemplateId, endTemplateId);
       if (connection) {
@@ -330,8 +335,8 @@ export class VehicleDispatchService {
     await this.deliverJobsAtPlace(vehicle, arrivedPlace);
 
     // 3. Update vehicle position
-    vehicle.currentPlaceInstance = arrivedPlace as any;
-    vehicle.destinationPlaceInstance = null as any;
+    vehicle.currentPlaceInstance = arrivedPlace._id;
+    vehicle.destinationPlaceInstance = null;
 
     // 4. Check for multi-stop handling
     if (remainingRoute.length > 1) {
@@ -340,8 +345,8 @@ export class VehicleDispatchService {
       vehicle.status = 'IN_TRANSIT';
 
       const nextDestination = remainingRoute[remainingRoute.length - 1];
-      vehicle.destinationPlaceInstance = await this.placeInstancesService.findOne(nextDestination) as any;
-      vehicle.currentPlaceInstance = null as any;
+      vehicle.destinationPlaceInstance = new ObjectId(nextDestination);
+      vehicle.currentPlaceInstance = null;
 
       // Calculate time to next destination
       const travelTimeMs = await this.calculateTravelTime(vehicle, remainingRoute);

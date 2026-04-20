@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
 import { Column, Entity, Repository } from 'typeorm';
@@ -125,7 +125,7 @@ export class UsersService {
   }
 
   async getById(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ _id: new Types.ObjectId(userId) });
+    const user = await this.usersRepository.findOneBy({ _id: new ObjectId(userId) });
     if (user) {
       return user;
     }
@@ -134,7 +134,7 @@ export class UsersService {
 
   async create(userData: CreateUserDto): Promise<UserDto> {
     const newUser = this.usersRepository.create({
-      _id: new Types.ObjectId(),
+      _id: new ObjectId(),
       ...this.userDtoMapper.toEntity(userData)
     });
     await this.usersRepository.save(newUser);
@@ -147,7 +147,7 @@ export class UsersService {
       userEntity.password = await bcrypt.hash(userEntity.password, 10);
     }
     await this.usersRepository.update(uuid, userEntity);
-    const updatedUser = await this.usersRepository.findOne({ where: { _id: new Types.ObjectId(uuid) } });
+    const updatedUser = await this.usersRepository.findOne({ where: { _id: new ObjectId(uuid) } });
     if (updatedUser) {
       return this.userDtoMapper.toDto(updatedUser);
     }

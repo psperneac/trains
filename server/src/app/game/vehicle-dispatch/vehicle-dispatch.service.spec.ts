@@ -5,6 +5,7 @@ import { VehicleInstancesService } from '../../api/vehicle-instances.module';
 import { PlaceInstancesService } from '../../api/place-instance.module';
 import { PlaceConnectionService } from '../../api/place-connection.module';
 import { JobsService } from '../../api/jobs.module';
+import { PlacesService } from '../../api/places.module';
 import { EconomyService, CurrencyType } from '../economy/economy.service';
 import { InMemorySchedulerService } from '../scheduler/in-memory-scheduler.service';
 
@@ -32,6 +33,10 @@ const mockJobsService = {
   create: jest.fn()
 };
 
+const mockPlacesService = {
+  findOne: jest.fn()
+};
+
 const mockEconomyService = {
   creditPlayer: jest.fn(),
   debitPlayer: jest.fn()
@@ -49,6 +54,7 @@ jest.mock('../../api/vehicle-instances.module');
 jest.mock('../../api/place-instance.module');
 jest.mock('../../api/place-connection.module');
 jest.mock('../../api/jobs.module');
+jest.mock('../../api/places.module');
 jest.mock('../economy/economy.service');
 jest.mock('../scheduler/in-memory-scheduler.service');
 
@@ -70,7 +76,7 @@ describe('VehicleDispatchService', () => {
 
   const createMockPlaceInstance = (id: string, playerId: string, placeId: string, placeName: string) => ({
     _id: { toString: () => id } as any,
-    place: createMockPlace(placeId, placeName),
+    placeId: { toString: () => placeId } as any,
     playerId: { toString: () => playerId } as any,
     gameId: { toString: () => gameId } as any,
     jobOffers: [],
@@ -80,7 +86,7 @@ describe('VehicleDispatchService', () => {
   const createMockVehicle = (id: string, playerId: string, currentPlaceInstanceId: string | null, status: 'AT_PLACE' | 'IN_TRANSIT' = 'AT_PLACE') => ({
     _id: { toString: () => id } as any,
     vehicle: { _id: { toString: () => 'vehicle-template-1' } as any, name: 'Locomotive', speed: 0.1 },
-    currentPlaceInstance: currentPlaceInstanceId ? createMockPlaceInstance(currentPlaceInstanceId, playerId, 'place-template-1', 'Current Place') : null,
+    currentPlaceInstance: currentPlaceInstanceId ? currentPlaceInstanceId : null,
     destinationPlaceInstance: null,
     route: [],
     status,
@@ -104,6 +110,7 @@ describe('VehicleDispatchService', () => {
     (PlaceInstancesService as jest.Mock).mockImplementation(() => mockPlaceInstancesService);
     (PlaceConnectionService as jest.Mock).mockImplementation(() => mockPlaceConnectionService);
     (JobsService as jest.Mock).mockImplementation(() => mockJobsService);
+    (PlacesService as jest.Mock).mockImplementation(() => mockPlacesService);
     (EconomyService as jest.Mock).mockImplementation(() => mockEconomyService);
     (InMemorySchedulerService as jest.Mock).mockImplementation(() => mockSchedulerService);
 
@@ -116,6 +123,7 @@ describe('VehicleDispatchService', () => {
         { provide: PlaceInstancesService, useValue: mockPlaceInstancesService },
         { provide: PlaceConnectionService, useValue: mockPlaceConnectionService },
         { provide: JobsService, useValue: mockJobsService },
+        { provide: PlacesService, useValue: mockPlacesService },
         { provide: EconomyService, useValue: mockEconomyService },
         { provide: InMemorySchedulerService, useValue: mockSchedulerService }
       ],

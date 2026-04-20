@@ -1,5 +1,5 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { AbstractEntity } from 'src/utils/abstract.entity';
 import { Repository } from 'typeorm';
 
@@ -25,66 +25,58 @@ export class PlaceTypeDto {
   content: any;
 }
 
-/*
-
-682be65aeffcff2be10510e4
-682be65aeffcff2be10510e5
-682be65aeffcff2be10510e6
-
-*/
-
 export const PLACE_TYPE_DATA: PlaceType[] = [
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510de'),
+    _id: new ObjectId('682be65aeffcff2be10510de'),
     type: 'RAIL',
     name: 'Railway station',
     description: 'Railway station',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510df'),
+    _id: new ObjectId('682be65aeffcff2be10510df'),
     type: 'WAREHOUSE',
     name: 'Warehouse',
     description: 'Warehouse',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510e0'),
+    _id: new ObjectId('682be65aeffcff2be10510e0'),
     type: 'PORT',
     name: 'Port',
     description: 'Port',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510e1'),
+    _id: new ObjectId('682be65aeffcff2be10510e1'),
     type: 'BUSINESS',
     name: 'Business',
     description: 'A business place',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510e2'),
+    _id: new ObjectId('682be65aeffcff2be10510e2'),
     type: 'TRANSIT',
     name: 'Transit Station',
     description: 'Mass Transit Station',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510e3'),
+    _id: new ObjectId('682be65aeffcff2be10510e3'),
     type: 'YARD',
     name: 'Yard',
     description: 'Vehicle, Train, Mass Transit or Shipyard',
     content: {}
   } as any as PlaceType,
   {
-    _id: new Types.ObjectId('683bd04be7cc7a6c65087ab0'),
+    _id: new ObjectId('683bd04be7cc7a6c65087ab0'),
     type: 'RESIDENCE',
     name: 'Residence',
     description: 'A private residence',
     content: {}
   } as any as PlaceType,
     {
-    _id: new Types.ObjectId('683bd04be7cc7a6c65087ab1'),
+    _id: new ObjectId('683bd04be7cc7a6c65087ab1'),
     type: 'AIRPORT',
     name: 'Airport',
     description: 'An airport where planes take off and land',

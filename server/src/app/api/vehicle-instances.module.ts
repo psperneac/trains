@@ -2,15 +2,14 @@ import { Body, Controller, Get, HttpException, HttpStatus, Injectable, Module, P
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { ObjectId } from 'mongodb';
-import { Types } from 'mongoose';
 
 import { AbstractEntity } from '../../utils/abstract.entity';
-import { Place, PlacesModule, PlacesService } from './places.module';
-import { PlaceInstance, PlaceInstancesModule, PlaceInstancesService } from './place-instance.module';
-import { Vehicle, VehiclesModule, VehiclesService } from './vehicles.module';
-import { Job, JobType, JobsModule, JobsService } from './jobs.module';
+import { PlacesModule, PlacesService } from './places.module';
+import { PlaceInstancesModule, PlaceInstancesService } from './place-instance.module';
+import { VehiclesModule, VehiclesService } from './vehicles.module';
+import { JobType, JobsModule, JobsService } from './jobs.module';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -28,15 +27,13 @@ export class VehicleInstance extends AbstractEntity {
   @Expose()
   vehicleId: ObjectId;
 
-  @ManyToOne(_type => PlaceInstance, { eager: true })
-  @JoinColumn({ name: 'current_place_instance_id' })
+  @Column('objectId')
   @Expose()
-  currentPlaceInstance: PlaceInstance;
+  currentPlaceInstance: ObjectId;
 
-  @ManyToOne(_type => PlaceInstance, { eager: true })
-  @JoinColumn({ name: 'destination_place_instance_id' })
+  @Column('objectId')
   @Expose()
-  destinationPlaceInstance: PlaceInstance;
+  destinationPlaceInstance: ObjectId;
 
   @Column({ type: 'simple-array' })
   @Expose()
@@ -118,7 +115,7 @@ export class VehicleInstancesService extends AbstractService<VehicleInstance> {
   }
 
   findAllByPlayer(pagination: any, playerId: string): Promise<PageDto<VehicleInstance>> {
-    return this.findAllWhere({ playerId: new Types.ObjectId(playerId) }, pagination);
+    return this.findAllWhere({ playerId: new ObjectId(playerId) }, pagination);
   }
 }
 
@@ -126,9 +123,24 @@ export class VehicleInstancesService extends AbstractService<VehicleInstance> {
 export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, VehicleInstanceDto> {
   constructor(
     private readonly placeInstancesService: PlaceInstancesService,
-    private readonly vehiclesService: VehiclesService
+    private readonly vehiclesService: VehiclesService,
+    private readonly placesService: PlacesService
   ) {
     super();
+  }
+
+  private async fetchPlaceData(placeId: ObjectId | string): Promise<any> {
+    const place = await this.placesService.findOne(placeId.toString());
+    if (!place) return undefined;
+    return {
+      id: place._id?.toString(),
+      name: place.name,
+      description: place.description,
+      type: place.type,
+      lat: place.lat,
+      lng: place.lng,
+      gameId: place.gameId?.toString()
+    };
   }
 
   async toDto(domain: VehicleInstance): Promise<VehicleInstanceDto> {
@@ -138,13 +150,25 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
 
     const vehicle = domain.vehicleId ? await this.vehiclesService.findOne(domain.vehicleId.toString()) : null;
 
+    // Resolve IDs - current implementation uses ObjectId directly
+    const currentPlaceInstanceId = domain.currentPlaceInstance?.toString?.();
+    const destinationPlaceInstanceId = domain.destinationPlaceInstance?.toString?.();
+
+    // Fetch full place instance objects for the DTO's nested currentPlaceInstance/destinationPlaceInstance
+    const currentPlaceInstanceData = currentPlaceInstanceId
+      ? await this.placeInstancesService.findOne(currentPlaceInstanceId)
+      : null;
+    const destinationPlaceInstanceData = destinationPlaceInstanceId
+      ? await this.placeInstancesService.findOne(destinationPlaceInstanceId)
+      : null;
+
     const dto: VehicleInstanceDto = {
       id: domain._id.toString(),
       vehicleId: domain.vehicleId?.toString(),
       gameId: domain.gameId.toString(),
       playerId: domain.playerId.toString(),
-      currentPlaceInstanceId: domain.currentPlaceInstance?._id.toString(),
-      destinationPlaceInstanceId: domain.destinationPlaceInstance?._id.toString(),
+      currentPlaceInstanceId: currentPlaceInstanceId,
+      destinationPlaceInstanceId: destinationPlaceInstanceId,
       vehicle: vehicle ? {
         id: vehicle._id?.toString(),
         type: vehicle.type,
@@ -164,39 +188,23 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
         fuelBaseBurn: vehicle.fuelBaseBurn,
         fuelPerLoadBurn: vehicle.fuelPerLoadBurn
       } : undefined,
-      currentPlaceInstance: domain.currentPlaceInstance ? {
-        id: domain.currentPlaceInstance._id?.toString(),
-        placeId: domain.currentPlaceInstance.place?._id.toString(),
-        gameId: domain.currentPlaceInstance.gameId?.toString(),
-        playerId: domain.currentPlaceInstance.playerId?.toString(),
-        place: domain.currentPlaceInstance.place ? {
-          id: domain.currentPlaceInstance.place._id?.toString(),
-          name: domain.currentPlaceInstance.place.name,
-          description: domain.currentPlaceInstance.place.description,
-          type: domain.currentPlaceInstance.place.type,
-          lat: domain.currentPlaceInstance.place.lat,
-          lng: domain.currentPlaceInstance.place.lng,
-          gameId: domain.currentPlaceInstance.place.gameId?.toString()
-        } : undefined,
-        jobOffers: domain.currentPlaceInstance.jobOffers,
-        content: domain.currentPlaceInstance.content
+      currentPlaceInstance: currentPlaceInstanceData ? {
+        id: currentPlaceInstanceData._id?.toString(),
+        placeId: currentPlaceInstanceData.placeId?.toString(),
+        gameId: currentPlaceInstanceData.gameId?.toString(),
+        playerId: currentPlaceInstanceData.playerId?.toString(),
+        place: currentPlaceInstanceData.placeId ? await this.fetchPlaceData(currentPlaceInstanceData.placeId.toString()) : undefined,
+        jobOffers: currentPlaceInstanceData.jobOffers,
+        content: currentPlaceInstanceData.content
       } : undefined,
-      destinationPlaceInstance: domain.destinationPlaceInstance ? {
-        id: domain.destinationPlaceInstance._id?.toString(),
-        placeId: domain.destinationPlaceInstance.place?._id.toString(),
-        gameId: domain.destinationPlaceInstance.gameId?.toString(),
-        playerId: domain.destinationPlaceInstance.playerId?.toString(),
-        place: domain.destinationPlaceInstance.place ? {
-          id: domain.destinationPlaceInstance.place._id?.toString(),
-          name: domain.destinationPlaceInstance.place.name,
-          description: domain.destinationPlaceInstance.place.description,
-          type: domain.destinationPlaceInstance.place.type,
-          lat: domain.destinationPlaceInstance.place.lat,
-          lng: domain.destinationPlaceInstance.place.lng,
-          gameId: domain.destinationPlaceInstance.place.gameId?.toString()
-        } : undefined,
-        jobOffers: domain.destinationPlaceInstance.jobOffers,
-        content: domain.destinationPlaceInstance.content
+      destinationPlaceInstance: destinationPlaceInstanceData ? {
+        id: destinationPlaceInstanceData._id?.toString(),
+        placeId: destinationPlaceInstanceData.placeId?.toString(),
+        gameId: destinationPlaceInstanceData.gameId?.toString(),
+        playerId: destinationPlaceInstanceData.playerId?.toString(),
+        place: destinationPlaceInstanceData.placeId ? await this.fetchPlaceData(destinationPlaceInstanceData.placeId.toString()) : undefined,
+        jobOffers: destinationPlaceInstanceData.jobOffers,
+        content: destinationPlaceInstanceData.content
       } : undefined,
       route: domain.route?.map(id => id.toString()) ?? [],
       status: domain.status,
@@ -218,8 +226,8 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
       domain = {};
     }
 
-    const currentPlaceInstanceId = dto.currentPlaceInstanceId ?? domain.currentPlaceInstance?._id.toString();
-    const destinationPlaceInstanceId = dto.destinationPlaceInstanceId ?? domain.destinationPlaceInstance?._id.toString();
+    const currentPlaceInstanceId = dto.currentPlaceInstanceId ?? domain.currentPlaceInstance?.toString();
+    const destinationPlaceInstanceId = dto.destinationPlaceInstanceId ?? domain.destinationPlaceInstance?.toString();
 
     const fixedDto = omit(dto, [
       'playerId',
@@ -232,13 +240,13 @@ export class VehicleInstanceMapper extends AbstractDtoMapper<VehicleInstance, Ve
     return {
       ...domain,
       ...fixedDto,
-      vehicleId: dto.vehicleId ? new Types.ObjectId(dto.vehicleId) : domain?.vehicleId,
-      currentPlaceInstance: await this.placeInstancesService.findOne(currentPlaceInstanceId.toString()),
-      destinationPlaceInstance: await this.placeInstancesService.findOne(destinationPlaceInstanceId.toString()),
+      vehicleId: dto.vehicleId ? new ObjectId(dto.vehicleId) : domain?.vehicleId,
+      currentPlaceInstance: currentPlaceInstanceId ? new ObjectId(currentPlaceInstanceId) : null,
+      destinationPlaceInstance: destinationPlaceInstanceId ? new ObjectId(destinationPlaceInstanceId) : null,
       route: dto.route?.map(id => new ObjectId(id)) ?? [],
       status: dto.status ?? 'AT_PLACE',
-      gameId: dto.gameId ? new Types.ObjectId(dto.gameId) : domain?.gameId,
-      playerId: dto.playerId ? new Types.ObjectId(dto.playerId) : domain?.playerId
+      gameId: dto.gameId ? new ObjectId(dto.gameId) : domain?.gameId,
+      playerId: dto.playerId ? new ObjectId(dto.playerId) : domain?.playerId
     } as VehicleInstance;
   }
 }
@@ -323,7 +331,8 @@ export class VehicleInstancesController extends AbstractServiceController<
     }
 
     // Job must be at the same place as the vehicle
-    if (job.placeInstanceId?.toString() !== vehicle.currentPlaceInstance?._id?.toString()) {
+    const currentPlaceId = vehicle.currentPlaceInstance?.toString?.();
+    if (job.placeInstanceId?.toString() !== currentPlaceId) {
       throw new HttpException('Job is not at the vehicle\'s current location', HttpStatus.BAD_REQUEST);
     }
 
@@ -333,7 +342,7 @@ export class VehicleInstancesController extends AbstractServiceController<
     }
 
     // Update the job to be loaded on this vehicle
-    job.vehicleInstanceId = new Types.ObjectId(vehicle._id.toString());
+    job.vehicleInstanceId = new ObjectId(vehicle._id.toString());
     job.vehicleId = vehicle.vehicleId?.toString();
     job.content = { ...job.content, loadedAt: new Date() };
 
@@ -383,7 +392,7 @@ export class VehicleInstancesController extends AbstractServiceController<
 
     // Update the job - change to PLACE type at current location
     job.type = JobType.PLACE;
-    job.placeInstanceId = new Types.ObjectId(vehicle.currentPlaceInstance._id.toString());
+    job.placeInstanceId = new ObjectId(vehicle.currentPlaceInstance.toString());
     job.vehicleInstanceId = null;
     job.vehicleId = null;
     job.content = { ...job.content, unloadedAt: new Date() };
@@ -395,7 +404,7 @@ export class VehicleInstancesController extends AbstractServiceController<
 }
 
 @Module({
-  imports: [PlaceInstancesModule, VehiclesModule, forwardRef(() => JobsModule), TypeOrmModule.forFeature([VehicleInstance])],
+  imports: [PlaceInstancesModule, VehiclesModule, PlacesModule, forwardRef(() => JobsModule), TypeOrmModule.forFeature([VehicleInstance])],
   controllers: [VehicleInstancesController],
   providers: [VehicleInstancesService, VehicleInstanceMapper, VehicleInstanceRepository],
   exports: [VehicleInstancesService, VehicleInstanceMapper]

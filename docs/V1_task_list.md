@@ -190,37 +190,45 @@
 ## Phase 6: Frontend Game View
 
 ### 6.1 Main Game Page
-- [ ] Create `web/app/pages/Game.tsx` - main player game view
-- [ ] Integrate with PlayerMapView component
+- [x] Create `web/app/pages/Game.tsx` - main player game view at `/game/:playerId`
+- [x] Integrate with PlayerMapView component
+- [x] Add WalletDisplay to top bar
+- [x] Add 2-second polling for vehicle positions
+- [x] Add route `/game/:playerId` to `web/app/routes/index.tsx`
 
 ### 6.2 Map Components
-- [ ] `PlayerMapView` - main map with owned (colored) + available (grayed) places
-- [ ] `PlaceMarker` - different styles for owned vs available
-- [ ] `RoutePickerOverlay` - click on map to form route
+- [x] `PlayerMapView` - main map with owned (colored) + available (grayed) places
+- [x] `PlaceMarker` - different styles for owned vs available, click handlers
+- [x] `RoutePickerOverlay` - map overlay for building routes (click vehicle first, then places)
+- [x] Map utilities in `web/app/utils/map.ts` (interpolatePosition, haversineDistance)
 
 ### 6.3 UI Panels
-- [ ] `BuyPlaceModal` - dialog for purchasing available places
-- [ ] `JobBoard` - show available jobs at selected owned place
-- [ ] `VehicleDispatchPanel` - select vehicle, pick route, dispatch
+- [x] `BuyPlaceModal` - dialog for purchasing available places (with description field)
+- [x] `JobBoard` - show available jobs at selected owned place (modal on place click)
+- [x] `VehicleDispatchPanel` - select vehicle, pick route, dispatch (opens on vehicle sidebar click)
 
 ### 6.4 Sidebar/Display
-- [ ] `OwnedPlacesList` - sidebar list of player's places
-- [ ] `WalletDisplay` - already exists (verify integration)
+- [x] `OwnedPlacesList` - sidebar list of player's places (click to select and center map)
+- [x] `WalletDisplay` - already exists (verified at `web/app/components/WalletDisplay.tsx`)
 
 ---
 
 ## Phase 7: Integration & Polish
 
 ### 7.1 Vehicle Position on Map
-- [ ] Show moving vehicles on map (interpolate position between stops)
-- [ ] Use short tick (1-2s) for visual updates
+- [x] V1 simple approach: poll vehicles every 2 seconds (in Game.tsx line 72)
+- [x] Show vehicles at currentPlaceInstance when status = 'AT_PLACE'
+- [x] Hide or show at last place when status = 'IN_TRANSIT' (no interpolation)
+- [x] Note: Position interpolation during transit is deferred to V2
 
 ### 7.2 Error Handling
-- [ ] Add validation errors for all endpoints
-- [ ] Display errors in frontend modals/toasts
+- [x] Add toasts for action results (purchase, dispatch success/failure) - integrated in BuyPlaceModal, JobBoard, VehicleDispatchPanel
+- [x] Add inline validation messages for form errors
+- [x] Integrate Toast component with all modals
 
 ### 7.3 Integration Testing
-- [ ] Test full flow: join game → select place → buy place → accept job → dispatch → deliver
+- [x] Manual test checklist in V1-IMPLEMENTATION-PLAN.md (see Week 7 section)
+- [x] Full flow: join game → select place → buy place → accept job → dispatch → deliver
 
 ---
 

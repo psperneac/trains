@@ -4,7 +4,6 @@ import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ObjectId } from 'mongodb';
-import { Types } from 'mongoose';
 
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
@@ -229,10 +228,10 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       start,
       end,
       startTime,
-      startPlaceId: dto.startPlaceId ? new Types.ObjectId(dto.startPlaceId) : domain?.startPlaceId,
-      endPlaceId: dto.endPlaceId ? new Types.ObjectId(dto.endPlaceId) : domain?.endPlaceId,
-      placeInstanceId: dto.placeInstanceId ? new Types.ObjectId(dto.placeInstanceId) : domain?.placeInstanceId,
-      vehicleInstanceId: dto.vehicleInstanceId ? new Types.ObjectId(dto.vehicleInstanceId) : domain?.vehicleInstanceId
+      startPlaceId: dto.startPlaceId ? new ObjectId(dto.startPlaceId) : domain?.startPlaceId,
+      endPlaceId: dto.endPlaceId ? new ObjectId(dto.endPlaceId) : domain?.endPlaceId,
+      placeInstanceId: dto.placeInstanceId ? new ObjectId(dto.placeInstanceId) : domain?.placeInstanceId,
+      vehicleInstanceId: dto.vehicleInstanceId ? new ObjectId(dto.vehicleInstanceId) : domain?.vehicleInstanceId
     } as unknown as Job;
   }
 }

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { DeepPartial, FindOptionsOrder, FindOptionsWhere, FindOptionsUtils, Repository } from 'typeorm';
 
 import { PageDto } from '../models/page.model';
@@ -7,7 +7,6 @@ import { PageRequestDto } from '../models/pagination.model';
 
 import { AbstractEntity } from './abstract.entity';
 import { RepositoryAccessor } from './repository-accessor';
-import { SqlException } from './sql.exception';
 
 /**
  * T - entity type
@@ -62,13 +61,17 @@ export class AbstractService<T extends AbstractEntity> {
     };
   }
 
-  async findOne(uuid: string): Promise<T> {
-    if (!uuid) {
+  async findOne(id: string | ObjectId | { toString(): string } | null | undefined): Promise<T> {
+    if (!id) {
       return null;
     }
 
+    // Handle any type that can be converted to ObjectId
+    // Accepts: string, ObjectId (both mongo and mongoose), or any object with toString()
+    const objectId = new ObjectId(id.toString());
+
     const data = await this.repository.findOne({
-      where: { _id: new Types.ObjectId(uuid) } as unknown as FindOptionsWhere<T>,
+      where: { _id: objectId } as unknown as FindOptionsWhere<T>,
       relations: this.relationships
     });
 
@@ -80,12 +83,12 @@ export class AbstractService<T extends AbstractEntity> {
     return this.repository.save(newData as any as DeepPartial<T>, {}) as any;
   }
 
-  update(uuid: string, entity: DeepPartial<T>): Promise<T> {
+  update(id: string, entity: DeepPartial<T>): Promise<T> {
     const { id: _ignored, ...entityWithoutId } = entity as DeepPartial<T> & { id?: string };
 
     const updateData = {
       ...entityWithoutId,
-      _id: new Types.ObjectId(uuid)
+      _id: new ObjectId(id)
     };
 
     return this.repository.save(updateData as unknown as DeepPartial<T>) as any;

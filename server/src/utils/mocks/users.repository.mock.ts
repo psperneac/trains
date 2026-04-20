@@ -2,14 +2,14 @@ import { isString } from 'util';
 
 import * as bcrypt from 'bcrypt';
 import { cloneDeep } from 'lodash';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 import { User } from '../../app/api/support/users.module';
 
 export function createMockUser(id: number, prefix: string, scope?: string): User {
   const password = bcrypt.hashSync(prefix + '1!', 10);
   return {
-    _id: new Types.ObjectId(),
+    _id: new ObjectId(),
     username: prefix + id,
     password,
     email: prefix + id + '@trains.com',

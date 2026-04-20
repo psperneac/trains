@@ -8,7 +8,6 @@ import { PlaceConnectionsModule } from './place-connection.module';
 import { PlaceInstancesModule } from './place-instance.module';
 import { PlaceTypeModule } from './place-type.module';
 import { PlacesModule } from './places.module';
-import { PostsModule } from './posts/posts.module';
 import { PlayersModule } from './support/players.module';
 import { TransactionsModule } from './support/transactions.module';
 import { TranslationsModule } from './support/translations.module';
@@ -19,7 +18,6 @@ import { VehiclesModule } from './vehicles.module';
 @Module({
   imports: [
     PlacesModule,
-    PostsModule,
     UsersModule,
     TranslationsModule,
     VehicleTypesModule,

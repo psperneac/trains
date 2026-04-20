@@ -1,6 +1,7 @@
 import ProtectedRoute from "../components/ProtectedRoute";
 import ChangePassword from "../pages/ChangePassword";
 import Games from "../pages/Games";
+import Game from "../pages/Game";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -57,6 +58,14 @@ export const routes = [
     element: (
       <ProtectedRoute>
         <SelectStartingPlace />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/game/:playerId",
+    element: (
+      <ProtectedRoute>
+        <Game />
       </ProtectedRoute>
     ),
   },

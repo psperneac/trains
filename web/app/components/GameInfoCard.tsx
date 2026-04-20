@@ -29,8 +29,12 @@ export default function GameInfoCard({ game }: GameInfoCardProps) {
   }
 
   const handlePlayGame = () => {
-    // Navigate to the games page to play the selected game
-    navigate('/games');
+    // Navigate to the game page if player exists, otherwise to games page
+    if (currentPlayer) {
+      navigate(`/game/${currentPlayer.id}`);
+    } else {
+      navigate('/games');
+    }
   };
 
   return (

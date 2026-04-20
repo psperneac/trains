@@ -15,7 +15,6 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { GamesModule } from './games.module';
 import { Expose } from 'class-transformer';
-import { Types } from 'mongoose';
 
 @Entity({ name: 'places' })
 export class Place extends AbstractEntity {
@@ -136,7 +135,7 @@ export class PlaceMapper extends AbstractDtoMapper<Place, PlaceDto> {
     return {
       ...domain,
       ...fixedDto,
-      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId,
+      gameId: gameId ? new ObjectId(gameId) : domain?.gameId,
     } as any as Place;
   }
 }
@@ -148,7 +147,7 @@ export class PlacesService extends AbstractService<Place> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Place>> {
-    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
   }
 
   async copyPlaces(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
@@ -158,8 +157,8 @@ export class PlacesService extends AbstractService<Place> {
     // Errors are logged but do not stop the process.
     // Returns counts of places copied, overwritten, skipped, and failed.
     const repo = this.repo.getRepository();
-    const sourcePlaces = await repo.find({ where: { gameId: new Types.ObjectId(sourceGameId) } });
-    const targetPlaces = await repo.find({ where: { gameId: new Types.ObjectId(targetGameId) } });
+    const sourcePlaces = await repo.find({ where: { gameId: new ObjectId(sourceGameId) } });
+    const targetPlaces = await repo.find({ where: { gameId: new ObjectId(targetGameId) } });
     
     const targetPlacesByName = new Map(targetPlaces.map(p => [p.name, p]));
 
@@ -190,7 +189,7 @@ export class PlacesService extends AbstractService<Place> {
             type: place.type,
             lat: place.lat,
             lng: place.lng,
-            gameId: new Types.ObjectId(targetGameId),
+            gameId: new ObjectId(targetGameId),
           });
           await repo.save(newPlace);
           copiedCount++;
@@ -211,7 +210,7 @@ export class PlacesService extends AbstractService<Place> {
 
   async deleteAllByGameId(gameId: string): Promise<number> {
     const repo = this.repo.getRepository();
-    const places = await repo.find({ where: { gameId: new Types.ObjectId(gameId) } });
+    const places = await repo.find({ where: { gameId: new ObjectId(gameId) } });
     let deletedCount = 0;
     for (const place of places) {
       await repo.delete(place._id);

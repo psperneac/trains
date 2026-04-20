@@ -1,9 +1,9 @@
 import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
-import { Column, Entity, ObjectId } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
@@ -88,8 +88,8 @@ export class TransactionsService extends AbstractService<Transaction> {
     return this.findAllWhere(
       {
         $or: [
-          { sourceId: new Types.ObjectId(entityId), sourceType: entityType },
-          { targetId: new Types.ObjectId(entityId), targetType: entityType }
+          { sourceId: new ObjectId(entityId), sourceType: entityType },
+          { targetId: new ObjectId(entityId), targetType: entityType }
         ]
       },
       pagination
@@ -111,9 +111,9 @@ export class TransactionsService extends AbstractService<Transaction> {
   ): Promise<Transaction> {
     const transaction = new Transaction();
     transaction.type = type;
-    transaction.sourceId = new Types.ObjectId(sourceId);
+    transaction.sourceId = new ObjectId(sourceId);
     transaction.sourceType = sourceType;
-    transaction.targetId = new Types.ObjectId(targetId);
+    transaction.targetId = new ObjectId(targetId);
     transaction.targetType = targetType;
     transaction.payload = payload;
     transaction.description = description;
@@ -159,9 +159,9 @@ export class TransactionMapper extends AbstractDtoMapper<Transaction, Transactio
     return {
       ...domain,
       type: dto.type,
-      sourceId: dto.sourceId ? new Types.ObjectId(dto.sourceId) : domain?.sourceId,
+      sourceId: dto.sourceId ? new ObjectId(dto.sourceId) : domain?.sourceId,
       sourceType: dto.sourceType,
-      targetId: dto.targetId ? new Types.ObjectId(dto.targetId) : domain?.targetId,
+      targetId: dto.targetId ? new ObjectId(dto.targetId) : domain?.targetId,
       targetType: dto.targetType,
       payload: dto.payload,
       description: dto.description,

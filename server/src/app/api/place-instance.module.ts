@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, forwardRef, Get, HttpException, HttpStatus, Inject, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { omit } from 'lodash';
 import { AbstractEntity } from '../../utils/abstract.entity';
-import { Column, Entity, JoinColumn, ManyToOne, ObjectId } from 'typeorm';
-import { Types } from 'mongoose';
+import { Column, Entity } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -18,12 +18,11 @@ import { RepositoryAccessor } from '../../utils/repository-accessor';
 import { Place, PlacesModule, PlacesService } from './places.module';
 import { JobOffer, JobOfferDto, JobsModule, JobsService } from './jobs.module';
 
-@Entity({ name: 'map_place_instances' })
+@Entity({ name: 'place_instances' })
 export class PlaceInstance extends AbstractEntity {
-  @ManyToOne(type => Place, { eager: true })
-  @JoinColumn({ name: 'place_id' })
+  @Column('objectId')
   @Expose()
-  place: Place;
+  placeId: ObjectId;
 
   @Column('objectId')
   @Expose()
@@ -94,7 +93,7 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
   }
 
   findAllByPlayer(pagination: PageRequestDto, playerId: string): Promise<PageDto<PlaceInstance>> {
-    return this.findAllWhere({ playerId: new Types.ObjectId(playerId) }, pagination);
+    return this.findAllWhere({ playerId: new ObjectId(playerId) }, pagination);
   }
 
   /**
@@ -139,19 +138,22 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
       return null;
     }
 
+    // Fetch the place template if we have a placeId
+    const place = domain.placeId ? await this.placesService.findOne(domain.placeId.toString()) : null;
+
     const dto: PlaceInstanceDto = {
       id: domain._id.toString(),
-      placeId: domain.place?._id.toString(),
+      placeId: domain.placeId?.toString(),
       gameId: domain.gameId?.toString(),
       playerId: domain.playerId?.toString(),
-      place: domain.place ? {
-        id: domain.place._id?.toString(),
-        name: domain.place.name,
-        description: domain.place.description,
-        type: domain.place.type,
-        lat: domain.place.lat,
-        lng: domain.place.lng,
-        gameId: domain.place.gameId?.toString()
+      place: place ? {
+        id: place._id?.toString(),
+        name: place.name,
+        description: place.description,
+        type: place.type,
+        lat: place.lat,
+        lng: place.lng,
+        gameId: place.gameId?.toString()
       } : undefined,
       jobOffers: domain.jobOffers?.map(j => j as JobOfferDto),
       content: domain.content
@@ -172,15 +174,19 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
       domain = {};
     }
 
-    const placeId = dto.placeId ?? domain.place?._id.toString();
+    const placeId = dto.placeId ?? domain.placeId?.toString();
+    const gameId = dto.gameId ?? domain.gameId?.toString();
+    const playerId = dto.playerId ?? domain.playerId?.toString();
 
-    const fixedDto = omit(dto, ['placeId']);
+    const fixedDto = omit(dto, ['placeId', 'gameId', 'playerId']);
 
     return {
       ...domain,
       ...fixedDto,
-      mapPlace: await this.placesService.findOne(placeId)
-    } as any as PlaceInstance;
+      placeId: placeId ? new ObjectId(placeId) : domain.placeId,
+      gameId: gameId ? new ObjectId(gameId) : domain.gameId,
+      playerId: playerId ? new ObjectId(playerId) : domain.playerId
+    } as unknown as PlaceInstance;
   }
 }
 
@@ -190,7 +196,7 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
   constructor(
     service: PlaceInstancesService,
     mapper: PlaceInstanceMapper,
-    private readonly jobsService: JobsService
+    @Inject(forwardRef(() => JobsService)) private readonly jobsService: JobsService
   ) {
     super(service, mapper);
   }
@@ -343,7 +349,7 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
 }
 
 @Module({
-  imports: [PlacesModule, JobsModule, TypeOrmModule.forFeature([PlaceInstance])],
+  imports: [PlacesModule, forwardRef(() => JobsModule), TypeOrmModule.forFeature([PlaceInstance])],
   controllers: [PlaceInstanceController],
   providers: [PlaceInstancesService, PlaceInstanceMapper, PlaceInstanceRepository],
   exports: [PlaceInstancesService, PlaceInstanceMapper, PlaceInstancesService]

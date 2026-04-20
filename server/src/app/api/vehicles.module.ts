@@ -3,7 +3,6 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { Column, Entity } from 'typeorm';
 import { ObjectId } from 'mongodb';
-import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -144,7 +143,7 @@ export class VehiclesService extends AbstractService<Vehicle> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Vehicle>> {
-    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
   }
 }
 
@@ -196,7 +195,7 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
     return {
       ...domain,
       ...fixedDto,
-      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId
+      gameId: gameId ? new ObjectId(gameId) : domain?.gameId
     } as any as Vehicle;
   }
 }

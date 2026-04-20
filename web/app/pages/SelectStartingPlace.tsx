@@ -72,7 +72,7 @@ export default function SelectStartingPlace() {
 
       if (result.success) {
         // Redirect to main game view
-        navigate('/');
+        navigate(`/game/${playerId}`);
       } else {
         setError(result.error || 'Failed to select starting place');
       }

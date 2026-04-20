@@ -3,7 +3,7 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Expose } from 'class-transformer';
 import { AbstractDto } from '../../utils/abstract-dto';
 import { AbstractEntity } from '../../utils/abstract.entity';
-import { Column, Entity, ObjectId } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
@@ -16,7 +16,7 @@ import { RepositoryAccessor } from '../../utils/repository-accessor';
 
 import { GamesModule } from './games.module';
 
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { PlacesModule, PlacesService } from './places.module';
 
 @Entity({ name: 'place_connections' })
@@ -37,15 +37,15 @@ export class PlaceConnection extends AbstractEntity {
   @Expose()
   content: any;
 
-  @Column('objectId')
+  @Column('objectid')
   @Expose()
   startId: ObjectId;
 
-  @Column('objectId')
+  @Column('objectid')
   @Expose()
   endId: ObjectId;
 
-  @Column('objectId')
+  @Column('objectid')
   @Expose()
   gameId: ObjectId;
 }
@@ -104,7 +104,7 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<PlaceConnection>> {
-    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
   }
 
   async copyPlaceConnections(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
@@ -115,17 +115,17 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
     // (with overwrite=true) or is skipped (with overwrite=false).
     // Errors are logged but do not stop the process.
     // Returns counts of connections copied, overwritten, skipped, and failed.
-    const sourceConnections = await this.repository.find({ where: { gameId: new Types.ObjectId(sourceGameId) } });
-    const targetConnections = await this.repository.find({ where: { gameId: new Types.ObjectId(targetGameId) } });
+    const sourceConnections = await this.repository.find({ where: { gameId: new ObjectId(sourceGameId) } });
+    const targetConnections = await this.repository.find({ where: { gameId: new ObjectId(targetGameId) } });
     
     const targetConnectionsByRoute = new Map(
       targetConnections.map(c => [`${c.startId.toString()}-${c.endId.toString()}`, c])
     );
 
-    const sourcePlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(sourceGameId) });
+    const sourcePlacesResult = await this.placesService.findAllWhere({ gameId: new ObjectId(sourceGameId) });
     const sourcePlaceIdToName = new Map(sourcePlacesResult.data.map((p: any) => [p._id.toString(), p.name]));
 
-    const targetPlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(targetGameId) });
+    const targetPlacesResult = await this.placesService.findAllWhere({ gameId: new ObjectId(targetGameId) });
     const targetPlaceNameToId = new Map(targetPlacesResult.data.map((p: any) => [p.name, p._id.toString()]));
 
     let copiedCount = 0;
@@ -171,9 +171,9 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
             name: connection.name,
             description: connection.description,
             content: connection.content,
-            startId: new Types.ObjectId(targetStartId),
-            endId: new Types.ObjectId(targetEndId),
-            gameId: new Types.ObjectId(targetGameId),
+            startId: new ObjectId(targetStartId),
+            endId: new ObjectId(targetEndId),
+            gameId: new ObjectId(targetGameId),
           } as any);
           await this.repository.save(newConnection);
           copiedCount++;
@@ -193,7 +193,7 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
   }
 
   async deleteAllByGameId(gameId: string): Promise<number> {
-    const connections = await this.repository.find({ where: { gameId: new Types.ObjectId(gameId) } });
+    const connections = await this.repository.find({ where: { gameId: new ObjectId(gameId) } });
     let deletedCount = 0;
     for (const connection of connections) {
       await this.repository.delete(connection._id);
@@ -246,9 +246,9 @@ export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, Pl
     return {
       ...domain,
       ...fixedDto,
-      startId: startId ? new Types.ObjectId(startId) : domain?.startId,
-      endId: endId ? new Types.ObjectId(endId) : domain?.endId,
-      gameId: gameId ? new Types.ObjectId(gameId) : domain?.gameId,
+      startId: startId ? new ObjectId(startId) : domain?.startId,
+      endId: endId ? new ObjectId(endId) : domain?.endId,
+      gameId: gameId ? new ObjectId(gameId) : domain?.gameId,
     } as any as PlaceConnection;
   }
 }

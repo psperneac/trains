@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 export class RepositoryAccessor<T> {
   constructor(

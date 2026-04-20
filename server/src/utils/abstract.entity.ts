@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
-import { CreateDateColumn, DeleteDateColumn, ObjectId, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { CreateDateColumn, DeleteDateColumn, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class AbstractEntity {
   @ObjectIdColumn()

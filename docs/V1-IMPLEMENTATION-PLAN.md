@@ -955,64 +955,137 @@ export class EconomyService {
 
 ### Page Structure
 ```
-/game
+/game/:playerId
 ├── PlayerMapView (main game view)
 │   ├── WalletDisplay (top bar)
-│   ├── OwnedPlacesList (sidebar)
+│   ├── OwnedPlacesList (sidebar - click to select)
 │   ├── Map (Leaflet)
-│   │   ├── PlaceMarker (for each owned/available place)
+│   │   ├── PlaceMarker (owned = colored, available = grayed)
 │   │   └── RoutePickerOverlay (when dispatching)
-│   ├── BuyPlaceModal (when clicking available place)
-│   ├── JobBoard (when at a place)
-│   └── VehicleDispatchPanel (when dispatching)
+│   ├── BuyPlaceModal (on click available place - includes description field)
+│   ├── JobBoard (modal on click owned place)
+│   └── VehicleDispatchPanel (on click vehicle in sidebar)
 ```
+
+---
+
+## Phase 6/7 Implementation Details
+
+### UX Decisions
+
+| # | Item | Decision |
+|---|------|----------|
+| 1 | Game page route | `/game/:playerId` in Game.tsx, separate from Home.tsx |
+| 2 | Map architecture | Separate from admin PlacesOptions, share utilities via `utils/map.ts` |
+| 3 | RoutePickerOverlay | Click vehicle first, then places to build route |
+| 4 | OwnedPlacesList | Simple list with click-to-select (centers map) |
+| 5 | Error display | Both - toasts for actions, inline for form validation |
+| 6 | JobBoard trigger | Modal when clicking owned place on map |
+| 7 | VehicleDispatchPanel trigger | Opens when clicking vehicle in sidebar |
+| 8 | BuyPlaceModal trigger | Modal when clicking available place, includes description field |
+| 9 | Map utility file | Use existing `web/app/utils/map.ts` |
+| 10 | Vehicle animation | V1: Poll every 2s, show at place when AT_PLACE, hide during IN_TRANSIT |
+| 11 | Tick mechanism | 2-second polling interval in Game.tsx |
+| 12 | Post-selection redirect | SelectStartingPlace.tsx redirects to `/game/:playerId` |
+
+### Component File Structure
+
+```
+web/app/
+├── components/
+│   ├── PlayerMapView.tsx       # Main map component
+│   ├── PlaceMarker.tsx         # Owned (colored) vs available (grayed) markers
+│   ├── OwnedPlacesList.tsx    # Sidebar list, click to center map
+│   ├── BuyPlaceModal.tsx       # Purchase dialog with description
+│   ├── JobBoard.tsx            # Job offers modal
+│   ├── VehicleDispatchPanel.tsx # Vehicle dispatch form
+│   └── RoutePickerOverlay.tsx  # Route building overlay
+├── pages/
+│   └── Game.tsx                # Main player game page
+└── utils/
+    └── map.ts                  # Extended with interpolation utilities
+```
+
+### API Endpoints Used by Frontend
+
+| Endpoint | Method | Used By |
+|----------|--------|---------|
+| `GET /players/:id/map-view` | GET | Game.tsx (initial load) |
+| `GET /place-instances/by-player/:playerId` | GET | OwnedPlacesList |
+| `GET /vehicle-instances/by-player/:playerId` | GET | Game.tsx (polling) |
+| `POST /players/:id/purchase-place` | POST | BuyPlaceModal |
+| `GET /place-instances/:id/jobs` | GET | JobBoard |
+| `POST /place-instances/:id/accept-job` | POST | JobBoard |
+| `POST /vehicles/:id/dispatch` | POST | VehicleDispatchPanel |
+
+### Vehicle Animation (V1)
+
+Simple polling approach:
+- 2-second interval polls `GET /vehicle-instances/by-player/:playerId`
+- Vehicles with `status: 'AT_PLACE'` shown at their `currentPlaceInstance`
+- Vehicles with `status: 'IN_TRANSIT'` hidden (no position interpolation)
+- Route display shows planned route polyline but vehicle marker not interpolated
+- V2 enhancement: interpolate position during transit using startTime/endTime + routePoints
 
 ---
 
 ## Implementation Order
 
 ### Week 1: Foundation
-- [ ] SchedulerService (interface + in-memory)
-- [ ] GameClockService
-- [ ] Test basic scheduling works
+- [x] SchedulerService (interface + in-memory)
+- [x] GameClockService
+- [x] Test basic scheduling works
 
 ### Week 2: Player Initialization
-- [ ] Change starting resources in Games.tsx: 100 gold → 10,000 gold + 100 gems
-- [ ] Modify join flow to redirect to "Select Starting Place" after Player created
-- [ ] Add price fields to Place entity
-- [ ] Add level/price/speed/capacity to Vehicle entity
-- [ ] Refactor VehicleInstance (currentPlaceInstance, route, status)
-- [ ] Add select-starting-place endpoint
-- [ ] MapRevealService
-- [ ] PlacePurchaseService
+- [x] Change starting resources in Games.tsx: 100 gold → 10,000 gold + 100 gems
+- [x] Modify join flow to redirect to "Select Starting Place" after Player created
+- [x] Add price fields to Place entity
+- [x] Add level/price/speed/capacity to Vehicle entity
+- [x] Refactor VehicleInstance (currentPlaceInstance, route, status)
+- [x] Add select-starting-place endpoint
+- [x] MapRevealService
+- [x] PlacePurchaseService
 
 ### Week 3: Job System
-- [ ] Update Job entity (cargoType, placeInstanceId, vehicleInstanceId)
-- [ ] JobOfferService (generate offers between owned places)
-- [ ] Accept job endpoint
-- [ ] Load/unload job endpoints
-- [ ] Job warehousing at 3rd places
+- [x] Update Job entity (cargoType, placeInstanceId, vehicleInstanceId)
+- [x] JobOfferService (generate offers between owned places)
+- [x] Accept job endpoint
+- [x] Load/unload job endpoints
+- [x] Job warehousing at 3rd places
 
 ### Week 4: Vehicle Dispatch
-- [ ] Dispatch endpoint with route validation
-- [ ] Arrival handler with job delivery
-- [ ] Payment on delivery
-- [ ] Multi-stop handling
+- [x] Dispatch endpoint with route validation
+- [x] Arrival handler with job delivery
+- [x] Payment on delivery
+- [x] Multi-stop handling
 
 ### Week 5: Frontend Game View
-- [ ] PlayerMapView page
-- [ ] Place markers (owned vs available styles)
-- [ ] BuyPlaceModal
-- [ ] JobBoard component
-- [ ] VehicleDispatchPanel
-- [ ] RoutePicker (click on map to build route)
-- [ ] Wallet display
+- [x] PlayerMapView page
+- [x] Place markers (owned vs available styles)
+- [x] BuyPlaceModal
+- [x] JobBoard component
+- [x] VehicleDispatchPanel
+- [x] RoutePicker (click on map to build route)
+- [x] Wallet display
 
 ### Week 6: Polish
-- [ ] Vehicle position animation on map
-- [ ] PlaceInstance job boards
-- [ ] Error handling
-- [ ] Integration testing
+- [x] Vehicle position animation on map (V1: simple polling, no interpolation)
+- [x] PlaceInstance job boards
+- [x] Error handling (toasts + inline validation)
+- [x] Integration testing (manual checklist)
+
+### Week 7: Frontend Implementation (current)
+- [ ] Game.tsx page shell with 2-second vehicle polling
+- [ ] Add /game route to routes/index.tsx
+- [ ] Fix SelectStartingPlace.tsx redirect to /game/:playerId
+- [ ] Extend map.ts utilities (interpolation, haversine)
+- [ ] PlayerMapView component
+- [ ] PlaceMarker component
+- [ ] OwnedPlacesList sidebar
+- [ ] BuyPlaceModal component
+- [ ] JobBoard modal
+- [ ] VehicleDispatchPanel
+- [ ] RoutePickerOverlay
 
 ---
 

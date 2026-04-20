@@ -1,5 +1,5 @@
 import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { Repository } from 'typeorm';
 
 import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
@@ -35,23 +35,23 @@ export class VehicleTypeDto {
 
 */
 const VEHICLE_TYPE_DATE: VehicleType[] = [
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d3'), type: 'TRUCK', name: 'Truck', description: 'Carries freight by road', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d4'), type: 'SHIP', name: 'Ship', description: 'Goes on water, carries a lot', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510d3'), type: 'TRUCK', name: 'Truck', description: 'Carries freight by road', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510d4'), type: 'SHIP', name: 'Ship', description: 'Goes on water, carries a lot', content: {} } as any as VehicleType,
   {
-    _id: new Types.ObjectId('682be65aeffcff2be10510d5'),
+    _id: new ObjectId('682be65aeffcff2be10510d5'),
     type: 'TRAIN',
     name: 'Train',
     description: 'A vehicle that runs on tracks',
     content: {}
   } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d6'), type: 'CAR', name: 'Car', description: 'Small road vehicle', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d7'), type: 'BUS', name: 'Bus', description: 'Mass transit vehicle', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d8'), type: 'PLANE', name: 'Plane', description: 'Flies in the air', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510d9'), type: 'LOCOMOTIVE', name: 'Locomotive', description: 'Rail vehicle for hauling cargo', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510da'), type: 'FREIGHT_CAR', name: 'Freight Car', description: 'Rail cargo car for carrying goods', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510db'), type: 'TENDER', name: 'Tender', description: 'Coal and water car for steam locomotives', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510dc'), type: 'CARGO_TRUCK', name: 'Cargo Truck', description: 'Road vehicle for transporting goods', content: {} } as any as VehicleType,
-  { _id: new Types.ObjectId('682be65aeffcff2be10510dd'), type: 'CARGO_SHIP', name: 'Cargo Ship', description: 'Water vessel for transporting goods', content: {} } as any as VehicleType
+  { _id: new ObjectId('682be65aeffcff2be10510d6'), type: 'CAR', name: 'Car', description: 'Small road vehicle', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510d7'), type: 'BUS', name: 'Bus', description: 'Mass transit vehicle', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510d8'), type: 'PLANE', name: 'Plane', description: 'Flies in the air', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510d9'), type: 'LOCOMOTIVE', name: 'Locomotive', description: 'Rail vehicle for hauling cargo', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510da'), type: 'FREIGHT_CAR', name: 'Freight Car', description: 'Rail cargo car for carrying goods', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510db'), type: 'TENDER', name: 'Tender', description: 'Coal and water car for steam locomotives', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510dc'), type: 'CARGO_TRUCK', name: 'Cargo Truck', description: 'Road vehicle for transporting goods', content: {} } as any as VehicleType,
+  { _id: new ObjectId('682be65aeffcff2be10510dd'), type: 'CARGO_SHIP', name: 'Cargo Ship', description: 'Water vessel for transporting goods', content: {} } as any as VehicleType
 ];
 
 @Injectable()

@@ -77,7 +77,7 @@ export class PlayerInitService {
       pageSize: 1000
     } as any);
     const playerAlreadyHasPlace = existingInstances.data.some(
-      (pi: any) => pi.playerId?.toString() === playerId && pi.place?._id?.toString() === placeId
+      (pi: any) => pi.playerId?.toString() === playerId && pi.placeId?.toString() === placeId
     );
     if (playerAlreadyHasPlace) {
       return {
@@ -88,7 +88,7 @@ export class PlayerInitService {
 
     // 4. Create PlaceInstance at the starting place
     const placeInstance = await this.placeInstancesService.create({
-      place: place,
+      placeId: new ObjectId(placeId),
       gameId: new ObjectId(player.gameId),
       playerId: new ObjectId(playerId),
       jobOffers: [],
@@ -127,7 +127,7 @@ export class PlayerInitService {
     // 6. Create VehicleInstance for the player at the starting place
     const vehicleInstance = await this.vehicleInstancesService.create({
       vehicleId: vehicleTemplate._id,
-      currentPlaceInstance: placeInstance,
+      currentPlaceInstance: placeInstance._id,
       destinationPlaceInstance: null,
       route: [],
       status: 'AT_PLACE',
