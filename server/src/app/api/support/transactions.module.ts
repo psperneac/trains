@@ -1,18 +1,19 @@
 import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
-
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
-import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
+import { Types } from 'mongoose';
+import { LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
 import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { AbstractEntity } from '../../../utils/abstract.entity';
-import { AbstractService } from '../../../utils/abstract.service';
+import { AbstractMongoEntity } from '../../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../../utils/abstract-mongo-service.controller';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument, DeepPartial } from 'mongoose';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../../utils/repository-accessor';
 
 export enum TransactionType {
   GOLD_GEMS_TRANSFER = 'GOLD_GEMS_TRANSFER',
@@ -27,36 +28,39 @@ export enum EntityType {
   PLACE = 'PLACE',
 }
 
-@Entity({ name: 'transactions' })
-export class Transaction extends AbstractEntity {
-  @Column('varchar', { length: 50 })
+@Schema({ collection: 'transactions' })
+export class Transaction extends AbstractMongoEntity {
+  @Prop({ type: String, enum: TransactionType, required: true })
   @Expose()
   type: TransactionType;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, required: true })
   @Expose()
-  sourceId: ObjectId;
+  sourceId: Types.ObjectId;
 
-  @Column('varchar', { length: 20 })
+  @Prop({ type: String, enum: EntityType, required: true })
   @Expose()
   sourceType: EntityType;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, required: true })
   @Expose()
-  targetId: ObjectId;
+  targetId: Types.ObjectId;
 
-  @Column('varchar', { length: 20 })
+  @Prop({ type: String, enum: EntityType, required: true })
   @Expose()
   targetType: EntityType;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   payload: any;
 
-  @Column('varchar', { length: 500 })
+  @Prop({ type: String })
   @Expose()
   description: string;
 }
+
+export type TransactionDocument = HydratedDocument<Transaction>;
+export const TransactionSchema = SchemaFactory.createForClass(Transaction);
 
 export interface TransactionDto {
   id: string;
@@ -72,16 +76,9 @@ export interface TransactionDto {
 }
 
 @Injectable()
-export class TransactionRepository extends RepositoryAccessor<Transaction> {
-  constructor(@InjectRepository(Transaction) injectedRepo) {
-    super(injectedRepo);
-  }
-}
-
-@Injectable()
-export class TransactionsService extends AbstractService<Transaction> {
-  constructor(repo: TransactionRepository) {
-    super(repo);
+export class TransactionsService extends AbstractMongoService<Transaction> {
+  constructor(@InjectModel(Transaction.name) private readonly transactionModel: Model<TransactionDocument>) {
+    super(transactionModel);
   }
 
   async findAllByEntityId(entityId: string, entityType: EntityType, pagination?: PageRequestDto): Promise<PageDto<Transaction>> {
@@ -109,16 +106,15 @@ export class TransactionsService extends AbstractService<Transaction> {
     payload: any,
     description: string
   ): Promise<Transaction> {
-    const transaction = new Transaction();
-    transaction.type = type;
-    transaction.sourceId = new ObjectId(sourceId);
-    transaction.sourceType = sourceType;
-    transaction.targetId = new ObjectId(targetId);
-    transaction.targetType = targetType;
-    transaction.payload = payload;
-    transaction.description = description;
-
-    return this.create(transaction);
+    return this.create({
+      type,
+      sourceId: new ObjectId(sourceId),
+      sourceType,
+      targetId: new ObjectId(targetId),
+      targetType,
+      payload,
+      description
+    } as DeepPartial<Transaction>);
   }
 }
 
@@ -134,7 +130,7 @@ export class TransactionMapper extends AbstractDtoMapper<Transaction, Transactio
     }
 
     return {
-      id: domain._id.toString(),
+      id: (domain as any).id || (domain as any)._id?.toString(),
       type: domain.type,
       sourceId: domain.sourceId?.toString(),
       sourceType: domain.sourceType,
@@ -147,33 +143,33 @@ export class TransactionMapper extends AbstractDtoMapper<Transaction, Transactio
     };
   }
 
-  async toDomain(dto: TransactionDto, domain?: Partial<Transaction> | Transaction): Promise<Transaction> {
+  async toDomain(dto: TransactionDto, domain?: Transaction | Partial<Transaction>): Promise<Transaction> {
     if (!dto) {
       return domain as any as Transaction;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<Transaction>;
     }
 
     return {
       ...domain,
       type: dto.type,
-      sourceId: dto.sourceId ? new ObjectId(dto.sourceId) : domain?.sourceId,
+      sourceId: dto.sourceId ? new ObjectId(dto.sourceId) : (domain as any).sourceId,
       sourceType: dto.sourceType,
-      targetId: dto.targetId ? new ObjectId(dto.targetId) : domain?.targetId,
+      targetId: dto.targetId ? new ObjectId(dto.targetId) : (domain as any).targetId,
       targetType: dto.targetType,
       payload: dto.payload,
       description: dto.description,
-      created: dto.created ? new Date(dto.created) : domain?.created,
-      updated: dto.updated ? new Date(dto.updated) : domain?.updated,
+      created: dto.created ? new Date(dto.created) : (domain as any).created,
+      updated: dto.updated ? new Date(dto.updated) : (domain as any).updated,
     } as Transaction;
   }
 }
 
 @Controller('transactions')
 @UseFilters(AllExceptionsFilter)
-export class TransactionController extends AbstractUserServiceController<Transaction, TransactionDto> {
+export class TransactionController extends AbstractMongoServiceController<Transaction, TransactionDto> {
   constructor(
     private readonly transactionsService: TransactionsService,
     private readonly transactionMapper: TransactionMapper
@@ -182,7 +178,7 @@ export class TransactionController extends AbstractUserServiceController<Transac
   }
 
   @Get('by-player/:playerId')
-  @UseGuards(LoggedIn, Admin)
+  @UseGuards(LoggedIn)
   async findAllByPlayerId(
     @Param('playerId') playerId: string,
     @Query() pagination: PageRequestDto
@@ -191,7 +187,7 @@ export class TransactionController extends AbstractUserServiceController<Transac
   }
 
   @Get('by-entity/:entityId/:entityType')
-  @UseGuards(LoggedIn, Admin)
+  @UseGuards(LoggedIn)
   async findAllByEntityId(
     @Param('entityId') entityId: string,
     @Param('entityType') entityType: EntityType,
@@ -199,20 +195,12 @@ export class TransactionController extends AbstractUserServiceController<Transac
   ): Promise<PageDto<TransactionDto>> {
     return this.transactionsService.findAllByEntityId(entityId, entityType, pagination).then(this.makeHandler());
   }
-
-  @Get()
-  @UseGuards(LoggedIn, Admin)
-  async findAllTransactions(
-    @Query() pagination: PageRequestDto
-  ): Promise<PageDto<TransactionDto>> {
-    return this.transactionsService.findAll(pagination).then(this.makeHandler());
-  }
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction])],
+  imports: [MongooseModule.forFeature([{ name: Transaction.name, schema: TransactionSchema }])],
   controllers: [TransactionController],
-  providers: [TransactionsService, TransactionMapper, TransactionRepository],
-  exports: [TransactionsService, TransactionMapper, TransactionRepository]
+  providers: [TransactionsService, TransactionMapper],
+  exports: [TransactionsService, TransactionMapper]
 })
 export class TransactionsModule {}
