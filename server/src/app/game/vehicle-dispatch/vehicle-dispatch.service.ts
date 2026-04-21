@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { InMemorySchedulerService } from '../scheduler/in-memory-scheduler.service';
 import { VehicleInstancesService } from '../../api/vehicle-instances.module';
 import { PlaceInstancesService } from '../../api/place-instance.module';
@@ -112,7 +112,7 @@ export class VehicleDispatchService {
     }
 
     // 4. Validate first stop is current location
-    const currentPlaceId = vehicle.currentPlaceInstance?.toString();
+    const currentPlaceId = vehicle.currentPlaceInstanceId?.toString();
     if (route[0] !== currentPlaceId) {
       return {
         success: false,
@@ -129,9 +129,9 @@ export class VehicleDispatchService {
     // 7. Update vehicle status
     const destinationPlaceInstanceId = route[route.length - 1];
     vehicle.status = 'IN_TRANSIT';
-    vehicle.destinationPlaceInstance = new ObjectId(destinationPlaceInstanceId);
-    vehicle.route = route.map(id => new ObjectId(id));
-    vehicle.currentPlaceInstance = null;
+    vehicle.destinationPlaceInstanceId = new Types.ObjectId(destinationPlaceInstanceId);
+    vehicle.route = route.map(id => new Types.ObjectId(id));
+    vehicle.currentPlaceInstanceId = null;
     await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
 
     // 8. Schedule arrival
@@ -335,18 +335,18 @@ export class VehicleDispatchService {
     await this.deliverJobsAtPlace(vehicle, arrivedPlace);
 
     // 3. Update vehicle position
-    vehicle.currentPlaceInstance = arrivedPlace._id;
-    vehicle.destinationPlaceInstance = null;
+    vehicle.currentPlaceInstanceId = arrivedPlace._id;
+    vehicle.destinationPlaceInstanceId = null;
 
     // 4. Check for multi-stop handling
     if (remainingRoute.length > 1) {
       // More stops - continue journey
-      vehicle.route = remainingRoute.map(id => new ObjectId(id));
+      vehicle.route = remainingRoute.map(id => new Types.ObjectId(id));
       vehicle.status = 'IN_TRANSIT';
 
       const nextDestination = remainingRoute[remainingRoute.length - 1];
-      vehicle.destinationPlaceInstance = new ObjectId(nextDestination);
-      vehicle.currentPlaceInstance = null;
+      vehicle.destinationPlaceInstanceId = new Types.ObjectId(nextDestination);
+      vehicle.currentPlaceInstanceId = null;
 
       // Calculate time to next destination
       const travelTimeMs = await this.calculateTravelTime(vehicle, remainingRoute);
