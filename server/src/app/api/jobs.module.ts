@@ -1,100 +1,96 @@
-import { Controller, forwardRef, Inject, Injectable, Module, UseFilters } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Body, Controller, Delete, forwardRef, Get, HttpException, HttpStatus, Inject, Injectable, Module, Param, Post, Put, Patch, Query, UseFilters } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { omit } from 'lodash';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 import { AuthenticationModule } from '../../authentication/authentication.module';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
-import { Place } from './places.module';
-import { PlaceInstance, PlaceInstancesModule, PlaceInstancesService } from './place-instance.module';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument } from 'mongoose';
+import { PlaceInstancesModule, PlaceInstancesService } from './place-instance.module';
 
 export enum JobType {
   PLACE = 'PLACE',
   VEHICLE = 'VEHICLE'
 }
 
-@Entity({ name: 'jobs' })
-export class Job extends AbstractEntity {
-  @Column('varchar', { length: 20 })
+@Schema({ collection: 'jobs' })
+export class Job extends AbstractMongoEntity {
+  @Prop({ required: true })
   @Expose()
   type: JobType;
 
-  @Column('varchar', { length: 250 })
+  @Prop({ required: true })
   @Expose()
   name: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop()
   @Expose()
   description: string;
 
-  /** Type of cargo being transported (e.g., 'Coal', 'Grain', 'Electronics') */
-  @Column('varchar', { length: 100 })
+  @Prop({ required: true })
   @Expose()
   cargoType: string;
 
-  /** Origin PlaceInstance where the job was accepted or warehoused */
-  @ManyToOne(_type => PlaceInstance, { eager: true })
-  @JoinColumn({ name: 'start' })
+  @Prop({ type: Object })
   @Expose()
-  start: Place;
+  start: any;
 
-  /** Destination PlaceInstance for job delivery */
-  @ManyToOne(_type => PlaceInstance, { eager: true })
-  @JoinColumn({ name: 'end' })
+  @Prop({ type: Object })
   @Expose()
-  end: Place;
+  end: any;
 
-  @Column()
+  @Prop()
   @Expose()
   load: number;
 
-  @Column({ name: 'pay_type' })
+  @Prop({ name: 'pay_type' })
   @Expose()
   payType: string;
 
-  @Column()
+  @Prop()
   @Expose()
   pay: number;
 
-  @Column({ name: 'start_time' })
+  @Prop({ name: 'start_time' })
   @Expose()
   startTime: Date;
 
-  /** Template Place origin - the template Place this job originates from */
-  @Column('objectId')
-  startPlaceId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Place' })
+  startPlaceId: Types.ObjectId;
 
-  @Column('objectId')
-  endPlaceId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Place' })
+  endPlaceId: Types.ObjectId;
 
-  @Column('objectId')
-  placeInstanceId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'PlaceInstance' })
+  placeInstanceId: Types.ObjectId;
 
-  @Column('objectId')
-  vehicleInstanceId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'VehicleInstance' })
+  vehicleInstanceId: Types.ObjectId;
 
-  @Column({ name: 'place_id' })
+  @Prop({ name: 'place_id' })
   @Expose()
   placeId: string;
 
-  @Column({ name: 'vehicle_id' })
+  @Prop({ name: 'vehicle_id' })
   @Expose()
   vehicleId: string;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 }
 
+export type JobDocument = HydratedDocument<Job>;
+export const JobSchema = SchemaFactory.createForClass(Job);
+
 export interface JobDto {
-  id: string;
+  id?: string;
   name: string;
   description: string;
   type: string;
@@ -112,10 +108,11 @@ export interface JobDto {
   placeId: string;
   vehicleId: string;
   content: any;
+  created?: string;
+  updated?: string;
 }
 
 export interface JobOffer {
-  /** Unique identifier for this job offer (used when accepting) */
   jobOfferId: string;
   name: string;
   description: string;
@@ -143,24 +140,17 @@ export interface JobOfferDto {
 }
 
 @Injectable()
-export class JobRepository extends RepositoryAccessor<Job> {
-  constructor(@InjectRepository(Job) injectedRepo) {
-    super(injectedRepo, ['start', 'end']);
+export class JobsService extends AbstractMongoService<Job> {
+  constructor(@InjectModel(Job.name) private readonly jobModel: Model<JobDocument>) {
+    super(jobModel);
   }
 }
 
 @Injectable()
-export class JobsService extends AbstractService<Job> {
-  constructor(repo: JobRepository) {
-    super(repo);
-  }
-}
-
-@Injectable()
-export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
+export class JobMapper extends AbstractMongoDtoMapper<Job, JobDto> {
   constructor(
     @Inject(forwardRef(() => PlaceInstancesService))
-    private readonly service: PlaceInstancesService
+    private readonly placeInstancesService: PlaceInstancesService
   ) {
     super();
   }
@@ -171,7 +161,7 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
     }
 
     const dto: JobDto = {
-      id: domain._id.toString(),
+      id: (domain as any).id || (domain as any)._id?.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
@@ -181,31 +171,31 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       payType: domain.payType,
       pay: domain.pay,
       startTime: domain.startTime?.toISOString(),
-      startId: domain.start?._id.toString(),
-      endId: domain.end?._id.toString(),
+      startId: (domain as any).startId || (domain as any).start?._id?.toString(),
+      endId: (domain as any).endId || (domain as any).end?._id?.toString(),
       startPlaceId: domain.startPlaceId?.toString(),
       endPlaceId: domain.endPlaceId?.toString(),
       placeInstanceId: domain.placeInstanceId?.toString(),
       vehicleInstanceId: domain.vehicleInstanceId?.toString(),
       placeId: domain.placeId,
-      vehicleId: domain.vehicleId
+      vehicleId: domain.vehicleId,
     };
 
     return dto;
   }
 
-  async toDomain(dto: JobDto, domain?: Partial<Job> | Job): Promise<Job> {
+  async toDomain(dto: JobDto, domain?: Job | Partial<Job>): Promise<Job> {
     if (!dto) {
-      return domain as any as Job;
+      return domain as Job;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<Job>;
     }
 
-    const startId = dto.startId ?? domain.start?._id.toString();
-    const endId = dto.endId ?? domain.end?._id.toString();
-    const startTime = dto.startTime ? new Date(dto.startTime) : domain.startTime;
+    const startId = dto.startId ?? ((domain as any).startId || (domain as any).start?._id?.toString());
+    const endId = dto.endId ?? ((domain as any).endId || (domain as any).end?._id?.toString());
+    const startTime = dto.startTime ? new Date(dto.startTime) : (domain as any).startTime;
 
     const fixedDto = omit({ ...dto }, [
       'startId',
@@ -217,10 +207,17 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       'vehicleInstanceId'
     ]);
 
-    const [start, end] = await Promise.all([
-      this.service.findOne(startId),
-      this.service.findOne(endId)
-    ]);
+    let start: any = (domain as any).start;
+    let end: any = (domain as any).end;
+
+    if (startId || endId) {
+      const [startData, endData] = await Promise.all([
+        startId ? this.placeInstancesService.findOne(startId) : Promise.resolve(null),
+        endId ? this.placeInstancesService.findOne(endId) : Promise.resolve(null)
+      ]);
+      start = startData || start;
+      end = endData || end;
+    }
 
     return {
       ...domain,
@@ -228,26 +225,89 @@ export class JobMapper extends AbstractDtoMapper<Job, JobDto> {
       start,
       end,
       startTime,
-      startPlaceId: dto.startPlaceId ? new ObjectId(dto.startPlaceId) : domain?.startPlaceId,
-      endPlaceId: dto.endPlaceId ? new ObjectId(dto.endPlaceId) : domain?.endPlaceId,
-      placeInstanceId: dto.placeInstanceId ? new ObjectId(dto.placeInstanceId) : domain?.placeInstanceId,
-      vehicleInstanceId: dto.vehicleInstanceId ? new ObjectId(dto.vehicleInstanceId) : domain?.vehicleInstanceId
-    } as unknown as Job;
+      startPlaceId: dto.startPlaceId ? new Types.ObjectId(dto.startPlaceId) : (domain as any).startPlaceId,
+      endPlaceId: dto.endPlaceId ? new Types.ObjectId(dto.endPlaceId) : (domain as any).endPlaceId,
+      placeInstanceId: dto.placeInstanceId ? new Types.ObjectId(dto.placeInstanceId) : (domain as any).placeInstanceId,
+      vehicleInstanceId: dto.vehicleInstanceId ? new Types.ObjectId(dto.vehicleInstanceId) : (domain as any).vehicleInstanceId
+    } as Job;
   }
 }
 
 @Controller('jobs')
 @UseFilters(AllExceptionsFilter)
-export class JobsController extends AbstractServiceController<Job, JobDto> {
-  constructor(service: JobsService, mapper: JobMapper) {
-    super(service, mapper);
+export class JobsController {
+  constructor(
+    private readonly jobsService: JobsService,
+    private readonly jobMapper: JobMapper
+  ) {
+  }
+
+  @Get()
+  async findAll(@Query() pagination: any) {
+    return this.jobsService.findAll(pagination).then(this.handlePagedResults());
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const domain = await this.jobsService.findOne(id);
+    if (!domain) {
+      throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+    }
+    return this.jobMapper.toDto(domain);
+  }
+
+  @Post()
+  async create(@Body() dto: JobDto) {
+    const domain = await this.jobMapper.toDomain(dto);
+    const created = await this.jobsService.create(domain as any);
+    return this.jobMapper.toDto(created);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() dto: JobDto) {
+    const existing = await this.jobsService.findOne(id);
+    if (!existing) {
+      throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+    }
+    const domain = await this.jobMapper.toDomain(dto, existing);
+    const updated = await this.jobsService.update(id, domain as any);
+    return this.jobMapper.toDto(updated);
+  }
+
+  @Patch(':id')
+  async patch(@Param('id') id: string, @Body() dto: JobDto) {
+    const existing = await this.jobsService.findOne(id);
+    if (!existing) {
+      throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+    }
+    const domain = await this.jobMapper.toDomain(dto, existing);
+    const updated = await this.jobsService.update(id, domain as any);
+    return this.jobMapper.toDto(updated);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.jobsService.delete(id);
+  }
+
+  private handlePagedResults() {
+    return async (page: any) => {
+      const mappedData = await Promise.all(page?.data?.map(async item => {
+        return await this.jobMapper.toDto(item);
+      }) || []);
+      return { ...page, data: mappedData };
+    };
   }
 }
 
 @Module({
-  imports: [forwardRef(() => PlaceInstancesModule), TypeOrmModule.forFeature([Job]), AuthenticationModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Job.name, schema: JobSchema }]),
+    forwardRef(() => PlaceInstancesModule),
+    AuthenticationModule
+  ],
   controllers: [JobsController],
-  providers: [JobsService, JobMapper, JobRepository],
+  providers: [JobsService, JobMapper],
   exports: [JobsService, JobMapper]
 })
 export class JobsModule {}

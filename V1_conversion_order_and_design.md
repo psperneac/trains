@@ -9,7 +9,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 | Entity | Module | Storage | Status |
 |--------|--------|---------|--------|
 | Game | games.module.ts | Mongoose | **Converted** |
-| Job | jobs.module.ts | TypeORM | Pending |
+| Job | jobs.module.ts | Mongoose | **Converted** |
 | Place | places.module.ts | Mongoose | **Converted** |
 | PlaceConnection | place-connection.module.ts | Mongoose | **Converted** |
 | PlaceInstance | place-instance.module.ts | Mongoose | **Converted** |
