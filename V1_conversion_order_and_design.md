@@ -15,7 +15,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 | PlaceInstance | place-instance.module.ts | TypeORM | Pending |
 | Vehicle | vehicles.module.ts | Mongoose | **Converted** |
 | VehicleInstance | vehicle-instances.module.ts | TypeORM | Pending |
-| Player | support/players.module.ts | TypeORM | Pending |
+| Player | support/players.module.ts | Mongoose | **Converted** |
 | Transaction | support/transactions.module.ts | Mongoose | **Converted** |
 | User | support/users.module.ts | Mongoose | **Converted** |
 | VehicleType | vehicle-types.module.ts | MockRepository | **Skip** (no DB) |

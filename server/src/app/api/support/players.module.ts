@@ -1,21 +1,21 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, Req, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
-import { RequestWithUser } from '../../../authentication/authentication.model';
-
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { AbstractUserServiceController } from '../../../utils/abstract-user-service.controller';
+import { Types } from 'mongoose';
+import { RequestWithUser } from '../../../authentication/authentication.model';
 import { Admin, LoggedIn, UserOrAdmin } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
-import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { AbstractEntity } from '../../../utils/abstract.entity';
-import { AbstractService } from '../../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractMongoEntity } from '../../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../../utils/abstract-mongo.service';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../../utils/repository-accessor';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument } from 'mongoose';
 import { EntityType, TransactionType, TransactionsModule, TransactionsService } from './transactions.module';
-import { User } from './users.module';
+import { User, UserDto } from './users.module';
 import { Wallet, WalletDto, SendGoldAndGemsDto } from './wallet.model';
 import { PlaceInstancesModule, PlaceInstanceMapper, PlaceInstancesService } from '../place-instance.module';
 import { VehicleInstancesModule, VehicleInstanceMapper, VehicleInstancesService } from '../vehicle-instances.module';
@@ -25,41 +25,46 @@ import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
 
 export { Wallet, WalletDto, SendGoldAndGemsDto };
 
-@Entity({ name: 'players' })
-export class Player extends AbstractEntity {
-  @Column('varchar', { length: 250 })
+@Schema({ collection: 'players' })
+export class Player extends AbstractMongoEntity {
+  @Prop({ required: true })
   @Expose()
   name: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop()
   @Expose()
   description: string;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   @Expose()
-  userId: ObjectId;
+  userId: Types.ObjectId;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   @Expose()
-  gameId: ObjectId;
+  gameId: Types.ObjectId;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
-  wallet: Wallet;
+  wallet: { gold: number; gems: number; parts: number; content: any };
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 }
 
+export type PlayerDocument = HydratedDocument<Player>;
+export const PlayerSchema = SchemaFactory.createForClass(Player);
+
 export interface PlayerDto {
-  id: string;
+  id?: string;
   name: string;
   description: string;
   userId: string;
   gameId: string;
   wallet?: WalletDto;
   content: any;
+  created?: string;
+  updated?: string;
 }
 
 /**
@@ -78,9 +83,9 @@ export interface PlayerFullStateDto {
  * and the connections between places for rendering the map.
  */
 export interface MapViewResponseDto {
-  owned: any[];           // PlaceInstance objects with jobOffers populated
-  available: any[];       // Place template objects with priceGold/priceGems
-  connections: PlaceConnectionDto[];  // All connections in the game (filtered by proximity)
+  owned: any[];
+  available: any[];
+  connections: PlaceConnectionDto[];
 }
 
 /**
@@ -88,30 +93,22 @@ export interface MapViewResponseDto {
  * Returns only the places available for purchase by the player.
  */
 export interface AvailablePlacesResponseDto {
-  places: any[];          // Place template objects with priceGold/priceGems
-  ownedPlaceIds: string[]; // IDs of places the player already owns (for reference)
+  places: any[];
+  ownedPlaceIds: string[];
 }
 
 @Injectable()
-export class PlayerRepository extends RepositoryAccessor<Player> {
-  constructor(@InjectRepository(Player) injectedRepo) {
-    super(injectedRepo);
-  }
-
-}
-
-@Injectable()
-export class PlayersService extends AbstractService<Player> {
-  constructor(repo: PlayerRepository) {
-    super(repo);
+export class PlayersService extends AbstractMongoService<Player> {
+  constructor(@InjectModel(Player.name) private readonly playerModel: Model<PlayerDocument>) {
+    super(playerModel);
   }
 
   async findAllByUserId(userId: string, pagination?: PageRequestDto): Promise<PageDto<Player>> {
-    return this.findAllWhere({ userId: new ObjectId(userId) }, pagination);
+    return this.findAllWhere({ userId: new Types.ObjectId(userId) }, pagination);
   }
 
   async findAllByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Player>> {
-    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 
   async sendGoldAndGems(playerId: string, gold: number, gems: number, parts: number): Promise<Player> {
@@ -120,7 +117,6 @@ export class PlayersService extends AbstractService<Player> {
       throw new Error('Player not found');
     }
 
-    // Update wallet
     if (!player.wallet) {
       player.wallet = { gold: 0, gems: 0, parts: 0, content: {} };
     }
@@ -134,30 +130,25 @@ export class PlayersService extends AbstractService<Player> {
 }
 
 @Injectable()
-export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
-  constructor() {
-    super();
-  }
-
+export class PlayerMapper extends AbstractMongoDtoMapper<Player, PlayerDto> {
   async toDto(domain: Player, currentUser?: User): Promise<PlayerDto> {
     if (!domain) {
       return null;
     }
 
     const dto: PlayerDto = {
-      id: domain._id.toString(),
+      id: (domain as any).id || (domain as any)._id?.toString(),
       name: domain.name,
       description: domain.description,
       userId: domain.userId?.toString(),
       gameId: domain.gameId?.toString(),
-      content: domain.content
+      content: domain.content,
     };
 
-    // Handle wallet visibility based on user permissions
     if (!currentUser || !this.shouldIncludeWallet(domain, currentUser)) {
       dto.wallet = undefined;
     } else {
-      dto.wallet = { ...domain.wallet } as WalletDto;
+      dto.wallet = { ...domain.wallet, id: (domain as any).id || (domain as any)._id?.toString() } as WalletDto;
     }
 
     return dto;
@@ -167,36 +158,31 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
     if (!currentUser) {
       return false;
     }
-
-    // Admin can see all wallets
     if (currentUser.scope === 'ADMIN') {
       return true;
     }
-
-    // User can only see their own wallet
     if (currentUser.scope === 'USER') {
-      return currentUser._id.toString() === player.userId?.toString();
+      return currentUser._id?.toString() === player.userId?.toString();
     }
-
     return false;
   }
 
-  async toDomain(dto: PlayerDto, domain?: Partial<Player> | Player): Promise<Player> {
+  async toDomain(dto: PlayerDto, domain?: Player | Partial<Player>): Promise<Player> {
     if (!dto) {
-      return domain as any as Player;
+      return domain as Player;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<Player>;
     }
 
     return {
       ...domain,
       name: dto.name,
       description: dto.description,
-      userId: dto.userId ? new ObjectId(dto.userId) : domain?.userId,
-      gameId: dto.gameId ? new ObjectId(dto.gameId) : domain?.gameId,
-      wallet: { ...dto.wallet } as Wallet,
+      userId: dto.userId ? new Types.ObjectId(dto.userId) : (domain as any).userId,
+      gameId: dto.gameId ? new Types.ObjectId(dto.gameId) : (domain as any).gameId,
+      wallet: dto.wallet ? { ...dto.wallet } : (domain as any).wallet,
       content: dto.content,
     } as Player;
   }
@@ -204,7 +190,7 @@ export class PlayerMapper extends AbstractDtoMapper<Player, PlayerDto> {
 
 @Controller('players')
 @UseFilters(AllExceptionsFilter)
-export class PlayerController extends AbstractUserServiceController<Player, PlayerDto> {
+export class PlayerController {
   constructor(
     private readonly playersService: PlayersService,
     private readonly playersMapper: PlayerMapper,
@@ -215,7 +201,6 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     private readonly vehicleInstanceMapper: VehicleInstanceMapper,
     private readonly mapRevealService: MapRevealService,
     private readonly placeConnectionService: PlaceConnectionService) {
-    super(playersService, playersMapper);
   }
 
   @Get('by-user/:userId')
@@ -227,30 +212,58 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     return this.playersService.findAllByUserId(userId, pagination).then(this.makeHandler());
   }
 
+  @Get(':id')
+  @UseGuards(LoggedIn)
+  async findOne(@Param('id') id: string): Promise<PlayerDto> {
+    return this.playersService.findOne(id).then(async domain => {
+      if (!domain) {
+        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+      }
+      const found = await this.playersMapper.toDto(domain);
+      if (!found) {
+        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+      }
+      return found;
+    });
+  }
+
+  @Get()
+  @UseGuards(LoggedIn)
+  async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<PlayerDto>> {
+    return this.playersService.findAll(pagination).then(this.makeHandler());
+  }
+
+  public makeHandler() {
+    return (page: PageDto<Player>) => this.handlePagedResults(page, this.playersMapper);
+  }
+
+  public async handlePagedResults(page: PageDto<Player>, mapper: PlayerMapper) {
+    const mappedData = await Promise.all(page?.data?.map(async item => {
+      return await mapper.toDto(item);
+    }));
+    return { ...page, data: mappedData };
+  }
+
   @Delete(':id')
   @UseGuards(LoggedIn, UserOrAdmin)
   async delete(@Param('id') id: string, @Req() request: RequestWithUser): Promise<{ success: boolean }> {
     const currentUser = request.user;
-    const canDeleteResult = this.canDelete(id, currentUser);
-    const isAllowed = canDeleteResult instanceof Promise ? await canDeleteResult : canDeleteResult;
+    const canDeleteResult = await this.canDelete(id, currentUser);
 
-    if (!isAllowed) {
+    if (!canDeleteResult) {
       throw new HttpException('Delete operation not allowed', HttpStatus.FORBIDDEN);
     }
 
-    // Delete all PlaceInstances owned by this player
     const placeInstancesPage = await this.placeInstancesService.findAllByPlayer({}, id);
     for (const pi of placeInstancesPage.data) {
       await this.placeInstancesService.delete(pi._id.toString());
     }
 
-    // Delete all VehicleInstances owned by this player
     const vehicleInstancesPage = await this.vehicleInstancesService.findAllByPlayer({}, id);
     for (const vi of vehicleInstancesPage.data) {
       await this.vehicleInstancesService.delete(vi._id.toString());
     }
 
-    // Delete the player
     await this.playersService.delete(id);
     return { success: true };
   }
@@ -262,17 +275,12 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     @Query() pagination: PageRequestDto,
     @Req() request: RequestWithUser
   ): Promise<PageDto<PlayerDto>> {
-    // User might not be in request if not authenticated, handle gracefully
     const currentUser = request.user || undefined;
-
     return this.playersService.findAllByGameId(gameId, pagination).then(
       this.makeHandlerWithUser(currentUser)
     );
   }
 
-  /**
-   * Custom handler that passes current user context to the mapper for wallet visibility
-   */
   private makeHandlerWithUser(currentUser?: User) {
     return (page: PageDto<Player>) => this.handlePagedResultsWithUser(page, currentUser);
   }
@@ -281,11 +289,7 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     const mappedData = await Promise.all(
       page?.data?.map(item => this.playersMapper.toDto(item, currentUser)) || []
     );
-
-    return {
-      ...page,
-      data: mappedData
-    };
+    return { ...page, data: mappedData };
   }
 
   @Post('send')
@@ -296,7 +300,6 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
   ): Promise<PlayerDto> {
     const currentUser = request.user;
 
-    // Create transaction record first
     await this.transactionsService.createTransaction(
       TransactionType.GOLD_GEMS_TRANSFER,
       currentUser._id.toString(),
@@ -318,15 +321,10 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     );
   }
 
-  /**
-   * Allow users to delete their own players, and admins to delete any player.
-   */
   protected async canDelete(playerId: string, currentUser: User): Promise<boolean> {
-    // Admins can delete any player
     if (currentUser.scope === 'ADMIN') {
       return true;
     }
-    // Users can only delete their own player
     const player = await this.playersService.findOne(playerId);
     if (!player) {
       return false;
@@ -334,82 +332,53 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     return player.userId?.toString() === currentUser._id.toString();
   }
 
-  /**
-   * GET /players/:id/full-state
-   * Returns the complete state of a player including all place instances and vehicle instances.
-   * Useful for debugging and verifying data flow before map view implementation.
-   */
   @Get(':id/full-state')
   @UseGuards(LoggedIn)
   async getFullState(@Param('id') playerId: string): Promise<PlayerFullStateDto> {
-    // Fetch the player
     const player = await this.playersService.findOne(playerId);
     if (!player) {
       throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
     }
 
-    // Convert player to DTO
     const playerDto = await this.playersMapper.toDto(player);
 
-    // Fetch all place instances for this player (no pagination for full state)
     const placeInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
     const placeInstances = await Promise.all(
       placeInstancesPage.data.map(pi => this.placeInstanceMapper.toDto(pi))
     );
 
-    // Fetch all vehicle instances for this player (no pagination for full state)
     const vehicleInstancesPage = await this.vehicleInstancesService.findAllByPlayer({}, playerId);
     const vehicleInstances = await Promise.all(
       vehicleInstancesPage.data.map(vi => this.vehicleInstanceMapper.toDto(vi))
     );
 
-    return {
-      player: playerDto,
-      placeInstances,
-      vehicleInstances
-    };
+    return { player: playerDto, placeInstances, vehicleInstances };
   }
 
-  /**
-   * GET /players/:id/map-view
-   * Returns the map view for a player including:
-   * - owned: PlaceInstance objects with jobOffers populated (places the player owns)
-   * - available: Place template objects with priceGold/priceGems (places available for purchase)
-   * - connections: PlaceConnection objects for the game's places (filtered to relevant ones)
-   */
   @Get(':id/map-view')
   @UseGuards(LoggedIn)
   async getMapView(@Param('id') playerId: string): Promise<MapViewResponseDto> {
-    // Fetch the player to verify they exist and get their gameId
     const player = await this.playersService.findOne(playerId);
     if (!player) {
       throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
     }
 
-    // Get owned place instances
     const ownedPlaceInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
     const ownedPlaceInstances = await Promise.all(
       ownedPlaceInstancesPage.data.map(pi => this.placeInstanceMapper.toDto(pi))
     );
 
-    // Get available places (templates) for purchase
     const availablePlaces = await this.mapRevealService.getAvailablePlaces(playerId);
 
-    // Get the player's owned place IDs to include in response for reference
     const ownedPlaceIds = ownedPlaceInstances
       .map(pi => pi.placeId)
       .filter(id => id);
 
-    // Get connections for the player's game
-    // Filter connections to only those involving owned or available places
-    const gameId = player.gameId;
     const allConnectionsPage = await this.placeConnectionService.findAllWhere(
-      { gameId: new ObjectId(gameId.toString()) } as any,
+      { gameId: new Types.ObjectId(player.gameId.toString()) } as any,
       { page: 1, pageSize: 1000 } as any
     );
 
-    // Filter connections to only those relevant to the player's map view
-    // (connections where startId or endId is in owned or available places)
     const relevantPlaceIds = new Set([
       ...ownedPlaceIds,
       ...availablePlaces.map(p => p._id?.toString()).filter(id => id)
@@ -421,7 +390,6 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
       return relevantPlaceIds.has(startId) || relevantPlaceIds.has(endId);
     });
 
-    // Map connections to DTOs
     const connections: PlaceConnectionDto[] = await Promise.all(
       relevantConnections.map(async (conn: any) => ({
         id: conn._id?.toString(),
@@ -452,27 +420,19 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     };
   }
 
-  /**
-   * GET /players/:id/available-places
-   * Returns only the places available for purchase by the player.
-   * Useful for dedicated UI components showing available purchases.
-   */
   @Get(':id/available-places')
   @UseGuards(LoggedIn)
   async getAvailablePlaces(@Param('id') playerId: string): Promise<AvailablePlacesResponseDto> {
-    // Verify player exists
     const player = await this.playersService.findOne(playerId);
     if (!player) {
       throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
     }
 
-    // Get owned place instances to get the list of owned place IDs
     const ownedPlaceInstancesPage = await this.placeInstancesService.findAllByPlayer({}, playerId);
     const ownedPlaceIds = ownedPlaceInstancesPage.data
       .map(pi => pi.placeId?.toString())
       .filter(id => id);
 
-    // Get available places (templates) for purchase
     const availablePlaces = await this.mapRevealService.getAvailablePlaces(playerId);
 
     return {
@@ -490,12 +450,11 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
       ownedPlaceIds
     };
   }
-
 }
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Player]),
+    MongooseModule.forFeature([{ name: Player.name, schema: PlayerSchema }]),
     TransactionsModule,
     PlaceInstancesModule,
     VehicleInstancesModule,
@@ -503,7 +462,7 @@ export class PlayerController extends AbstractUserServiceController<Player, Play
     PlacesModule
   ],
   controllers: [PlayerController],
-  providers: [PlayersService, PlayerMapper, PlayerRepository, MapRevealService],
+  providers: [PlayersService, PlayerMapper, MapRevealService],
   exports: [PlayersService, PlayerMapper]
 })
 export class PlayersModule {}
