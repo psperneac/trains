@@ -1,65 +1,67 @@
 import { Body, Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { AbstractDto } from '../../utils/abstract-dto';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { Column, Entity, ObjectIdColumn } from 'typeorm';
-
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../utils/abstract-mongo-service.controller';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
-
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument, DeepPartial } from 'mongoose';
 import { GamesModule } from './games.module';
-
-import { ObjectId } from 'mongodb';
 import { PlacesModule, PlacesService } from './places.module';
 
-@Entity({ name: 'place_connections' })
-export class PlaceConnection extends AbstractEntity {
-  @Column('varchar', { length: 20 })
+@Schema({ collection: 'place_connections' })
+export class PlaceConnection extends AbstractMongoEntity {
+  @Prop({ type: String, length: 20 })
   @Expose()
   type: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop({ type: String, length: 250 })
   @Expose()
   name: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop({ type: String, length: 250 })
   @Expose()
   description: string;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 
-  @Column('objectid')
+  @Prop({ type: Types.ObjectId, ref: 'Place', required: true })
   @Expose()
-  startId: ObjectId;
+  startId: Types.ObjectId;
 
-  @Column('objectid')
+  @Prop({ type: Types.ObjectId, ref: 'Place', required: true })
   @Expose()
-  endId: ObjectId;
+  endId: Types.ObjectId;
 
-  @Column('objectid')
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   @Expose()
-  gameId: ObjectId;
+  gameId: Types.ObjectId;
 }
 
-export class PlaceConnectionDto implements AbstractDto {
-  id: string;
+export type PlaceConnectionDocument = HydratedDocument<PlaceConnection>;
+export const PlaceConnectionSchema = SchemaFactory.createForClass(PlaceConnection);
+
+export interface PlaceConnectionDto {
+  id?: string;
   type: string;
   name: string;
   description: string;
   content: any;
-
   startId: string;
   endId: string;
   gameId: string;
+  created?: string;
+  updated?: string;
 }
 
 export class CopyPlaceConnectionsDto {
@@ -88,45 +90,31 @@ export class CopyResultDto {
 }
 
 @Injectable()
-export class PlaceConnectionRepository extends RepositoryAccessor<PlaceConnection> {
-  constructor(@InjectRepository(PlaceConnection) injectedRepo) {
-    super(injectedRepo); // No relationships - using ObjectId columns directly
-  }
-}
-
-@Injectable()
-export class PlaceConnectionService extends AbstractService<PlaceConnection> {
+export class PlaceConnectionsService extends AbstractMongoService<PlaceConnection> {
   constructor(
-    repo: PlaceConnectionRepository,
+    @InjectModel(PlaceConnection.name) private readonly connectionModel: Model<PlaceConnectionDocument>,
     private readonly placesService: PlacesService
   ) {
-    super(repo);
+    super(connectionModel);
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<PlaceConnection>> {
-    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 
   async copyPlaceConnections(sourceGameId: string, targetGameId: string, overwrite: boolean): Promise<CopyResultDto> {
-    // Copies place connections from source game to target game.
-    // Connections are matched to places by name: for each source connection, we look up the
-    // place names (start/end), then find those places in the target game to get their new IDs.
-    // If a connection between the same two places exists in target, it either gets overwritten
-    // (with overwrite=true) or is skipped (with overwrite=false).
-    // Errors are logged but do not stop the process.
-    // Returns counts of connections copied, overwritten, skipped, and failed.
-    const sourceConnections = await this.repository.find({ where: { gameId: new ObjectId(sourceGameId) } });
-    const targetConnections = await this.repository.find({ where: { gameId: new ObjectId(targetGameId) } });
-    
+    const sourceConnections = await this.connectionModel.find({ gameId: new Types.ObjectId(sourceGameId) }).exec();
+    const targetConnections = await this.connectionModel.find({ gameId: new Types.ObjectId(targetGameId) }).exec();
+
     const targetConnectionsByRoute = new Map(
       targetConnections.map(c => [`${c.startId.toString()}-${c.endId.toString()}`, c])
     );
 
-    const sourcePlacesResult = await this.placesService.findAllWhere({ gameId: new ObjectId(sourceGameId) });
-    const sourcePlaceIdToName = new Map(sourcePlacesResult.data.map((p: any) => [p._id.toString(), p.name]));
+    const sourcePlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(sourceGameId) });
+    const sourcePlaceIdToName = new Map(sourcePlacesResult.data.map((p: any) => [p._id?.toString() || p.id, p.name]));
 
-    const targetPlacesResult = await this.placesService.findAllWhere({ gameId: new ObjectId(targetGameId) });
-    const targetPlaceNameToId = new Map(targetPlacesResult.data.map((p: any) => [p.name, p._id.toString()]));
+    const targetPlacesResult = await this.placesService.findAllWhere({ gameId: new Types.ObjectId(targetGameId) });
+    const targetPlaceNameToId = new Map(targetPlacesResult.data.map((p: any) => [p.name, p._id?.toString() || p.id]));
 
     let copiedCount = 0;
     let skippedCount = 0;
@@ -137,7 +125,7 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
       try {
         const startName = sourcePlaceIdToName.get(connection.startId.toString());
         const endName = sourcePlaceIdToName.get(connection.endId.toString());
-        
+
         if (!startName || !endName) {
           skippedCount++;
           continue;
@@ -145,7 +133,7 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
 
         const targetStartId = targetPlaceNameToId.get(startName);
         const targetEndId = targetPlaceNameToId.get(endName);
-        
+
         if (!targetStartId || !targetEndId) {
           skippedCount++;
           continue;
@@ -153,29 +141,28 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
 
         const routeKey = `${targetStartId}-${targetEndId}`;
         const existingConnection = targetConnectionsByRoute.get(routeKey);
-        
+
         if (existingConnection) {
           if (overwrite) {
             existingConnection.name = connection.name;
             existingConnection.description = connection.description;
             existingConnection.type = connection.type;
             existingConnection.content = connection.content;
-            await this.repository.save(existingConnection as any);
+            await existingConnection.save();
             overwrittenCount++;
           } else {
             skippedCount++;
           }
         } else {
-          const newConnection = this.repository.create({
+          await this.connectionModel.create({
             type: connection.type,
             name: connection.name,
             description: connection.description,
             content: connection.content,
-            startId: new ObjectId(targetStartId),
-            endId: new ObjectId(targetEndId),
-            gameId: new ObjectId(targetGameId),
-          } as any);
-          await this.repository.save(newConnection);
+            startId: new Types.ObjectId(targetStartId),
+            endId: new Types.ObjectId(targetEndId),
+            gameId: new Types.ObjectId(targetGameId),
+          });
           copiedCount++;
         }
       } catch (error) {
@@ -193,74 +180,61 @@ export class PlaceConnectionService extends AbstractService<PlaceConnection> {
   }
 
   async deleteAllByGameId(gameId: string): Promise<number> {
-    const connections = await this.repository.find({ where: { gameId: new ObjectId(gameId) } });
-    let deletedCount = 0;
-    for (const connection of connections) {
-      await this.repository.delete(connection._id);
-      deletedCount++;
-    }
-    return deletedCount;
+    const result = await this.connectionModel.deleteMany({ gameId: new Types.ObjectId(gameId) }).exec();
+    return result.deletedCount || 0;
   }
 }
 
 @Injectable()
-export class PlaceConnectionMapper extends AbstractDtoMapper<PlaceConnection, PlaceConnectionDto> {
-  constructor(private readonly service: PlacesService) {
-    super();
-  }
-
+export class PlaceConnectionMapper extends AbstractMongoDtoMapper<PlaceConnection, PlaceConnectionDto> {
   async toDto(domain: PlaceConnection): Promise<PlaceConnectionDto> {
     if (!domain) {
       return null;
     }
 
-    const dto: PlaceConnectionDto = {
-      id: domain._id.toString(),
+    return {
+      id: (domain as any).id || (domain as any)._id?.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
       content: domain.content,
-      startId: domain.startId.toString(),
-      endId: domain.endId.toString(),
-      gameId: domain.gameId.toString(),
+      startId: domain.startId?.toString(),
+      endId: domain.endId?.toString(),
+      gameId: domain.gameId?.toString(),
+      created: domain.created?.toISOString(),
+      updated: domain.updated?.toISOString(),
     };
-
-    return dto;
   }
 
-  async toDomain(
-    dto: PlaceConnectionDto,
-    domain?: Partial<PlaceConnection> | PlaceConnection
-  ): Promise<PlaceConnection> {
+  async toDomain(dto: PlaceConnectionDto, domain?: Partial<PlaceConnection> | PlaceConnection): Promise<PlaceConnection> {
     if (!dto) {
       return domain as any as PlaceConnection;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<PlaceConnection>;
     }
 
-    // Use DTO values if provided, otherwise keep domain values
     const { startId, endId, gameId, ...fixedDto } = dto;
 
     return {
       ...domain,
       ...fixedDto,
-      startId: startId ? new ObjectId(startId) : domain?.startId,
-      endId: endId ? new ObjectId(endId) : domain?.endId,
-      gameId: gameId ? new ObjectId(gameId) : domain?.gameId,
+      startId: startId ? new Types.ObjectId(startId) : (domain as any).startId,
+      endId: endId ? new Types.ObjectId(endId) : (domain as any).endId,
+      gameId: gameId ? new Types.ObjectId(gameId) : (domain as any).gameId,
     } as any as PlaceConnection;
   }
 }
 
 @Controller('place-connections')
 @UseFilters(AllExceptionsFilter)
-export class PlaceConnectionController extends AbstractServiceController<PlaceConnection, PlaceConnectionDto> {
+export class PlaceConnectionController extends AbstractMongoServiceController<PlaceConnection, PlaceConnectionDto> {
   constructor(
-    private readonly placeConnectionService: PlaceConnectionService,
+    private readonly placeConnectionsService: PlaceConnectionsService,
     private readonly placeConnectionMapper: PlaceConnectionMapper
   ) {
-    super(placeConnectionService, placeConnectionMapper);
+    super(placeConnectionsService, placeConnectionMapper);
   }
 
   @Get('game/:gameId')
@@ -269,27 +243,35 @@ export class PlaceConnectionController extends AbstractServiceController<PlaceCo
     @Param('gameId') gameId: string,
     @Query() pagination: PageRequestDto
   ): Promise<PageDto<PlaceConnectionDto>> {
-    const page = await this.placeConnectionService.findByGameId(gameId, pagination);
+    const page = await this.placeConnectionsService.findByGameId(gameId, pagination);
     return this.handlePagedResults(page, this.placeConnectionMapper);
   }
 
   @Post('copy')
   @UseGuards(LoggedIn)
   async copyPlaceConnections(@Body() copyDto: CopyPlaceConnectionsDto): Promise<CopyResultDto> {
-    return this.placeConnectionService.copyPlaceConnections(copyDto.sourceGameId, copyDto.targetGameId, copyDto.overwrite);
+    return this.placeConnectionsService.copyPlaceConnections(copyDto.sourceGameId, copyDto.targetGameId, copyDto.overwrite);
   }
 
   @Delete('game/:gameId')
   @UseGuards(LoggedIn)
-  async deleteAllByGameId(@Param('gameId') gameId: string): Promise<number> {
-    return this.placeConnectionService.deleteAllByGameId(gameId);
+  async deleteAllByGameId(@Param('gameId') gameId: string): Promise<{ deletedCount: number }> {
+    const deletedCount = await this.placeConnectionsService.deleteAllByGameId(gameId);
+    return { deletedCount };
   }
 }
 
 @Module({
-  imports: [PlacesModule, GamesModule, TypeOrmModule.forFeature([PlaceConnection])],
+  imports: [
+    MongooseModule.forFeature([{ name: PlaceConnection.name, schema: PlaceConnectionSchema }]),
+    PlacesModule,
+    GamesModule
+  ],
   controllers: [PlaceConnectionController],
-  providers: [PlaceConnectionService, PlaceConnectionMapper, PlaceConnectionRepository],
-  exports: [PlaceConnectionService, PlaceConnectionMapper]
+  providers: [PlaceConnectionsService, PlaceConnectionMapper],
+  exports: [PlaceConnectionsService, PlaceConnectionMapper]
 })
 export class PlaceConnectionsModule {}
+
+// Backward compatibility alias
+export { PlaceConnectionsService as PlaceConnectionService };

@@ -11,7 +11,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 | Game | games.module.ts | Mongoose | **Converted** |
 | Job | jobs.module.ts | TypeORM | Pending |
 | Place | places.module.ts | Mongoose | **Converted** |
-| PlaceConnection | place-connection.module.ts | TypeORM | Pending |
+| PlaceConnection | place-connection.module.ts | Mongoose | **Converted** |
 | PlaceInstance | place-instance.module.ts | TypeORM | Pending |
 | Vehicle | vehicles.module.ts | TypeORM | Pending |
 | VehicleInstance | vehicle-instances.module.ts | TypeORM | Pending |
@@ -27,8 +27,8 @@ This document outlines the migration strategy for converting all TypeORM entitie
 
 ```
 Game (converted)
-  ├── Place (pending) - gameId FK
-  ├── PlaceConnection (pending) - gameId FK
+  ├── Place (converted) - gameId FK
+  ├── PlaceConnection (converted) - gameId FK
   ├── Vehicle (pending) - gameId FK
   └── Player (pending) - gameId FK, userId FK
        ├── PlaceInstance (pending) - playerId FK, gameId FK
@@ -61,7 +61,7 @@ Entities are ordered by **dependency count** (ascending) - entities with fewer d
 | Order | Entity | Rationale |
 |-------|--------|-----------|
 | 3 | **Place** | Depends only on `Game` (already Mongoose). ✅ **Converted** |
-| 4 | **PlaceConnection** | Depends only on `Game`. Uses raw ObjectIds, not relations. |
+| 4 | **PlaceConnection** | Depends only on `Game`. Uses raw ObjectIds, not relations. ✅ **Converted** |
 | 5 | **Vehicle** | Depends only on `Game`. |
 
 ### Phase 3: Entities Depending on Phase 1-2 Entities
