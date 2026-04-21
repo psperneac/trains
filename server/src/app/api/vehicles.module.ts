@@ -1,19 +1,19 @@
-import { Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Body, Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
-import { ObjectId } from 'mongodb';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
-import { AbstractDto } from '../../utils/abstract-dto';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../utils/abstract-mongo-service.controller';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument } from 'mongoose';
 import { GamesModule } from './games.module';
 
 /**
@@ -40,126 +40,118 @@ export const CargoTypes = [
  */
 export type CargoType = (typeof CargoTypes)[number];
 
-@Entity({ name: 'vehicles' })
-export class Vehicle extends AbstractEntity {
-  @Column('varchar', { length: 20 })
+@Schema({ collection: 'vehicles' })
+export class Vehicle extends AbstractMongoEntity {
+  @Prop({ required: true })
   @Expose()
   type: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop({ required: true })
   @Expose()
   name: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop()
   @Expose()
   description: string;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   engineMax: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   engineLoad: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   engineFuel: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   auxMax: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   auxLoad: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   auxFuel: number;
 
-  @Column('int')
+  @Prop({ default: 0 })
   @Expose()
   speed: number;
 
-  @Column('objectId')
-  gameId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
+  @Expose()
+  gameId: Types.ObjectId;
 
-  @Column({ default: 5000 })
+  @Prop({ default: 5000 })
   @Expose()
   priceGold: number;
 
-  @Column({ default: 10 })
+  @Prop({ default: 10 })
   @Expose()
   priceGems: number;
 
-  @Column({ default: 1 })
+  @Prop({ default: 1 })
   @Expose()
   fuelBaseBurn: number;
 
-  @Column({ default: 0.1 })
+  @Prop({ default: 0.1 })
   @Expose()
   fuelPerLoadBurn: number;
 }
 
-export class VehicleDto implements AbstractDto {
-  id: string;
+export type VehicleDocument = HydratedDocument<Vehicle>;
+export const VehicleSchema = SchemaFactory.createForClass(Vehicle);
+
+export interface VehicleDto {
+  id?: string;
   type: string;
   name: string;
   description: string;
   content: any;
-
   engineMax: number;
   engineLoad: number;
   engineFuel: number;
-
   auxMax: number;
   auxLoad: number;
   auxFuel: number;
-
   speed: number;
   gameId: string;
   priceGold: number;
   priceGems: number;
   fuelBaseBurn: number;
   fuelPerLoadBurn: number;
+  created?: string;
+  updated?: string;
 }
 
 @Injectable()
-export class VehicleRepository extends RepositoryAccessor<Vehicle> {
-  constructor(@InjectRepository(Vehicle) private readonly injectedRepository) {
-    super(injectedRepository);
-  }
-}
-
-@Injectable()
-export class VehiclesService extends AbstractService<Vehicle> {
-  constructor(private readonly repo: VehicleRepository) {
-    super(repo);
+export class VehiclesService extends AbstractMongoService<Vehicle> {
+  constructor(@InjectModel(Vehicle.name) private readonly vehicleModel: Model<VehicleDocument>) {
+    super(vehicleModel);
   }
 
   async findByGameId(gameId: string, pagination?: PageRequestDto): Promise<PageDto<Vehicle>> {
-    return this.findAllWhere({ gameId: new ObjectId(gameId) }, pagination);
+    return this.findAllWhere({ gameId: new Types.ObjectId(gameId) }, pagination);
   }
 }
 
 @Injectable()
-export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
-  constructor() {
-    super();
-  }
-
+export class VehicleMapper extends AbstractMongoDtoMapper<Vehicle, VehicleDto> {
   async toDto(domain: Vehicle): Promise<VehicleDto> {
     if (!domain) {
       return null;
     }
 
-    const dto: VehicleDto = {
-      id: domain._id.toString(),
+    return {
+      id: (domain as any).id || (domain as any)._id?.toString(),
       type: domain.type,
       name: domain.name,
       description: domain.description,
@@ -171,23 +163,23 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
       auxLoad: domain.auxLoad,
       auxFuel: domain.auxFuel,
       speed: domain.speed,
-      gameId: domain.gameId.toString(),
+      gameId: domain.gameId?.toString(),
       priceGold: domain.priceGold,
       priceGems: domain.priceGems,
       fuelBaseBurn: domain.fuelBaseBurn,
-      fuelPerLoadBurn: domain.fuelPerLoadBurn
+      fuelPerLoadBurn: domain.fuelPerLoadBurn,
+      created: domain.created?.toISOString(),
+      updated: domain.updated?.toISOString(),
     };
-
-    return dto;
   }
 
-  async toDomain(dto: VehicleDto, domain?: Partial<Vehicle> | Vehicle): Promise<Vehicle> {
+  async toDomain(dto: VehicleDto, domain?: Vehicle | Partial<Vehicle>): Promise<Vehicle> {
     if (!dto) {
-      return domain as any as Vehicle;
+      return domain as Vehicle;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<Vehicle>;
     }
 
     const { gameId, ...fixedDto } = dto;
@@ -195,14 +187,14 @@ export class VehicleMapper extends AbstractDtoMapper<Vehicle, VehicleDto> {
     return {
       ...domain,
       ...fixedDto,
-      gameId: gameId ? new ObjectId(gameId) : domain?.gameId
-    } as any as Vehicle;
+      gameId: gameId ? new Types.ObjectId(gameId) : (domain as any).gameId,
+    } as Vehicle;
   }
 }
 
 @Controller('vehicles')
 @UseFilters(AllExceptionsFilter)
-export class VehiclesController extends AbstractServiceController<Vehicle, VehicleDto> {
+export class VehiclesController extends AbstractMongoServiceController<Vehicle, VehicleDto> {
   constructor(
     private readonly vehiclesService: VehiclesService,
     private readonly vehicleMapper: VehicleMapper
@@ -222,9 +214,12 @@ export class VehiclesController extends AbstractServiceController<Vehicle, Vehic
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Vehicle]), GamesModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Vehicle.name, schema: VehicleSchema }]),
+    GamesModule
+  ],
   controllers: [VehiclesController],
-  providers: [VehicleMapper, VehiclesService, VehicleRepository],
-  exports: [VehicleMapper, VehiclesService]
+  providers: [VehiclesService, VehicleMapper],
+  exports: [VehiclesService, VehicleMapper]
 })
 export class VehiclesModule {}
