@@ -12,7 +12,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 | Job | jobs.module.ts | TypeORM | Pending |
 | Place | places.module.ts | Mongoose | **Converted** |
 | PlaceConnection | place-connection.module.ts | Mongoose | **Converted** |
-| PlaceInstance | place-instance.module.ts | TypeORM | Pending |
+| PlaceInstance | place-instance.module.ts | Mongoose | **Converted** |
 | Vehicle | vehicles.module.ts | Mongoose | **Converted** |
 | VehicleInstance | vehicle-instances.module.ts | TypeORM | Pending |
 | Player | support/players.module.ts | Mongoose | **Converted** |

@@ -1,61 +1,66 @@
 import { Body, Controller, forwardRef, Get, HttpException, HttpStatus, Inject, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { omit } from 'lodash';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { Column, Entity } from 'typeorm';
 import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument } from 'mongoose';
 
 import { Place, PlacesModule, PlacesService } from './places.module';
 import { JobOffer, JobOfferDto, JobsModule, JobsService } from './jobs.module';
 
-@Entity({ name: 'place_instances' })
-export class PlaceInstance extends AbstractEntity {
-  @Column('objectId')
+@Schema({ collection: 'place_instances' })
+export class PlaceInstance extends AbstractMongoEntity {
+  @Prop({ type: Types.ObjectId, ref: 'Place', required: true })
   @Expose()
-  placeId: ObjectId;
+  placeId: Types.ObjectId;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   @Expose()
-  gameId: ObjectId;
+  gameId: Types.ObjectId;
 
-  @Column('objectId')
+  @Prop({ type: Types.ObjectId, ref: 'Player', required: true })
   @Expose()
-  playerId: ObjectId;
+  playerId: Types.ObjectId;
 
-  @Column()
+  @Prop({ type: Object })
   @Expose()
   jobOffers: JobOffer[];
 
-  @Column({ type: 'json' })
+  @Prop({ type: Object })
   @Expose()
   content: any;
 }
 
+export type PlaceInstanceDocument = HydratedDocument<PlaceInstance>;
+export const PlaceInstanceSchema = SchemaFactory.createForClass(PlaceInstance);
+
 export interface PlaceInstanceDto {
-  id: string;
+  id?: string;
   placeId: string;
   gameId: string;
   playerId: string;
   place?: any;
   jobOffers: JobOfferDto[];
   content: any;
+  created?: string;
+  updated?: string;
 }
 
 /**
  * Request DTO for accepting a job offer from a place instance.
  */
 export interface AcceptJobDto {
-  /** The jobOfferId of the offer to accept */
   jobOfferId: string;
 }
 
@@ -63,21 +68,13 @@ export interface AcceptJobDto {
  * Request DTO for warehousing a job at a place instance.
  */
 export interface WarehouseJobDto {
-  /** The jobOfferId of the offer to warehouse */
   jobOfferId: string;
 }
 
 @Injectable()
-export class PlaceInstanceRepository extends RepositoryAccessor<PlaceInstance> {
-  constructor(@InjectRepository(PlaceInstance) injectedRepo) {
-    super(injectedRepo, ['place', 'map', 'jobs', 'jobOffers']);
-  }
-}
-
-@Injectable()
-export class PlaceInstancesService extends AbstractService<PlaceInstance> {
-  constructor(repo: PlaceInstanceRepository) {
-    super(repo);
+export class PlaceInstancesService extends AbstractMongoService<PlaceInstance> {
+  constructor(@InjectModel(PlaceInstance.name) private readonly placeInstanceModel: Model<PlaceInstanceDocument>) {
+    super(placeInstanceModel);
   }
 
   findAllByPlayerAndMap(
@@ -85,24 +82,13 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
     playerId: string,
     mapId: string
   ): Promise<PageDto<PlaceInstance>> {
-    return this.findAllWithQuery(
-      pagination,
-      'map_place_instances.map.id = :mapId and map_place_instances.player.id = :playerId',
-      { mapId, playerId }
-    ) as Promise<PageDto<PlaceInstance>>;
+    return this.findAllWhere({ playerId: new Types.ObjectId(playerId) }, pagination);
   }
 
   findAllByPlayer(pagination: PageRequestDto, playerId: string): Promise<PageDto<PlaceInstance>> {
-    return this.findAllWhere({ playerId: new ObjectId(playerId) }, pagination);
+    return this.findAllWhere({ playerId: new Types.ObjectId(playerId) }, pagination);
   }
 
-  /**
-   * Find a job offer by jobOfferId within a place instance.
-   *
-   * @param placeInstanceId - The place instance ID
-   * @param jobOfferId - The job offer ID to find
-   * @returns The matching JobOffer or null
-   */
   async findJobOffer(placeInstanceId: string, jobOfferId: string): Promise<JobOffer | null> {
     const placeInst = await this.findOne(placeInstanceId);
     if (!placeInst || !placeInst.jobOffers) {
@@ -111,12 +97,6 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
     return placeInst.jobOffers.find(o => o.jobOfferId === jobOfferId) || null;
   }
 
-  /**
-   * Remove a job offer from a place instance's jobOffers array.
-   *
-   * @param placeInstanceId - The place instance ID
-   * @param jobOfferId - The job offer ID to remove
-   */
   async removeJobOffer(placeInstanceId: string, jobOfferId: string): Promise<void> {
     const placeInst = await this.findOne(placeInstanceId);
     if (!placeInst || !placeInst.jobOffers) {
@@ -128,7 +108,7 @@ export class PlaceInstancesService extends AbstractService<PlaceInstance> {
 }
 
 @Injectable()
-export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceInstanceDto> {
+export class PlaceInstanceMapper extends AbstractMongoDtoMapper<PlaceInstance, PlaceInstanceDto> {
   constructor(private readonly placesService: PlacesService) {
     super();
   }
@@ -138,67 +118,62 @@ export class PlaceInstanceMapper extends AbstractDtoMapper<PlaceInstance, PlaceI
       return null;
     }
 
-    // Fetch the place template if we have a placeId
     const place = domain.placeId ? await this.placesService.findOne(domain.placeId.toString()) : null;
 
     const dto: PlaceInstanceDto = {
-      id: domain._id.toString(),
+      id: (domain as any).id || (domain as any)._id?.toString(),
       placeId: domain.placeId?.toString(),
       gameId: domain.gameId?.toString(),
       playerId: domain.playerId?.toString(),
       place: place ? {
-        id: place._id?.toString(),
+        id: (place as any).id || (place as any)._id?.toString(),
         name: place.name,
         description: place.description,
         type: place.type,
         lat: place.lat,
         lng: place.lng,
-        gameId: place.gameId?.toString()
+        gameId: (place as any).gameId?.toString()
       } : undefined,
       jobOffers: domain.jobOffers?.map(j => j as JobOfferDto),
-      content: domain.content
+      content: domain.content,
     };
 
     return dto;
   }
 
-  async toDomain(
-    dto: PlaceInstanceDto,
-    domain?: Partial<PlaceInstance> | PlaceInstance
-  ): Promise<PlaceInstance> {
+  async toDomain(dto: PlaceInstanceDto, domain?: PlaceInstance | Partial<PlaceInstance>): Promise<PlaceInstance> {
     if (!dto) {
-      return domain as any as PlaceInstance;
+      return domain as PlaceInstance;
     }
 
     if (!domain) {
-      domain = {};
+      domain = {} as Partial<PlaceInstance>;
     }
 
-    const placeId = dto.placeId ?? domain.placeId?.toString();
-    const gameId = dto.gameId ?? domain.gameId?.toString();
-    const playerId = dto.playerId ?? domain.playerId?.toString();
+    const placeId = dto.placeId ?? (domain as any).placeId?.toString();
+    const gameId = dto.gameId ?? (domain as any).gameId?.toString();
+    const playerId = dto.playerId ?? (domain as any).playerId?.toString();
 
     const fixedDto = omit(dto, ['placeId', 'gameId', 'playerId']);
 
     return {
       ...domain,
       ...fixedDto,
-      placeId: placeId ? new ObjectId(placeId) : domain.placeId,
-      gameId: gameId ? new ObjectId(gameId) : domain.gameId,
-      playerId: playerId ? new ObjectId(playerId) : domain.playerId
-    } as unknown as PlaceInstance;
+      placeId: placeId ? new Types.ObjectId(placeId) : (domain as any).placeId,
+      gameId: gameId ? new Types.ObjectId(gameId) : (domain as any).gameId,
+      playerId: playerId ? new Types.ObjectId(playerId) : (domain as any).playerId,
+    } as PlaceInstance;
   }
 }
 
 @Controller('place-instances')
 @UseFilters(AllExceptionsFilter)
-export class PlaceInstanceController extends AbstractServiceController<PlaceInstance, PlaceInstanceDto> {
+export class PlaceInstanceController {
   constructor(
-    service: PlaceInstancesService,
-    mapper: PlaceInstanceMapper,
+    private readonly placeInstancesService: PlaceInstancesService,
+    private readonly placeInstanceMapper: PlaceInstanceMapper,
     @Inject(forwardRef(() => JobsService)) private readonly jobsService: JobsService
   ) {
-    super(service, mapper);
   }
 
   @Get('by-player/:playerId')
@@ -207,9 +182,39 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
     @Query() pagination: PageRequestDto,
     @Param('playerId') playerId: string
   ): Promise<PageDto<PlaceInstanceDto>> {
-    return (this.service as PlaceInstancesService)
-      .findAllByPlayer(pagination, playerId)
-      .then(this.makeHandler());
+    return this.placeInstancesService.findAllByPlayer(pagination, playerId).then(this.makeHandler());
+  }
+
+  @Get(':id')
+  @UseGuards(LoggedIn)
+  async findOne(@Param('id') id: string): Promise<PlaceInstanceDto> {
+    return this.placeInstancesService.findOne(id).then(async domain => {
+      if (!domain) {
+        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+      }
+      const found = await this.placeInstanceMapper.toDto(domain);
+      if (!found) {
+        throw new HttpException('Entity not found', HttpStatus.NOT_FOUND);
+      }
+      return found;
+    });
+  }
+
+  @Get()
+  @UseGuards(LoggedIn)
+  async findAll(@Query() pagination: PageRequestDto): Promise<PageDto<PlaceInstanceDto>> {
+    return this.placeInstancesService.findAll(pagination).then(this.makeHandler());
+  }
+
+  public makeHandler() {
+    return (page: PageDto<PlaceInstance>) => this.handlePagedResults(page, this.placeInstanceMapper);
+  }
+
+  public async handlePagedResults(page: PageDto<PlaceInstance>, mapper: PlaceInstanceMapper) {
+    const mappedData = await Promise.all(page?.data?.map(async item => {
+      return await mapper.toDto(item);
+    }));
+    return { ...page, data: mappedData };
   }
 
   @Get('by-player-and-map/:playerId/:mapId')
@@ -219,37 +224,19 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
     playerId: string,
     mapId: string
   ): Promise<PageDto<PlaceInstanceDto>> {
-    return (this.service as PlaceInstancesService)
-      .findAllByPlayerAndMap(pagination, playerId, mapId)
-      .then(this.makeHandler());
+    return this.placeInstancesService.findAllByPlayerAndMap(pagination, playerId, mapId).then(this.makeHandler());
   }
 
-  /**
-   * GET /place-instances/:id/jobs
-   * Get job offers at an owned place instance.
-   *
-   * @param id - Place instance ID
-   * @returns Array of job offers at this place
-   */
   @Get(':id/jobs')
   @UseGuards(LoggedIn)
   async getJobs(@Param('id') id: string): Promise<JobOfferDto[]> {
-    const placeInstance = await this.service.findOne(id);
+    const placeInstance = await this.placeInstancesService.findOne(id);
     if (!placeInstance) {
       throw new HttpException('Place instance not found', HttpStatus.NOT_FOUND);
     }
     return placeInstance.jobOffers || [];
   }
 
-  /**
-   * POST /place-instances/:id/accept-job
-   * Accept a job offer from a place instance. Creates a Job entity.
-   * The job will be of type VEHICLE so it can be loaded into a vehicle.
-   *
-   * @param id - Place instance ID
-   * @param acceptJobDto - The jobOfferId to accept
-   * @returns The created Job
-   */
   @Post(':id/accept-job')
   @UseGuards(LoggedIn)
   async acceptJob(
@@ -258,19 +245,16 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
   ): Promise<any> {
     const { jobOfferId } = acceptJobDto;
 
-    // Find the job offer
-    const jobOffer = await (this.service as PlaceInstancesService).findJobOffer(id, jobOfferId);
+    const jobOffer = await this.placeInstancesService.findJobOffer(id, jobOfferId);
     if (!jobOffer) {
       throw new HttpException('Job offer not found', HttpStatus.NOT_FOUND);
     }
 
-    // Get place instance for player/game context
-    const placeInstance = await this.service.findOne(id);
+    const placeInstance = await this.placeInstancesService.findOne(id);
     if (!placeInstance) {
       throw new HttpException('Place instance not found', HttpStatus.NOT_FOUND);
     }
 
-    // Create the job entity
     const job = {
       type: 'VEHICLE' as const,
       name: jobOffer.name,
@@ -288,21 +272,11 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
 
     const createdJob = await this.jobsService.create(job as any);
 
-    // Remove the offer from the place instance
-    await (this.service as PlaceInstancesService).removeJobOffer(id, jobOfferId);
+    await this.placeInstancesService.removeJobOffer(id, jobOfferId);
 
     return this.jobsService.findOne(createdJob._id.toString()).then(j => j);
   }
 
-  /**
-   * POST /place-instances/:id/warehouse-job
-   * Warehouse a job at a place instance (leave job at place).
-   * The job will be of type PLACE so it stays at the place.
-   *
-   * @param id - Place instance ID
-   * @param warehouseJobDto - The jobOfferId to warehouse
-   * @returns The created Job
-   */
   @Post(':id/warehouse-job')
   @UseGuards(LoggedIn)
   async warehouseJob(
@@ -311,19 +285,16 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
   ): Promise<any> {
     const { jobOfferId } = warehouseJobDto;
 
-    // Find the job offer
-    const jobOffer = await (this.service as PlaceInstancesService).findJobOffer(id, jobOfferId);
+    const jobOffer = await this.placeInstancesService.findJobOffer(id, jobOfferId);
     if (!jobOffer) {
       throw new HttpException('Job offer not found', HttpStatus.NOT_FOUND);
     }
 
-    // Get place instance for player/game context
-    const placeInstance = await this.service.findOne(id);
+    const placeInstance = await this.placeInstancesService.findOne(id);
     if (!placeInstance) {
       throw new HttpException('Place instance not found', HttpStatus.NOT_FOUND);
     }
 
-    // Create the job entity with type PLACE
     const job = {
       type: 'PLACE' as const,
       name: jobOffer.name,
@@ -341,17 +312,20 @@ export class PlaceInstanceController extends AbstractServiceController<PlaceInst
 
     const createdJob = await this.jobsService.create(job as any);
 
-    // Remove the offer from the place instance
-    await (this.service as PlaceInstancesService).removeJobOffer(id, jobOfferId);
+    await this.placeInstancesService.removeJobOffer(id, jobOfferId);
 
     return this.jobsService.findOne(createdJob._id.toString()).then(j => j);
   }
 }
 
 @Module({
-  imports: [PlacesModule, forwardRef(() => JobsModule), TypeOrmModule.forFeature([PlaceInstance])],
+  imports: [
+    MongooseModule.forFeature([{ name: PlaceInstance.name, schema: PlaceInstanceSchema }]),
+    PlacesModule,
+    forwardRef(() => JobsModule),
+  ],
   controllers: [PlaceInstanceController],
-  providers: [PlaceInstancesService, PlaceInstanceMapper, PlaceInstanceRepository],
-  exports: [PlaceInstancesService, PlaceInstanceMapper, PlaceInstancesService]
+  providers: [PlaceInstancesService, PlaceInstanceMapper],
+  exports: [PlaceInstancesService, PlaceInstanceMapper]
 })
 export class PlaceInstancesModule {}
