@@ -10,7 +10,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 |--------|--------|---------|--------|
 | Game | games.module.ts | Mongoose | **Converted** |
 | Job | jobs.module.ts | TypeORM | Pending |
-| Place | places.module.ts | TypeORM | Pending |
+| Place | places.module.ts | Mongoose | **Converted** |
 | PlaceConnection | place-connection.module.ts | TypeORM | Pending |
 | PlaceInstance | place-instance.module.ts | TypeORM | Pending |
 | Vehicle | vehicles.module.ts | TypeORM | Pending |
@@ -60,7 +60,7 @@ Entities are ordered by **dependency count** (ascending) - entities with fewer d
 
 | Order | Entity | Rationale |
 |-------|--------|-----------|
-| 3 | **Place** | Depends only on `Game` (already Mongoose). |
+| 3 | **Place** | Depends only on `Game` (already Mongoose). ✅ **Converted** |
 | 4 | **PlaceConnection** | Depends only on `Game`. Uses raw ObjectIds, not relations. |
 | 5 | **Vehicle** | Depends only on `Game`. |
 
