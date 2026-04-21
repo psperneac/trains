@@ -17,7 +17,7 @@ This document outlines the migration strategy for converting all TypeORM entitie
 | VehicleInstance | vehicle-instances.module.ts | TypeORM | Pending |
 | Player | support/players.module.ts | TypeORM | Pending |
 | Transaction | support/transactions.module.ts | Mongoose | **Converted** |
-| User | support/users.module.ts | TypeORM | Pending |
+| User | support/users.module.ts | Mongoose | **Converted** |
 | VehicleType | vehicle-types.module.ts | MockRepository | **Skip** (no DB) |
 | PlaceType | place-type.module.ts | MockRepository | **Skip** (no DB) |
 
@@ -38,7 +38,7 @@ Game (converted)
 
 Transaction (pending) - entityId FK, entityType FK (generic relation)
 
-User (pending) - standalone, no entity dependencies
+User (converted) - standalone, no entity dependencies
 ```
 
 ---
@@ -54,7 +54,7 @@ Entities are ordered by **dependency count** (ascending) - entities with fewer d
 | Order | Entity | Rationale |
 |-------|--------|-----------|
 | 1 | **Transaction** | No entity dependencies. Only tracks generic entity references. ✅ **Converted** |
-| 2 | **User** | No entity dependencies. Standalone authentication entity. |
+| 2 | **User** | No entity dependencies. Standalone authentication entity. ✅ **Converted** |
 
 ### Phase 2: Entities Depending Only on Converted Entities
 

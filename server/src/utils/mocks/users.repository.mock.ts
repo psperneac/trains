@@ -2,21 +2,22 @@ import { isString } from 'util';
 
 import * as bcrypt from 'bcrypt';
 import { cloneDeep } from 'lodash';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
-import { User } from '../../app/api/support/users.module';
+import { User, UserScope } from '../../app/api/support/users.module';
 
 export function createMockUser(id: number, prefix: string, scope?: string): User {
   const password = bcrypt.hashSync(prefix + '1!', 10);
   return {
-    _id: new ObjectId(),
+    _id: new Types.ObjectId() as any,
+    __v: 0,
     username: prefix + id,
     password,
     email: prefix + id + '@trains.com',
     created: new Date(),
     updated: new Date(),
     deleted: null,
-    scope: scope || 'USER'
+    scope: (scope || 'USER') as UserScope
   };
 }
 

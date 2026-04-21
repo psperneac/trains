@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { UserDto, UsersService } from '../app/api/support/users.module';
-import { SCOPE_USER } from '../utils/constants';
+import { SCOPE_USER, SCOPE_ADMIN } from '../utils/constants';
 
 import { RegisterDto, TokenPayload } from './authentication.model';
 
@@ -21,10 +21,10 @@ export class AuthenticationService {
     const createdUser = await this.usersService.create({
       ...registrationData,
       password: hashedPassword,
-      scope: SCOPE_USER
+      scope: SCOPE_USER as any
     });
 
-    return createdUser;
+    return createdUser as any;
   }
 
   public async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<void> {
@@ -32,7 +32,7 @@ export class AuthenticationService {
       const user = await this.usersService.getById(userId);
       await this.verifyPassword(oldPassword, user.password);
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      await this.usersService.replace(userId, { email: user.email, username: user.username, scope: user.scope, password: hashedNewPassword });
+      await this.usersService.replace(userId, { email: user.email, username: user.username, scope: user.scope as any, password: hashedNewPassword });
     } catch (error) {
       this.logger.error(error);
       throw new HttpException('Failed to change password. Please check your old password.', HttpStatus.BAD_REQUEST);

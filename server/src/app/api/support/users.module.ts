@@ -1,217 +1,243 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Module,
-  Param,
-  Post,
-  Put,
-  SerializeOptions,
-  UseFilters,
-  UseGuards
-} from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Put, Query, SerializeOptions, UseFilters, UseGuards } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Expose } from 'class-transformer';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 import { Admin, LoggedIn } from '../../../authentication/authentication.guard';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { Column, Entity, Repository } from 'typeorm';
-import { AbstractEntity } from '../../../utils/abstract.entity';
+import { AbstractMongoEntity } from '../../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../../utils/abstract-mongo-service.controller';
+import { AbstractMongoDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, HydratedDocument, DeepPartial } from 'mongoose';
 import { Wallet, WalletDto } from './wallet.model';
 
+export enum UserScope {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
+@Schema({ collection: 'users' })
+export class User extends AbstractMongoEntity {
+  @Prop({ required: true })
+  @Expose()
+  username: string;
+
+  @Prop({ required: true })
+  @Expose()
+  password: string;
+
+  @Prop({ required: true, unique: true })
+  @Expose()
+  email: string;
+
+  @Prop({ required: true, enum: UserScope })
+  @Expose()
+  scope: UserScope;
+
+  @Prop({ type: Object })
+  @Expose()
+  preferences?: any;
+
+  @Prop({ type: Object })
+  @Expose()
+  wallet?: { gold: number; gems: number; parts: number; content: any };
+}
+
+export type UserDocument = HydratedDocument<User>;
+export const UserSchema = SchemaFactory.createForClass(User);
 
 export class CreateUserDto {
   email: string;
   username: string;
   password: string;
-  scope: string;
-  preferences?: UserPreferenceDto;
+  scope: UserScope;
+  preferences?: any;
 }
 
 export class UpdateUserDto {
   email: string;
   username: string;
   password: string;
-  scope: string;
-  preferences?: UserPreferenceDto;
+  scope: UserScope;
+  preferences?: any;
 }
 
-export class UserPreference {
-  @Column({ type: 'json' })
-  content: any;
-}
-
-export interface UserPreferenceDto {
-  id: string;
-  userId: string;
-  content: any;
-}
-
-export class UserDto {
-  public username: string;
-  public email: string;
-  public scope: string;
-  public preferences?: UserPreferenceDto;
-  public wallet?: WalletDto;
-}
-
-@Entity({ name: 'users' })
-export class User extends AbstractEntity {
-  @Column()
-  public username: string;
-
-  @Column()
-  public password: string;
-
-  @Column()
-  public email: string;
-
-  @Column()
-  public scope: string;
-
-  @Column({ type: 'json' })
-  public preferences?: UserPreference;
-
-  @Column({ type: 'json' })
-  public wallet?: Wallet;
+export interface UserDto {
+  id?: string;
+  username: string;
+  email: string;
+  password?: string;
+  scope: UserScope;
+  preferences?: any;
+  wallet?: WalletDto;
+  created?: string;
+  updated?: string;
 }
 
 @Injectable()
-class UserDtoMapper {
-  toDto(user: User): UserDto {
-    const userDto = new UserDto();
-    userDto.email = user.email;
-    userDto.username = user.username;
-    userDto.scope = user.scope;
-    userDto.preferences = { ...user.preferences } as UserPreferenceDto;
-    userDto.wallet = { ...user.wallet } as WalletDto;
-    return userDto;
-  }
-
-  toEntity(userDto: CreateUserDto | UpdateUserDto, user?: User): User {
-    const userEntity = user || new User();
-    userEntity.email = userDto.email;
-    userEntity.username = userDto.username;
-    userEntity.scope = userDto.scope;
-    userEntity.password = userDto.password ?? userEntity.password;
-    userEntity.preferences = { ...userDto.preferences } as UserPreference;
-    userEntity.wallet = undefined;
-    return userEntity;
-  }
-}
-
-@Injectable()
-export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private userDtoMapper: UserDtoMapper
-  ) {}
-
-  getAll() {
-    return this.usersRepository.find();
+export class UsersService extends AbstractMongoService<User> {
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {
+    super(userModel);
   }
 
   async getByEmail(email: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { email } });
+    const user = await this.userModel.findOne({ email }).exec();
     if (user) {
-      return user;
+      return {
+        ...user.toObject(),
+        id: user._id?.toString()
+      } as unknown as User;
     }
     throw new HttpException('User with this email does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getById(userId: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ _id: new ObjectId(userId) });
+    const user = await this.findOne(userId);
     if (user) {
       return user;
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async create(userData: CreateUserDto): Promise<UserDto> {
-    const newUser = this.usersRepository.create({
-      _id: new ObjectId(),
-      ...this.userDtoMapper.toEntity(userData)
-    });
-    await this.usersRepository.save(newUser);
-    return this.userDtoMapper.toDto(newUser);
+  async create(userData: CreateUserDto): Promise<User> {
+    return super.create({
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      scope: userData.scope,
+      preferences: userData.preferences,
+    } as DeepPartial<User>);
   }
 
-  async replace(uuid: string, user: UpdateUserDto): Promise<UserDto> {
-    const userEntity = this.userDtoMapper.toEntity(user);
-    if (userEntity.password) {
-      userEntity.password = await bcrypt.hash(userEntity.password, 10);
-    }
-    await this.usersRepository.update(uuid, userEntity);
-    const updatedUser = await this.usersRepository.findOne({ where: { _id: new ObjectId(uuid) } });
-    if (updatedUser) {
-      return this.userDtoMapper.toDto(updatedUser);
-    }
-
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-  }
-
-  async delete(uuid: string): Promise<boolean> {
-    const deleteResponse = await this.usersRepository.delete(uuid);
-    if (!deleteResponse.affected) {
+  async replace(userId: string, userData: UpdateUserDto): Promise<User> {
+    const existing = await this.findOne(userId);
+    if (!existing) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
+    const updated = await this.update(userId, {
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      scope: userData.scope,
+      preferences: userData.preferences,
+    } as DeepPartial<User>);
+
+    if (updated) {
+      return updated;
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  }
+
+  async remove(userId: string): Promise<boolean> {
+    const result = await this.delete(userId);
+    if (!result) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     return true;
   }
 }
 
+@Injectable()
+export class UsersMapper extends AbstractMongoDtoMapper<User, UserDto> {
+  async toDto(domain: User): Promise<UserDto> {
+    if (!domain) {
+      return null;
+    }
+
+    return {
+      id: (domain as any).id || (domain as any)._id?.toString(),
+      username: domain.username,
+      email: domain.email,
+      scope: domain.scope,
+      preferences: domain.preferences,
+      wallet: domain.wallet ? {
+        id: (domain as any).id || (domain as any)._id?.toString(),
+        gold: domain.wallet.gold,
+        gems: domain.wallet.gems,
+        parts: domain.wallet.parts,
+        content: domain.wallet.content,
+      } : undefined,
+      created: domain.created?.toISOString(),
+      updated: domain.updated?.toISOString(),
+    };
+  }
+
+  async toDomain(dto: any, domain?: User | Partial<User>): Promise<User> {
+    if (!dto) {
+      return domain as User;
+    }
+
+    if (!domain) {
+      domain = {} as Partial<User>;
+    }
+
+    return {
+      ...domain,
+      username: dto.username,
+      email: dto.email,
+      password: dto.password ? (dto.password.length < 60 ? bcrypt.hashSync(dto.password, 10) : dto.password) : (domain as any).password,
+      scope: dto.scope,
+      preferences: dto.preferences,
+    } as User;
+  }
+}
+
 @Controller('users')
-@UseGuards(LoggedIn, Admin)
 @SerializeOptions({
   strategy: 'excludeAll'
 })
 @UseFilters(AllExceptionsFilter)
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Get()
-  getAllUsers() {
-    return this.usersService.getAll();
+export class UsersController extends AbstractMongoServiceController<User, UserDto> {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly usersMapper: UsersMapper
+  ) {
+    super(usersService, usersMapper);
   }
 
-  @Get(':id')
-  getUserById(@Param('id') id: string) {
-    return this.usersService.getById(id);
+  @Get()
+  @UseGuards(LoggedIn, Admin)
+  async getAllUsers() {
+    const { PageRequestDto } = await import('../../../models/pagination.model');
+    return this.service.findAll(new PageRequestDto());
   }
 
   @Get('/by-email/:email')
+  @UseGuards(LoggedIn, Admin)
   getUserByEmail(@Param('email') email: string) {
-    return this.usersService.getByEmail(email);
+    return this.usersService.getByEmail(email).then(user => this.usersMapper.toDto(user));
   }
 
   @Post()
+  @UseGuards(LoggedIn, Admin)
   async createUser(@Body() user: CreateUserDto) {
-    return this.usersService.create(user);
+    return this.service.create(user as any).then(created => this.usersMapper.toDto(created));
   }
 
   @Put(':id')
+  @UseGuards(LoggedIn, Admin)
   async replaceUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
-    return this.usersService.replace(id, user);
+    return this.usersService.replace(id, user).then(updated => this.usersMapper.toDto(updated));
   }
 
   @Delete(':id')
+  @UseGuards(LoggedIn, Admin)
   async deleteUser(@Param('id') id: string) {
-    return this.usersService.delete(id);
+    return this.usersService.remove(id);
   }
 }
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
   ],
   controllers: [UsersController],
-  providers: [UsersService, UserDtoMapper],
+  providers: [UsersService, UsersMapper],
   exports: [UsersService]
 })
 export class UsersModule {}
-
