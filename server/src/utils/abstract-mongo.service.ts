@@ -176,7 +176,7 @@ export class AbstractMongoService<T extends AbstractMongoEntity> {
       ...entity,
       _id: new Types.ObjectId(id), // Prevent _id from being changed
       updated: now
-    }, { new: true }).exec().then(doc => {
+    }, { returnDocument: 'after' }).exec().then(doc => {
       if (!doc) return null;
       const plain = doc.toObject();
       return { ...plain, id: plain._id?.toString() } as T;

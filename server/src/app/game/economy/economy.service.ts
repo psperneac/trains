@@ -211,8 +211,8 @@ export class EconomyService {
     description: string
   ): Promise<void> {
     await this.transactionsService.createTransaction(
-      direction === 'CREDIT' ? TransactionType.GAME_ACTION : TransactionType.GAME_ACTION,
-      'SYSTEM',
+      TransactionType.GAME_ACTION,
+      '000000000000000000000000', // SYSTEM placeholder ID
       EntityType.USER,
       playerId,
       EntityType.PLAYER,

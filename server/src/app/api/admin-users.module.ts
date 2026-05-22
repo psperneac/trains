@@ -1,16 +1,16 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { InjectModel, MongooseModule } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 import { Admin, LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoService } from '../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../utils/abstract-mongo-service.controller';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
-import { User } from './support/users.module';
+import { User, UserSchema, UserDocument } from './support/users.module';
 import { WalletDto } from './support/wallet.model';
 
 import { GameMapper, GamesModule, GamesService } from './games.module';
@@ -40,14 +40,7 @@ export interface AdminUserDto {
 }
 
 @Injectable()
-export class AdminUsersRepository extends RepositoryAccessor<User> {
-  constructor(@InjectRepository(User) injectRepository) {
-    super(injectRepository);
-  }
-}
-
-@Injectable()
-export class AdminUserMapper extends AbstractDtoMapper<User, AdminUserDto> {
+export class AdminUserMapper extends AbstractMongoDtoMapper<User, AdminUserDto> {
   getMappedProperties(): string[] {
     return ['id', 'username', 'email', 'scope', 'preferences', 'created', 'updated'];
   }
@@ -65,15 +58,15 @@ export class AdminUserMapper extends AbstractDtoMapper<User, AdminUserDto> {
 }
 
 @Injectable()
-export class AdminUsersService extends AbstractService<User> {
+export class AdminUsersService extends AbstractMongoService<User> {
   constructor(
-    private readonly repo: AdminUsersRepository,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly playersService: PlayersService,
     private readonly gamesService: GamesService,
     private readonly playerMapper: PlayerMapper,
     private readonly gameMapper: GameMapper
   ) {
-    super(repo);
+    super(userModel);
   }
 
   async enrichUserWithData(dto: AdminUserDto, user: User): Promise<AdminUserDto> {
@@ -100,7 +93,7 @@ export class AdminUsersService extends AbstractService<User> {
       throw new HttpException('Cannot reset password for an admin user', HttpStatus.FORBIDDEN);
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.repo.getRepository().update(userId, { password: hashedPassword });
+    await this.userModel.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true }).exec();
   }
 
   async sendGoldAndGems(userId: string, gold: number, gems: number, parts: number): Promise<User> {
@@ -109,25 +102,35 @@ export class AdminUsersService extends AbstractService<User> {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (!user.wallet) {
-      user.wallet = { gold: 0, gems: 0, parts: 0, content: {} };
+    const currentGold = typeof user.wallet?.gold === 'number' && !isNaN(user.wallet.gold) ? user.wallet.gold : 0;
+    const currentGems = typeof user.wallet?.gems === 'number' && !isNaN(user.wallet.gems) ? user.wallet.gems : 0;
+    const currentParts = typeof user.wallet?.parts === 'number' && !isNaN(user.wallet.parts) ? user.wallet.parts : 0;
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        wallet: {
+          gold: currentGold + gold,
+          gems: currentGems + gems,
+          parts: currentParts + parts,
+          content: user.wallet?.content ?? {},
+        },
+      },
+      { new: true }
+    ).exec();
+
+    if (!updatedUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const currentGold = typeof user.wallet.gold === 'number' && !isNaN(user.wallet.gold) ? user.wallet.gold : 0;
-    const currentGems = typeof user.wallet.gems === 'number' && !isNaN(user.wallet.gems) ? user.wallet.gems : 0;
-    const currentParts = typeof user.wallet.parts === 'number' && !isNaN(user.wallet.parts) ? user.wallet.parts : 0;
-
-    user.wallet.gold = currentGold + gold;
-    user.wallet.gems = currentGems + gems;
-    user.wallet.parts = currentParts + parts;
-
-    return this.repo.getRepository().save(user) as Promise<User>;
+    const plain = updatedUser.toObject();
+    return { ...plain, id: plain._id?.toString() } as User;
   }
 }
 
 @Controller('admin')
 @UseFilters(AllExceptionsFilter)
-export class AdminUsersController extends AbstractServiceController<User, AdminUserDto> {
+export class AdminUsersController extends AbstractMongoServiceController<User, AdminUserDto> {
   constructor(
     private readonly adminUsersService: AdminUsersService,
     private readonly adminUserMapper: AdminUserMapper
@@ -189,12 +192,12 @@ export class AdminUsersController extends AbstractServiceController<User, AdminU
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PlayersModule,
     GamesModule
   ],
   controllers: [AdminUsersController],
-  providers: [AdminUsersService, AdminUserMapper, AdminUsersRepository],
+  providers: [AdminUsersService, AdminUserMapper],
   exports: [AdminUsersService]
 })
 export class AdminUsersModule {}

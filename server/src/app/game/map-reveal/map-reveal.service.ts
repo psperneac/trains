@@ -116,7 +116,7 @@ export class MapRevealService {
     // Keep as ObjectIds to avoid string conversion
     const ownedTemplateIds = ownedPlaceInstances
       .map(pi => pi.placeId)
-      .filter(id => id instanceof ObjectId);
+      .filter(id => !!id);
 
     if (ownedTemplateIds.length === 0) {
       return [];

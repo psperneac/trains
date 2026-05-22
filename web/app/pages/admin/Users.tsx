@@ -202,7 +202,7 @@ export default function Users() {
                         {user.scope !== 'ADMIN' && (
                           <button
                             onClick={() => openResetModal(user)}
-                            className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1 px-3 rounded text-sm w-fit"
                           >
                             Reset Password
                           </button>

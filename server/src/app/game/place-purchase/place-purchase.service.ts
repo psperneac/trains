@@ -156,7 +156,7 @@ export class PlacePurchaseService {
    */
   private async createPlaceInstance(player: any, place: Place): Promise<PlaceInstance> {
     const placeInstanceData = {
-      place: place,
+      placeId: place._id,
       gameId: player.gameId,
       playerId: player._id,
       jobOffers: [],
