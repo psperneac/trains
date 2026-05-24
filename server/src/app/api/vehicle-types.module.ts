@@ -1,21 +1,9 @@
-import { Controller, Injectable, Module, UseFilters } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
-import { Repository } from 'typeorm';
+import { Controller, Get, Injectable, Module, UseFilters } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
-import { AbstractEntity } from '../../utils/abstract.entity';
-import { AbstractServiceController } from '../../utils/abstract-service.controller';
-import { AbstractService } from '../../utils/abstract.service';
+import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
-import { MockRepository } from '../../utils/mocks/repository.mock';
-import { RepositoryAccessor } from '../../utils/repository-accessor';
-
-export class VehicleType extends AbstractEntity {
-  type: string;
-  name: string;
-  description: string;
-  content: any;
-}
 
 export class VehicleTypeDto {
   id: string;
@@ -34,58 +22,77 @@ export class VehicleTypeDto {
 682be65aeffcff2be10510dd
 
 */
-const VEHICLE_TYPE_DATE: VehicleType[] = [
-  { _id: new ObjectId('682be65aeffcff2be10510d3'), type: 'TRUCK', name: 'Truck', description: 'Carries freight by road', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510d4'), type: 'SHIP', name: 'Ship', description: 'Goes on water, carries a lot', content: {} } as any as VehicleType,
-  {
-    _id: new ObjectId('682be65aeffcff2be10510d5'),
-    type: 'TRAIN',
-    name: 'Train',
-    description: 'A vehicle that runs on tracks',
-    content: {}
-  } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510d6'), type: 'CAR', name: 'Car', description: 'Small road vehicle', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510d7'), type: 'BUS', name: 'Bus', description: 'Mass transit vehicle', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510d8'), type: 'PLANE', name: 'Plane', description: 'Flies in the air', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510d9'), type: 'LOCOMOTIVE', name: 'Locomotive', description: 'Rail vehicle for hauling cargo', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510da'), type: 'FREIGHT_CAR', name: 'Freight Car', description: 'Rail cargo car for carrying goods', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510db'), type: 'TENDER', name: 'Tender', description: 'Coal and water car for steam locomotives', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510dc'), type: 'CARGO_TRUCK', name: 'Cargo Truck', description: 'Road vehicle for transporting goods', content: {} } as any as VehicleType,
-  { _id: new ObjectId('682be65aeffcff2be10510dd'), type: 'CARGO_SHIP', name: 'Cargo Ship', description: 'Water vessel for transporting goods', content: {} } as any as VehicleType
+const VEHICLE_TYPE_DATA: VehicleTypeDto[] = [
+  { id: '682be65aeffcff2be10510d3', type: 'TRUCK', name: 'Truck', description: 'Carries freight by road', content: {} },
+  { id: '682be65aeffcff2be10510d4', type: 'SHIP', name: 'Ship', description: 'Goes on water, carries a lot', content: {} },
+  { id: '682be65aeffcff2be10510d5', type: 'TRAIN', name: 'Train', description: 'A vehicle that runs on tracks', content: {} },
+  { id: '682be65aeffcff2be10510d6', type: 'CAR', name: 'Car', description: 'Small road vehicle', content: {} },
+  { id: '682be65aeffcff2be10510d7', type: 'BUS', name: 'Bus', description: 'Mass transit vehicle', content: {} },
+  { id: '682be65aeffcff2be10510d8', type: 'PLANE', name: 'Plane', description: 'Flies in the air', content: {} },
+  { id: '682be65aeffcff2be10510d9', type: 'LOCOMOTIVE', name: 'Locomotive', description: 'Rail vehicle for hauling cargo', content: {} },
+  { id: '682be65aeffcff2be10510da', type: 'FREIGHT_CAR', name: 'Freight Car', description: 'Rail cargo car for carrying goods', content: {} },
+  { id: '682be65aeffcff2be10510db', type: 'TENDER', name: 'Tender', description: 'Coal and water car for steam locomotives', content: {} },
+  { id: '682be65aeffcff2be10510dc', type: 'CARGO_TRUCK', name: 'Cargo Truck', description: 'Road vehicle for transporting goods', content: {} },
+  { id: '682be65aeffcff2be10510dd', type: 'CARGO_SHIP', name: 'Cargo Ship', description: 'Water vessel for transporting goods', content: {} }
 ];
 
+@Schema({ collection: 'vehicle_types' })
+export class VehicleType extends AbstractMongoEntity {
+  @Prop({ required: true, type: String })
+  type: string;
+
+  @Prop({ required: true, type: String })
+  name: string;
+
+  @Prop({ required: true, type: String })
+  description: string;
+
+  @Prop({ type: Object })
+  content: any;
+}
+
+export const VehicleTypeSchema = SchemaFactory.createForClass(VehicleType);
+
 @Injectable()
-export class VehicleTypeRepository extends RepositoryAccessor<VehicleType> {
+export class VehicleTypeService {
   constructor() {
-    super(new MockRepository(VEHICLE_TYPE_DATE) as any as Repository<VehicleType>);
+  }
+
+  findAllVehicleTypes(): Promise<VehicleTypeDto[]> {
+    return Promise.resolve(VEHICLE_TYPE_DATA);
   }
 }
 
 @Injectable()
-export class VehicleTypeService extends AbstractService<VehicleType> {
-  constructor(private readonly repoAccessor: VehicleTypeRepository) {
-    super(repoAccessor);
-  }
-}
-
-@Injectable()
-export class VehicleTypeMapper extends AbstractDtoMapper<VehicleType, VehicleTypeDto> {
-  getMappedProperties(): string[] {
-    return ['id', 'type', 'name', 'description', 'content'];
+export class VehicleTypeMapper {
+  toDto(vehicleType: any): VehicleTypeDto {
+    return {
+      id: vehicleType._id?.toString(),
+      type: vehicleType.type,
+      name: vehicleType.name,
+      description: vehicleType.description,
+      content: vehicleType.content,
+    };
   }
 }
 
 @Controller('vehicle-types')
 @UseFilters(AllExceptionsFilter)
-export class VehicleTypeController extends AbstractServiceController<VehicleType, VehicleTypeDto> {
-  constructor(service: VehicleTypeService, mapper: VehicleTypeMapper) {
-    super(service, mapper);
+export class VehicleTypeController {
+  constructor(private readonly service: VehicleTypeService) {}
+
+  @Get()
+  getAllVehicleTypes() {
+    return this.service.findAllVehicleTypes();
   }
 }
 
 @Module({
+  imports: [
+    MongooseModule.forFeature([{ name: VehicleType.name, schema: VehicleTypeSchema }])
+  ],
   controllers: [VehicleTypeController],
-  providers: [VehicleTypeService, VehicleTypeMapper, VehicleTypeRepository],
+  providers: [VehicleTypeService, VehicleTypeMapper],
   exports: [VehicleTypeService, VehicleTypeMapper]
 })
 export class VehicleTypesModule {}

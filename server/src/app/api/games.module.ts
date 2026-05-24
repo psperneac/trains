@@ -4,7 +4,7 @@ import { Expose } from 'class-transformer';
 import { LoggedIn } from '../../authentication/authentication.guard';
 import { PageDto } from '../../models/page.model';
 import { PageRequestDto } from '../../models/pagination.model';
-import { AbstractDtoMapper } from '../../utils/abstract-dto-mapper';
+import { AbstractMongoDtoMapper } from '../../utils/abstract-dto-mapper';
 import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { InjectModel, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractMongoEntity } from '../../utils/abstract-mongo.entity';
@@ -59,7 +59,7 @@ export class GamesService extends AbstractMongoService<Game> {
 }
 
 @Injectable()
-export class GameMapper extends AbstractDtoMapper<Game, GameDto> {
+export class GameMapper extends AbstractMongoDtoMapper<Game, GameDto> {
   constructor() {
     super();
   }

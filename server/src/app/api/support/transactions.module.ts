@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 import { LoggedIn } from '../../../authentication/authentication.guard';
 import { PageDto } from '../../../models/page.model';
 import { PageRequestDto } from '../../../models/pagination.model';
-import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
+import { AbstractMongoDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AbstractMongoEntity } from '../../../utils/abstract-mongo.entity';
 import { AbstractMongoService } from '../../../utils/abstract-mongo.service';
 import { AbstractMongoServiceController } from '../../../utils/abstract-mongo-service.controller';
@@ -119,7 +119,7 @@ export class TransactionsService extends AbstractMongoService<Transaction> {
 }
 
 @Injectable()
-export class TransactionMapper extends AbstractDtoMapper<Transaction, TransactionDto> {
+export class TransactionMapper extends AbstractMongoDtoMapper<Transaction, TransactionDto> {
   constructor() {
     super();
   }

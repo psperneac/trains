@@ -22,6 +22,7 @@ import { VehicleInstancesModule, VehicleInstanceMapper, VehicleInstancesService 
 import { PlaceConnectionService, PlaceConnectionDto, PlaceConnectionsModule } from '../place-connection.module';
 import { PlacesModule } from '../places.module';
 import { MapRevealService } from '../../game/map-reveal/map-reveal.service';
+import { AbstractMongoServiceController } from 'src/utils/abstract-mongo-service.controller';
 
 export { Wallet, WalletDto, SendGoldAndGemsDto };
 
@@ -190,7 +191,7 @@ export class PlayerMapper extends AbstractMongoDtoMapper<Player, PlayerDto> {
 
 @Controller('players')
 @UseFilters(AllExceptionsFilter)
-export class PlayerController {
+export class PlayerController extends AbstractMongoServiceController<Player, PlayerDto> {
   constructor(
     private readonly playersService: PlayersService,
     private readonly playersMapper: PlayerMapper,
@@ -201,6 +202,7 @@ export class PlayerController {
     private readonly vehicleInstanceMapper: VehicleInstanceMapper,
     private readonly mapRevealService: MapRevealService,
     private readonly placeConnectionService: PlaceConnectionService) {
+      super(playersService, playersMapper);
   }
 
   @Get('by-user/:userId')

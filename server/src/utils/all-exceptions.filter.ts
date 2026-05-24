@@ -9,7 +9,6 @@ import {
   ForbiddenException
 } from '@nestjs/common';
 import { Request } from 'express';
-import { QueryFailedError, EntityNotFoundError, CannotCreateEntityIdMapError } from 'typeorm';
 
 export const GlobalResponseError: (
   statusCode: number,
@@ -71,21 +70,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     switch (ex.constructor) {
       case HttpException:
         status = (ex as HttpException).getStatus();
-        break;
-      case QueryFailedError: // this is a TypeOrm error
-        status = HttpStatus.UNPROCESSABLE_ENTITY;
-        message = (ex as QueryFailedError).message;
-        code = (ex as any).code;
-        break;
-      case EntityNotFoundError: // this is another TypeOrm error
-        status = HttpStatus.UNPROCESSABLE_ENTITY;
-        message = (ex as EntityNotFoundError).message;
-        code = (ex as any).code;
-        break;
-      case CannotCreateEntityIdMapError: // and another
-        status = HttpStatus.UNPROCESSABLE_ENTITY;
-        message = (ex as CannotCreateEntityIdMapError).message;
-        code = (ex as any).code;
         break;
       case UnauthorizedException:
         status = HttpStatus.UNAUTHORIZED;

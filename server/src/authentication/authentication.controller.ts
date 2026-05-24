@@ -70,7 +70,7 @@ export class AuthenticationController {
   @HttpCode(200)
   @UseGuards(LocalAuthenticationGuard)
   @Post('login')
-  async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
+  logIn(@Req() request: RequestWithUser, @Res() response: Response) {
     const { user } = request;
     const token = this.authenticationService.getAuthToken(user._id.toString(), user.scope);
     user.password = undefined;

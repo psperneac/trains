@@ -1,34 +1,38 @@
 import { Controller, Get, Injectable, Module, Param, UseFilters } from '@nestjs/common';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 import { AbstractDto } from '../../../utils/abstract-dto';
-import { AbstractDtoMapper } from '../../../utils/abstract-dto-mapper';
-import { AbstractServiceController } from '../../../utils/abstract-service.controller';
-import { AbstractEntity } from '../../../utils/abstract.entity';
-import { AbstractService } from '../../../utils/abstract.service';
+import { AbstractMongoEntity } from '../../../utils/abstract-mongo.entity';
+import { AbstractMongoService } from '../../../utils/abstract-mongo.service';
+import { AbstractMongoServiceController } from '../../../utils/abstract-mongo-service.controller';
+import { AbstractMongoDtoMapper } from '../../../utils/abstract-dto-mapper';
 import { AllExceptionsFilter } from '../../../utils/all-exceptions.filter';
-import { RepositoryAccessor } from '../../../utils/repository-accessor';
 
-@Entity({ name: 'translations' })
-export class Translation extends AbstractEntity {
-  @Column('varchar', { length: 10 })
+@Schema({ collection: 'translations' })
+export class Translation extends AbstractMongoEntity {
+  @Prop({ required: true, type: String, length: 10 })
   @Expose()
-  public language: string;
+  language: string;
 
-  @Column('varchar', { length: 250 })
+  @Prop({ required: true, type: String, length: 250 })
   @Expose()
-  public key: string;
+  key: string;
 
-  @Column('varchar', { length: 1024 })
+  @Prop({ required: true, type: String, length: 1024 })
   @Expose()
-  public value: string;
+  value: string;
 
-  @Column('varchar', { length: 2000 })
+  @Prop({ type: String, length: 2000 })
   @Expose()
-  public content: string;
+  content: string;
 }
+
+export type TranslationDocument = import('mongoose').HydratedDocument<Translation>;
+export const TranslationSchema = SchemaFactory.createForClass(Translation);
 
 export interface TranslationDto extends AbstractDto {
   language: string;
@@ -38,28 +42,18 @@ export interface TranslationDto extends AbstractDto {
 }
 
 @Injectable()
-export class TranslationRepository extends RepositoryAccessor<Translation> {
-  constructor(@InjectRepository(Translation) private readonly injectedRepository) {
-    super(injectedRepository);
-  }
-}
-
-@Injectable()
-export class TranslationsService extends AbstractService<Translation> {
-  constructor(private readonly repo: TranslationRepository) {
-    super(repo);
+export class TranslationsService extends AbstractMongoService<Translation> {
+  constructor(@InjectModel(Translation.name) private readonly translationModel: Model<TranslationDocument>) {
+    super(translationModel);
   }
 
   getAllByLanguage(language: string): Promise<Translation[]> {
-    return this.repository
-      .createQueryBuilder('translation')
-      .where('translation.language = :language', { language })
-      .getMany();
+    return this.translationModel.find({ language }).exec();
   }
 }
 
 @Injectable()
-export class TranslationMapper extends AbstractDtoMapper<Translation, TranslationDto> {
+export class TranslationMapper extends AbstractMongoDtoMapper<Translation, TranslationDto> {
   getMappedProperties() {
     return ['id', 'language', 'key', 'content', 'value'];
   }
@@ -67,7 +61,7 @@ export class TranslationMapper extends AbstractDtoMapper<Translation, Translatio
 
 @Controller('translations')
 @UseFilters(AllExceptionsFilter)
-export class TranslationsController extends AbstractServiceController<Translation, TranslationDto> {
+export class TranslationsController extends AbstractMongoServiceController<Translation, TranslationDto> {
   constructor(service: TranslationsService, mapper: TranslationMapper) {
     super(service, mapper);
   }
@@ -93,9 +87,11 @@ export class TranslationsI18nController {
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Translation])],
+  imports: [
+    MongooseModule.forFeature([{ name: Translation.name, schema: TranslationSchema }])
+  ],
   controllers: [TranslationsController, TranslationsI18nController],
-  providers: [TranslationsService, TranslationMapper, TranslationRepository],
-  exports: [TranslationsService, TranslationMapper, TranslationRepository]
+  providers: [TranslationsService, TranslationMapper],
+  exports: [TranslationsService, TranslationMapper]
 })
 export class TranslationsModule {}
