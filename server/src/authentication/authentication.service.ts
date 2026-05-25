@@ -73,4 +73,13 @@ export class AuthenticationService {
 
     return token;
   }
+
+  public async validateToken(token: string): Promise<boolean> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      return !!decoded && !!decoded.sub;
+    } catch {
+      return false;
+    }
+  }
 }

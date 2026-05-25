@@ -1,4 +1,5 @@
 import { Body, Controller, forwardRef, Get, HttpException, HttpStatus, Inject, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { ConflictException } from '../game/events-gateway/conflict.exception';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -40,6 +41,10 @@ export class PlaceInstance extends AbstractMongoEntity {
   @Prop({ type: Object })
   @Expose()
   content: any;
+
+  @Prop({ default: 0 })
+  @Expose()
+  version: number;
 }
 
 export type PlaceInstanceDocument = HydratedDocument<PlaceInstance>;
@@ -51,6 +56,7 @@ export interface PlaceInstanceDto {
   gameId: string;
   playerId: string;
   place?: any;
+  version: number;
   jobOffers: JobOfferDto[];
   content: any;
   created?: string;
@@ -62,6 +68,7 @@ export interface PlaceInstanceDto {
  */
 export interface AcceptJobDto {
   jobOfferId: string;
+  expectedVersion: number;
 }
 
 /**
@@ -69,6 +76,7 @@ export interface AcceptJobDto {
  */
 export interface WarehouseJobDto {
   jobOfferId: string;
+  expectedVersion: number;
 }
 
 @Injectable()
@@ -103,6 +111,7 @@ export class PlaceInstancesService extends AbstractMongoService<PlaceInstance> {
       return;
     }
     placeInst.jobOffers = placeInst.jobOffers.filter(o => o.jobOfferId !== jobOfferId);
+    placeInst.version = (placeInst.version || 0) + 1;
     await this.update(placeInstanceId, placeInst);
   }
 }
@@ -134,6 +143,7 @@ export class PlaceInstanceMapper extends AbstractMongoDtoMapper<PlaceInstance, P
         lng: place.lng,
         gameId: (place as any).gameId?.toString()
       } : undefined,
+      version: domain.version,
       jobOffers: domain.jobOffers?.map(j => j as JobOfferDto),
       content: domain.content,
     };
@@ -154,7 +164,7 @@ export class PlaceInstanceMapper extends AbstractMongoDtoMapper<PlaceInstance, P
     const gameId = dto.gameId ?? (domain as any).gameId?.toString();
     const playerId = dto.playerId ?? (domain as any).playerId?.toString();
 
-    const fixedDto = omit(dto, ['placeId', 'gameId', 'playerId']);
+    const fixedDto = omit(dto, ['placeId', 'gameId', 'playerId', 'version']);
 
     return {
       ...domain,
@@ -162,6 +172,7 @@ export class PlaceInstanceMapper extends AbstractMongoDtoMapper<PlaceInstance, P
       placeId: placeId ? new Types.ObjectId(placeId) : (domain as any).placeId,
       gameId: gameId ? new Types.ObjectId(gameId) : (domain as any).gameId,
       playerId: playerId ? new Types.ObjectId(playerId) : (domain as any).playerId,
+      version: ((domain as any).version || 0) + 1,
     } as PlaceInstance;
   }
 }
@@ -243,7 +254,7 @@ export class PlaceInstanceController {
     @Param('id') id: string,
     @Body() acceptJobDto: AcceptJobDto
   ): Promise<any> {
-    const { jobOfferId } = acceptJobDto;
+    const { jobOfferId, expectedVersion } = acceptJobDto;
 
     const jobOffer = await this.placeInstancesService.findJobOffer(id, jobOfferId);
     if (!jobOffer) {
@@ -253,6 +264,10 @@ export class PlaceInstanceController {
     const placeInstance = await this.placeInstancesService.findOne(id);
     if (!placeInstance) {
       throw new HttpException('Place instance not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (placeInstance.version !== expectedVersion) {
+      throw new ConflictException('stale_place_instance_state', placeInstance.version, placeInstance);
     }
 
     const job = {
@@ -283,7 +298,7 @@ export class PlaceInstanceController {
     @Param('id') id: string,
     @Body() warehouseJobDto: WarehouseJobDto
   ): Promise<any> {
-    const { jobOfferId } = warehouseJobDto;
+    const { jobOfferId, expectedVersion } = warehouseJobDto;
 
     const jobOffer = await this.placeInstancesService.findJobOffer(id, jobOfferId);
     if (!jobOffer) {
@@ -293,6 +308,10 @@ export class PlaceInstanceController {
     const placeInstance = await this.placeInstancesService.findOne(id);
     if (!placeInstance) {
       throw new HttpException('Place instance not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (placeInstance.version !== expectedVersion) {
+      throw new ConflictException('stale_place_instance_state', placeInstance.version, placeInstance);
     }
 
     const job = {

@@ -32,7 +32,7 @@ export class VehicleDispatchController {
     @Param('id') id: string,
     @Body() dispatchDto: DispatchVehicleDto
   ): Promise<DispatchResult> {
-    return this.vehicleDispatchService.dispatch(id, dispatchDto.route);
+    return this.vehicleDispatchService.dispatch(id, dispatchDto.route, dispatchDto.expectedVersion);
   }
 
   /**

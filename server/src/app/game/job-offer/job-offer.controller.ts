@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
-import { LoggedIn } from '../../../authentication/authentication.guard';
+import { Admin } from '../../../authentication/authentication.guard';
 import { JobOfferService, GameJobOffer } from './job-offer.service';
 
 /**
@@ -8,10 +8,10 @@ import { JobOfferService, GameJobOffer } from './job-offer.service';
  * Provides endpoints for:
  * - Getting job offers at a specific place
  * - Getting all job offers for a player
- * - Manually triggering job offer refresh for a place
+ * - Manually triggering job offer refresh for a place (admin only)
  */
 @Controller('place-instances')
-@UseGuards(LoggedIn)
+@UseGuards(Admin)
 export class JobOfferController {
   constructor(private readonly jobOfferService: JobOfferService) {}
 

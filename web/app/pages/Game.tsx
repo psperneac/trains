@@ -10,6 +10,10 @@ import VehicleDispatchPanel from '../components/VehicleDispatchPanel';
 import { useAuthStore } from '../store/authStore';
 import { usePlaceInstanceStore } from '../store/placeInstanceStore';
 import { useVehicleInstanceStore } from '../store/vehicleInstanceStore';
+import { useSocketStore } from '../store/socket';
+import { initPlaceInstanceSocketListeners } from '../store/placeInstanceStore';
+import { initVehicleSocketListeners } from '../store/vehicleInstanceStore';
+import { useGameSocket } from '../hooks/useGameSocket';
 import { apiRequest } from '../config/api';
 import type { PlaceDto } from '../types/place';
 import type { PlaceInstanceDto } from '../types/placeInstance';
@@ -24,9 +28,9 @@ interface MapViewData {
 export default function Game() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
-  const { authToken, currentPlayer, setCurrentPlayer } = useAuthStore();
-  const { fetchPlaceInstancesByPlayerId, placeInstancesByPlayer } = usePlaceInstanceStore();
-  const { fetchVehicleInstancesByPlayerId, vehicleInstancesByPlayer } = useVehicleInstanceStore();
+  const { authToken, currentPlayer } = useAuthStore();
+  const { placeInstancesByPlayer } = usePlaceInstanceStore();
+  const { vehicleInstancesByPlayer } = useVehicleInstanceStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,6 +44,9 @@ export default function Game() {
 
   // Resolve playerId - use param or fallback to currentPlayer
   const resolvedPlayerId = playerId || currentPlayer?.id;
+
+  // Initialize real-time socket connection
+  useGameSocket(currentPlayer?.gameId || '', resolvedPlayerId || '');
 
   // Fetch map view and player data
   const fetchData = useCallback(async () => {
@@ -75,15 +82,18 @@ export default function Game() {
       return;
     }
 
+    // Initialize socket listeners for real-time updates
+    initPlaceInstanceSocketListeners();
+    initVehicleSocketListeners();
+
+    // Request full sync from server
+    const socket = useSocketStore.getState().socket;
+    if (socket && currentPlayer?.gameId) {
+      useSocketStore.getState().requestFullSync(currentPlayer.gameId, resolvedPlayerId);
+    }
+
     fetchData();
-
-    // 2-second polling for vehicle positions
-    const pollInterval = setInterval(() => {
-      useVehicleInstanceStore.getState().fetchVehicleInstancesByPlayerId(resolvedPlayerId);
-    }, 2000);
-
-    return () => clearInterval(pollInterval);
-  }, [resolvedPlayerId, fetchData, navigate]);
+  }, [resolvedPlayerId, fetchData, navigate, currentPlayer?.gameId]);
 
   // Handle place selection from sidebar
   const handlePlaceSelect = (placeInstance: PlaceInstanceDto) => {
@@ -168,6 +178,7 @@ export default function Game() {
 
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden">
+          
           {/* Sidebar */}
           <div className="w-64 bg-white border-r overflow-y-auto">
             <OwnedPlacesList

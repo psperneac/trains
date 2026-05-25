@@ -5,6 +5,7 @@ import { PlaceInstance } from '../../api/place-instance.module';
 import { PlacesService } from '../../api/places.module';
 import { CargoTypes, CargoType } from '../../api/vehicles.module';
 import { InMemorySchedulerService } from '../scheduler/in-memory-scheduler.service';
+import { EventsGateway } from '../events-gateway/events-gateway';
 
 /**
  * Job offer representing a cargo delivery opportunity.
@@ -85,8 +86,15 @@ export class JobOfferService implements OnModuleInit {
   constructor(
     private readonly placeInstancesService: PlaceInstancesService,
     private readonly placesService: PlacesService,
-    private readonly schedulerService: InMemorySchedulerService
-  ) {}
+    private readonly schedulerService: InMemorySchedulerService,
+    private readonly eventsGateway: EventsGateway
+  ) {
+    // Register the refresh handler once - it reschedules itself after each tick
+    this.schedulerService.on('jobOffer:refresh', async () => {
+      await this.refreshAllOffers();
+      this.scheduleGlobalRefresh();
+    });
+  }
 
   /**
    * Initialize the global tick refresh on module load.
@@ -106,26 +114,30 @@ export class JobOfferService implements OnModuleInit {
       {},
       JobOfferService.DEFAULT_REFRESH_INTERVAL_MS
     );
-
-    this.schedulerService.on('jobOffer:refresh', async () => {
-      await this.refreshAllOffers();
-      this.scheduleGlobalRefresh();
-    });
   }
+
+  private isRefreshing = false;
 
   /**
    * Refresh job offers for all player-owned places.
    * Called by the global tick.
    */
-  private async refreshAllOffers(): Promise<void> {
-    const allPlaceInstances = await this.placeInstancesService.findAll({ page: 1, pageSize: 1000 } as any);
+  async refreshAllOffers(): Promise<void> {
+    if (this.isRefreshing) return;
+    this.isRefreshing = true;
 
-    for (const placeInstance of allPlaceInstances.data) {
-      try {
-        await this.generateOffersForPlace(placeInstance._id.toString());
-      } catch (error) {
-        console.error(`Failed to refresh job offers for place ${placeInstance._id}:`, error);
+    try {
+      const allPlaceInstances = await this.placeInstancesService.findAll({ page: 1, pageSize: 1000 } as any);
+
+      for (const placeInstance of allPlaceInstances.data) {
+        try {
+          await this.generateOffersForPlace(placeInstance._id.toString());
+        } catch (error) {
+          console.error(`Failed to refresh job offers for place ${placeInstance._id}:`, error);
+        }
       }
+    } finally {
+      this.isRefreshing = false;
     }
   }
 
@@ -154,6 +166,7 @@ export class JobOfferService implements OnModuleInit {
     // Need 2+ places for jobs
     if (allOwned.length < 2) {
       placeInst.jobOffers = [];
+      placeInst.version = (placeInst.version || 0) + 1;
       await this.placeInstancesService.update(placeInstanceId, placeInst);
       return [];
     }
@@ -195,7 +208,17 @@ export class JobOfferService implements OnModuleInit {
       startTime: new Date(),
       content: {}
     }));
+    placeInst.version = (placeInst.version || 0) + 1;
     await this.placeInstancesService.update(placeInstanceId, placeInst);
+
+    // Broadcast updated job offers to connected clients
+    if (playerId) {
+      this.eventsGateway.broadcastJobOffersUpdated(
+        playerId,
+        placeInst._id.toString(),
+        placeInst.jobOffers,
+      );
+    }
 
     return offers;
   }
@@ -243,7 +266,7 @@ export class JobOfferService implements OnModuleInit {
     }
 
     return placeInst.jobOffers.map(jo => ({
-      id: new ObjectId().toString(),
+      id: jo.jobOfferId,
       cargoType: jo.cargoType as CargoType,
       startPlaceId: jo.startId,
       endPlaceId: jo.endId,

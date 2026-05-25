@@ -38,6 +38,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
     gameId: { toString: () => mockGameId } as any,
     jobOffers,
     content: {},
+    version: 1,
   });
 
   const createMockJobOffer = (id: string = mockJobOfferId) => ({
@@ -142,7 +143,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       jobsService.create.mockResolvedValue(createdJob as any);
       jobsService.findOne.mockResolvedValue(createdJob as any);
 
-      const result = await controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId });
+      const result = await controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 });
 
       expect(jobsService.create).toHaveBeenCalledWith(expect.objectContaining({
         type: 'VEHICLE',
@@ -156,7 +157,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       placeInstancesService.findJobOffer.mockResolvedValue(null);
 
       await expect(
-        controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId })
+        controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 })
       ).rejects.toThrow(HttpException);
     });
 
@@ -165,7 +166,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       placeInstancesService.findOne.mockResolvedValue(null);
 
       await expect(
-        controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId })
+        controller.acceptJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 })
       ).rejects.toMatchObject({ status: 404 });
     });
   });
@@ -189,7 +190,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       jobsService.create.mockResolvedValue(createdJob as any);
       jobsService.findOne.mockResolvedValue(createdJob as any);
 
-      const result = await controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId });
+      const result = await controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 });
 
       expect(jobsService.create).toHaveBeenCalledWith(expect.objectContaining({
         type: 'PLACE',
@@ -203,7 +204,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       placeInstancesService.findJobOffer.mockResolvedValue(null);
 
       await expect(
-        controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId })
+        controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 })
       ).rejects.toThrow(HttpException);
     });
 
@@ -212,7 +213,7 @@ describe('PlaceInstanceController - Job Endpoints', () => {
       placeInstancesService.findOne.mockResolvedValue(null);
 
       await expect(
-        controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId })
+        controller.warehouseJob(mockPlaceInstanceId, { jobOfferId: mockJobOfferId, expectedVersion: 1 })
       ).rejects.toMatchObject({ status: 404 });
     });
   });

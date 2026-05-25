@@ -7,6 +7,8 @@ import { PlaceConnectionService } from '../../api/place-connection.module';
 import { JobsService } from '../../api/jobs.module';
 import { PlacesService } from '../../api/places.module';
 import { EconomyService, CurrencyType } from '../economy/economy.service';
+import { EventsGateway } from '../events-gateway/events-gateway';
+import { ConflictException } from '../events-gateway/conflict.exception';
 
 /**
  * DTO for dispatching a vehicle with a route.
@@ -14,6 +16,8 @@ import { EconomyService, CurrencyType } from '../economy/economy.service';
 export class DispatchVehicleDto {
   /** Array of PlaceInstance IDs forming the route */
   route: string[];
+  /** Expected version for optimistic concurrency control */
+  expectedVersion: number;
 }
 
 /**
@@ -66,7 +70,8 @@ export class VehicleDispatchService {
     private readonly jobsService: JobsService,
     private readonly placesService: PlacesService,
     private readonly economyService: EconomyService,
-    private readonly schedulerService: InMemorySchedulerService
+    private readonly schedulerService: InMemorySchedulerService,
+    private readonly eventsGateway: EventsGateway
   ) {
     // Register handler for arrival events
     this.schedulerService.on('vehicle:arrival', this.processArrival.bind(this));
@@ -88,11 +93,16 @@ export class VehicleDispatchService {
    * @throws NotFoundException if vehicle not found
    * @throws BadRequestException if vehicle is already in transit or route is invalid
    */
-  async dispatch(vehicleInstanceId: string, route: string[]): Promise<DispatchResult> {
+  async dispatch(vehicleInstanceId: string, route: string[], expectedVersion: number): Promise<DispatchResult> {
     // 1. Validate vehicle exists
     const vehicle = await this.vehicleInstancesService.findOne(vehicleInstanceId);
     if (!vehicle) {
       throw new NotFoundException(`Vehicle not found: ${vehicleInstanceId}`);
+    }
+
+    // 1b. Validate version for optimistic concurrency
+    if (vehicle.version !== expectedVersion) {
+      throw new ConflictException('stale_vehicle_state', vehicle.version, vehicle);
     }
 
     // 2. Validate vehicle is at a place (not already in transit)
@@ -132,7 +142,14 @@ export class VehicleDispatchService {
     vehicle.destinationPlaceInstanceId = new Types.ObjectId(destinationPlaceInstanceId);
     vehicle.route = route.map(id => new Types.ObjectId(id));
     vehicle.currentPlaceInstanceId = null;
+    vehicle.version = (vehicle.version || 0) + 1;
     await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
+
+    // Broadcast vehicle state update
+    const playerId = vehicle.playerId?.toString();
+    if (playerId) {
+      this.eventsGateway.broadcastVehicleStateUpdated(playerId, vehicle);
+    }
 
     // 8. Schedule arrival
     const remainingRoute = route.slice(1);
@@ -351,7 +368,14 @@ export class VehicleDispatchService {
       // Calculate time to next destination
       const travelTimeMs = await this.calculateTravelTime(vehicle, remainingRoute);
 
+      vehicle.version = (vehicle.version || 0) + 1;
       await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
+
+      // Broadcast vehicle state update
+      const playerId = vehicle.playerId?.toString();
+      if (playerId) {
+        this.eventsGateway.broadcastVehicleStateUpdated(playerId, vehicle);
+      }
 
       // Schedule next arrival
       const nextPayload: ArrivalPayload = {
@@ -366,12 +390,26 @@ export class VehicleDispatchService {
       // Final destination reached
       vehicle.route = [];
       vehicle.status = 'AT_PLACE';
+      vehicle.version = (vehicle.version || 0) + 1;
       await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
+
+      // Broadcast vehicle state update
+      const playerId = vehicle.playerId?.toString();
+      if (playerId) {
+        this.eventsGateway.broadcastVehicleStateUpdated(playerId, vehicle);
+      }
     } else {
       // No remaining stops
       vehicle.route = [];
       vehicle.status = 'AT_PLACE';
+      vehicle.version = (vehicle.version || 0) + 1;
       await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
+
+      // Broadcast vehicle state update
+      const playerId = vehicle.playerId?.toString();
+      if (playerId) {
+        this.eventsGateway.broadcastVehicleStateUpdated(playerId, vehicle);
+      }
     }
   }
 

@@ -16,10 +16,13 @@ import { ISchedulerEvent, ISchedulerService } from './scheduler.interface';
  */
 @Injectable()
 export class InMemorySchedulerService implements ISchedulerService {
+
   /** Maps task ID to NodeJS.Timeout for cancellation */
   private timers: Map<string, NodeJS.Timeout> = new Map();
+  
   /** Maps task ID to event metadata for getPending() queries */
   private events: Map<string, ISchedulerEvent> = new Map();
+  
   /** Maps event name to array of handler functions */
   private handlers: Map<string, Array<(payload: any) => void>> = new Map();
 

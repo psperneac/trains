@@ -88,11 +88,6 @@ export class MapRevealService {
    */
   async getOwnedPlaceInstances(playerId: string): Promise<PlaceInstance[]> {
     const allPlaceInstances = await this.placeInstancesService.findAll({ page: 1, pageSize: 1000 } as any);
-    console.log('[MapReveal] allPlaceInstances:', allPlaceInstances.data.length, allPlaceInstances.data.map(pi => ({
-      id: pi._id?.toString(),
-      playerId: pi.playerId?.toString(),
-      placeId: pi.placeId?.toString()
-    })));
     return allPlaceInstances.data.filter(pi => pi.playerId?.toString() === playerId);
   }
 
@@ -125,22 +120,18 @@ export class MapRevealService {
     // Get available place IDs (connected but not owned) in one query
     const availableTemplateIds = await this.findAvailablePlaceIds(ownedTemplateIds);
 
-    console.log('[MapReveal] availableTemplateIds:', availableTemplateIds);
-
     if (availableTemplateIds.length === 0) {
       return [];
     }
 
     // Fetch all available places - use findAll and filter in memory since $or with $in doesn't work in TypeORM
     const availableIdStrings = availableTemplateIds.map(id => id.toString());
-    console.log('[MapReveal] about to query places with id strings:', availableIdStrings);
 
     // Use findAll and filter in memory
     const allPlacesResult = await this.placesService.findAll({ page: 1, pageSize: 10000 } as any);
     const availablePlaces = allPlacesResult.data.filter(place =>
       availableIdStrings.includes(place._id?.toString())
     );
-    console.log('[MapReveal] availablePlaces:', availablePlaces.length, availablePlaces.map(p => p._id?.toString()));
     return availablePlaces;
   }
 
@@ -154,8 +145,6 @@ export class MapRevealService {
     if (ownedPlaceIds.length === 0) {
       return [];
     }
-
-    console.log('[MapReveal] findAvailablePlaceIds called with:', ownedPlaceIds.map(id => id.toString()));
 
     // TypeORM doesn't support $or with $in in FindOptionsWhere, so query each owned ID separately
     const allConnections: any[] = [];
@@ -175,11 +164,6 @@ export class MapRevealService {
       allConnections.push(...startConnections.data, ...endConnections.data);
     }
 
-    console.log('[MapReveal] connections found:', allConnections.length, allConnections.map(c => ({
-      startId: c.startId?.toString(),
-      endId: c.endId?.toString()
-    })));
-
     // Convert owned IDs to strings for Set comparison
     const ownedIdStrings = new Set(ownedPlaceIds.map(id => id.toString()));
     const availableIds = new Set<string>();
@@ -198,7 +182,6 @@ export class MapRevealService {
       }
     }
 
-    console.log('[MapReveal] availableIds:', [...availableIds]);
     return [...availableIds].map(id => new ObjectId(id));
   }
 }

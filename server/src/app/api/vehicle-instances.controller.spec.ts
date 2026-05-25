@@ -37,6 +37,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
     gameId: { toString: () => 'game-1' } as any,
     playerId: { toString: () => mockPlayerId } as any,
     content: {},
+    version: 1,
   });
 
   const createMockJob = (type: JobType, vehicleInstanceId: string | null = null, placeInstanceId: string | null = mockPlaceId) => ({
@@ -100,7 +101,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       jobsService.findOne.mockResolvedValue(mockJob as any);
       jobsService.update.mockResolvedValue(mockJob as any);
 
-      const result = await controller.loadJob(mockVehicleId, { jobId: mockJobId });
+      const result = await controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 });
 
       expect(jobsService.update).toHaveBeenCalledWith(mockJobId, expect.objectContaining({
         vehicleInstanceId: expect.anything(),
@@ -112,7 +113,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       vehicleInstancesService.findOne.mockResolvedValue(null);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 404 });
     });
 
@@ -121,7 +122,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       vehicleInstancesService.findOne.mockResolvedValue(mockVehicle as any);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 400 });
     });
 
@@ -131,7 +132,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       jobsService.findOne.mockResolvedValue(null);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 404 });
     });
 
@@ -142,7 +143,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       jobsService.findOne.mockResolvedValue(mockJob as any);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 400 });
     });
 
@@ -153,7 +154,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       jobsService.findOne.mockResolvedValue(mockJob as any);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 400 });
     });
 
@@ -164,7 +165,7 @@ describe('VehicleInstancesController - Job Endpoints', () => {
       jobsService.findOne.mockResolvedValue(mockJob as any);
 
       await expect(
-        controller.loadJob(mockVehicleId, { jobId: mockJobId })
+        controller.loadJob(mockVehicleId, { jobId: mockJobId, expectedVehicleVersion: 1 })
       ).rejects.toMatchObject({ status: 400 });
     });
   });

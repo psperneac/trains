@@ -127,8 +127,8 @@ export class PlayerInitService {
     // 6. Create VehicleInstance for the player at the starting place
     const vehicleInstance = await this.vehicleInstancesService.create({
       vehicleId: vehicleTemplate._id,
-      currentPlaceInstance: placeInstance._id,
-      destinationPlaceInstance: null,
+      currentPlaceInstanceId: placeInstance._id,
+      destinationPlaceInstanceId: null,
       route: [],
       status: 'AT_PLACE',
       gameId: player.gameId,

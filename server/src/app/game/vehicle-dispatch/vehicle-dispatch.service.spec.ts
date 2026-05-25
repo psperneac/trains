@@ -92,7 +92,8 @@ describe('VehicleDispatchService', () => {
     status,
     gameId: { toString: () => gameId } as any,
     playerId: { toString: () => playerId } as any,
-    content: {}
+    content: {},
+    version: 1,
   });
 
   const createMockConnection = (startPlaceId: string, endPlaceId: string) => ({
@@ -153,7 +154,7 @@ describe('VehicleDispatchService', () => {
       mockVehicleInstancesService.update.mockResolvedValue(mockVehicle);
 
       const route = [place1Id, place2Id];
-      const result = await service.dispatch(vehicleId, route);
+      const result = await service.dispatch(vehicleId, route, 1);
 
       expect(result.success).toBe(true);
       expect(result.travelTimeMs).toBeDefined();
@@ -164,7 +165,7 @@ describe('VehicleDispatchService', () => {
     it('should reject dispatch if vehicle not found', async () => {
       mockVehicleInstancesService.findOne.mockResolvedValue(null);
 
-      await expect(service.dispatch(vehicleId, [place1Id, place2Id]))
+      await expect(service.dispatch(vehicleId, [place1Id, place2Id], 1))
         .rejects.toThrow(NotFoundException);
     });
 
@@ -173,7 +174,7 @@ describe('VehicleDispatchService', () => {
       mockVehicleInstancesService.findOne.mockResolvedValue(inTransitVehicle);
 
       const route = [place1Id, place2Id];
-      const result = await service.dispatch(vehicleId, route);
+      const result = await service.dispatch(vehicleId, route, 1);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Vehicle is already in transit');
@@ -183,11 +184,11 @@ describe('VehicleDispatchService', () => {
       const mockVehicle = createMockVehicle(vehicleId, playerId, place1Id);
       mockVehicleInstancesService.findOne.mockResolvedValue(mockVehicle);
 
-      const result1 = await service.dispatch(vehicleId, []);
+      const result1 = await service.dispatch(vehicleId, [], 1);
       expect(result1.success).toBe(false);
       expect(result1.error).toBe('Route must have at least 2 stops');
 
-      const result2 = await service.dispatch(vehicleId, [place1Id]);
+      const result2 = await service.dispatch(vehicleId, [place1Id], 1);
       expect(result2.success).toBe(false);
       expect(result2.error).toBe('Route must have at least 2 stops');
     });
@@ -197,7 +198,7 @@ describe('VehicleDispatchService', () => {
       mockVehicleInstancesService.findOne.mockResolvedValue(mockVehicle);
 
       const route = [place2Id, place3Id]; // Does not start at vehicle's current place
-      const result = await service.dispatch(vehicleId, route);
+      const result = await service.dispatch(vehicleId, route, 1);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('must start at vehicle\'s current location');
@@ -213,7 +214,7 @@ describe('VehicleDispatchService', () => {
       mockPlaceConnectionService.findAll.mockResolvedValue({ data: [], total: 0, page: 1, pageSize: 10 } as any);
 
       const route = [place1Id, place2Id];
-      await expect(service.dispatch(vehicleId, route)).rejects.toThrow(BadRequestException);
+      await expect(service.dispatch(vehicleId, route, 1)).rejects.toThrow(BadRequestException);
     });
   });
 

@@ -5,12 +5,13 @@ import { EconomyService } from './economy/economy.service';
 import { MapRevealService } from './map-reveal/map-reveal.service';
 import { PlacePurchaseService } from './place-purchase/place-purchase.service';
 import { PlacePurchaseController } from './place-purchase/place-purchase.controller';
-import { JobOfferService } from './job-offer/job-offer.service';
+import { JobOfferModule } from './job-offer/job-offer.module';
 import { JobOfferController } from './job-offer/job-offer.controller';
 import { VehicleDispatchService } from './vehicle-dispatch/vehicle-dispatch.service';
 import { VehicleDispatchController } from './vehicle-dispatch/vehicle-dispatch.controller';
 import { PlayerInitService } from './player-init/player-init.service';
 import { PlayerInitController } from './player-init/player-init.controller';
+import { GameController } from './game.controller';
 import { PlayersModule } from '../api/support/players.module';
 import { TransactionsModule } from '../api/support/transactions.module';
 import { PlaceInstancesModule } from '../api/place-instance.module';
@@ -20,6 +21,7 @@ import { VehiclesModule } from '../api/vehicles.module';
 import { VehicleInstancesModule } from '../api/vehicle-instances.module';
 import { JobsModule } from '../api/jobs.module';
 import { AuthenticationModule } from '../../authentication/authentication.module';
+import { EventsGatewayModule } from './events-gateway/events-gateway.module';
 
 @Module({
   imports: [
@@ -31,16 +33,17 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     VehiclesModule,
     VehicleInstancesModule,
     JobsModule,
-    AuthenticationModule
+    AuthenticationModule,
+    EventsGatewayModule,
+    JobOfferModule
   ],
-  controllers: [PlacePurchaseController, JobOfferController, VehicleDispatchController, PlayerInitController],
+  controllers: [PlacePurchaseController, JobOfferController, VehicleDispatchController, PlayerInitController, GameController],
   providers: [
     InMemorySchedulerService,
     GameClockService,
     EconomyService,
     MapRevealService,
     PlacePurchaseService,
-    JobOfferService,
     VehicleDispatchService,
     PlayerInitService
   ],
@@ -50,7 +53,6 @@ import { AuthenticationModule } from '../../authentication/authentication.module
     EconomyService,
     MapRevealService,
     PlacePurchaseService,
-    JobOfferService,
     VehicleDispatchService,
     PlayerInitService
   ]

@@ -4,7 +4,7 @@
  */
 export interface JobOffer {
   /** Temporary ID for frontend keying */
-  id: string;
+  jobOfferId: string;
   /** Type of cargo being transported */
   cargoType: string;
   /** Origin place template ID */

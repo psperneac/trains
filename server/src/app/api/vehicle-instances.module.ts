@@ -1,4 +1,5 @@
 import { Body, Controller, forwardRef, Get, HttpException, HttpStatus, Inject, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { ConflictException } from '../game/events-gateway/conflict.exception';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -56,6 +57,10 @@ export class VehicleInstance extends AbstractMongoEntity {
   @Prop({ type: Object })
   @Expose()
   content: any;
+
+  @Prop({ default: 0 })
+  @Expose()
+  version: number;
 }
 
 export type VehicleInstanceDocument = HydratedDocument<VehicleInstance>;
@@ -83,6 +88,7 @@ export interface VehicleInstanceDto {
  */
 export interface LoadJobDto {
   jobId: string;
+  expectedVehicleVersion: number;
 }
 
 /**
@@ -312,11 +318,15 @@ export class VehicleInstancesController {
     @Param('id') id: string,
     @Body() loadJobDto: LoadJobDto
   ): Promise<any> {
-    const { jobId } = loadJobDto;
+    const { jobId, expectedVehicleVersion } = loadJobDto;
 
     const vehicle = await this.vehicleInstancesService.findOne(id);
     if (!vehicle) {
       throw new HttpException('Vehicle not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (vehicle.version !== expectedVehicleVersion) {
+      throw new ConflictException('stale_vehicle_state', vehicle.version, vehicle);
     }
 
     if (vehicle.status !== 'AT_PLACE') {

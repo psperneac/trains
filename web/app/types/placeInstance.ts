@@ -16,4 +16,5 @@ export interface PlaceInstanceDto {
   place?: PlaceDto;
   jobOffers: any[];
   content: any;
+  version?: number;
 }

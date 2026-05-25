@@ -44,7 +44,7 @@ export default function JobBoard({ placeInstance, onAcceptJob, onClose }: JobBoa
   const handleAcceptJob = async (jobOffer: JobOffer) => {
     if (!currentPlayer) return;
 
-    setAcceptingJobId(jobOffer.id);
+    setAcceptingJobId(jobOffer.jobOfferId);
     setError('');
 
     try {
@@ -54,7 +54,7 @@ export default function JobBoard({ placeInstance, onAcceptJob, onClose }: JobBoa
         {
           method: 'POST',
           authToken: token,
-          body: JSON.stringify({ jobOfferId: jobOffer.id }),
+          body: JSON.stringify({ jobOfferId: jobOffer.jobOfferId, expectedVersion: placeInstance.version || 0 }),
         }
       );
 
