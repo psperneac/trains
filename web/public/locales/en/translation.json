@@ -44,6 +44,7 @@
     "changePassword": "Change Password",
     "logout": "Logout",
     "admin": "Admin",
+    "misc": "Misc",
     "users": "Users"
   },
   "pagination": {

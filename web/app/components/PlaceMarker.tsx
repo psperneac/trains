@@ -59,14 +59,24 @@ export default function PlaceMarker({ place, onClick }: PlaceMarkerProps) {
   }
 
   const icon = getPinIcon(place.type, place.isOwned);
-  // console.log('[PlaceMarker] Rendering:', { name: place.name, type: place.type, isOwned: place.isOwned, lat: place.lat, lng: place.lng });
 
+  // For owned places: marker click just opens popup (Leaflet default), don't call onClick
+  // onClick is only called from the popup's "View Jobs" button
+  // For non-owned places: marker click calls onClick (shows buy modal)
+  const markerClickHandler = (e: L.LeafletMouseEvent) => {
+    if (!place.isOwned) {
+      onClick();
+    }
+    // For owned places, Leaflet auto-opens the popup - don't call onClick here
+ };
+
+  // Only show popup for owned places; non-owned places show the buy modal on click
   return (
     <Marker
       position={[place.lat, place.lng]}
       icon={icon}
       eventHandlers={{
-        click: onClick,
+        click: markerClickHandler,
       }}
     >
       <Tooltip direction="top" offset={[0, -32]} permanent={false}>
@@ -80,27 +90,24 @@ export default function PlaceMarker({ place, onClick }: PlaceMarkerProps) {
           )}
         </div>
       </Tooltip>
-      <Popup>
-        <div className="p-2 min-w-[150px]">
-          <h3 className="font-semibold">{place.name}</h3>
-          <p className="text-sm text-gray-600">{place.description}</p>
-          <p className="text-xs text-gray-500 mt-1">Type: {place.type}</p>
-          {!place.isOwned && place.priceGold !== undefined && (
-            <p className="text-sm font-medium mt-1 text-purple-600">
-              Price: {place.priceGold} gold{place.priceGems ? ` + ${place.priceGems} gems` : ''}
-            </p>
-          )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick();
-            }}
-            className="mt-2 px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700"
-          >
-            {place.isOwned ? 'View Jobs' : 'Buy Place'}
-          </button>
-        </div>
-      </Popup>
+      {place.isOwned && (
+        <Popup>
+          <div className="p-2 min-w-[150px]">
+            <h3 className="font-semibold">{place.name}</h3>
+            <p className="text-sm text-gray-600">{place.description}</p>
+            <p className="text-xs text-gray-500 mt-1">Type: {place.type}</p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+              className="mt-2 px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700"
+            >
+              View Jobs
+            </button>
+          </div>
+        </Popup>
+      )}
     </Marker>
   );
 }

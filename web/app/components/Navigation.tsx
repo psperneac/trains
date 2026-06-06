@@ -15,7 +15,7 @@ export default function Navigation() {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const location = useLocation();
   const submenuRef = useRef<HTMLDivElement>(null);
-  const { currentGameId, setAuthToken, isAdmin } = useAuthStore();
+  const { currentGameId, isAdmin, logout } = useAuthStore();
   const { t } = useTranslation();
   
   const baseMenuItems: MenuItem[] = [
@@ -81,9 +81,9 @@ export default function Navigation() {
     },
   ];
 
-  const settingsMenuItems: MenuItem[] = [
+  const miscMenuItems: MenuItem[] = [
     {
-      label: 'Settings',
+      label: t('navigation.misc'),
       children: [
         {
           label: t('navigation.changePassword'),
@@ -94,7 +94,7 @@ export default function Navigation() {
         },
         {
           label: t('navigation.logout'),
-          action: () => setAuthToken(null),
+          action: () => logout(),
         },
       ],
     },
@@ -104,7 +104,7 @@ export default function Navigation() {
     ...baseMenuItems,
     ...(isAdmin() ? gameAdminMenuItems : []),
     ...(isAdmin() ? adminMenuItems : []),
-    ...settingsMenuItems,
+    ...miscMenuItems,
   ];
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import { apiRequest } from '../config/api';
 import type { GameDto } from '../types/game';
 import type { PlayerDto } from '../types/player';
 import { useOptionsStore } from './optionsStore';
+import { useSocketStore } from './socket';
 
 const AUTH_TOKEN_KEY = 'authToken';
 
@@ -33,7 +34,37 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
+  logout: () => Promise<void>;
   initializeAuth: () => void;
+}
+
+// JWT token expires in 600 seconds (10 minutes) - logout 5 seconds before expiry
+const JWT_EXPIRATION_SECONDS = 600;
+const AUTO_LOGOUT_BUFFER_SECONDS = 5;
+const AUTO_LOGOUT_TIMEOUT_MS = (JWT_EXPIRATION_SECONDS - AUTO_LOGOUT_BUFFER_SECONDS) * 1000;
+
+// Store for the auto-logout timeout reference
+let autoLogoutTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+function scheduleAutoLogout(logoutFn: () => Promise<void>) {
+  // Clear any existing timeout
+  if (autoLogoutTimeoutId) {
+    clearTimeout(autoLogoutTimeoutId);
+    autoLogoutTimeoutId = null;
+  }
+
+  // Schedule auto-logout
+  autoLogoutTimeoutId = setTimeout(() => {
+    console.log('Auto-logout: token expired');
+    logoutFn();
+  }, AUTO_LOGOUT_TIMEOUT_MS);
+}
+
+function cancelAutoLogout() {
+  if (autoLogoutTimeoutId) {
+    clearTimeout(autoLogoutTimeoutId);
+    autoLogoutTimeoutId = null;
+  }
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -55,13 +86,36 @@ export const useAuthStore = create<AuthState>()(
         set({ authToken: token, userId, userScope });
         useOptionsStore.getState().initializeOptions(userId);
         restoreGameAndPlayer(userId);
+        // Schedule auto-logout before token expires
+        scheduleAutoLogout(get().logout);
       } else {
         set({ authToken: token, userId: null, userScope });
       }
     } else {
+      cancelAutoLogout();
       localStorage.removeItem(AUTH_TOKEN_KEY);
       set({ authToken: null, userId: null, userScope: null, currentGameId: null, currentGame: null, currentPlayerId: null, currentPlayer: null });
     }
+  },
+
+  logout: async () => {
+    // call authentication logout so server can cleanup any session info
+    const authToken = get().authToken;
+    try {
+      await apiRequest('/api/authentication/logout', {
+        method: 'POST',
+        authToken: authToken || undefined,
+      });
+    } catch (err) {
+      // Logout should succeed even if the server call fails (e.g., token already invalid)
+      console.warn('Logout API call failed:', err);
+    }
+
+    // disconnect web socket
+    useSocketStore.getState().disconnect();
+    
+    // set web token to null
+    get().setAuthToken(null);
   },
 
   setCurrentGame: (game) => {
@@ -196,6 +250,8 @@ useAuthStore.setState({
         });
         useOptionsStore.getState().initializeOptions(userId);
         restoreGameAndPlayer(userId);
+        // Schedule auto-logout before token expires
+        scheduleAutoLogout(useAuthStore.getState().logout);
       }
     } else if (storedToken) {
       localStorage.removeItem(AUTH_TOKEN_KEY);
