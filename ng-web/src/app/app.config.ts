@@ -15,10 +15,13 @@ import { playerReducer } from './store/player/player.state';
 import { PlayerEffects } from './store/player/player.effects';
 import { placeTypeReducer } from './store/place-type/place-type.state';
 import { PlaceTypeEffects } from './store/place-type/place-type.effects';
+import { vehicleTypeReducer } from './store/vehicle-type/vehicle-type.state';
+import { VehicleTypeEffects } from './store/vehicle-type/vehicle-type.effects';
 import { LoginComponent } from './pages/auth/login.component';
 import { RegisterComponent } from './pages/auth/register.component';
 import { HomeComponent } from './pages/home/home.component';
 import { PlaceTypesComponent } from './pages/game-admin/place-types.component';
+import { VehicleTypesComponent } from './pages/game-admin/vehicle-types.component';
 import { authGuard, guestGuard } from './guards/auth.guard';
 import { gameResolver } from './resolvers/game.resolver';
 import { placeTypeResolver } from './resolvers/place-type.resolver';
@@ -33,6 +36,7 @@ export const appRoutes = [
     children: [
       { path: '', component: HomeComponent },
       { path: 'game-admin/place-types', component: PlaceTypesComponent, resolve: { placeTypes: placeTypeResolver } },
+      { path: 'game-admin/vehicle-types', component: VehicleTypesComponent },
     ],
   },
 ];
@@ -47,8 +51,9 @@ export const appConfig: ApplicationConfig = {
       game: gameReducer,
       player: playerReducer,
       placeType: placeTypeReducer,
+      vehicleType: vehicleTypeReducer,
     }),
-    provideEffects(AuthEffects, GameEffects, PlayerEffects, PlaceTypeEffects),
+    provideEffects(AuthEffects, GameEffects, PlayerEffects, PlaceTypeEffects, VehicleTypeEffects),
     provideStoreDevtools(),
     provideRouter(appRoutes, withComponentInputBinding()),
     provideTranslateService({
