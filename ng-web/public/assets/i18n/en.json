@@ -1,0 +1,18 @@
+{
+  "home": {
+    "title": "Welcome to Trains",
+    "subtitle": "Manage your games and explore the railway empire",
+    "loading": "Loading...",
+    "dismiss": "Dismiss",
+    "select_game": "Select Game",
+    "select_game_placeholder": "-- Select a game --",
+    "template": "(Template)",
+    "players_in_game": "Players in this Game",
+    "loading_players": "Loading players...",
+    "no_players": "No players found in this game.",
+    "select_player": "Select Player",
+    "current_player": "Current Player: {{name}}",
+    "wallet_balance": "Wallet Balance: {{balance}}",
+    "gems": "Gems: {{gems}}"
+  }
+}

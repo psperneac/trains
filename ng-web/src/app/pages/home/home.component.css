@@ -1,0 +1,126 @@
+    .home-container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .home-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .home-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .error-message {
+      background-color: #fee;
+      border: 1px solid #fcc;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .error-message button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .game-selection-section {
+      margin-bottom: 30px;
+      padding: 0;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .game-selection-section h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .game-select-wrapper {
+      max-width: 400px;
+    }
+
+    .game-select {
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+      cursor: pointer;
+    }
+
+    .game-select:focus {
+      outline: none;
+      border-color: #1976d2;
+      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+    }
+
+    .players-section {
+      margin-bottom: 30px;
+    }
+
+    .players-section h2 {
+      margin-bottom: 15px;
+    }
+
+    .players-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .player-card.selected {
+      border: 2px solid #1976d2;
+    }
+
+    .player-wallet {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .no-players {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+    }
+
+    .current-player-section {
+      margin-bottom: 20px;
+      max-width: 400px;
+    }
+
+    .admin-section {
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+      margin-top: 30px;
+    }
+
+    .admin-section h2 {
+      margin-bottom: 15px;
+    }
+
+    .admin-section button {
+      padding: 10px 20px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .admin-section button:hover {
+      background-color: #1b5e20;
+    }
