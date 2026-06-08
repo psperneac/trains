@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import WalletDisplay from '../components/WalletDisplay';
-import OwnedPlacesList from '../components/OwnedPlacesList';
+import GameControlPanel from '../components/GameControlPanel';
 import PlayerMapView from '../components/PlayerMapView';
 import BuyPlaceModal from '../components/BuyPlaceModal';
 import JobBoard from '../components/JobBoard';
@@ -168,20 +168,15 @@ export default function Game() {
   const vehicleInstances = resolvedPlayerId ? vehicleInstancesByPlayer[resolvedPlayerId] || [] : [];
 
   return (
-    <Layout title="Game">
+    <Layout title="Your Empire">
       <div className="flex flex-col h-full">
-        {/* Top bar with wallet */}
-        <div className="bg-white border-b p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Your Railway Empire</h1>
-          {currentPlayer?.wallet && <WalletDisplay wallet={currentPlayer.wallet} />}
-        </div>
-
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden">
           
           {/* Sidebar */}
-          <div className="w-64 bg-white border-r overflow-y-auto">
-            <OwnedPlacesList
+          <div className="w-100 bg-white border-r overflow-y-auto">
+            <GameControlPanel
+              player={currentPlayer}
               placeInstances={ownedPlaceInstances}
               vehicleInstances={vehicleInstances}
               onPlaceSelect={handlePlaceSelect}

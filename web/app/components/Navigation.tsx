@@ -228,7 +228,7 @@ export default function Navigation() {
 
   return (
     <nav className="bg-white shadow-sm py-1 pb-2">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <div className="flex space-x-2">
             {menuItems.slice(0, -1).map(renderMenuItem)}

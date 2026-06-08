@@ -1,55 +1,50 @@
-import { useState } from 'react';
 import type { PlaceInstanceDto } from '../types/placeInstance';
 import type { VehicleInstanceDto } from '../types/vehicleInstance';
+import type { PlayerDto } from '~/types/player';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs';
+import WalletDisplay from './WalletDisplay';
 
-interface OwnedPlacesListProps {
+interface GameControlPanelProps {
+  player: PlayerDto;
   placeInstances: PlaceInstanceDto[];
   vehicleInstances: VehicleInstanceDto[];
   onPlaceSelect: (placeInstance: PlaceInstanceDto) => void;
   onVehicleClick: (vehicle: VehicleInstanceDto) => void;
 }
 
-export default function OwnedPlacesList({
+export default function GameControlPanel({
+  player,
   placeInstances,
   vehicleInstances,
   onPlaceSelect,
   onVehicleClick,
-}: OwnedPlacesListProps) {
-  const [activeTab, setActiveTab] = useState<'places' | 'vehicles'>('places');
-
+}: GameControlPanelProps) {
   // Group vehicles by their current place
   const vehiclesAtPlace = vehicleInstances.filter(v => v.status === 'AT_PLACE' && v.currentPlaceInstanceId);
   const vehiclesInTransit = vehicleInstances.filter(v => v.status === 'IN_TRANSIT');
 
   return (
     <div className="flex flex-col h-full">
-      {/* Tab headers */}
-      <div className="flex border-b">
-        <button
-          onClick={() => setActiveTab('places')}
-          className={`flex-1 px-4 py-2 text-sm font-medium ${
-            activeTab === 'places'
-              ? 'border-b-2 border-indigo-600 text-indigo-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Places ({placeInstances.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('vehicles')}
-          className={`flex-1 px-4 py-2 text-sm font-medium ${
-            activeTab === 'vehicles'
-              ? 'border-b-2 border-indigo-600 text-indigo-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Vehicles ({vehicleInstances.length})
-        </button>
-      </div>
+      <Tabs defaultValue="places" className="flex flex-col flex-1">
+        <TabsList className="w-full">
+          <TabsTrigger value="player">
+            Player
+          </TabsTrigger>
+          <TabsTrigger value="places">
+            Places ({placeInstances.length})
+          </TabsTrigger>
+          <TabsTrigger value="vehicles">
+            Vehicles ({vehicleInstances.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-2">
-        {activeTab === 'places' && (
+        <TabsContent value="player" className="flex-1 overflow-y-auto p-2">
+          <div className="space-y-1">
+            {player?.wallet && <WalletDisplay wallet={player.wallet} />}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="places" className="flex-1 overflow-y-auto p-2">
           <div className="space-y-1">
             {placeInstances.length === 0 ? (
               <p className="text-sm text-gray-500 p-2">No places owned yet.</p>
@@ -75,9 +70,9 @@ export default function OwnedPlacesList({
               ))
             )}
           </div>
-        )}
+        </TabsContent>
 
-        {activeTab === 'vehicles' && (
+        <TabsContent value="vehicles" className="flex-1 overflow-y-auto p-2">
           <div className="space-y-1">
             {/* Vehicles at places */}
             <div className="text-xs text-gray-500 uppercase font-medium px-2 py-1">
@@ -131,8 +126,8 @@ export default function OwnedPlacesList({
               ))
             )}
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

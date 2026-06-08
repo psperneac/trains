@@ -7,7 +7,14 @@ This file provides guidance to coding agents like Claude Code (claude.ai/code) o
 Trains is a transportation game where players send jobs by vehicles from one place to another to earn cash. The application uses a multi-tenant architecture where each game is a tenant. The project consists of:
 
 - **server/** - NestJS backend with MongoDB (TypeORM + Mongoose)
-- **web/** - React frontend with Vite, React Router, and Leaflet maps
+- **ng-web/** - **Current UI implementation** — Angular 19+ frontend with NgRx state management
+- **web/** - React frontend (reference only — do not develop new features here)
+
+### UI Implementation Status
+
+**Active development: `ng-web/` (Angular)** — This is the current UI we are building.
+
+**`web/` (React)** — Complete implementation used as reference for API contracts, domain models, and UI patterns. Do not add new features here; it serves only as a source of truth for how the backend APIs work and how features should behave.
 
 ## Development Commands
 

@@ -13,7 +13,7 @@ export default function Layout({ children, title, statusOptions = [] }: LayoutPr
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="py-2">
             <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Train Management</h1>
           </div>
@@ -21,7 +21,7 @@ export default function Layout({ children, title, statusOptions = [] }: LayoutPr
       </header>
       <Navigation />
       <StatusComponent options={statusOptions} />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-9rem)] overflow-hidden">
+      <main className="py-6 px-4 sm:px-6 lg:px-8 h-[calc(100vh-9rem)] overflow-hidden">
         <div className="px-4 py-0 sm:px-0 h-full">
           {title && (
             <div className="mb-3">

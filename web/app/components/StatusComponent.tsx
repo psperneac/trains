@@ -60,7 +60,7 @@ export default function StatusComponent({ options = [] }: StatusComponentProps) 
 
   return (
     <div className="bg-blue-50 dark:bg-blue-900/20 border-t border-b border-blue-200 dark:border-blue-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center space-x-4">
             {isAdmin() ? (
