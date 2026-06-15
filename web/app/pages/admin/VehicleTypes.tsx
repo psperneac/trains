@@ -6,8 +6,10 @@ export default function VehicleTypes() {
   const { vehicleTypes, loading, error, fetchVehicleTypes } = useVehicleTypeStore();
 
   useEffect(() => {
-    fetchVehicleTypes();
-  }, [fetchVehicleTypes]);
+    if (!vehicleTypes?.length) {
+      fetchVehicleTypes();
+    }
+  }, [fetchVehicleTypes, vehicleTypes]);
 
   return (
     <Layout title="Vehicle Types">
@@ -25,7 +27,7 @@ export default function VehicleTypes() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {vehicleTypes.map((vt, idx) => (
+              {vehicleTypes?.map((vt, idx) => (
                 <tr key={vt.type + '-' + idx}>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{vt.type}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{vt.name}</td>
@@ -41,4 +43,4 @@ export default function VehicleTypes() {
       </div>
     </Layout>
   );
-} 
+}

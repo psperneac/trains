@@ -127,11 +127,24 @@ export default function Navigation() {
     setOpenSubmenu(openSubmenu === label ? null : label);
   };
 
+  // Detect whether the "Misc" button is on the right half of the viewport.
+  // If so, anchor the dropdown to the right so it flows leftward and stays in-screen.
+  // The other menus (in the left nav group) always anchor left.
+  const isRightAnchored = openSubmenu === t('navigation.misc') &&
+    typeof window !== 'undefined' &&
+    (() => {
+      const btn = document.getElementById('misc-menu-btn');
+      if (!btn) return false;
+      const rect = btn.getBoundingClientRect();
+      return rect.left > window.innerWidth / 2;
+    })();
+
   const renderMenuItem = (item: MenuItem) => {
     if (item.children) {
       return (
         <div key={item.label} className="relative" ref={openSubmenu === item.label ? submenuRef : undefined}>
           <button
+            id={item.label === t('navigation.misc') ? 'misc-menu-btn' : undefined}
             onClick={() => toggleSubmenu(item.label!)}
             className={`flex items-center px-3 py-1 text-sm font-medium rounded-md ${
               openSubmenu === item.label
@@ -156,7 +169,7 @@ export default function Navigation() {
             </svg>
           </button>
           {openSubmenu === item.label && (
-            <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <div className={`absolute ${isRightAnchored ? 'right-0' : 'left-0'} top-full mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50`}>
               <div className="py-1" role="menu">
                 {item.children?.map((child, index) => {
                   if (child.separator) {

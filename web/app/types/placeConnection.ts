@@ -7,5 +7,6 @@ export interface PlaceConnectionDto {
   startId: string;
   endId: string;
   gameId: string;
+  distance?: number;
 }
 

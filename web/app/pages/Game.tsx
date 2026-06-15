@@ -10,31 +10,26 @@ import VehicleDispatchPanel from '../components/VehicleDispatchPanel';
 import { useAuthStore } from '../store/authStore';
 import { usePlaceInstanceStore } from '../store/placeInstanceStore';
 import { useVehicleInstanceStore } from '../store/vehicleInstanceStore';
+import { usePlayersStore } from '../store/playersStore';
 import { useSocketStore } from '../store/socket';
 import { initPlaceInstanceSocketListeners } from '../store/placeInstanceStore';
 import { initVehicleSocketListeners } from '../store/vehicleInstanceStore';
 import { useGameSocket } from '../hooks/useGameSocket';
-import { apiRequest } from '../config/api';
 import type { PlaceDto } from '../types/place';
 import type { PlaceInstanceDto } from '../types/placeInstance';
 import type { VehicleInstanceDto } from '../types/vehicleInstance';
-
-interface MapViewData {
-  owned: PlaceInstanceDto[];
-  available: (PlaceDto & { priceGold: number; priceGems: number })[];
-  connections: any[];
-}
+import { useGame } from '~/hooks/useGame';
 
 export default function Game() {
-  const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
   const { authToken, currentPlayer } = useAuthStore();
+  const playerId = currentPlayer?.id;
   const { placeInstancesByPlayer } = usePlaceInstanceStore();
   const { vehicleInstancesByPlayer } = useVehicleInstanceStore();
+  const { mapViewData } = usePlayersStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [mapViewData, setMapViewData] = useState<MapViewData | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<{ lat: number; lng: number } | null>(null);
 
   // Modal states
@@ -42,32 +37,55 @@ export default function Game() {
   const [jobBoard, setJobBoard] = useState<PlaceInstanceDto | null>(null);
   const [vehiclePanel, setVehiclePanel] = useState<VehicleInstanceDto | null>(null);
 
+  // Dispatch route picker state - lifted from VehicleDispatchPanel
+  const [isRoutePickerActive, setIsRoutePickerActive] = useState(false);
+  const [route, setRoute] = useState<string[]>([]);
+
+  // Get the starting place for the route (vehicle's current location)
+  const startingPlaceId = vehiclePanel?.currentPlaceInstanceId;
+
+  // Handle adding a place to the route from map click
+  const handlePlaceInRoute = (placeInstanceId: string) => {
+    if (route[route.length - 1] === placeInstanceId) return;
+    if (route.length > 0 && !reachableNextPlaceInstanceIds.has(placeInstanceId)) return;
+    setRoute([...route, placeInstanceId]);
+  };
+
+  // Handle starting route from VehicleDispatchPanel
+  const handleStartRoute = () => {
+    if (startingPlaceId) {
+      setRoute([startingPlaceId]);
+      setIsRoutePickerActive(true);
+    }
+  };
+
+  // Handle clearing/canceling route
+  const handleClearRoute = () => {
+    setRoute([]);
+    setIsRoutePickerActive(false);
+  };
+
   // Resolve playerId - use param or fallback to currentPlayer
   const resolvedPlayerId = playerId || currentPlayer?.id;
 
   // Initialize real-time socket connection
   useGameSocket(currentPlayer?.gameId || '', resolvedPlayerId || '');
 
+  const { getReachableNextPlaceInstanceIds } = useGame();
+
   // Fetch map view and player data
   const fetchData = useCallback(async () => {
     if (!resolvedPlayerId) return;
 
     try {
-      const token = typeof authToken === 'string' ? authToken : undefined;
-
       // Fetch map view
-      const mapView = await apiRequest<MapViewData>(
-        `/api/players/${resolvedPlayerId}/map-view`,
-        { method: 'GET', authToken: token }
-      );
-      console.log('[Game] map-view response:', mapView);
-      setMapViewData(mapView);
+      await usePlayersStore.getState().loadMapView(resolvedPlayerId);
 
       // Fetch place instances for sidebar (using getState to avoid dependency issues)
-      usePlaceInstanceStore.getState().fetchPlaceInstancesByPlayerId(resolvedPlayerId);
+      await usePlaceInstanceStore.getState().loadPlaceInstancesByPlayerId(resolvedPlayerId);
 
       // Fetch vehicle instances for polling
-      useVehicleInstanceStore.getState().fetchVehicleInstancesByPlayerId(resolvedPlayerId);
+      await useVehicleInstanceStore.getState().loadVehicleInstancesByPlayerId(resolvedPlayerId);
 
       setLoading(false);
     } catch (err: any) {
@@ -75,6 +93,13 @@ export default function Game() {
       setLoading(false);
     }
   }, [resolvedPlayerId, authToken]);
+
+  // Refresh the map view after a mutation. Calls `fetchMapView` (always
+  // hits the network) rather than `loadMapView` (returns the cache).
+  const fetchMapView = useCallback(async () => {
+    if (!resolvedPlayerId) return;
+    await usePlayersStore.getState().fetchMapView(resolvedPlayerId);
+  }, [resolvedPlayerId]);
 
   useEffect(() => {
     if (!resolvedPlayerId) {
@@ -129,6 +154,10 @@ export default function Game() {
   // Handle purchase completion - refresh data
   const handlePurchaseComplete = () => {
     setBuyPlaceModal(null);
+    // We can't go through fetchData (which calls the cached loadMapView),
+    // because the cache would skip the network and the newly-bought place
+    // would never appear on the map.
+    fetchMapView();
     fetchData();
   };
 
@@ -141,8 +170,22 @@ export default function Game() {
   // Handle dispatch completion - refresh data
   const handleDispatchComplete = () => {
     setVehiclePanel(null);
+    setRoute([]);
+    setIsRoutePickerActive(false);
     fetchData();
   };
+
+  const ownedPlaceInstances = resolvedPlayerId ? placeInstancesByPlayer[resolvedPlayerId] || [] : [];
+  const ownedVehicleInstances = resolvedPlayerId ? vehicleInstancesByPlayer[resolvedPlayerId] || [] : [];
+
+  // Compute the set of owned place instance IDs that are valid next stops
+  // in the current route. A place is reachable if there is any connection
+  // (in either direction) from the last stop's template place, and the
+  // place is not already in the route.
+  let reachableNextPlaceInstanceIds: Set<string> = new Set<string>();
+  useEffect(() => {
+    reachableNextPlaceInstanceIds = getReachableNextPlaceInstanceIds(isRoutePickerActive, route);
+  }, [isRoutePickerActive, route, ownedPlaceInstances, mapViewData]);
 
   if (loading) {
     return (
@@ -164,42 +207,36 @@ export default function Game() {
     );
   }
 
-  const ownedPlaceInstances = resolvedPlayerId ? placeInstancesByPlayer[resolvedPlayerId] || [] : [];
-  const vehicleInstances = resolvedPlayerId ? vehicleInstancesByPlayer[resolvedPlayerId] || [] : [];
-
   return (
     <Layout title="Your Empire">
       <div className="flex flex-col h-full">
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden">
-          
+
           {/* Sidebar */}
           <div className="w-100 bg-white border-r overflow-y-auto">
-            <GameControlPanel
-              player={currentPlayer}
-              placeInstances={ownedPlaceInstances}
-              vehicleInstances={vehicleInstances}
-              onPlaceSelect={handlePlaceSelect}
-              onVehicleClick={handleVehicleClick}
-            />
+            {currentPlayer && (
+              <GameControlPanel
+                player={currentPlayer}
+                placeInstances={ownedPlaceInstances}
+                vehicleInstances={ownedVehicleInstances}
+                onPlaceSelect={handlePlaceSelect}
+                onVehicleClick={handleVehicleClick}
+              />
+            )}
           </div>
 
           {/* Map area */}
           <div className="flex-1 relative z-0">
             {mapViewData && (
               <PlayerMapView
-                ownedPlaces={mapViewData.owned.map(pi => ({
-                  ...pi.place!,
-                  isOwned: true,
-                  placeInstanceId: pi.id,
-                }))}
-                availablePlaces={mapViewData.available.map(p => ({
-                  ...p,
-                  isOwned: false,
-                }))}
-                connections={mapViewData.connections}
+                mapViewData={mapViewData}
                 selectedPlace={selectedPlace}
                 onPlaceClick={handlePlaceClick}
+                dispatchMode={isRoutePickerActive}
+                onDispatchPlaceClick={handlePlaceInRoute}
+                route={isRoutePickerActive ? route : []}
+                reachableNextPlaceInstanceIds={reachableNextPlaceInstanceIds}
               />
             )}
 
@@ -213,7 +250,7 @@ export default function Game() {
             )}
 
             {/* Job Board Modal */}
-            {jobBoard && (
+            {jobBoard && !isRoutePickerActive && (
               <JobBoard
                 placeInstance={jobBoard}
                 onAcceptJob={handleJobAccept}
@@ -228,6 +265,12 @@ export default function Game() {
                 ownedPlaceInstances={ownedPlaceInstances}
                 onDispatchComplete={handleDispatchComplete}
                 onClose={() => setVehiclePanel(null)}
+                route={route}
+                isRoutePickerActive={isRoutePickerActive}
+                onStartRoute={handleStartRoute}
+                onPlaceInRoute={handlePlaceInRoute}
+                onRemoveLastStop={() => route.length > 1 && setRoute(route.slice(0, -1))}
+                onClearRoute={handleClearRoute}
               />
             )}
           </div>

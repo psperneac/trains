@@ -43,7 +43,8 @@ export const useVehicleTypeStore = create<VehicleTypeState>()(
     }),
     {
       name: 'vehicle-types-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )
-); 
+);

@@ -6,13 +6,53 @@ import type { JobOffer } from '../types/job';
 import { useAuthStore } from './authStore';
 import { useSocketStore } from './socket';
 
-interface PlaceInstanceState {
+export interface PlaceInstanceState {
   placeInstancesByPlayer: Record<string, PlaceInstanceDto[]>;
   loading: boolean;
   error: string | null;
+  inFlightRequestsByPlayer: Record<string, Promise<void> | undefined>;
   fetchPlaceInstancesByPlayerId: (playerId: string) => Promise<void>;
+  loadPlaceInstancesByPlayerId: (playerId: string) => Promise<void>;
   setJobOffers: (placeInstanceId: string, jobOffers: JobOffer[]) => void;
   setPlaceInstance: (placeInstance: PlaceInstanceDto) => void;
+  purchasePlace: (playerId: string, placeId: string, description?: string) => Promise<{ success: boolean; error?: string; placeInstance?: PlaceInstanceDto }>;
+}
+
+// Internal helper — kept outside the state interface to avoid TypeScript complaints
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchPlaceInstancesByPlayerIdImpl(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: any,
+  get: () => PlaceInstanceState,
+  playerId: string
+) {
+  set({ loading: true, error: null });
+  try {
+    const rawToken = useAuthStore.getState().authToken;
+    const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+    const response = await apiRequest<{ data: PlaceInstanceDto[] }>(
+      `/api/place-instances/by-player/${playerId}?limit=1000`,
+      { method: 'GET', authToken }
+    );
+    set({
+      placeInstancesByPlayer: {
+        ...get().placeInstancesByPlayer,
+        [playerId]: response.data
+      },
+      loading: false
+    });
+  } catch (err: any) {
+    set({ error: err.message || 'Unknown error', loading: false });
+  } finally {
+    // clean in flight flag
+    set((state: PlaceInstanceState) => ({
+      ...state,
+      inFlightRequestsByPlayer: {
+        ...state.inFlightRequestsByPlayer,
+        [playerId]: undefined
+      }
+    }));
+  }
 }
 
 export const usePlaceInstanceStore = create<PlaceInstanceState>()(
@@ -21,26 +61,36 @@ export const usePlaceInstanceStore = create<PlaceInstanceState>()(
       placeInstancesByPlayer: {},
       loading: false,
       error: null,
+      inFlightRequestsByPlayer: {},
 
       fetchPlaceInstancesByPlayerId: async (playerId: string) => {
-        set({ loading: true, error: null });
-        try {
-          const rawToken = useAuthStore.getState().authToken;
-          const authToken = typeof rawToken === 'string' ? rawToken : undefined;
-          const response = await apiRequest<{ data: PlaceInstanceDto[] }>(
-            `/api/place-instances/by-player/${playerId}?limit=1000`,
-            { method: 'GET', authToken }
-          );
-          set({
-            placeInstancesByPlayer: {
-              ...get().placeInstancesByPlayer,
-              [playerId]: response.data
-            },
-            loading: false
-          });
-        } catch (err: any) {
-          set({ error: err.message || 'Unknown error', loading: false });
+        const { inFlightRequestsByPlayer } = get();
+
+        if (inFlightRequestsByPlayer[playerId]) {
+          return inFlightRequestsByPlayer[playerId];
         }
+
+        const networkPromise = fetchPlaceInstancesByPlayerIdImpl(set, get, playerId);
+        inFlightRequestsByPlayer[playerId] = networkPromise;
+        return networkPromise;
+      },
+
+      // The smart "load" method
+      // only fetches if not already fetched
+      loadPlaceInstancesByPlayerId: async (playerId: string) => {
+        const { inFlightRequestsByPlayer, placeInstancesByPlayer } = get();
+
+        if (inFlightRequestsByPlayer[playerId]) {
+          return inFlightRequestsByPlayer[playerId];
+        }
+
+        // 1. Cache Check: Do we already have data for this player?
+        if (placeInstancesByPlayer[playerId]) {
+          console.log(`Cache hit for player ${playerId}, skipping fetch.`);
+          return; // Resolves the promise immediately
+        }
+
+        return get().fetchPlaceInstancesByPlayerId(playerId);
       },
 
       setJobOffers: (placeInstanceId: string, jobOffers: JobOffer[]) => {
@@ -79,9 +129,27 @@ export const usePlaceInstanceStore = create<PlaceInstanceState>()(
         }
         set({ placeInstancesByPlayer: updated });
       },
+
+      purchasePlace: async (playerId: string, placeId: string, description?: string) => {
+        const rawToken = useAuthStore.getState().authToken;
+        const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+        const result = await apiRequest<{ success: boolean; error?: string; placeInstance?: PlaceInstanceDto }>(
+          `/api/players/${playerId}/purchase-place`,
+          {
+            method: 'POST',
+            authToken,
+            body: JSON.stringify({ placeId, description }),
+          }
+        );
+        if (result.success && result.placeInstance) {
+          get().setPlaceInstance(result.placeInstance);
+        }
+        return result;
+      },
     }),
     {
       name: 'place-instance-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

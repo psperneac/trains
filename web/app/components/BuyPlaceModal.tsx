@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { PlaceDto } from '../types/place';
 import { useAuthStore } from '../store/authStore';
-import { apiRequest } from '../config/api';
+import { usePlaceInstanceStore } from '../store/placeInstanceStore';
 import Toast from './Toast';
 
 interface BuyPlaceModalProps {
@@ -11,7 +11,8 @@ interface BuyPlaceModalProps {
 }
 
 export default function BuyPlaceModal({ place, onPurchaseComplete, onCancel }: BuyPlaceModalProps) {
-  const { authToken, currentPlayer } = useAuthStore();
+  const { currentPlayer } = useAuthStore();
+  const purchasePlace = usePlaceInstanceStore(s => s.purchasePlace);
   const [description, setDescription] = useState('');
   const [purchasing, setPurchasing] = useState(false);
   const [error, setError] = useState('');
@@ -26,15 +27,7 @@ export default function BuyPlaceModal({ place, onPurchaseComplete, onCancel }: B
     setError('');
 
     try {
-      const token = typeof authToken === 'string' ? authToken : undefined;
-      const result = await apiRequest<{ success: boolean; error?: string }>(
-        `/api/players/${currentPlayer.id}/purchase-place`,
-        {
-          method: 'POST',
-          authToken: token,
-          body: JSON.stringify({ placeId: place.id, description }),
-        }
-      );
+      const result = await purchasePlace(currentPlayer.id, place.id, description);
 
       if (result.success) {
         setToastMessage(`${place.name} purchased successfully!`);

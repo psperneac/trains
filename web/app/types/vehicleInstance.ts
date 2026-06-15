@@ -17,4 +17,5 @@ export interface VehicleInstanceDto {
   gameId: string;
   playerId: string;
   content: any;
+  version: number;
 }

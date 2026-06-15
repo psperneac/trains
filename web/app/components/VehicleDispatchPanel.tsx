@@ -4,13 +4,20 @@ import type { PlaceInstanceDto } from '../types/placeInstance';
 import { useAuthStore } from '../store/authStore';
 import { apiRequest } from '../config/api';
 import Toast from './Toast';
-import RoutePickerOverlay from './RoutePickerOverlay';
+import { Button } from './ui/button';
 
 interface VehicleDispatchPanelProps {
   vehicle: VehicleInstanceDto;
   ownedPlaceInstances: PlaceInstanceDto[];
   onDispatchComplete: () => void;
   onClose: () => void;
+  // Route picker state lifted to parent (Game.tsx)
+  route: string[];
+  isRoutePickerActive: boolean;
+  onStartRoute: () => void;
+  onPlaceInRoute: (placeInstanceId: string) => void;
+  onRemoveLastStop: () => void;
+  onClearRoute: () => void;
 }
 
 export default function VehicleDispatchPanel({
@@ -18,50 +25,25 @@ export default function VehicleDispatchPanel({
   ownedPlaceInstances,
   onDispatchComplete,
   onClose,
+  route,
+  isRoutePickerActive,
+  onStartRoute,
+  onPlaceInRoute,
+  onRemoveLastStop,
+  onClearRoute,
 }: VehicleDispatchPanelProps) {
   const { authToken, currentPlayer } = useAuthStore();
-  const [route, setRoute] = useState<string[]>([]);
   const [dispatching, setDispatching] = useState(false);
   const [error, setError] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
-  const [isRoutePickerActive, setIsRoutePickerActive] = useState(false);
 
   // Get the starting place for the route (vehicle's current location)
   const startingPlaceId = vehicle.currentPlaceInstanceId;
 
   // Get all places that can be used as waypoints (owned places)
   const availableWaypoints = ownedPlaceInstances.filter(pi => pi.id !== startingPlaceId);
-
-  const handleStartRoute = () => {
-    // Initialize route with vehicle's current location as first stop
-    setRoute([startingPlaceId]);
-    setIsRoutePickerActive(true);
-  };
-
-  const handlePlaceInRoute = (placeInstanceId: string) => {
-    // Add place to route if it's not already the last stop
-    if (route[route.length - 1] !== placeInstanceId) {
-      setRoute([...route, placeInstanceId]);
-    }
-  };
-
-  const handleRemoveLastStop = () => {
-    if (route.length > 1) {
-      setRoute(route.slice(0, -1));
-    }
-  };
-
-  const handleClearRoute = () => {
-    setRoute([]);
-    setIsRoutePickerActive(false);
-  };
-
-  const handleConfirmRoute = () => {
-    // Finalize route selection
-    setIsRoutePickerActive(false);
-  };
 
   const handleDispatch = async () => {
     if (!currentPlayer || route.length < 2) return;
@@ -72,11 +54,11 @@ export default function VehicleDispatchPanel({
     try {
       const token = typeof authToken === 'string' ? authToken : undefined;
       const result = await apiRequest<{ success: boolean; error?: string; travelTimeMs?: number }>(
-        `/api/vehicles/${vehicle.id}/dispatch`,
+        `/api/vehicle-dispatch/${vehicle.id}/dispatch`,
         {
           method: 'POST',
           authToken: token,
-          body: JSON.stringify({ route }),
+          body: JSON.stringify({ route, expectedVersion: vehicle.version }),
         }
       );
 
@@ -137,101 +119,69 @@ export default function VehicleDispatchPanel({
 
         {/* Route builder */}
         <div className="p-4 flex-1 overflow-y-auto">
-          {!isRoutePickerActive ? (
-            <>
-              {/* Route display */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Route ({route.length} stops)
-                </label>
-                <div className="bg-gray-50 rounded p-2 min-h-[60px]">
-                  {route.length === 0 ? (
-                    <p className="text-sm text-gray-400">No route selected</p>
-                  ) : (
-                    <div className="space-y-1">
-                      {getRouteDisplay().map((name, idx) => (
-                        <div key={idx} className="text-sm flex items-center gap-2">
-                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
-                            idx === 0 ? 'bg-green-500 text-white' :
-                            idx === route.length - 1 ? 'bg-red-500 text-white' :
-                            'bg-gray-300 text-gray-700'
-                          }`}>
-                            {idx + 1}
-                          </span>
-                          <span className={idx === 0 ? 'font-medium' : ''}>{name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+          {/* Route picker mode message */}
+          {isRoutePickerActive && (
+            <div className="mb-4 p-3 bg-blue-50 rounded">
+              <p className="text-sm text-blue-700">
+                Click on places on the map to add stops. When ready, click Dispatch Vehicle.
+              </p>
+            </div>
+          )}
 
-              {/* Actions */}
-              <div className="space-y-2">
-                <button
-                  onClick={handleStartRoute}
-                  disabled={route.length > 0}
-                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 text-sm"
-                >
-                  {route.length > 0 ? 'Route Started' : 'Build Route'}
-                </button>
-                {route.length > 1 && (
-                  <button
-                    onClick={handleRemoveLastStop}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-                  >
-                    Remove Last Stop
-                  </button>
-                )}
-                {route.length > 0 && (
-                  <button
-                    onClick={handleClearRoute}
-                    className="w-full px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm"
-                  >
-                    Clear Route
-                  </button>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="mb-4 p-3 bg-blue-50 rounded">
-                <p className="text-sm text-blue-700">
-                  Click on the map to add stops to your route.
-                  Start with your vehicle's location.
-                </p>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Route ({route.length} stops)
-                </label>
-                <div className="bg-gray-50 rounded p-2 min-h-[60px]">
+          {/* Route display */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Route ({route.length} stops)
+            </label>
+            <div className="bg-gray-50 rounded p-2 min-h-[60px]">
+              {route.length === 0 ? (
+                <p className="text-sm text-gray-400">No route selected</p>
+              ) : (
+                <div className="space-y-1">
                   {getRouteDisplay().map((name, idx) => (
                     <div key={idx} className="text-sm flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+                        idx === 0 ? 'bg-green-500 text-white' :
+                        idx === route.length - 1 ? 'bg-red-500 text-white' :
+                        'bg-gray-300 text-gray-700'
+                      }`}>
                         {idx + 1}
                       </span>
-                      <span>{name}</span>
+                      <span className={idx === 0 ? 'font-medium' : ''}>{name}</span>
                     </div>
                   ))}
                 </div>
-              </div>
-              <div className="space-y-2">
-                <button
-                  onClick={handleConfirmRoute}
-                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
-                >
-                  Confirm Route
-                </button>
-                <button
-                  onClick={handleClearRoute}
-                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            {!isRoutePickerActive && route.length === 0 && (
+              <Button
+                onClick={onStartRoute}
+                className="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+              >
+                Build Route
+              </Button>
+            )}
+            {route.length > 1 && (
+              <Button
+                onClick={onRemoveLastStop}
+                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+              >
+                Remove Last Stop
+              </Button>
+            )}
+            {route.length > 0 && (
+              <Button
+                onClick={onClearRoute}
+                className="w-full px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm"
+              >
+                {isRoutePickerActive ? 'Cancel' : 'Clear Route'}
+              </Button>
+            )}
+          </div>
 
           {/* Error message */}
           {error && (
@@ -252,16 +202,6 @@ export default function VehicleDispatchPanel({
           </button>
         </div>
       </div>
-
-      {/* Route picker overlay - shown when in route picker mode */}
-      {isRoutePickerActive && (
-        <RoutePickerOverlay
-          ownedPlaceInstances={availableWaypoints}
-          route={route}
-          onPlaceClick={handlePlaceInRoute}
-          currentLocationId={startingPlaceId}
-        />
-      )}
 
       {showToast && (
         <Toast

@@ -43,6 +43,7 @@ export const usePlaceTypeStore = create<PlaceTypeState>()(
     }),
     {
       name: 'place-types-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

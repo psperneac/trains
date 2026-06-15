@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { ObjectId } from 'mongodb';
 import { PlayersService } from '../../api/support/players.module';
 import { PlacesService } from '../../api/places.module';
-import { PlaceInstancesService } from '../../api/place-instance.module';
+import { PlaceInstanceDto, PlaceInstanceMapper, PlaceInstancesService } from '../../api/place-instance.module';
 import { PlaceInstance } from '../../api/place-instance.module';
 import { EconomyService, CurrencyType } from '../economy/economy.service';
 import { MapRevealService } from '../map-reveal/map-reveal.service';
@@ -20,7 +20,7 @@ export class PurchasePlaceDto {
  */
 export interface PurchasePlaceResult {
   success: boolean;
-  placeInstance?: PlaceInstance;
+  placeInstance?: PlaceInstanceDto;
   error?: string;
 }
 
@@ -50,6 +50,7 @@ export class PlacePurchaseService {
     private readonly playersService: PlayersService,
     private readonly placesService: PlacesService,
     private readonly placeInstancesService: PlaceInstancesService,
+    private readonly placeInstanceMapper: PlaceInstanceMapper,
     private readonly economyService: EconomyService,
     private readonly mapRevealService: MapRevealService
   ) {}
@@ -130,7 +131,7 @@ export class PlacePurchaseService {
 
     // 6. Create PlaceInstance
     try {
-      const placeInstance = await this.createPlaceInstance(player, place);
+      const placeInstance = await this.createPlaceInstance(player, place).then(pi => this.placeInstanceMapper.toDto(pi));
       return {
         success: true,
         placeInstance

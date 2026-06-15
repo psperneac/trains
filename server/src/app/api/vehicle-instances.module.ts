@@ -79,6 +79,7 @@ export interface VehicleInstanceDto {
   gameId: string;
   playerId: string;
   content: any;
+  version: number;
   created?: string;
   updated?: string;
 }
@@ -205,6 +206,7 @@ export class VehicleInstanceMapper extends AbstractMongoDtoMapper<VehicleInstanc
       route: domain.route?.map(id => id.toString()) ?? [],
       status: domain.status,
       content: domain.content,
+      version: domain.version ?? 0,
     };
 
     return dto;

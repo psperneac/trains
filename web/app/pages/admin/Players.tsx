@@ -4,7 +4,7 @@ import Pagination from '../../components/Pagination';
 import WalletDisplay from '../../components/WalletDisplay';
 import { useAuthStore } from '../../store/authStore';
 import { usePlayersStore } from '../../store/playersStore';
-import { usePlaceInstanceStore } from '../../store/placeInstanceStore';
+import { usePlaceInstanceStore } from '../../store/rootStore';
 import { useVehicleInstanceStore } from '../../store/vehicleInstanceStore';
 import type { PlayerDto } from '../../types/player';
 import type { PlayerFullStateDto } from '../../types/player';

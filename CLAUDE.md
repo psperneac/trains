@@ -7,14 +7,11 @@ This file provides guidance to coding agents like Claude Code (claude.ai/code) o
 Trains is a transportation game where players send jobs by vehicles from one place to another to earn cash. The application uses a multi-tenant architecture where each game is a tenant. The project consists of:
 
 - **server/** - NestJS backend with MongoDB (TypeORM + Mongoose)
-- **ng-web/** - **Current UI implementation** — Angular 19+ frontend with NgRx state management
-- **web/** - React frontend (reference only — do not develop new features here)
+- **web/** - React frontend / web
 
 ### UI Implementation Status
 
-**Active development: `ng-web/` (Angular)** — This is the current UI we are building.
-
-**`web/` (React)** — Complete implementation used as reference for API contracts, domain models, and UI patterns. Do not add new features here; it serves only as a source of truth for how the backend APIs work and how features should behave.
+**Active development: `web/` (React)** — This is the current UI we are building.
 
 ## Development Commands
 
@@ -156,6 +153,39 @@ Key directories:
 - [app/routes/](web/app/routes/) - Route definitions
 - [app/types/](web/app/types/) - TypeScript type definitions
 - [app/store/](web/app/store/) - Zustand state stores
+
+#### Store API Call Pattern
+
+All API calls are made from Zustand stores, never directly from components. This ensures consistent state management and enables optimistic updates and cache invalidation from a single location.
+
+**Rules:**
+
+1. **All API calls originate from a store.** Components call store actions, not `apiRequest` directly. Store actions are async functions that perform the network request and update local state.
+
+2. **Create/Update/Delete operations update the local store immediately.** The server must return the full updated DTO (including nested relations like `currentPlaceInstance`). The store uses the returned DTO to update state in-place — no re-fetch required. This pattern is:
+   - Server performs the operation and returns the complete updated entity as the response body
+   - Store action receives the DTO and calls an `updateX` or `setX` helper to merge it into the store
+   - Only re-fetch from the server when in-place updates are not possible (e.g., paginated list results)
+
+3. **Store update strategy — update in-place first, re-fetch last.** Find the entity by ID in the store's record and replace it with the server's returned DTO. Only call `fetchX` to re-fetch if the operation affects a collection that cannot be updated item-by-item (e.g., "get all" responses, pagination, sorted lists).
+
+4. **Server DTOs must include full entity state.** When returning updated entities from write operations (POST/PUT/PATCH), the server must populate nested relations (e.g., `vehicle.currentPlaceInstance` not just `vehicle.currentPlaceInstanceId`). The client uses these to keep the UI in sync without additional requests.
+
+Example store action:
+
+```ts
+// In placeInstanceStore.ts
+purchasePlace: async (playerId: string, placeId: string, description?: string) => {
+  const result = await apiRequest<{ success: boolean; placeInstance?: PlaceInstanceDto }>(
+    `/api/players/${playerId}/purchase-place`,
+    { method: 'POST', authToken, body: JSON.stringify({ placeId, description }) }
+  );
+  if (result.success && result.placeInstance) {
+    get().setPlaceInstance(result.placeInstance); // update in-place
+  }
+  return result;
+}
+```
 
 ## Domain Model
 

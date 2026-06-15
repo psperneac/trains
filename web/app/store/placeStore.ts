@@ -162,6 +162,7 @@ export const usePlaceStore = create<PlaceState>()(
     }),
     {
       name: 'places-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

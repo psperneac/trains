@@ -9,8 +9,41 @@ interface VehicleInstanceState {
   vehicleInstancesByPlayer: Record<string, VehicleInstanceDto[]>;
   loading: boolean;
   error: string | null;
+  inFlightRequestsByPlayer: Record<string, Promise<void> | undefined>;
   fetchVehicleInstancesByPlayerId: (playerId: string) => Promise<void>;
+  loadVehicleInstancesByPlayerId: (playerId: string) => Promise<void>;
   updateVehicle: (vehicleId: string, vehicle: Partial<VehicleInstanceDto>) => void;
+}
+
+// Internal helper — kept outside the state interface
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchVehicleInstancesByPlayerIdImpl(set: any, get: () => VehicleInstanceState, playerId: string) {
+  set({ loading: true, error: null });
+  try {
+    const rawToken = useAuthStore.getState().authToken;
+    const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+    const response = await apiRequest<{ data: VehicleInstanceDto[] }>(
+      `/api/vehicle-instances/by-player/${playerId}?limit=1000`,
+      { method: 'GET', authToken }
+    );
+    set({
+      vehicleInstancesByPlayer: {
+        ...get().vehicleInstancesByPlayer,
+        [playerId]: response.data
+      },
+      loading: false
+    });
+  } catch (err: any) {
+    set({ error: err.message || 'Unknown error', loading: false });
+  } finally {
+    set((state: VehicleInstanceState) => ({
+      ...state,
+      inFlightRequestsByPlayer: {
+        ...state.inFlightRequestsByPlayer,
+        [playerId]: undefined
+      }
+    }));
+  }
 }
 
 export const useVehicleInstanceStore = create<VehicleInstanceState>()(
@@ -19,26 +52,34 @@ export const useVehicleInstanceStore = create<VehicleInstanceState>()(
       vehicleInstancesByPlayer: {},
       loading: false,
       error: null,
+      inFlightRequestsByPlayer: {},
 
       fetchVehicleInstancesByPlayerId: async (playerId: string) => {
-        set({ loading: true, error: null });
-        try {
-          const rawToken = useAuthStore.getState().authToken;
-          const authToken = typeof rawToken === 'string' ? rawToken : undefined;
-          const response = await apiRequest<{ data: VehicleInstanceDto[] }>(
-            `/api/vehicle-instances/by-player/${playerId}?limit=1000`,
-            { method: 'GET', authToken }
-          );
-          set({
-            vehicleInstancesByPlayer: {
-              ...get().vehicleInstancesByPlayer,
-              [playerId]: response.data
-            },
-            loading: false
-          });
-        } catch (err: any) {
-          set({ error: err.message || 'Unknown error', loading: false });
+        const { inFlightRequestsByPlayer } = get();
+
+        if (inFlightRequestsByPlayer[playerId]) {
+          return inFlightRequestsByPlayer[playerId];
         }
+
+        const networkPromise = fetchVehicleInstancesByPlayerIdImpl(set, get, playerId);
+        inFlightRequestsByPlayer[playerId] = networkPromise;
+        return networkPromise;
+      },
+
+      // The smart "load" method — only fetches if not already fetched
+      loadVehicleInstancesByPlayerId: async (playerId: string) => {
+        const { inFlightRequestsByPlayer, vehicleInstancesByPlayer } = get();
+
+        if (inFlightRequestsByPlayer[playerId]) {
+          return inFlightRequestsByPlayer[playerId];
+        }
+
+        if (vehicleInstancesByPlayer[playerId]) {
+          console.log(`Cache hit for player ${playerId}, skipping fetch.`);
+          return;
+        }
+
+        return get().fetchVehicleInstancesByPlayerId(playerId);
       },
 
       updateVehicle: (vehicleId: string, vehicle: Partial<VehicleInstanceDto>) => {
@@ -62,6 +103,7 @@ export const useVehicleInstanceStore = create<VehicleInstanceState>()(
     }),
     {
       name: 'vehicle-instance-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

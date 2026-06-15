@@ -82,8 +82,9 @@ export class VehicleTypeController {
   constructor(private readonly service: VehicleTypeService) {}
 
   @Get()
-  getAllVehicleTypes() {
-    return this.service.findAllVehicleTypes();
+  async getAllVehicleTypes() {
+    const data = await this.service.findAllVehicleTypes();
+    return { data, page: 1, limit: 0, totalCount: data.length };
   }
 }
 

@@ -209,9 +209,13 @@ export class PlayerController extends AbstractMongoServiceController<Player, Pla
   @UseGuards(LoggedIn)
   async findAllByUserId(
     @Param('userId') userId: string,
-    @Query() pagination: PageRequestDto
+    @Query() pagination: PageRequestDto,
+    @Req() request: RequestWithUser
   ): Promise<PageDto<PlayerDto>> {
-    return this.playersService.findAllByUserId(userId, pagination).then(this.makeHandler());
+    const currentUser = request.user || undefined;
+    return this.playersService.findAllByUserId(userId, pagination).then(
+      this.makeHandlerWithUser(currentUser)
+    );
   }
 
   @Get(':id')

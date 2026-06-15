@@ -20,7 +20,7 @@ export class VehicleDispatchController {
   /**
    * Dispatch a vehicle along a specified route.
    *
-   * POST /vehicles/:id/dispatch
+   * POST /vehicle-dispatch/:id/dispatch
    *
    * @param id - Vehicle instance ID
    * @param dispatchDto - Route information
@@ -38,7 +38,7 @@ export class VehicleDispatchController {
   /**
    * Get current dispatch status of a vehicle.
    *
-   * GET /vehicles/:id/dispatch/status
+   * GET /vehicle-dispatch/:id/dispatch/status
    *
    * @param id - Vehicle instance ID
    * @returns Current vehicle state including status and route info
@@ -52,7 +52,7 @@ export class VehicleDispatchController {
   /**
    * Cancel a pending vehicle dispatch.
    *
-   * POST /vehicles/:id/dispatch/cancel
+   * POST /vehicle-dispatch/:id/dispatch/cancel
    *
    * @param id - Vehicle instance ID
    * @returns Success status

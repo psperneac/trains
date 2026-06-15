@@ -2,7 +2,6 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:base-ui.com)",
-      "Bash(npx -y @angular/cli@21 new ng-web --skip-git --style=css --ssr=false --skip-tests --routing=false --defaults)",
       "Bash(npm install *)"
     ]
   }

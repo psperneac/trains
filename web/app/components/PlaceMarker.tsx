@@ -12,6 +12,13 @@ interface PlaceWithOwnership extends PlaceDto {
 interface PlaceMarkerProps {
   place: PlaceWithOwnership;
   onClick: () => void;
+  // Dispatch mode - when active, owned place clicks go to dispatch handler instead of job board
+  dispatchMode?: boolean;
+  onDispatchClick?: (placeInstanceId: string) => void;
+  // Visual state for the in-progress route. 'inRoute' tints the marker green
+  // (already picked as a stop); 'unreachable' dims it (cannot be the next stop);
+  // 'default' falls back to the normal type color.
+  markerState?: 'default' | 'inRoute' | 'unreachable';
 }
 
 // Color mapping for place types
@@ -36,14 +43,25 @@ const grayedColorMap: Record<string, string> = {
   YARD: '#886644',
 };
 
-function getPinIcon(type: string, isOwned: boolean) {
-  const color = isOwned
-    ? typeColorMap[type] || '#607d8b'
-    : grayedColorMap[type] || '#888888';
+function getPinIcon(type: string, isOwned: boolean, markerState: 'default' | 'inRoute' | 'unreachable' = 'default') {
+  // Route-state colors override the type color
+  let color: string;
+  if (markerState === 'inRoute') {
+    color = '#16a34a'; // green-600
+  } else if (markerState === 'unreachable') {
+    color = grayedColorMap[type] || '#9ca3af';
+  } else {
+    color = isOwned
+      ? typeColorMap[type] || '#607d8b'
+      : grayedColorMap[type] || '#888888';
+  }
+
+  // Apply reduced opacity for unreachable markers via SVG attribute
+  const opacity = markerState === 'unreachable' ? '0.35' : '1';
 
   return new L.Icon({
     iconUrl:
-      `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path fill='${encodeURIComponent(color)}' d='M16 2C9.373 2 4 7.373 4 14c0 7.732 9.09 15.36 11.13 16.97a2 2 0 0 0 2.74 0C18.91 29.36 28 21.732 28 14c0-6.627-5.373-12-12-12zm0 18a6 6 0 1 1 0-12a6 6 0 0 1 0 12z'/></svg>`,
+      `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path fill='${encodeURIComponent(color)}' fill-opacity='${opacity}' d='M16 2C9.373 2 4 7.373 4 14c0 7.732 9.09 15.36 11.13 16.97a2 2 0 0 0 2.74 0C18.91 29.36 28 21.732 28 14c0-6.627-5.373-12-12-12zm0 18a6 6 0 1 1 0-12a6 6 0 0 1 0 12z'/></svg>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
@@ -51,32 +69,43 @@ function getPinIcon(type: string, isOwned: boolean) {
   });
 }
 
-export default function PlaceMarker({ place, onClick }: PlaceMarkerProps) {
+export default function PlaceMarker({ place, onClick, dispatchMode = false, onDispatchClick, markerState = 'default' }: PlaceMarkerProps) {
   // Validate coordinates before rendering
   if (typeof place.lat !== 'number' || typeof place.lng !== 'number') {
     console.log('[PlaceMarker] Invalid coordinates:', place);
     return null;
   }
 
-  const icon = getPinIcon(place.type, place.isOwned);
+  const icon = getPinIcon(place.type, place.isOwned, markerState);
 
-  // For owned places: marker click just opens popup (Leaflet default), don't call onClick
-  // onClick is only called from the popup's "View Jobs" button
-  // For non-owned places: marker click calls onClick (shows buy modal)
-  const markerClickHandler = (e: L.LeafletMouseEvent) => {
+  // In dispatch mode, clicking directly adds to route - no popup
+  const handleMarkerClick = (e: L.LeafletMouseEvent) => {
+    // Block clicks on places that can't be added to the route
+    if (markerState === 'unreachable') return;
+    // Block re-clicking a place that's already in the route
+    if (markerState === 'inRoute') return;
+
     if (!place.isOwned) {
       onClick();
+      return;
     }
-    // For owned places, Leaflet auto-opens the popup - don't call onClick here
- };
 
-  // Only show popup for owned places; non-owned places show the buy modal on click
+    if (dispatchMode && place.placeInstanceId && onDispatchClick) {
+      // Directly add to route without showing popup
+      onDispatchClick(place.placeInstanceId);
+    }
+    // Otherwise, Leaflet auto-opens the popup as usual
+  };
+
+  // Only show popup for owned places when NOT in dispatch mode
+  const showPopup = place.isOwned && !dispatchMode;
+
   return (
     <Marker
       position={[place.lat, place.lng]}
       icon={icon}
       eventHandlers={{
-        click: markerClickHandler,
+        click: handleMarkerClick,
       }}
     >
       <Tooltip direction="top" offset={[0, -32]} permanent={false}>
@@ -90,7 +119,7 @@ export default function PlaceMarker({ place, onClick }: PlaceMarkerProps) {
           )}
         </div>
       </Tooltip>
-      {place.isOwned && (
+      {showPopup && (
         <Popup>
           <div className="p-2 min-w-[150px]">
             <h3 className="font-semibold">{place.name}</h3>

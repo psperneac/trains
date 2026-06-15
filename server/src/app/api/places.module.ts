@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -238,7 +238,7 @@ export class PlacesController extends AbstractMongoServiceController<Place, Plac
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Place.name, schema: PlaceSchema }]),
-    GamesModule
+    forwardRef(() => GamesModule)
   ],
   controllers: [PlacesController],
   providers: [PlacesService, PlaceMapper],

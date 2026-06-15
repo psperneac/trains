@@ -155,6 +155,7 @@ export const usePlaceConnectionStore = create<PlaceConnectionState>()(
     }),
     {
       name: 'place-connections-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

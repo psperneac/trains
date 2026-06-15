@@ -20,6 +20,8 @@ interface GameState {
   addGame: (game: Omit<GameDto, 'id'>) => Promise<void>;
   updateGame: (game: GameDto) => Promise<void>;
   deleteGame: (id: string) => Promise<void>;
+  lockGame: (id: string) => Promise<void>;
+  unlockGame: (id: string) => Promise<void>;
 }
 
 export const useGameStore = create<GameState>()(
@@ -125,9 +127,50 @@ export const useGameStore = create<GameState>()(
       set({ error: err.message || 'Unknown error', loading: false });
     }
   },
+
+  lockGame: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const updatedGame = await apiRequest<GameDto>(`/api/games/${id}/lock`, {
+        method: 'POST',
+        authToken,
+      });
+      // Update the game in both lists
+      set(state => ({
+        games: state.games.map(g => g.id === id ? updatedGame : g),
+        allGames: state.allGames.map(g => g.id === id ? updatedGame : g),
+        loading: false
+      }));
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
+
+  unlockGame: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const rawToken = useAuthStore.getState().authToken;
+      const authToken = typeof rawToken === 'string' ? rawToken : undefined;
+      const updatedGame = await apiRequest<GameDto>(`/api/games/${id}/unlock`, {
+        method: 'POST',
+        authToken,
+      });
+      // Update the game in both lists
+      set(state => ({
+        games: state.games.map(g => g.id === id ? updatedGame : g),
+        allGames: state.allGames.map(g => g.id === id ? updatedGame : g),
+        loading: false
+      }));
+    } catch (err: any) {
+      set({ error: err.message || 'Unknown error', loading: false });
+    }
+  },
     }),
     {
       name: 'game-store', // Name for Redux DevTools
+      store: 'trains-app',
       enabled: import.meta.env.DEV, // Only enable in development
     }
   )

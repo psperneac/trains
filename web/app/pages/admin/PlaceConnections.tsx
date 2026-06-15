@@ -257,7 +257,7 @@ export default function PlaceConnections() {
       <div className="flex flex-col lg:flex-row h-admin-content gap-4">
         {/* Table Section - Left Side */}
         <div className="w-full lg:w-120 lg:flex-shrink-0 bg-white shadow rounded-lg flex flex-col">
-          <div className="px-6 py-3 border-b flex-shrink-0">
+          <div className="px-3 py-2 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Place Connections ({visibleConnections.length})</h2>
               <button
@@ -268,47 +268,47 @@ export default function PlaceConnections() {
               </button>
             </div>
           </div>
-          
+
           {loading && <div className="p-4">Loading...</div>}
           {error && <div className="p-4 text-red-500">{error}</div>}
-          
+
           {!loading && !error && (
             <div className="overflow-y-auto flex-1">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
 {visibleConnections.map((connection, idx) => {
                     const startPlace = placesById[connection.startId];
                     const endPlace = placesById[connection.endId];
-                    
+
                     return (
                       <tr key={connection.id || idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-sm text-gray-900">
+                        <td className="px-2 py-1 text-sm text-gray-900">
                           <div>
                             <div className="font-medium">{connection.name}</div>
                             <div className="text-xs text-gray-500 truncate">{connection.description}</div>
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-900">
+                        <td className="px-2 py-1 text-sm text-gray-900">
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                             {connection.type}
                           </span>
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-900">
+                        <td className="px-2 py-1 text-sm text-gray-900">
                           <div className="text-xs">
                             <div>{startPlace?.name || connection.startId}</div>
                             <div className="text-gray-400">→</div>
                             <div>{endPlace?.name || connection.endId}</div>
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-sm flex gap-1">
+                        <td className="px-2 py-1 text-sm flex gap-1">
                           <button
                             onClick={() => handleShowOnMap(connection)}
                             className="text-blue-600 hover:text-blue-900 p-1"

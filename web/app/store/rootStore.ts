@@ -1,15 +1,25 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { usePlaceInstanceStore } from './placeInstanceStore';
 
-// Simple root store that just initializes all stores for unified view
-export const useRootStore = create()(
+// Re-export so existing call sites that import from `rootStore` keep working.
+export { usePlaceInstanceStore };
+
+export interface AppState {
+  initialized: boolean;
+}
+
+// Placeholder root store — kept only so Redux DevTools has a single
+// connection point under the shared `trains-app` store key. All real
+// state lives in independent per-domain stores.
+export const useRootStore = create<AppState>()(
   devtools(
-    (set, get) => ({
-      // This is just a placeholder to make all stores visible in one place
+    () => ({
       initialized: true,
     }),
     {
-      name: 'all-stores', // Unified store name
+      name: 'TrainsAppStore',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

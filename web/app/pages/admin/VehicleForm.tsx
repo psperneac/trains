@@ -50,10 +50,10 @@ export default function VehicleForm() {
       fetchedRef.current = true;
       fetchVehiclesByGameId(currentGameId);
     }
-    if (vehicleTypes.length === 0) {
+    if (!vehicleTypes?.length) {
       fetchVehicleTypes();
     }
-  }, [isEdit, currentVehicle, currentGameId, fetchVehiclesByGameId, vehicleTypes.length, fetchVehicleTypes]);
+  }, [isEdit, currentVehicle, currentGameId, fetchVehiclesByGameId, vehicleTypes, fetchVehicleTypes]);
 
   useEffect(() => {
     if (isEdit && currentVehicle) {
@@ -126,9 +126,9 @@ export default function VehicleForm() {
               onChange={handleChange}
               required
               className="mt-1 block w-full rounded border border-gray-300 p-2"
-              disabled={vehicleTypes.length === 0}
+              disabled={!vehicleTypes?.length}
             >
-              {vehicleTypes.length === 0 ? (
+              {!vehicleTypes?.length ? (
                 <option value="">Loading types...</option>
               ) : (
                 <>

@@ -6,6 +6,7 @@ import { PlaceInstancesService } from '../../api/place-instance.module';
 import { PlaceConnectionService } from '../../api/place-connection.module';
 import { JobsService } from '../../api/jobs.module';
 import { PlacesService } from '../../api/places.module';
+import { GamesService } from '../../api/games.module';
 import { EconomyService, CurrencyType } from '../economy/economy.service';
 import { EventsGateway } from '../events-gateway/events-gateway';
 import { ConflictException } from '../events-gateway/conflict.exception';
@@ -46,7 +47,7 @@ export interface ArrivalPayload {
  *
  * The VehicleDispatchService handles:
  * - Route validation (verifying connections exist between consecutive stops)
- * - Travel time calculation (based on distance and vehicle speed)
+ * - Travel time calculation (based on distance, vehicle speed, and game speed multiplier)
  * - Arrival processing (delivering jobs, updating vehicle position)
  * - Multi-stop handling (continuing to next stop or ending journey)
  *
@@ -63,12 +64,16 @@ export interface ArrivalPayload {
  */
 @Injectable()
 export class VehicleDispatchService {
+  /** Default speed multiplier when game doesn't have one set */
+  private static readonly DEFAULT_SPEED_MULTIPLIER = 60;
+
   constructor(
     private readonly vehicleInstancesService: VehicleInstancesService,
     private readonly placeInstancesService: PlaceInstancesService,
     private readonly placeConnectionService: PlaceConnectionService,
     private readonly jobsService: JobsService,
     private readonly placesService: PlacesService,
+    private readonly gamesService: GamesService,
     private readonly economyService: EconomyService,
     private readonly schedulerService: InMemorySchedulerService,
     private readonly eventsGateway: EventsGateway
@@ -243,7 +248,10 @@ export class VehicleDispatchService {
   /**
    * Calculate total travel time for a vehicle along a route.
    *
-   * Sums distances for all legs of the journey, then divides by vehicle speed.
+   * Sums distances for all legs of the journey, then divides by vehicle speed
+   * and multiplies by the game's speed multiplier to convert real-world hours
+   * to game minutes.
+   *
    * Time is returned in milliseconds.
    *
    * @param vehicle - The vehicle instance
@@ -266,9 +274,40 @@ export class VehicleDispatchService {
       }
     }
 
-    // Time = distance / speed (speed is in km per ms)
+    // Get the game's speed multiplier (default to 60 if not set)
+    const speedMultiplier = await this.getSpeedMultiplier(vehicle);
+
+    // Time = (distance / speed) * (3600 / speedMultiplier) * 1000
+    // - distance is in km
+    // - speed is in km/h
+    // - speedMultiplier converts hours to game minutes (e.g., 60 = 1 real minute = 1 game hour)
+    // - dividing by speedMultiplier/3600 gives us the fraction of an hour, then we convert to ms
     const speed = vehicle.vehicle?.speed || 1;
-    return Math.ceil(totalDistance / speed);
+    const timeInHours = totalDistance / speed;
+    const timeInGameHours = timeInHours * speedMultiplier;
+    const timeInMs = Math.ceil(timeInGameHours * 3600 * 1000);
+
+    return timeInMs;
+  }
+
+  /**
+   * Get the speed multiplier for the game this vehicle belongs to.
+   *
+   * @param vehicle - The vehicle instance
+   * @returns The speed multiplier, or DEFAULT_SPEED_MULTIPLIER if not set
+   */
+  private async getSpeedMultiplier(vehicle: any): Promise<number> {
+    const gameId = vehicle.gameId?.toString();
+    if (!gameId) {
+      return VehicleDispatchService.DEFAULT_SPEED_MULTIPLIER;
+    }
+
+    const game = await this.gamesService.findOne(gameId);
+    if (!game || game.speedMultiplier == null) {
+      return VehicleDispatchService.DEFAULT_SPEED_MULTIPLIER;
+    }
+
+    return game.speedMultiplier;
   }
 
   /**
@@ -321,6 +360,33 @@ export class VehicleDispatchService {
   }
 
   /**
+   * Build the resolved currentPlaceInstance object for broadcast, mirroring
+   * the shape that VehicleInstancesMapper.toDto() produces so the client
+   * always receives a fully-populated object.
+   */
+  private async populateCurrentPlaceInstance(vehicle: any, placeInstance: any): Promise<void> {
+    const placeId = placeInstance.placeId?.toString();
+    const place = placeId ? await this.placesService.findOne(placeId) : null;
+    (vehicle as any).currentPlaceInstance = {
+      id: (placeInstance as any).id || (placeInstance as any)._id?.toString(),
+      placeId,
+      gameId: (placeInstance as any).gameId?.toString(),
+      playerId: (placeInstance as any).playerId?.toString(),
+      place: place ? {
+        id: (place as any).id || (place as any)._id?.toString(),
+        name: place.name,
+        description: place.description,
+        type: place.type,
+        lat: place.lat,
+        lng: place.lng,
+        gameId: (place as any).gameId?.toString(),
+      } : undefined,
+      jobOffers: (placeInstance as any).jobOffers,
+      content: (placeInstance as any).content,
+    };
+  }
+
+  /**
    * Process vehicle arrival at a destination.
    *
    * This handler:
@@ -364,6 +430,7 @@ export class VehicleDispatchService {
       const nextDestination = remainingRoute[remainingRoute.length - 1];
       vehicle.destinationPlaceInstanceId = new Types.ObjectId(nextDestination);
       vehicle.currentPlaceInstanceId = null;
+      (vehicle as any).currentPlaceInstance = undefined;
 
       // Calculate time to next destination
       const travelTimeMs = await this.calculateTravelTime(vehicle, remainingRoute);
@@ -386,23 +453,15 @@ export class VehicleDispatchService {
       };
 
       this.schedulerService.schedule('vehicle:arrival', nextPayload, travelTimeMs);
-    } else if (remainingRoute.length === 1) {
-      // Final destination reached
-      vehicle.route = [];
-      vehicle.status = 'AT_PLACE';
-      vehicle.version = (vehicle.version || 0) + 1;
-      await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
-
-      // Broadcast vehicle state update
-      const playerId = vehicle.playerId?.toString();
-      if (playerId) {
-        this.eventsGateway.broadcastVehicleStateUpdated(playerId, vehicle);
-      }
     } else {
-      // No remaining stops
+      // Final destination reached (remainingRoute.length === 1 or 0)
       vehicle.route = [];
       vehicle.status = 'AT_PLACE';
       vehicle.version = (vehicle.version || 0) + 1;
+
+      // Populate currentPlaceInstance so the broadcast carries the resolved place name
+      await this.populateCurrentPlaceInstance(vehicle as any, arrivedPlace);
+
       await this.vehicleInstancesService.update(vehicleInstanceId, vehicle);
 
       // Broadcast vehicle state update

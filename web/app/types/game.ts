@@ -11,4 +11,6 @@ export interface GameDto {
   places?: string[];
   placeConnections?: string[];
   content: any;
+  locked: boolean;
+  lockedBy: string | null;
 }

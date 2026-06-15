@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, forwardRef, Get, Injectable, Module, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -216,7 +216,7 @@ export class VehiclesController extends AbstractMongoServiceController<Vehicle, 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Vehicle.name, schema: VehicleSchema }]),
-    GamesModule
+    forwardRef(() => GamesModule)
   ],
   controllers: [VehiclesController],
   providers: [VehiclesService, VehicleMapper],

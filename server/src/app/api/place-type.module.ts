@@ -70,8 +70,9 @@ export class PlaceTypeController {
   constructor(private readonly service: PlaceTypeService) {}
 
   @Get()
-  getAllPlaceTypes() {
-    return this.service.findAllPlaceTypes();
+  async getAllPlaceTypes() {
+    const data = await this.service.findAllPlaceTypes();
+    return { data, page: 1, limit: 0, totalCount: data.length };
   }
 }
 

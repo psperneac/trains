@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Injectable, Module, Param, Post, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -46,6 +46,10 @@ export class PlaceConnection extends AbstractMongoEntity {
   @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   @Expose()
   gameId: Types.ObjectId;
+
+  @Prop({ type: Number, required: false })
+  @Expose()
+  distance?: number;
 }
 
 export type PlaceConnectionDocument = HydratedDocument<PlaceConnection>;
@@ -60,6 +64,7 @@ export interface PlaceConnectionDto {
   startId: string;
   endId: string;
   gameId: string;
+  distance?: number;
   created?: string;
   updated?: string;
 }
@@ -201,6 +206,7 @@ export class PlaceConnectionMapper extends AbstractMongoDtoMapper<PlaceConnectio
       startId: domain.startId?.toString(),
       endId: domain.endId?.toString(),
       gameId: domain.gameId?.toString(),
+      distance: domain.distance,
       created: domain.created?.toISOString(),
       updated: domain.updated?.toISOString(),
     };
@@ -265,7 +271,7 @@ export class PlaceConnectionController extends AbstractMongoServiceController<Pl
   imports: [
     MongooseModule.forFeature([{ name: PlaceConnection.name, schema: PlaceConnectionSchema }]),
     PlacesModule,
-    GamesModule
+    forwardRef(() => GamesModule)
   ],
   controllers: [PlaceConnectionController],
   providers: [PlaceConnectionsService, PlaceConnectionMapper],

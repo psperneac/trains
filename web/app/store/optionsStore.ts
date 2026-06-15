@@ -52,6 +52,7 @@ export const useOptionsStore = create<OptionsState>()(
     }),
     {
       name: 'options-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Expose } from 'class-transformer';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { omit } from 'lodash';
-import { ObjectId } from 'mongodb';
 import { Types } from 'mongoose';
 
 import { LoggedIn } from '../../authentication/authentication.guard';
@@ -17,7 +16,7 @@ import { AllExceptionsFilter } from '../../utils/all-exceptions.filter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, HydratedDocument } from 'mongoose';
 
-import { Place, PlacesModule, PlacesService } from './places.module';
+import { PlacesModule, PlacesService } from './places.module';
 import { JobOffer, JobOfferDto, JobsModule, JobsService } from './jobs.module';
 
 @Schema({ collection: 'place_instances' })

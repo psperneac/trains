@@ -111,6 +111,7 @@ export const useAdminUserStore = create<AdminUserState>()(
     }),
     {
       name: 'admin-users-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

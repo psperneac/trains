@@ -97,6 +97,7 @@ export const useVehicleStore = create<VehicleState>()(
     }),
     {
       name: 'vehicle-store',
+      store: 'trains-app',
       enabled: import.meta.env.DEV,
     }
   )

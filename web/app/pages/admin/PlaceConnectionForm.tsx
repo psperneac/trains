@@ -38,7 +38,23 @@ const emptyConnection: Omit<PlaceConnectionDto, 'id'> = {
   startId: '',
   endId: '',
   gameId: '', // Will be set from currentGameId
+  distance: undefined,
 };
+
+// Calculate distance between two points in km (Haversine formula)
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 function FitBounds({ places }: { places: { id: string; lat: number; lng: number }[] }) {
   const map = useMap();
@@ -151,6 +167,7 @@ export default function PlaceConnectionForm() {
   const { allGames, fetchAllGames } = useGameStore();
   const { currentGameId } = useAuthStore();
   const isEdit = Boolean(id);
+  const [distanceManuallySet, setDistanceManuallySet] = useState(false);
 
   // Redirect to home if no game is selected
   useEffect(() => {
@@ -189,12 +206,29 @@ export default function PlaceConnectionForm() {
   useEffect(() => {
     if (isEdit && currentConnection) {
       setForm(currentConnection);
+      if (currentConnection.distance !== undefined) {
+        setDistanceManuallySet(true);
+      }
     }
   }, [isEdit, currentConnection]);
 
+  // Get selected places for map (declared early for use in effects)
+  const startPlace = allPlaces.find((p) => p.id === form.startId);
+  const endPlace = allPlaces.find((p) => p.id === form.endId);
+
+  // Auto-fill distance when both places are selected (if not manually set)
+  useEffect(() => {
+    if (startPlace && endPlace && !distanceManuallySet) {
+      const dist = calculateDistance(startPlace.lat, startPlace.lng, endPlace.lat, endPlace.lng);
+      const roundedDist = Math.round(dist);
+      setForm((prev) => ({ ...prev, distance: roundedDist }));
+    }
+  }, [startPlace, endPlace, distanceManuallySet]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const parsedValue = type === 'number' ? (value === '' ? undefined : parseFloat(value)) : value;
+    setForm((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -213,10 +247,6 @@ export default function PlaceConnectionForm() {
   };
 
   const handleCancel = () => navigate('/game-admin/place-connections');
-
-  // Get selected places for map
-  const startPlace = allPlaces.find((p) => p.id === form.startId);
-  const endPlace = allPlaces.find((p) => p.id === form.endId);
 
   // Prepare places options for select
   const placeOptions = allPlaces.map((p) => ({ id: p.id, name: p.name }));
@@ -307,6 +337,40 @@ export default function PlaceConnectionForm() {
               required
               placeholder="Select end place..."
             />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Distance (km)</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  name="distance"
+                  value={form.distance ?? ''}
+                  onChange={(e) => {
+                    setDistanceManuallySet(true);
+                    handleChange(e);
+                  }}
+                  min="0"
+                  step="1"
+                  className="mt-1 block w-full rounded border border-gray-300 p-2"
+                  style={{ padding: '0.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (startPlace && endPlace) {
+                      const dist = calculateDistance(startPlace.lat, startPlace.lng, endPlace.lat, endPlace.lng);
+                      const roundedDist = Math.round(dist);
+                      setForm((prev) => ({ ...prev, distance: roundedDist }));
+                      setDistanceManuallySet(false);
+                    }
+                  }}
+                  className="mt-1 px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm"
+                  title="Recalculate distance"
+                >
+                  ↻
+                </button>
+              </div>
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Game</label>

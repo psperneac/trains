@@ -184,6 +184,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store', // Name for Redux DevTools
+      store: 'trains-app',
       enabled: import.meta.env.DEV, // Only enable in development
     }
   )

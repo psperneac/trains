@@ -20,6 +20,7 @@ import { PlacesModule } from '../api/places.module';
 import { VehiclesModule } from '../api/vehicles.module';
 import { VehicleInstancesModule } from '../api/vehicle-instances.module';
 import { JobsModule } from '../api/jobs.module';
+import { GamesModule } from '../api/games.module';
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { EventsGatewayModule } from './events-gateway/events-gateway.module';
 
@@ -33,6 +34,7 @@ import { EventsGatewayModule } from './events-gateway/events-gateway.module';
     VehiclesModule,
     VehicleInstancesModule,
     JobsModule,
+    GamesModule,
     AuthenticationModule,
     EventsGatewayModule,
     JobOfferModule
