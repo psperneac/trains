@@ -29,6 +29,7 @@
     "react-leaflet": "^5.0.0",
     "react-router": "^7.5.3",
     "react-router-dom": "^7.6.1",
+    "selenium-webdriver": "^4.45.0",
     "shadcn": "^4.10.0",
     "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.6.0",
@@ -37,13 +38,17 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@types/leaflet": "^1.9.18",
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "chromedriver": "^150.0.0",
+    "playwright": "^1.61.1",
     "tailwindcss": "^4.1.4",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4"

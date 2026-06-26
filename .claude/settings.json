@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:base-ui.com)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(brew --prefix node)",
+      "Read(//opt/homebrew/lib/node_modules/npm/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(/opt/homebrew/bin/npm install *)",
+      "Read(//opt/homebrew/Cellar/node/25.9.0_1/bin/**)",
+      "Bash(brew list *)",
+      "Bash(PATH=/opt/homebrew/bin:__TRACKED_VAR__ /opt/homebrew/bin/npm install selenium-webdriver)",
+      "Bash(PATH=/opt/homebrew/bin:__TRACKED_VAR__ /opt/homebrew/bin/npm install -D chromedriver)"
     ]
   }
 }

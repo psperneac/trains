@@ -12,12 +12,7 @@ import type { MapViewData } from '~/store/playersStore';
 // These names mirror the PlayerMapView.md spec 1:1. The spec is the source of
 // truth; the renderer is a dumb projector over these statuses.
 
-export type PlaceStatus =
-  | 'OWNED'
-  | 'OWNED_ON_ROUTE'
-  | 'OWNED_ROUTABLE'
-  | 'NOT_OWNED'
-  | 'NOT_OWNED_PURCHASEABLE';
+export type PlaceStatus = 'OWNED' | 'OWNED_ON_ROUTE' | 'OWNED_ROUTABLE' | 'NOT_OWNED' | 'NOT_OWNED_PURCHASEABLE';
 
 export type ConnectionStatus =
   | 'INTERNAL'
@@ -39,9 +34,12 @@ export interface PlaceWithOwnership extends PlaceDto {
 
 export interface PlaceView extends PlaceWithOwnership {
   status: PlaceStatus;
+
   // Resolved visual style — keeps JSX dumb.
   markerColor: string;
+
   markerOpacity: number;
+
   // False when the place is already in the route or unreachable during
   // route picking; PlaceMarker uses this to short-circuit click handlers.
   clickable: boolean;
@@ -65,6 +63,7 @@ export interface PlayerMapModel {
   center: [number, number];
   places: PlaceView[];
   connections: ConnectionView[];
+
   // Green polyline tracing the in-progress route. Empty when not in
   // DISPATCH mode or when the route has fewer than 2 stops.
   routePolyline: [number, number][];
@@ -90,8 +89,20 @@ const CONNECTION_COLOR: Record<ConnectionStatus, string> = {
   INTERNAL_ON_ROUTE: '#1d4ed8', // blue
   INTERNAL_ROUTABLE: '#f5ca0c', // '#b91c1c', // darker red
   EXTERNAL: '#cccccc',
-  EXTERNAL_PURCHASEABLE: '#404040' // '#9ca3af', // darker gray
+  EXTERNAL_PURCHASEABLE: '#404040', // '#9ca3af', // darker gray
 };
+
+interface MarkerStyle {
+  color: string;
+  opacity: number;
+}
+
+interface ConnectionStyle {
+  color: string;
+  weight: number;
+  opacity: number;
+  dashArray?: string;
+}
 
 // ---------------------------------------------------------------------------
 // Shared helpers (mode-agnostic)
@@ -106,28 +117,18 @@ function ownedTemplateIds(mapViewData: MapViewData): Set<string> {
 }
 
 function pickCenter(places: PlaceView[]): [number, number] {
-  const first = places.find(
-    (p) => typeof p.lat === 'number' && typeof p.lng === 'number'
-  );
+  const first = places.find(p => typeof p.lat === 'number' && typeof p.lng === 'number');
   return first ? [first.lat, first.lng] : [51.505, -0.09];
 }
 
-function statusToMarkerStyle(status: PlaceStatus): {
-  color: string;
-  opacity: number;
-} {
+function statusToMarkerStyle(status: PlaceStatus): MarkerStyle {
   return {
     color: PLACE_COLOR[status],
     opacity: status === 'OWNED_ROUTABLE' ? 0.35 : 1,
   };
 }
 
-function statusToConnectionStyle(status: ConnectionStatus): {
-  color: string;
-  weight: number;
-  opacity: number;
-  dashArray?: string;
-} {
+function statusToConnectionStyle(status: ConnectionStatus): ConnectionStyle {
   const highlighted =
     status === 'INTERNAL' ||
     status === 'INTERNAL_ON_ROUTE' ||
@@ -169,7 +170,17 @@ function resolveConnectionStatus(args: {
   startPlaceInstanceId?: string;
   endPlaceInstanceId?: string;
 }): ConnectionStatus {
-  const { startOwned, endOwned, startInRoute, endInRoute, mode, route = [], startPlaceInstanceId, endPlaceInstanceId } = args;
+  const {
+    startOwned,
+    endOwned,
+    startInRoute,
+    endInRoute,
+    mode,
+    route = [],
+    startPlaceInstanceId,
+    endPlaceInstanceId,
+  } = args;
+
   // Route-picker active: only the route itself and its routable edge stand
   // out; everything else is dimmed (encoded as EXTERNAL by the renderer).
   if (mode === 'DISPATCH') {
@@ -194,8 +205,10 @@ function resolveConnectionStatus(args: {
     if (startOwned || endOwned) return 'EXTERNAL_PURCHASEABLE';
     return 'EXTERNAL';
   }
+
   if (startOwned && endOwned) return 'INTERNAL';
   if (startOwned || endOwned) return 'EXTERNAL_PURCHASEABLE';
+
   return 'EXTERNAL';
 }
 
@@ -209,17 +222,13 @@ interface BuildOptions {
   reachableNextPlaceInstanceIds?: Set<string>;
 }
 
-function buildNormalModel(
-  mapViewData: MapViewData
-): PlayerMapModel {
+function buildNormalModel(mapViewData: MapViewData): PlayerMapModel {
   const ownedTemplates = ownedTemplateIds(mapViewData);
 
   const places: PlaceView[] = [
-    ...mapViewData.owned.map<PlaceView>((pi) => {
+    ...mapViewData.owned.map<PlaceView>(pi => {
       const place = pi.place;
-      const isPurchaseable = place
-        ? mapViewData.available.some((a) => a.id === place.id)
-        : false;
+      const isPurchaseable = place ? mapViewData.available.some(a => a.id === place.id) : false;
       const status = resolvePlaceStatus({
         isOwned: true,
         isInRoute: false,
@@ -239,17 +248,14 @@ function buildNormalModel(
       };
     }),
     ...mapViewData.available
-      .filter((p) => !ownedTemplates.has(String(p.id)))
-      .map<PlaceView>((p) => {
+      .filter(p => !ownedTemplates.has(String(p.id)))
+      .map<PlaceView>(p => {
         // A non-owned place is purchaseable when it sits one connection away
         // from any owned place.
-        const isPurchaseable = mapViewData.connections.some((c) => {
+        const isPurchaseable = mapViewData.connections.some(c => {
           const s = c.startId?.toString();
           const e = c.endId?.toString();
-          return (
-            (s === String(p.id) && ownedTemplates.has(e)) ||
-            (e === String(p.id) && ownedTemplates.has(s))
-          );
+          return (s === String(p.id) && ownedTemplates.has(e)) || (e === String(p.id) && ownedTemplates.has(s));
         });
         const status = resolvePlaceStatus({
           isOwned: false,
@@ -270,10 +276,8 @@ function buildNormalModel(
       }),
   ];
 
-  const validPlaces = places.filter(
-    (p) => typeof p.lat === 'number' && typeof p.lng === 'number'
-  );
-  const placeById = new Map(validPlaces.map((p) => [String(p.id), p]));
+  const validPlaces = places.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
+  const placeById = new Map(validPlaces.map(p => [String(p.id), p]));
 
   const connections: ConnectionView[] = [];
   mapViewData.connections.forEach((conn, idx) => {
@@ -322,7 +326,7 @@ function buildNormalModel(
 
 function buildDispatchModel(
   mapViewData: MapViewData,
-  options: Required<Pick<BuildOptions, 'route' | 'reachableNextPlaceInstanceIds'>> & BuildOptions
+  options: Required<Pick<BuildOptions, 'route' | 'reachableNextPlaceInstanceIds'>> & BuildOptions,
 ): PlayerMapModel {
   const { route, reachableNextPlaceInstanceIds } = options;
   const ownedTemplates = ownedTemplateIds(mapViewData);
@@ -331,14 +335,14 @@ function buildDispatchModel(
   // Build the green polyline tracing the in-progress route in order.
   const routePolyline: [number, number][] = [];
   for (const instanceId of route) {
-    const pi = mapViewData.owned.find((p) => p.id === instanceId);
+    const pi = mapViewData.owned.find(p => p.id === instanceId);
     if (pi?.place && typeof pi.place.lat === 'number' && typeof pi.place.lng === 'number') {
       routePolyline.push([pi.place.lat, pi.place.lng]);
     }
   }
 
   const places: PlaceView[] = [
-    ...mapViewData.owned.map<PlaceView>((pi) => {
+    ...mapViewData.owned.map<PlaceView>(pi => {
       const place = pi.place;
       const isInRoute = !!pi.place && routeSet.has(pi.id);
       const isReachable = reachableNextPlaceInstanceIds.has(pi.id);
@@ -363,17 +367,14 @@ function buildDispatchModel(
       };
     }),
     ...mapViewData.available
-      .filter((p) => !ownedTemplates.has(String(p.id)))
-      .map<PlaceView>((p) => {
+      .filter(p => !ownedTemplates.has(String(p.id)))
+      .map<PlaceView>(p => {
         // In dispatch mode, an unowned place is purchaseable when it is
         // adjacent (in either direction) to any owned place.
-        const isPurchaseable = mapViewData.connections.some((c) => {
+        const isPurchaseable = mapViewData.connections.some(c => {
           const s = c.startId?.toString();
           const e = c.endId?.toString();
-          return (
-            (s === String(p.id) && ownedTemplates.has(e)) ||
-            (e === String(p.id) && ownedTemplates.has(s))
-          );
+          return (s === String(p.id) && ownedTemplates.has(e)) || (e === String(p.id) && ownedTemplates.has(s));
         });
         const status = resolvePlaceStatus({
           isOwned: false,
@@ -394,10 +395,8 @@ function buildDispatchModel(
       }),
   ];
 
-  const validPlaces = places.filter(
-    (p) => typeof p.lat === 'number' && typeof p.lng === 'number'
-  );
-  const placeById = new Map(validPlaces.map((p) => [String(p.id), p]));
+  const validPlaces = places.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
+  const placeById = new Map(validPlaces.map(p => [String(p.id), p]));
 
   const connections: ConnectionView[] = [];
   mapViewData.connections.forEach((conn, idx) => {
@@ -410,12 +409,8 @@ function buildDispatchModel(
 
     const startOwned = startPlace.isOwned;
     const endOwned = endPlace.isOwned;
-    const startInRoute = startPlace.placeInstanceId
-      ? routeSet.has(startPlace.placeInstanceId)
-      : false;
-    const endInRoute = endPlace.placeInstanceId
-      ? routeSet.has(endPlace.placeInstanceId)
-      : false;
+    const startInRoute = startPlace.placeInstanceId ? routeSet.has(startPlace.placeInstanceId) : false;
+    const endInRoute = endPlace.placeInstanceId ? routeSet.has(endPlace.placeInstanceId) : false;
     const status = resolveConnectionStatus({
       startOwned,
       endOwned,
@@ -450,11 +445,7 @@ function buildDispatchModel(
   };
 }
 
-function buildModel(
-  mapViewData: MapViewData,
-  mode: MapMode,
-  options: BuildOptions
-): PlayerMapModel {
+function buildModel(mapViewData: MapViewData, mode: MapMode, options: BuildOptions): PlayerMapModel {
   if (mode === 'DISPATCH') {
     return buildDispatchModel(mapViewData, {
       ...options,
@@ -462,6 +453,7 @@ function buildModel(
       reachableNextPlaceInstanceIds: options.reachableNextPlaceInstanceIds ?? new Set(),
     });
   }
+
   // NORMAL mode does not consume any of the per-render options.
   return buildNormalModel(mapViewData);
 }
@@ -474,15 +466,12 @@ interface PlayerMapViewProps {
   mapViewData: MapViewData;
   selectedPlace: { lat: number; lng: number } | null;
   onPlaceClick: (place: PlaceWithOwnership, isOwned: boolean) => void;
-  // Dispatch mode - when active, clicking owned places goes to dispatch
-  // handler instead of job board.
+  // Dispatch mode - when active, clicking owned places goes to dispatch handler instead of job board.
   dispatchMode?: boolean;
   onDispatchPlaceClick?: (placeInstanceId: string) => void;
-  // Active route being built (place instance IDs, in order). Empty when not
-  // in dispatch mode.
+  // Active route being built (place instance IDs, in order). Empty when not in dispatch mode.
   route?: string[];
-  // Set of place instance IDs that are valid next stops from the current
-  // route endpoint.
+  // Set of place instance IDs that are valid next stops from the current route endpoint.
   reachableNextPlaceInstanceIds?: Set<string>;
 }
 
@@ -502,13 +491,7 @@ export default function PlayerMapView({
         route,
         reachableNextPlaceInstanceIds,
       }),
-    [
-      mapViewData,
-      dispatchMode,
-      selectedPlace,
-      route,
-      reachableNextPlaceInstanceIds,
-    ]
+    [mapViewData, dispatchMode, selectedPlace, route, reachableNextPlaceInstanceIds],
   );
 
   // Dev-only inspector — toggled with the keyboard shortcut below; lets a
@@ -543,7 +526,7 @@ export default function PlayerMapView({
         <FitBounds places={model.places} />
 
         {/* Connections */}
-        {model.connections.map((c) => (
+        {model.connections.map(c => (
           <Polyline
             key={c.id}
             positions={c.positions}
@@ -558,22 +541,17 @@ export default function PlayerMapView({
 
         {/* In-progress route (green) */}
         {model.routePolyline.length >= 2 && (
-          <Polyline
-            positions={model.routePolyline}
-            pathOptions={{ color: '#16a34a', weight: 5, opacity: 0.9 }}
-          />
+          <Polyline positions={model.routePolyline} pathOptions={{ color: '#16a34a', weight: 5, opacity: 0.9 }} />
         )}
 
         {/* Place markers */}
-        {model.places.map((p) => (
+        {model.places.map(p => (
           <PlaceMarker
             key={p.placeInstanceId ?? `available-${p.id}`}
             place={p}
             onClick={() => onPlaceClick(p, p.isOwned)}
             dispatchMode={model.mode === 'DISPATCH'}
-            onDispatchClick={
-              model.mode === 'DISPATCH' ? onDispatchPlaceClick : undefined
-            }
+            onDispatchClick={model.mode === 'DISPATCH' ? onDispatchPlaceClick : undefined}
             markerState={markerStateFor(p)}
           />
         ))}
@@ -599,14 +577,14 @@ export default function PlayerMapView({
               {
                 mode: model.mode,
                 center: model.center,
-                places: model.places.map((p) => ({
+                places: model.places.map(p => ({
                   id: p.id,
                   instanceId: p.placeInstanceId,
                   status: p.status,
                   markerColor: p.markerColor,
                   clickable: p.clickable,
                 })),
-                connections: model.connections.map((c) => ({
+                connections: model.connections.map(c => ({
                   id: c.id,
                   status: c.status,
                   color: c.color,
@@ -616,7 +594,7 @@ export default function PlayerMapView({
                 routePolyline: model.routePolyline,
               },
               null,
-              2
+              2,
             )}
           </pre>
         </div>
