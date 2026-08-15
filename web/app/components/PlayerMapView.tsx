@@ -398,43 +398,7 @@ function buildDispatchModel(
   const validPlaces = places.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
   const placeById = new Map(validPlaces.map(p => [String(p.id), p]));
 
-  const connections: ConnectionView[] = [];
-  mapViewData.connections.forEach((conn, idx) => {
-    const startId = conn.startId?.toString();
-    const endId = conn.endId?.toString();
-    if (!startId || !endId) return;
-    const startPlace = placeById.get(startId);
-    const endPlace = placeById.get(endId);
-    if (!startPlace || !endPlace) return;
-
-    const startOwned = startPlace.isOwned;
-    const endOwned = endPlace.isOwned;
-    const startInRoute = startPlace.placeInstanceId ? routeSet.has(startPlace.placeInstanceId) : false;
-    const endInRoute = endPlace.placeInstanceId ? routeSet.has(endPlace.placeInstanceId) : false;
-    const status = resolveConnectionStatus({
-      startOwned,
-      endOwned,
-      startInRoute,
-      endInRoute,
-      mode: 'DISPATCH',
-      route,
-      startPlaceInstanceId: startPlace.placeInstanceId,
-      endPlaceInstanceId: endPlace.placeInstanceId,
-    });
-    const style = statusToConnectionStyle(status);
-    connections.push({
-      id: String(conn.id ?? `${idx}`),
-      startId,
-      endId,
-      type: String(conn.type ?? ''),
-      status,
-      positions: [
-        [startPlace.lat, startPlace.lng],
-        [endPlace.lat, endPlace.lng],
-      ],
-      ...style,
-    });
-  });
+  const connections = buildDispatchConnections(mapViewData.connections, placeById, routeSet, route);
 
   return {
     mode: 'DISPATCH',
@@ -456,6 +420,62 @@ function buildModel(mapViewData: MapViewData, mode: MapMode, options: BuildOptio
 
   // NORMAL mode does not consume any of the per-render options.
   return buildNormalModel(mapViewData);
+}
+
+/**
+ * Builds ConnectionView array by resolving ownership, route-inclusion status,
+ * and visual style (color, weight, opacity, dash pattern) for each connection.
+ */
+function buildDispatchConnections(
+  connections: any[],
+  placeById: Map<string, PlaceView>,
+  routeSet: Set<string>,
+  route: string[],
+): ConnectionView[] {
+  return connections
+    .map((conn, idx) => {
+      const startId = conn.startId?.toString();
+      const endId = conn.endId?.toString();
+      if (!startId || !endId) {
+        return null;
+      }
+
+      const startPlace = placeById.get(startId);
+      const endPlace = placeById.get(endId);
+      if (!startPlace || !endPlace) {
+        return null;
+      }
+
+      const startOwned = startPlace.isOwned;
+      const endOwned = endPlace.isOwned;
+      const startInRoute = startPlace.placeInstanceId ? routeSet.has(startPlace.placeInstanceId) : false;
+      const endInRoute = endPlace.placeInstanceId ? routeSet.has(endPlace.placeInstanceId) : false;
+      const status = resolveConnectionStatus({
+        startOwned,
+        endOwned,
+        startInRoute,
+        endInRoute,
+        mode: 'DISPATCH',
+        route,
+        startPlaceInstanceId: startPlace.placeInstanceId,
+        endPlaceInstanceId: endPlace.placeInstanceId,
+      });
+
+      const style = statusToConnectionStyle(status);
+      return {
+        id: String(conn.id ?? `${idx}`),
+        startId,
+        endId,
+        type: String(conn.type ?? ''),
+        status,
+        positions: [
+          [startPlace.lat, startPlace.lng],
+          [endPlace.lat, endPlace.lng],
+        ],
+        ...style,
+      } as ConnectionView;
+    })
+    .filter((c): c is ConnectionView => c !== null);
 }
 
 // ---------------------------------------------------------------------------
