@@ -26,7 +26,7 @@ export default function GameControlPanel({
   return (
     <div className="flex flex-col h-full">
       <Tabs defaultValue="places" className="flex flex-col flex-1">
-        <TabsList className="w-full">
+        <TabsList className="w-full rounded-none">
           <TabsTrigger value="player">
             Player
           </TabsTrigger>
