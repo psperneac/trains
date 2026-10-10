@@ -170,7 +170,7 @@ export class PlaceConnectionsService extends AbstractMongoService<PlaceConnectio
           });
           copiedCount++;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Failed to copy connection "${connection.name}" (${connection.startId} -> ${connection.endId}):`, error.message);
         errorCount++;
       }

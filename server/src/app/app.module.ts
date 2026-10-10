@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import * as Joi from 'joi';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 
 import { AuthenticationModule } from '../authentication/authentication.module';
 import { DatabaseModule } from '../database/database.module';
@@ -22,7 +23,7 @@ import { AppService } from './app.service';
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().required()
-      })
+      }) as unknown as StandardSchemaV1
     }),
     DatabaseModule,
     AuthenticationModule,

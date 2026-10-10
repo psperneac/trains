@@ -140,7 +140,7 @@ export class PlacesService extends AbstractMongoService<Place> {
           });
           copiedCount++;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Failed to copy place "${place.name}":`, error.message);
         errorCount++;
       }

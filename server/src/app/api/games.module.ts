@@ -217,7 +217,7 @@ export class GamesController extends AbstractMongoServiceController<Game, GameDt
     try {
       const game = await this.gamesService.lock(id, adminId);
       return this.gameMapper.toDto(game);
-    } catch (err) {
+    } catch (err: any) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -229,7 +229,7 @@ export class GamesController extends AbstractMongoServiceController<Game, GameDt
     try {
       const game = await this.gamesService.unlock(id, adminId);
       return this.gameMapper.toDto(game);
-    } catch (err) {
+    } catch (err: any) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -240,7 +240,7 @@ export class GamesController extends AbstractMongoServiceController<Game, GameDt
     const adminId = (request as any).user?._id?.toString();
     try {
       return await this.gamesService.delete(id, adminId);
-    } catch (err) {
+    } catch (err: any) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
